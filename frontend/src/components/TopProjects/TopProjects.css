@@ -1,0 +1,57 @@
+.top-projects{
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+}
+
+.top-projects h2{
+
+    margin:0 0 20px;
+
+    color:#005AA9;
+
+    font-size:22px;
+
+}
+
+.top-project-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #ECECEC;
+
+}
+
+.top-project-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.top-project-row span{
+
+    color:#333;
+
+    font-weight:600;
+
+}
+
+.top-project-row strong{
+
+    color:#F58220;
+
+    font-size:20px;
+
+}

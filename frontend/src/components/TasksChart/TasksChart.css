@@ -1,0 +1,23 @@
+.tasks-chart{
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    margin-bottom:24px;
+
+}
+
+.tasks-chart h2{
+
+    margin:0 0 20px;
+
+    color:#005AA9;
+
+    font-size:22px;
+
+}

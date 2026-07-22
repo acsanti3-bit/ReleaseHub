@@ -1,0 +1,67 @@
+.attention-projects{
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    margin-bottom:24px;
+
+}
+
+.attention-projects h2{
+
+    margin-bottom:20px;
+
+    color:#005AA9;
+
+}
+
+.attention-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 0;
+
+    border-bottom:1px solid #EEE;
+
+}
+
+.attention-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.attention-badges{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
+
+}
+
+.attention-badges span{
+
+    background:#F58220;
+
+    color:#FFF;
+
+    padding:5px 10px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}

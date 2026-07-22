@@ -1,0 +1,53 @@
+.status-bar{
+
+    display:grid;
+
+    grid-template-columns:160px 1fr 45px;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.status-label{
+
+    font-size:15px;
+
+    color:#555;
+
+    font-weight:500;
+
+}
+
+.status-progress{
+
+    height:12px;
+
+    background:#ECECEC;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+}
+
+.status-fill{
+
+    height:100%;
+
+    border-radius:20px;
+
+    transition:.4s;
+
+}
+
+.status-bar strong{
+
+    color:#005AA9;
+
+    font-size:18px;
+
+    text-align:right;
+
+}

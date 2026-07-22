@@ -1,0 +1,371 @@
+.tv-dashboard{
+
+    width:100vw;
+
+    height:100vh;
+
+    padding:16px;
+
+    box-sizing:border-box;
+
+    background:#EEF3F8;
+
+    display:grid;
+
+    grid-template-rows:auto auto minmax(0,1fr);
+
+    gap:14px;
+
+    overflow:hidden;
+
+}
+
+/* HEADER */
+
+.tv-header{
+
+    min-height:82px;
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    padding:14px 24px;
+
+    box-sizing:border-box;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:24px;
+
+    box-shadow:0 6px 20px rgba(0,0,0,.07);
+
+}
+
+/* MARCA */
+
+.tv-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    min-width:0;
+
+}
+
+.tv-logo{
+
+    width:auto;
+
+    height:54px;
+
+    object-fit:contain;
+
+    flex-shrink:0;
+
+}
+
+.tv-brand-text{
+
+    min-width:0;
+
+}
+
+.tv-brand-text h1{
+
+    margin:0;
+
+    color:#005AA9;
+
+    font-size:30px;
+
+    font-weight:750;
+
+    line-height:1;
+
+    letter-spacing:-.5px;
+
+}
+
+.tv-brand-subtitle{
+
+    margin-top:8px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.tv-brand-subtitle > span{
+
+    color:#68737D;
+
+    font-size:13px;
+
+    font-weight:500;
+
+}
+
+/* PAINEL ATIVO */
+
+.tv-online{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    color:#2E7D32;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    background:#EDF7EE;
+
+    padding:4px 8px;
+
+    border-radius:20px;
+
+}
+
+.tv-online-dot{
+
+    width:7px;
+
+    height:7px;
+
+    border-radius:50%;
+
+    background:#43A047;
+
+    box-shadow:0 0 0 3px rgba(67,160,71,.12);
+
+}
+
+/* LADO DIREITO */
+
+.tv-header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:24px;
+
+    flex-shrink:0;
+
+}
+
+/* ÚLTIMA ATUALIZAÇÃO */
+
+.tv-last-update{
+
+    padding-right:24px;
+
+    border-right:1px solid #E3E7EB;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:3px;
+
+}
+
+.tv-last-update span{
+
+    color:#98A1AA;
+
+    font-size:10px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:.4px;
+
+}
+
+.tv-last-update strong{
+
+    color:#505B65;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+/* RELÓGIO */
+
+.tv-clock{
+
+    min-width:220px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+}
+
+.tv-clock strong{
+
+    color:#005AA9;
+
+    font-size:36px;
+
+    font-weight:750;
+
+    line-height:1;
+
+}
+
+.tv-clock small{
+
+    margin-top:6px;
+
+    color:#66717C;
+
+    font-size:12px;
+
+    font-weight:500;
+
+    text-transform:capitalize;
+
+    white-space:nowrap;
+
+}
+
+/* GRID DOS PROJETOS */
+
+.tv-grid{
+
+    min-height:0;
+
+    display:grid;
+
+    grid-template-columns:repeat(3,minmax(0,1fr));
+
+    grid-template-rows:repeat(2,minmax(0,1fr));
+
+    gap:14px;
+
+    overflow:hidden;
+
+}
+
+/* MONITORES UM POUCO MENORES */
+
+@media(max-width:1400px){
+
+    .tv-dashboard{
+
+        padding:12px;
+
+        gap:10px;
+
+    }
+
+    .tv-header{
+
+        min-height:72px;
+
+        padding:10px 18px;
+
+    }
+
+    .tv-logo{
+
+        height:46px;
+
+    }
+
+    .tv-brand-text h1{
+
+        font-size:25px;
+
+    }
+
+    .tv-clock strong{
+
+        font-size:31px;
+
+    }
+
+    .tv-clock{
+
+        min-width:190px;
+
+    }
+
+    .tv-grid{
+
+        gap:10px;
+
+    }
+
+}
+
+/* FORA DO MODO TV */
+
+@media(max-width:1000px){
+
+    .tv-dashboard{
+
+        width:100%;
+
+        height:auto;
+
+        min-height:100vh;
+
+        overflow:auto;
+
+    }
+
+    .tv-header{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+    .tv-header-right{
+
+        justify-content:space-between;
+
+    }
+
+    .tv-clock{
+
+        min-width:0;
+
+    }
+
+    .tv-grid{
+
+        grid-template-columns:1fr;
+
+        grid-template-rows:auto;
+
+        overflow:visible;
+
+    }
+
+}

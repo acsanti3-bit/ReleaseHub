@@ -1,0 +1,367 @@
+.project-card{
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+    border-left:6px solid #F58220;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+    transition:.25s;
+
+}
+
+.project-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.12);
+
+}
+
+.project-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+}
+
+.project-header h2{
+
+    margin:0;
+
+    color:#005AA9;
+
+    font-size:30px;
+
+    font-weight:700;
+
+}
+
+.project-subtitle{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-top:8px;
+
+}
+
+.project-subtitle span:first-child{
+
+    color:#777;
+
+    font-size:15px;
+
+}
+
+.task-total{
+
+    background:#EEF5FF;
+
+    color:#005AA9;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.project-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.status-badge{
+
+    color:#FFF;
+
+    padding:7px 14px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    white-space:nowrap;
+
+}
+
+.edit-button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#F5F5F5;
+
+    color:#005AA9;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transition:.2s;
+
+}
+
+.edit-button:hover{
+
+    background:#005AA9;
+
+    color:#FFF;
+
+}
+
+.project-info{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:24px;
+
+    padding:20px 0;
+
+    border-top:1px solid #ECECEC;
+
+    border-bottom:1px solid #ECECEC;
+
+}
+
+.project-info div{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.project-info small{
+
+    color:#888;
+
+    font-size:12px;
+
+    text-transform:uppercase;
+
+    margin-bottom:6px;
+
+}
+
+.project-info strong{
+
+    color:#222;
+
+    font-size:17px;
+
+}
+
+.progress-area{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.progress-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.progress-header span{
+
+    color:#666;
+
+    font-size:14px;
+
+}
+
+.progress-header strong{
+
+    color:#005AA9;
+
+    font-size:16px;
+
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:12px;
+
+    background:#ECECEC;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    height:100%;
+
+    background:linear-gradient(90deg,#43A047,#66BB6A);
+
+    border-radius:30px;
+
+    transition:.35s;
+
+}
+
+.status-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+}
+
+.status-row{
+
+    display:grid;
+
+    grid-template-columns:170px 1fr 45px;
+
+    gap:14px;
+
+    align-items:center;
+
+}
+
+.status-name{
+
+    color:#444;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+.status-bar{
+
+    width:100%;
+
+    height:12px;
+
+    background:#ECECEC;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+}
+
+.status-fill{
+
+    height:100%;
+
+    border-radius:30px;
+
+    transition:.3s;
+
+}
+
+.status-row strong{
+
+    color:#005AA9;
+
+    font-size:17px;
+
+    text-align:right;
+
+}
+
+.project-card.late{
+
+    border-left-color:#E53935;
+
+}
+
+.project-card.today{
+
+    border-left-color:#F58220;
+
+}
+
+@media(max-width:900px){
+
+    .project-header{
+
+        flex-direction:column;
+
+        gap:18px;
+
+    }
+
+    .project-actions{
+
+        width:100%;
+
+        justify-content:space-between;
+
+    }
+
+    .project-info{
+
+        grid-template-columns:1fr;
+
+        gap:18px;
+
+    }
+
+    .status-row{
+
+        grid-template-columns:110px 1fr 35px;
+
+    }
+
+}

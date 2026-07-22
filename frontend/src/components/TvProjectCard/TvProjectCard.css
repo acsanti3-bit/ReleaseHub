@@ -1,0 +1,261 @@
+.tv-project-card{
+
+    background:#FFF;
+
+    border-radius:18px;
+
+    border-top:6px solid #005AA9;
+
+    padding:15px 18px;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    display:flex;
+
+    flex-direction:column;
+
+    height:100%;
+
+    min-height:0;
+
+    box-sizing:border-box;
+
+    overflow:hidden;
+
+}
+
+.tv-card-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding-bottom:11px;
+
+    border-bottom:1px solid #ECECEC;
+
+    flex-shrink:0;
+
+}
+
+.tv-card-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+
+}
+
+.tv-project-dot{
+
+    width:11px;
+
+    height:11px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+
+}
+
+.tv-card-header h3{
+
+    margin:0;
+
+    font-size:23px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.tv-version{
+
+    background:#F3F6F9;
+
+    color:#4A5560;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    flex-shrink:0;
+
+}
+
+/* STATUS */
+
+.tv-status-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-evenly;
+
+    flex:1;
+
+    min-height:0;
+
+    padding:6px 0;
+
+}
+
+.tv-status-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    min-height:25px;
+
+    padding:2px 7px;
+
+    border-radius:7px;
+
+    box-sizing:border-box;
+
+}
+
+.tv-status-row:nth-child(even){
+
+    background:#F8FAFC;
+
+}
+
+.tv-status-name{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    color:#4B5563;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.tv-status-dot{
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+
+}
+
+.tv-status-row strong{
+
+    min-width:32px;
+
+    text-align:right;
+
+    font-size:18px;
+
+    font-weight:800;
+
+}
+
+/* STATUS ZERADO */
+
+.tv-status-zero .tv-status-name{
+
+    color:#222;
+
+    font-weight:400;
+
+}
+
+.tv-status-zero strong{
+
+    color:#222 !important;
+
+    font-weight:400;
+
+}
+
+/* DATAS */
+
+.tv-dates{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+
+    padding-top:9px;
+
+    border-top:1px solid #ECECEC;
+
+    flex-shrink:0;
+
+}
+
+.tv-dates div{
+
+    min-width:0;
+
+}
+
+.tv-dates small{
+
+    display:block;
+
+    margin-bottom:3px;
+
+    color:#8A939D;
+
+    font-size:10px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+}
+
+.tv-dates strong{
+
+    display:block;
+
+    color:#263238;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}

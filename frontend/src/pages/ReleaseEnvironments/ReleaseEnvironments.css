@@ -1,0 +1,281 @@
+ReleaseEnvironments.release-page{
+
+    padding:28px;
+
+}
+
+.release-page-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:22px;
+
+}
+
+.release-page-header h1{
+
+    margin:0;
+
+    color:#1F2937;
+
+    font-size:28px;
+
+}
+
+.release-page-header p{
+
+    margin:6px 0 0;
+
+    color:#7B8490;
+
+    font-size:14px;
+
+}
+
+.new-environment-button{
+
+    height:42px;
+
+    padding:0 17px;
+
+    border:none;
+
+    border-radius:9px;
+
+    background:#005AA9;
+
+    color:#FFF;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.new-environment-button:hover{
+
+    background:#004B8C;
+
+}
+
+.release-info{
+
+    background:#EEF6FD;
+
+    border:1px solid #D7EAF9;
+
+    border-radius:12px;
+
+    padding:14px 18px;
+
+    margin-bottom:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:#005AA9;
+
+}
+
+.release-info div{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:2px;
+
+}
+
+.release-info strong{
+
+    font-size:13px;
+
+}
+
+.release-info span{
+
+    color:#617181;
+
+    font-size:12px;
+
+}
+
+.release-table-container{
+
+    background:#FFF;
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.06);
+
+}
+
+.release-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.release-table thead{
+
+    background:#F6F8FA;
+
+}
+
+.release-table th{
+
+    padding:13px 14px;
+
+    text-align:left;
+
+    color:#667085;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+
+}
+
+.release-table td{
+
+    padding:15px 14px;
+
+    border-top:1px solid #EDF0F2;
+
+    color:#4B5563;
+
+    font-size:13px;
+
+    white-space:nowrap;
+
+}
+
+.release-table tbody tr:hover{
+
+    background:#FAFCFE;
+
+}
+
+.release-name{
+
+    color:#263238;
+
+}
+
+.release-reference-version{
+
+    color:#005AA9 !important;
+
+    font-weight:700;
+
+}
+
+.release-actions-column{
+
+    width:80px;
+
+    text-align:center !important;
+
+}
+
+.release-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:6px;
+
+}
+
+.release-actions button{
+
+    width:32px;
+
+    height:32px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:0;
+
+    border-radius:7px;
+
+    background:#EEF4F8;
+
+    color:#005AA9;
+
+    cursor:pointer;
+
+}
+
+.release-actions button:hover{
+
+    background:#DDEBF5;
+
+}
+
+.release-actions .delete-environment{
+
+    color:#D92D20;
+
+    background:#FFF1F0;
+
+}
+
+.release-actions .delete-environment:hover{
+
+    background:#FEE4E2;
+
+}
+
+.release-empty{
+
+    padding:50px;
+
+    text-align:center;
+
+    color:#98A2B3;
+
+    font-size:14px;
+
+}
+
+@media(max-width:1300px){
+
+    .release-table-container{
+
+        overflow-x:auto;
+
+    }
+
+}

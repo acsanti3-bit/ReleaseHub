@@ -1,0 +1,233 @@
+.compatibility-panel{
+
+    background:#FFF;
+
+    border-radius:14px;
+
+    min-height:56px;
+
+    padding:0 20px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.07);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    box-sizing:border-box;
+
+}
+
+.compatibility-title{
+
+    width:185px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    gap:3px;
+
+    white-space:nowrap;
+
+}
+
+.compatibility-title strong{
+
+    color:#005AA9;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+.compatibility-title small{
+
+    color:#F58220;
+
+    font-size:11px;
+
+    font-weight:700;
+
+}
+
+.compatibility-line{
+
+    flex:1;
+
+    display:grid;
+
+    grid-template-columns:repeat(6,minmax(0,1fr));
+
+    align-items:center;
+
+    height:100%;
+
+}
+
+.compatibility-version{
+
+    min-width:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    padding:0 12px;
+
+    box-sizing:border-box;
+
+    color:#005AA9;
+
+}
+
+.compatibility-version:not(:first-child){
+
+    border-left:1px solid #DDE3EA;
+
+}
+
+.compatibility-version svg{
+
+    flex-shrink:0;
+
+    color:#005AA9;
+
+}
+
+.compatibility-version span{
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    gap:2px;
+
+}
+
+.compatibility-version strong{
+
+    color:#005AA9;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+.compatibility-version small{
+
+    color:#4D5964;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+}
+
+.compatibility-empty{
+
+    flex:1;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#777;
+
+    font-size:13px;
+
+}
+
+.compatibility-empty strong{
+
+    color:#005AA9;
+
+}
+
+@media(max-width:1500px){
+
+    .compatibility-title{
+
+        width:155px;
+
+    }
+
+    .compatibility-version{
+
+        padding:0 6px;
+
+        gap:5px;
+
+    }
+
+    .compatibility-version strong{
+
+        font-size:11px;
+
+    }
+
+    .compatibility-version small{
+
+        font-size:11px;
+
+    }
+
+}
+
+@media(max-width:1000px){
+
+    .compatibility-panel{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+        padding:14px;
+
+    }
+
+    .compatibility-title{
+
+        width:auto;
+
+    }
+
+    .compatibility-line{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:10px;
+
+    }
+
+    .compatibility-version{
+
+        justify-content:flex-start;
+
+        border-left:none !important;
+
+    }
+
+}

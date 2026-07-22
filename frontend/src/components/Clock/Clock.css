@@ -1,0 +1,19 @@
+.clock{
+    text-align:right;
+}
+
+.clock h1{
+    color:#005AA9;
+    font-size:40px;
+    margin:0;
+}
+
+.clock h2{
+    margin:0;
+    color:#555;
+}
+
+.clock span{
+    color:#999;
+    font-size:15px;
+}
