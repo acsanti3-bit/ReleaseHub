@@ -9,15 +9,18 @@ async function requisicao<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-
   const response =
     await fetch(
       url,
-      options
+      {
+        credentials:
+          "include",
+
+        ...options,
+      }
     );
 
   if (!response.ok) {
-
     const texto =
       await response.text();
 
@@ -25,20 +28,30 @@ async function requisicao<T>(
       texto ||
       "Erro ao comunicar com a API."
     );
-
   }
 
   return response.json();
-
 }
 
 export async function listarAmbientes():
   Promise<ReleaseEnvironment[]> {
-
   return requisicao<
     ReleaseEnvironment[]
   >(API_URL);
+}
 
+export async function buscarAmbientePorId(
+  id: number
+): Promise<
+  ReleaseEnvironment | undefined
+> {
+  const ambientes =
+    await listarAmbientes();
+
+  return ambientes.find(
+    ambiente =>
+      ambiente.id === id
+  );
 }
 
 export async function buscarAmbientePorIntellicash(
@@ -46,7 +59,6 @@ export async function buscarAmbientePorIntellicash(
 ): Promise<
   ReleaseEnvironment | undefined
 > {
-
   const ambientes =
     await listarAmbientes();
 
@@ -55,18 +67,88 @@ export async function buscarAmbientePorIntellicash(
       ambiente.versoes.intellicash ===
       versaoIntellicash
   );
+}
 
+function compararVersoes(
+  versaoA: string,
+  versaoB: string
+): number {
+  const partesA =
+    versaoA
+      .split(".")
+      .map(
+        parte =>
+          Number(parte) || 0
+      );
+
+  const partesB =
+    versaoB
+      .split(".")
+      .map(
+        parte =>
+          Number(parte) || 0
+      );
+
+  const tamanho =
+    Math.max(
+      partesA.length,
+      partesB.length
+    );
+
+  for (
+    let index = 0;
+    index < tamanho;
+    index++
+  ) {
+    const valorA =
+      partesA[index] ?? 0;
+
+    const valorB =
+      partesB[index] ?? 0;
+
+    if (
+      valorA !== valorB
+    ) {
+      return (
+        valorA -
+        valorB
+      );
+    }
+  }
+
+  return 0;
+}
+
+export function ordenarAmbientesPorVersao(
+  ambientes: ReleaseEnvironment[]
+): ReleaseEnvironment[] {
+  return [
+    ...ambientes,
+  ].sort(
+    (a, b) =>
+      compararVersoes(
+        b.versoes.intellicash,
+        a.versoes.intellicash
+      )
+  );
+}
+
+export function obterAmbienteMaisRecente(
+  ambientes: ReleaseEnvironment[]
+): ReleaseEnvironment | undefined {
+  return ordenarAmbientesPorVersao(
+    ambientes
+  )[0];
 }
 
 export async function adicionarAmbiente(
   ambiente: ReleaseEnvironment
 ): Promise<ReleaseEnvironment> {
-
   return requisicao<ReleaseEnvironment>(
     API_URL,
     {
-
-      method: "POST",
+      method:
+        "POST",
 
       headers: {
         "Content-Type":
@@ -77,21 +159,18 @@ export async function adicionarAmbiente(
         JSON.stringify(
           ambiente
         ),
-
     }
   );
-
 }
 
 export async function editarAmbiente(
   ambiente: ReleaseEnvironment
 ): Promise<ReleaseEnvironment> {
-
   return requisicao<ReleaseEnvironment>(
     API_URL,
     {
-
-      method: "PUT",
+      method:
+        "PUT",
 
       headers: {
         "Content-Type":
@@ -102,50 +181,49 @@ export async function editarAmbiente(
         JSON.stringify(
           ambiente
         ),
-
     }
   );
-
 }
 
 export async function excluirAmbiente(
   id: number
 ): Promise<void> {
-
   await requisicao(
     `${API_URL}?id=${id}`,
     {
-      method: "DELETE",
+      method:
+        "DELETE",
     }
   );
-
 }
 
 export function criarAmbiente():
   ReleaseEnvironment {
-
   return {
+    id:
+      Date.now(),
 
-    id: Date.now(),
-
-    nome: "",
+    nome:
+      "",
 
     versoes: {
+      intellicash:
+        "",
 
-      intellicash: "",
+      easycash:
+        "",
 
-      easycash: "",
+      easycheckout:
+        "",
 
-      easycheckout: "",
+      easypdv:
+        "",
 
-      easypdv: "",
+      intellistock:
+        "",
 
-      intellistock: "",
-
-      iwbserver: "",
-
+      iwbserver:
+        "",
     },
-
   };
-
 }

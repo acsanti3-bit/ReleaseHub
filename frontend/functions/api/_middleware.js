@@ -38,13 +38,19 @@ export async function onRequest(
   /*
     Leituras necessárias para
     o Modo TV continuam públicas.
+
+    A TV precisa consultar:
+    - projetos
+    - ambientes
+    - projetos vinculados a uma release
   */
 
   const leituraPublica =
     metodo === "GET" &&
     (
       caminho === "/api/projects" ||
-      caminho === "/api/environments"
+      caminho === "/api/environments" ||
+      caminho === "/api/release-projects"
     );
 
 
@@ -110,16 +116,14 @@ export async function onRequest(
 
 
   /*
-    Visualizador possui
-    acesso somente leitura.
-
-    Qualquer alteração em projetos
-    ou ambientes é bloqueada.
+    Rotas que alteram dados
+    operacionais do ReleaseHub.
   */
 
   const rotaOperacional =
     caminho === "/api/projects" ||
-    caminho === "/api/environments";
+    caminho === "/api/environments" ||
+    caminho === "/api/release-projects";
 
 
   const metodoAlteracao =
@@ -132,6 +136,14 @@ export async function onRequest(
       metodo
     );
 
+
+  /*
+    Visualizador possui
+    acesso somente leitura.
+
+    Mesmo tentando alterar pela API,
+    a requisição será bloqueada.
+  */
 
   if (
     usuario.role === "visualizador" &&

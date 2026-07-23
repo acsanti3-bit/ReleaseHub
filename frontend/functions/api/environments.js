@@ -1,15 +1,12 @@
 function transformarAmbiente(
   row
 ) {
-
   return {
-
     id: row.id,
 
     nome: row.nome,
 
     versoes: {
-
       intellicash:
         row.intellicash,
 
@@ -27,18 +24,14 @@ function transformarAmbiente(
 
       iwbserver:
         row.iwbserver,
-
     },
-
   };
-
 }
 
 function respostaErro(
   mensagem,
   status = 500
 ) {
-
   return Response.json(
     {
       erro: mensagem,
@@ -47,8 +40,134 @@ function respostaErro(
       status,
     }
   );
-
 }
+
+function obterVersaoProjeto(
+  nome,
+  versoes
+) {
+  const projeto =
+    String(nome || "")
+      .toLowerCase();
+
+  if (
+    projeto.includes(
+      "intellicash"
+    ) ||
+    projeto.includes(
+      "intelicash"
+    )
+  ) {
+    return versoes.intellicash ?? "";
+  }
+
+  if (
+    projeto.includes(
+      "easycash"
+    )
+  ) {
+    return versoes.easycash ?? "";
+  }
+
+  if (
+    projeto.includes(
+      "easycheckout"
+    )
+  ) {
+    return versoes.easycheckout ?? "";
+  }
+
+  if (
+    projeto.includes(
+      "easypdv"
+    )
+  ) {
+    return versoes.easypdv ?? "";
+  }
+
+  if (
+    projeto.includes(
+      "intellistock"
+    ) ||
+    projeto.includes(
+      "isa"
+    )
+  ) {
+    return versoes.intellistock ?? "";
+  }
+
+  if (
+    projeto.includes(
+      "iwb"
+    )
+  ) {
+    return versoes.iwbserver ?? "";
+  }
+
+  return "";
+}
+
+async function sincronizarProjetos(
+  context,
+  environmentId,
+  versoes
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            nome
+          FROM projects
+          ORDER BY id
+        `
+      )
+      .all();
+
+  for (
+    const projeto of
+    resultado.results
+  ) {
+    const versao =
+      obterVersaoProjeto(
+        projeto.nome,
+        versoes
+      );
+
+    await context.env.DB
+      .prepare(
+        `
+          INSERT INTO release_projects (
+            environment_id,
+            project_id,
+            versao
+          )
+
+          VALUES (?, ?, ?)
+
+          ON CONFLICT(
+            environment_id,
+            project_id
+          )
+
+          DO UPDATE SET
+            versao =
+              excluded.versao,
+
+            updated_at =
+              CURRENT_TIMESTAMP
+        `
+      )
+      .bind(
+        environmentId,
+        projeto.id,
+        versao
+      )
+      .run();
+  }
+}
+
 
 /*
   GET /api/environments
@@ -57,9 +176,7 @@ function respostaErro(
 export async function onRequestGet(
   context
 ) {
-
   try {
-
     const resultado =
       await context.env.DB
         .prepare(
@@ -73,7 +190,9 @@ export async function onRequestGet(
               easypdv,
               intellistock,
               iwbserver
+
             FROM release_environments
+
             ORDER BY id DESC
           `
         )
@@ -87,9 +206,7 @@ export async function onRequestGet(
     return Response.json(
       ambientes
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao listar ambientes:",
       erro
@@ -98,10 +215,9 @@ export async function onRequestGet(
     return respostaErro(
       "Não foi possível listar os ambientes."
     );
-
   }
-
 }
+
 
 /*
   POST /api/environments
@@ -110,19 +226,15 @@ export async function onRequestGet(
 export async function onRequestPost(
   context
 ) {
-
   try {
-
     const body =
       await context.request.json();
 
     if (!body.nome?.trim()) {
-
       return respostaErro(
         "O nome do ambiente é obrigatório.",
         400
       );
-
     }
 
     if (
@@ -130,12 +242,10 @@ export async function onRequestPost(
         ?.intellicash
         ?.trim()
     ) {
-
       return respostaErro(
         "A versão do Intellicash é obrigatória.",
         400
       );
-
     }
 
     const id =
@@ -157,13 +267,13 @@ export async function onRequestPost(
             intellistock,
             iwbserver
           )
+
           VALUES (
             ?, ?, ?, ?, ?, ?, ?, ?
           )
         `
       )
       .bind(
-
         id,
 
         body.nome.trim(),
@@ -179,9 +289,14 @@ export async function onRequestPost(
         versoes.intellistock ?? "",
 
         versoes.iwbserver ?? ""
-
       )
       .run();
+
+    await sincronizarProjetos(
+      context,
+      id,
+      versoes
+    );
 
     return Response.json(
       {
@@ -192,9 +307,7 @@ export async function onRequestPost(
         status: 201,
       }
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao criar ambiente:",
       erro
@@ -203,10 +316,9 @@ export async function onRequestPost(
     return respostaErro(
       "Não foi possível criar o ambiente."
     );
-
   }
-
 }
+
 
 /*
   PUT /api/environments
@@ -215,28 +327,22 @@ export async function onRequestPost(
 export async function onRequestPut(
   context
 ) {
-
   try {
-
     const body =
       await context.request.json();
 
     if (!body.id) {
-
       return respostaErro(
         "O ID do ambiente é obrigatório.",
         400
       );
-
     }
 
     if (!body.nome?.trim()) {
-
       return respostaErro(
         "O nome do ambiente é obrigatório.",
         400
       );
-
     }
 
     const versoes =
@@ -260,7 +366,6 @@ export async function onRequestPut(
         `
       )
       .bind(
-
         body.nome.trim(),
 
         versoes.intellicash ?? "",
@@ -276,16 +381,27 @@ export async function onRequestPut(
         versoes.iwbserver ?? "",
 
         body.id
-
       )
       .run();
+
+    /*
+      Atualiza somente as versões
+      dos projetos vinculados.
+
+      Os números das tarefas,
+      prazo e executável permanecem.
+    */
+
+    await sincronizarProjetos(
+      context,
+      body.id,
+      versoes
+    );
 
     return Response.json(
       body
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao atualizar ambiente:",
       erro
@@ -294,10 +410,9 @@ export async function onRequestPut(
     return respostaErro(
       "Não foi possível atualizar o ambiente."
     );
-
   }
-
 }
+
 
 /*
   DELETE /api/environments?id=123
@@ -306,9 +421,7 @@ export async function onRequestPut(
 export async function onRequestDelete(
   context
 ) {
-
   try {
-
     const url =
       new URL(
         context.request.url
@@ -322,13 +435,21 @@ export async function onRequestDelete(
       );
 
     if (!id) {
-
       return respostaErro(
         "O ID do ambiente é obrigatório.",
         400
       );
-
     }
+
+    await context.env.DB
+      .prepare(
+        `
+          DELETE FROM release_projects
+          WHERE environment_id = ?
+        `
+      )
+      .bind(id)
+      .run();
 
     await context.env.DB
       .prepare(
@@ -345,9 +466,7 @@ export async function onRequestDelete(
         sucesso: true,
       }
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao excluir ambiente:",
       erro
@@ -356,7 +475,5 @@ export async function onRequestDelete(
     return respostaErro(
       "Não foi possível excluir o ambiente."
     );
-
   }
-
 }
