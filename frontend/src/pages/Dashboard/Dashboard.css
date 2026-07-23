@@ -153,8 +153,6 @@
 
     outline:none;
 
-    transition:.2s;
-
 }
 
 
@@ -185,8 +183,6 @@
 
     cursor:pointer;
 
-    transition:.2s;
-
 }
 
 
@@ -213,21 +209,37 @@
 }
 
 
-/* GRID DOS PROJETOS */
+/*
+  PROJETOS
+
+  Duas colunas independentes.
+  Assim um card alto não empurra
+  o card da coluna ao lado.
+*/
 
 .dashboard-grid{
 
     display:grid;
 
     grid-template-columns:
-        repeat(
-            2,
-            minmax(0,1fr)
-        );
+        repeat(2,minmax(0,1fr));
 
-    gap:16px;
+    gap:14px;
 
     align-items:start;
+
+}
+
+
+.dashboard-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:14px;
+
+    min-width:0;
 
 }
 
@@ -236,7 +248,7 @@
 
 .dashboard-empty{
 
-    grid-column:1/-1;
+    width:100%;
 
     background:#FFF;
 
@@ -273,7 +285,7 @@
 }
 
 
-/* TELAS MENORES */
+/* RESPONSIVO */
 
 @media(max-width:1200px){
 
@@ -346,13 +358,6 @@
     .new-project{
 
         width:100%;
-
-    }
-
-
-    .dashboard-grid{
-
-        grid-template-columns:1fr;
 
     }
 

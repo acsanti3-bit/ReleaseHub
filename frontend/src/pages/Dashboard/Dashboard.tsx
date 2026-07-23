@@ -185,11 +185,24 @@ function Dashboard() {
       const ano =
         Number(resultado[3]);
 
-      return new Date(
-        ano,
-        mes - 1,
-        dia
-      ).getTime();
+      const data =
+        new Date(
+          ano,
+          mes - 1,
+          dia
+        );
+
+      if (
+        data.getFullYear() !== ano ||
+        data.getMonth() !== mes - 1 ||
+        data.getDate() !== dia
+      ) {
+
+        return Number.MAX_SAFE_INTEGER;
+
+      }
+
+      return data.getTime();
 
     }
 
@@ -220,14 +233,11 @@ function Dashboard() {
       lista =
         lista.filter(
           project =>
-
             project.nome
               .toLowerCase()
               .includes(
-                pesquisa
-                  .toLowerCase()
+                pesquisa.toLowerCase()
               )
-
         );
 
       switch (filtro) {
@@ -327,12 +337,8 @@ function Dashboard() {
 
           lista.sort(
             (a, b) =>
-              converterPrazo(
-                a.prazo
-              ) -
-              converterPrazo(
-                b.prazo
-              )
+              converterPrazo(a.prazo) -
+              converterPrazo(b.prazo)
           );
 
           break;
@@ -389,6 +395,18 @@ function Dashboard() {
       filtro,
       ordenacao,
     ]);
+
+  const colunaEsquerda =
+    projetos.filter(
+      (_, index) =>
+        index % 2 === 0
+    );
+
+  const colunaDireita =
+    projetos.filter(
+      (_, index) =>
+        index % 2 !== 0
+    );
 
   return (
 
@@ -469,33 +487,13 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Todos
-            </option>
-
-            <option>
-              Qualidade
-            </option>
-
-            <option>
-              Testes
-            </option>
-
-            <option>
-              Em Progresso
-            </option>
-
-            <option>
-              Desenvolvido
-            </option>
-
-            <option>
-              Aguard. Comp.
-            </option>
-
-            <option>
-              Atrasados
-            </option>
+            <option>Todos</option>
+            <option>Qualidade</option>
+            <option>Testes</option>
+            <option>Em Progresso</option>
+            <option>Desenvolvido</option>
+            <option>Aguard. Comp.</option>
+            <option>Atrasados</option>
 
           </select>
 
@@ -509,17 +507,9 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Nome
-            </option>
-
-            <option>
-              Prazo
-            </option>
-
-            <option>
-              Tarefas
-            </option>
+            <option>Nome</option>
+            <option>Prazo</option>
+            <option>Tarefas</option>
 
           </select>
 
@@ -533,51 +523,73 @@ function Dashboard() {
 
         </span>
 
-        <div className="dashboard-grid">
+        {carregando ? (
 
-          {carregando ? (
+          <div className="dashboard-empty">
 
-            <div className="dashboard-empty">
+            <h2>
+              Carregando projetos...
+            </h2>
 
-              <h2>
-                Carregando projetos...
-              </h2>
+          </div>
+
+        ) : projetos.length === 0 ? (
+
+          <div className="dashboard-empty">
+
+            <h2>
+              Nenhum projeto encontrado
+            </h2>
+
+            <p>
+              Tente alterar os filtros ou a pesquisa.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="dashboard-grid">
+
+            <div className="dashboard-column">
+
+              {colunaEsquerda.map(
+                project => (
+
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onOpen={
+                      setProjectSelecionado
+                    }
+                  />
+
+                )
+              )}
 
             </div>
 
-          ) : projetos.length === 0 ? (
+            <div className="dashboard-column">
 
-            <div className="dashboard-empty">
+              {colunaDireita.map(
+                project => (
 
-              <h2>
-                Nenhum projeto encontrado
-              </h2>
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onOpen={
+                      setProjectSelecionado
+                    }
+                  />
 
-              <p>
-                Tente alterar os filtros ou a pesquisa.
-              </p>
+                )
+              )}
 
             </div>
 
-          ) : (
+          </div>
 
-            projetos.map(
-              project => (
-
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onOpen={
-                    setProjectSelecionado
-                  }
-                />
-
-              )
-            )
-
-          )}
-
-        </div>
+        )}
 
       </div>
 

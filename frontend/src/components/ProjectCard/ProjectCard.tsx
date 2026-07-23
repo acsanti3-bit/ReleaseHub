@@ -9,38 +9,25 @@ import type {
 } from "../../types/project";
 
 interface Props {
-
   project: Project;
-
-  onOpen: (
-    project: Project
-  ) => void;
-
+  onOpen: (project: Project) => void;
 }
 
 interface StatusItem {
-
   label: string;
-
   value: number;
-
   color: string;
-
 }
 
 interface PrazoInfo {
-
   texto: string;
-
   detalhe: string;
-
   classe:
     | "ok"
     | "warning"
     | "late"
     | "invalid"
     | "neutral";
-
 }
 
 function converterDataBrasileira(
@@ -48,20 +35,14 @@ function converterDataBrasileira(
 ): Date | null {
 
   if (!valor) {
-
     return null;
-
   }
 
   const partes =
     valor.split("/");
 
-  if (
-    partes.length !== 3
-  ) {
-
+  if (partes.length !== 3) {
     return null;
-
   }
 
   const dia =
@@ -78,9 +59,7 @@ function converterDataBrasileira(
     !mes ||
     !ano
   ) {
-
     return null;
-
   }
 
   const data =
@@ -90,19 +69,12 @@ function converterDataBrasileira(
       dia
     );
 
-  /*
-    Também valida casos impossíveis,
-    como 31/09/2026.
-  */
-
   if (
     data.getFullYear() !== ano ||
     data.getMonth() !== mes - 1 ||
     data.getDate() !== dia
   ) {
-
     return null;
-
   }
 
   data.setHours(
@@ -123,15 +95,9 @@ function obterSituacaoPrazo(
   if (!prazoTexto) {
 
     return {
-
       texto: "Sem prazo",
-
-      detalhe:
-        "Prazo não informado",
-
-      classe:
-        "neutral",
-
+      detalhe: "Prazo não informado",
+      classe: "neutral",
     };
 
   }
@@ -144,15 +110,9 @@ function obterSituacaoPrazo(
   if (!prazo) {
 
     return {
-
       texto: "Prazo inválido",
-
-      detalhe:
-        prazoTexto,
-
-      classe:
-        "invalid",
-
+      detalhe: prazoTexto,
+      classe: "invalid",
     };
 
   }
@@ -169,130 +129,77 @@ function obterSituacaoPrazo(
 
   const diferenca =
     Math.round(
-
       (
         prazo.getTime() -
         hoje.getTime()
       ) /
-
       86400000
-
     );
 
-  if (
-    diferenca < 0
-  ) {
+  if (diferenca < 0) {
 
     const dias =
-      Math.abs(
-        diferenca
-      );
+      Math.abs(diferenca);
 
     return {
-
-      texto:
-        "Atrasado",
-
+      texto: "Atrasado",
       detalhe:
         dias === 1
           ? "1 dia em atraso"
           : `${dias} dias em atraso`,
-
-      classe:
-        "late",
-
+      classe: "late",
     };
 
   }
 
-  if (
-    diferenca === 0
-  ) {
+  if (diferenca === 0) {
 
     return {
-
-      texto:
-        "Vence hoje",
-
-      detalhe:
-        "Prazo final hoje",
-
-      classe:
-        "warning",
-
+      texto: "Vence hoje",
+      detalhe: "Prazo final hoje",
+      classe: "warning",
     };
 
   }
 
-  if (
-    diferenca === 1
-  ) {
+  if (diferenca === 1) {
 
     return {
-
-      texto:
-        "Vence amanhã",
-
-      detalhe:
-        "1 dia restante",
-
-      classe:
-        "warning",
-
+      texto: "Vence amanhã",
+      detalhe: "1 dia restante",
+      classe: "warning",
     };
 
   }
 
-  if (
-    diferenca <= 3
-  ) {
+  if (diferenca <= 3) {
 
     return {
-
-      texto:
-        "Prazo próximo",
-
-      detalhe:
-        `${diferenca} dias restantes`,
-
-      classe:
-        "warning",
-
+      texto: "Prazo próximo",
+      detalhe: `${diferenca} dias restantes`,
+      classe: "warning",
     };
 
   }
 
   return {
-
-    texto:
-      "Em dia",
-
-    detalhe:
-      `${diferenca} dias restantes`,
-
-    classe:
-      "ok",
-
+    texto: "Em dia",
+    detalhe: `${diferenca} dias restantes`,
+    classe: "ok",
   };
 
 }
 
 function ProjectCard({
-
   project,
-
   onOpen,
-
 }: Props) {
 
   const total =
     Object.values(
       project.situacoes
     ).reduce(
-      (
-        acumulado,
-        valor
-      ) =>
+      (acumulado, valor) =>
         acumulado + valor,
       0
     );
@@ -306,138 +213,75 @@ function ProjectCard({
     StatusItem[] = [
 
     {
-
-      label:
-        "Qualidade",
-
+      label: "Qualidade",
       value:
-        project
-          .situacoes
+        project.situacoes
           .qualidade,
-
-      color:
-        "#F58220",
-
+      color: "#F58220",
     },
 
     {
-
-      label:
-        "Testes",
-
+      label: "Testes",
       value:
-        project
-          .situacoes
+        project.situacoes
           .testes,
-
-      color:
-        "#1976D2",
-
+      color: "#1976D2",
     },
 
     {
-
-      label:
-        "Desenvolvido",
-
+      label: "Desenvolvido",
       value:
-        project
-          .situacoes
+        project.situacoes
           .desenvolvido,
-
-      color:
-        "#43A047",
-
+      color: "#43A047",
     },
 
     {
-
-      label:
-        "Em Progresso",
-
+      label: "Em Progresso",
       value:
-        project
-          .situacoes
+        project.situacoes
           .emProgresso,
-
-      color:
-        "#FBC02D",
-
+      color: "#FBC02D",
     },
 
     {
-
-      label:
-        "Aguard. Comp.",
-
+      label: "Aguard. Comp.",
       value:
-        project
-          .situacoes
+        project.situacoes
           .aguardandoCompilacao,
-
-      color:
-        "#78909C",
-
+      color: "#78909C",
     },
 
     {
-
-      label:
-        "Nova",
-
+      label: "Nova",
       value:
-        project
-          .situacoes
+        project.situacoes
           .nova,
-
-      color:
-        "#26A69A",
-
+      color: "#26A69A",
     },
 
     {
-
-      label:
-        "Reaberta",
-
+      label: "Reaberta",
       value:
-        project
-          .situacoes
+        project.situacoes
           .reaberta,
-
-      color:
-        "#EF5350",
-
+      color: "#EF5350",
     },
 
     {
-
-      label:
-        "Rejeitada",
-
+      label: "Rejeitada",
       value:
-        project
-          .situacoes
+        project.situacoes
           .rejeitada,
-
-      color:
-        "#616161",
-
+      color: "#616161",
     },
 
     {
-
-      label:
-        "Interrompida",
-
+      label: "Interrompida",
       value:
-        project
-          .situacoes
+        project.situacoes
           .interrompida,
-
-      color:
-        "#8E24AA",
-
+      color: "#8E24AA",
     },
 
   ].filter(
@@ -460,19 +304,14 @@ function ProjectCard({
           <div className="release-project-subtitle">
 
             <span>
-
               Versão{" "}
-
               <strong>
                 {project.versao || "-"}
               </strong>
-
             </span>
 
             <span className="release-task-total">
-
               {total} tarefas
-
             </span>
 
           </div>
@@ -488,9 +327,7 @@ function ProjectCard({
           }
         >
 
-          <MdEdit
-            size={19}
-          />
+          <MdEdit size={19} />
 
         </button>
 
@@ -548,79 +385,50 @@ function ProjectCard({
 
       </div>
 
-      <div className="release-status-list">
+      <div className="release-status-grid">
 
         {situacoes.map(
-          status => {
+          status => (
 
-            const porcentagem =
-              total === 0
-                ? 0
-                : (
-                    status.value /
-                    total
-                  ) * 100;
+            <div
+              key={status.label}
+              className="release-status-item"
+            >
 
-            return (
+              <div className="release-status-label">
 
-              <div
-                key={
-                  status.label
-                }
-                className="release-status-row"
-              >
+                <span
+                  className="release-status-dot"
+                  style={{
+                    background:
+                      status.color,
+                  }}
+                />
 
-                <div className="release-status-label">
-
-                  <span
-                    className="release-status-dot"
-                    style={{
-                      background:
-                        status.color,
-                    }}
-                  />
-
-                  <span>
-
-                    {status.label}
-
-                  </span>
-
-                </div>
-
-                <div className="release-status-bar">
-
-                  <div
-                    className="release-status-fill"
-                    style={{
-                      width:
-                        `${porcentagem}%`,
-                      background:
-                        status.color,
-                    }}
-                  />
-
-                </div>
-
-                <strong>
-
-                  {status.value}
-
-                </strong>
+                <span>
+                  {status.label}
+                </span>
 
               </div>
 
-            );
+              <strong
+                style={{
+                  color:
+                    status.color,
+                }}
+              >
+                {status.value}
+              </strong>
 
-          }
+            </div>
+
+          )
         )}
 
         {situacoes.length === 0 && (
 
           <div className="release-status-empty">
-
             Nenhuma tarefa neste projeto.
-
           </div>
 
         )}
