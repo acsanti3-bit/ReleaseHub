@@ -1,30 +1,40 @@
+export type UserRole =
+  | "admin"
+  | "qualidade"
+  | "visualizador";
+
+
 export interface User {
   id: number;
   nome: string;
   email: string;
-  role: "admin" | "user";
+  role: UserRole;
   ativo: number;
   created_at?: string;
 }
+
 
 export interface CreateUserData {
   nome: string;
   email: string;
   senha: string;
-  role: "admin" | "user";
+  role: UserRole;
 }
+
 
 export interface UpdateUserData {
   id: number;
   nome: string;
   email: string;
-  role: "admin" | "user";
+  role: UserRole;
   ativo: number;
   novaSenha?: string;
 }
 
+
 const API_URL =
   "/api/users";
+
 
 async function obterErro(
   response: Response
@@ -34,6 +44,7 @@ async function obterErro(
 
     const data =
       await response.json();
+
 
     return (
       data.erro ||
@@ -48,6 +59,7 @@ async function obterErro(
 
 }
 
+
 export async function listarUsuarios():
   Promise<User[]> {
 
@@ -55,10 +67,14 @@ export async function listarUsuarios():
     await fetch(
       API_URL,
       {
-        credentials: "include",
-        cache: "no-store",
+        credentials:
+          "include",
+
+        cache:
+          "no-store",
       }
     );
+
 
   if (!response.ok) {
 
@@ -70,9 +86,11 @@ export async function listarUsuarios():
 
   }
 
+
   return response.json();
 
 }
+
 
 export async function adicionarUsuario(
   dados: CreateUserData
@@ -82,9 +100,11 @@ export async function adicionarUsuario(
     await fetch(
       API_URL,
       {
-        method: "POST",
+        method:
+          "POST",
 
-        credentials: "include",
+        credentials:
+          "include",
 
         headers: {
           "Content-Type":
@@ -98,6 +118,7 @@ export async function adicionarUsuario(
       }
     );
 
+
   if (!response.ok) {
 
     throw new Error(
@@ -108,9 +129,11 @@ export async function adicionarUsuario(
 
   }
 
+
   return response.json();
 
 }
+
 
 export async function editarUsuario(
   dados: UpdateUserData
@@ -120,9 +143,11 @@ export async function editarUsuario(
     await fetch(
       API_URL,
       {
-        method: "PUT",
+        method:
+          "PUT",
 
-        credentials: "include",
+        credentials:
+          "include",
 
         headers: {
           "Content-Type":
@@ -136,6 +161,7 @@ export async function editarUsuario(
       }
     );
 
+
   if (!response.ok) {
 
     throw new Error(
@@ -145,6 +171,7 @@ export async function editarUsuario(
     );
 
   }
+
 
   return response.json();
 

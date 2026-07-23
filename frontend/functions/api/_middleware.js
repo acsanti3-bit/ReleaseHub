@@ -19,9 +19,9 @@ export async function onRequest(
     context.request.method
       .toUpperCase();
 
+
   /*
-    Rotas responsáveis pelo próprio
-    processo de autenticação.
+    Rotas de autenticação.
   */
 
   if (
@@ -34,10 +34,10 @@ export async function onRequest(
 
   }
 
+
   /*
-    Somente estas consultas GET
-    permanecem públicas para que
-    o Modo TV funcione sem login.
+    Leituras necessárias para
+    o Modo TV continuam públicas.
   */
 
   const leituraPublica =
@@ -47,20 +47,23 @@ export async function onRequest(
       caminho === "/api/environments"
     );
 
+
   if (leituraPublica) {
 
     return context.next();
 
   }
 
+
   /*
-    Todo o restante exige sessão.
+    Todo o restante exige login.
   */
 
   const usuario =
     await buscarUsuarioLogado(
       context
     );
+
 
   if (!usuario) {
 
@@ -76,9 +79,14 @@ export async function onRequest(
 
   }
 
+
+  context.data.usuario =
+    usuario;
+
+
   /*
-    Gestão de usuários é exclusiva
-    para administradores.
+    Gestão de usuários:
+    somente administrador.
   */
 
   if (
@@ -100,8 +108,49 @@ export async function onRequest(
 
   }
 
-  context.data.usuario =
-    usuario;
+
+  /*
+    Visualizador possui
+    acesso somente leitura.
+
+    Qualquer alteração em projetos
+    ou ambientes é bloqueada.
+  */
+
+  const rotaOperacional =
+    caminho === "/api/projects" ||
+    caminho === "/api/environments";
+
+
+  const metodoAlteracao =
+    [
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+    ].includes(
+      metodo
+    );
+
+
+  if (
+    usuario.role === "visualizador" &&
+    rotaOperacional &&
+    metodoAlteracao
+  ) {
+
+    return Response.json(
+      {
+        erro:
+          "Seu perfil possui acesso somente para visualização.",
+      },
+      {
+        status: 403,
+      }
+    );
+
+  }
+
 
   return context.next();
 

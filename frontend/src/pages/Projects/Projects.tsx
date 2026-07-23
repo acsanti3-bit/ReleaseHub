@@ -20,6 +20,10 @@ import {
   excluirProjeto,
 } from "../../services/ProjectService";
 
+import {
+  buscarSessao,
+} from "../../services/AuthService";
+
 function Projects() {
 
   const [
@@ -33,6 +37,12 @@ function Projects() {
     setCarregando,
   ] =
     useState(true);
+
+  const [
+    podeEditar,
+    setPodeEditar,
+  ] =
+    useState(false);
 
   const [
     openModal,
@@ -72,15 +82,48 @@ function Projects() {
 
   }
 
+  async function carregarPermissao() {
+
+    try {
+
+      const usuario =
+        await buscarSessao();
+
+      setPodeEditar(
+        usuario?.role === "admin" ||
+        usuario?.role === "qualidade"
+      );
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar permissão:",
+        erro
+      );
+
+      setPodeEditar(false);
+
+    }
+
+  }
+
   useEffect(() => {
 
     void atualizarLista();
+
+    void carregarPermissao();
 
   }, []);
 
   async function handleSaveProject(
     project: Project
   ) {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     try {
 
@@ -131,6 +174,12 @@ function Projects() {
 
   function handleNewProject() {
 
+    if (!podeEditar) {
+
+      return;
+
+    }
+
     setSelectedProject(
       undefined
     );
@@ -145,6 +194,12 @@ function Projects() {
     project: Project
   ) {
 
+    if (!podeEditar) {
+
+      return;
+
+    }
+
     setSelectedProject(
       project
     );
@@ -158,6 +213,12 @@ function Projects() {
   async function handleDeleteProject(
     id: number
   ) {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     const confirmar =
       window.confirm(
@@ -209,20 +270,27 @@ function Projects() {
 
               {projects.length} projetos cadastrados
 
+              {!podeEditar &&
+                " • Somente leitura"}
+
             </span>
 
           </div>
 
-          <button
-            className="new-project-button"
-            onClick={
-              handleNewProject
-            }
-          >
+          {podeEditar && (
 
-            Novo Projeto
+            <button
+              className="new-project-button"
+              onClick={
+                handleNewProject
+              }
+            >
 
-          </button>
+              Novo Projeto
+
+            </button>
+
+          )}
 
         </div>
 
@@ -275,35 +343,39 @@ function Projects() {
 
                   </div>
 
-                  <div className="project-actions">
+                  {podeEditar && (
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleEditProject(
-                          project
-                        )
-                      }
-                    >
+                    <div className="project-actions">
 
-                      Editar
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleEditProject(
+                            project
+                          )
+                        }
+                      >
 
-                    </button>
+                        Editar
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        void handleDeleteProject(
-                          project.id
-                        )
-                      }
-                    >
+                      </button>
 
-                      Excluir
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void handleDeleteProject(
+                            project.id
+                          )
+                        }
+                      >
 
-                    </button>
+                        Excluir
 
-                  </div>
+                      </button>
+
+                    </div>
+
+                  )}
 
                 </div>
 
@@ -316,7 +388,8 @@ function Projects() {
 
       </div>
 
-      {openModal && (
+      {podeEditar &&
+        openModal && (
 
         <ProjectModal
           project={

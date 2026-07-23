@@ -11,6 +11,7 @@ import type {
 interface Props {
   project: Project;
   onOpen: (project: Project) => void;
+  canEdit: boolean;
 }
 
 interface StatusItem {
@@ -193,6 +194,7 @@ function obterSituacaoPrazo(
 function ProjectCard({
   project,
   onOpen,
+  canEdit,
 }: Props) {
 
   const total =
@@ -318,18 +320,22 @@ function ProjectCard({
 
         </div>
 
-        <button
-          type="button"
-          className="release-edit-button"
-          title="Editar projeto"
-          onClick={() =>
-            onOpen(project)
-          }
-        >
+        {canEdit && (
 
-          <MdEdit size={19} />
+          <button
+            type="button"
+            className="release-edit-button"
+            title="Editar projeto"
+            onClick={() =>
+              onOpen(project)
+            }
+          >
 
-        </button>
+            <MdEdit size={19} />
+
+          </button>
+
+        )}
 
       </div>
 

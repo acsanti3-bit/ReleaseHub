@@ -28,6 +28,10 @@ import {
   sincronizarProjetosComAmbienteAtual,
 } from "../../services/ProjectService";
 
+import {
+  buscarSessao,
+} from "../../services/AuthService";
+
 import type {
   ReleaseEnvironment,
 } from "../../types/releaseEnvironment";
@@ -47,6 +51,12 @@ function ReleaseEnvironments() {
     setCarregando,
   ] =
     useState(true);
+
+  const [
+    podeEditar,
+    setPodeEditar,
+  ] =
+    useState(false);
 
   const [
     ambienteSelecionado,
@@ -80,13 +90,46 @@ function ReleaseEnvironments() {
 
   }
 
+  async function carregarPermissao() {
+
+    try {
+
+      const usuario =
+        await buscarSessao();
+
+      setPodeEditar(
+        usuario?.role === "admin" ||
+        usuario?.role === "qualidade"
+      );
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar permissão:",
+        erro
+      );
+
+      setPodeEditar(false);
+
+    }
+
+  }
+
   useEffect(() => {
 
     void atualizarLista();
 
+    void carregarPermissao();
+
   }, []);
 
   function novoAmbiente() {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     setAmbienteSelecionado(
       criarAmbiente()
@@ -98,6 +141,12 @@ function ReleaseEnvironments() {
     ambiente: ReleaseEnvironment
   ) {
 
+    if (!podeEditar) {
+
+      return;
+
+    }
+
     setAmbienteSelecionado(
       ambiente
     );
@@ -107,6 +156,12 @@ function ReleaseEnvironments() {
   async function salvar(
     ambiente: ReleaseEnvironment
   ) {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     try {
 
@@ -157,6 +212,12 @@ function ReleaseEnvironments() {
   async function excluir(
     ambiente: ReleaseEnvironment
   ) {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     const confirmar =
       window.confirm(
@@ -210,23 +271,30 @@ function ReleaseEnvironments() {
 
               Configure a relação entre as versões dos projetos.
 
+              {!podeEditar &&
+                " • Somente leitura"}
+
             </p>
 
           </div>
 
-          <button
-            type="button"
-            className="new-environment-button"
-            onClick={
-              novoAmbiente
-            }
-          >
+          {podeEditar && (
 
-            <MdAdd size={20} />
+            <button
+              type="button"
+              className="new-environment-button"
+              onClick={
+                novoAmbiente
+              }
+            >
 
-            Novo Ambiente
+              <MdAdd size={20} />
 
-          </button>
+              Novo Ambiente
+
+            </button>
+
+          )}
 
         </div>
 
@@ -274,9 +342,13 @@ function ReleaseEnvironments() {
 
                 <th>IWB Server</th>
 
-                <th className="release-actions-column">
-                  Ações
-                </th>
+                {podeEditar && (
+
+                  <th className="release-actions-column">
+                    Ações
+                  </th>
+
+                )}
 
               </tr>
 
@@ -339,46 +411,50 @@ function ReleaseEnvironments() {
 
                     </td>
 
-                    <td>
+                    {podeEditar && (
 
-                      <div className="release-actions">
+                      <td>
 
-                        <button
-                          type="button"
-                          title="Editar"
-                          onClick={() =>
-                            editar(
-                              ambiente
-                            )
-                          }
-                        >
+                        <div className="release-actions">
 
-                          <MdEdit
-                            size={18}
-                          />
+                          <button
+                            type="button"
+                            title="Editar"
+                            onClick={() =>
+                              editar(
+                                ambiente
+                              )
+                            }
+                          >
 
-                        </button>
+                            <MdEdit
+                              size={18}
+                            />
 
-                        <button
-                          type="button"
-                          title="Excluir"
-                          className="delete-environment"
-                          onClick={() =>
-                            void excluir(
-                              ambiente
-                            )
-                          }
-                        >
+                          </button>
 
-                          <MdDeleteOutline
-                            size={19}
-                          />
+                          <button
+                            type="button"
+                            title="Excluir"
+                            className="delete-environment"
+                            onClick={() =>
+                              void excluir(
+                                ambiente
+                              )
+                            }
+                          >
 
-                        </button>
+                            <MdDeleteOutline
+                              size={19}
+                            />
 
-                      </div>
+                          </button>
 
-                    </td>
+                        </div>
+
+                      </td>
+
+                    )}
 
                   </tr>
 
@@ -411,7 +487,8 @@ function ReleaseEnvironments() {
 
       </div>
 
-      {ambienteSelecionado && (
+      {podeEditar &&
+        ambienteSelecionado && (
 
         <ReleaseEnvironmentDrawer
           environment={

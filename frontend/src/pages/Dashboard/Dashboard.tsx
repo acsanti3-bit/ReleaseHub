@@ -31,6 +31,10 @@ import {
   criarProjeto,
 } from "../../services/ProjectService";
 
+import {
+  buscarSessao,
+} from "../../services/AuthService";
+
 function Dashboard() {
 
   const [
@@ -44,6 +48,12 @@ function Dashboard() {
     setCarregando,
   ] =
     useState(true);
+
+  const [
+    podeEditar,
+    setPodeEditar,
+  ] =
+    useState(false);
 
   const [
     projectSelecionado,
@@ -95,9 +105,36 @@ function Dashboard() {
 
   }
 
+  async function carregarPermissao() {
+
+    try {
+
+      const usuario =
+        await buscarSessao();
+
+      setPodeEditar(
+        usuario?.role === "admin" ||
+        usuario?.role === "qualidade"
+      );
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar permissão:",
+        erro
+      );
+
+      setPodeEditar(false);
+
+    }
+
+  }
+
   useEffect(() => {
 
     void carregarProjetos();
+
+    void carregarPermissao();
 
   }, []);
 
@@ -112,6 +149,12 @@ function Dashboard() {
   async function salvarProjeto(
     project: Project
   ) {
+
+    if (!podeEditar) {
+
+      return;
+
+    }
 
     try {
 
@@ -428,18 +471,22 @@ function Dashboard() {
 
           </div>
 
-          <button
-            className="new-project"
-            onClick={() =>
-              setProjectSelecionado(
-                criarProjeto()
-              )
-            }
-          >
+          {podeEditar && (
 
-            + Novo Projeto
+            <button
+              className="new-project"
+              onClick={() =>
+                setProjectSelecionado(
+                  criarProjeto()
+                )
+              }
+            >
 
-          </button>
+              + Novo Projeto
+
+            </button>
+
+          )}
 
         </div>
 
@@ -521,6 +568,9 @@ function Dashboard() {
           {projetos.length} de{" "}
           {projects.length} projetos
 
+          {!podeEditar &&
+            " • Somente leitura"}
+
         </span>
 
         {carregando ? (
@@ -559,6 +609,9 @@ function Dashboard() {
                   <ProjectCard
                     key={project.id}
                     project={project}
+                    canEdit={
+                      podeEditar
+                    }
                     onOpen={
                       setProjectSelecionado
                     }
@@ -577,6 +630,9 @@ function Dashboard() {
                   <ProjectCard
                     key={project.id}
                     project={project}
+                    canEdit={
+                      podeEditar
+                    }
                     onOpen={
                       setProjectSelecionado
                     }
@@ -593,7 +649,8 @@ function Dashboard() {
 
       </div>
 
-      {projectSelecionado && (
+      {podeEditar &&
+        projectSelecionado && (
 
         <ProjectDrawer
           project={

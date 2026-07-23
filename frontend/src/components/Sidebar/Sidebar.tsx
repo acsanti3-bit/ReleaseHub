@@ -126,10 +126,31 @@ function Sidebar() {
       .toUpperCase() ||
     "U";
 
-  const descricaoRole =
-    usuario?.role === "admin"
-      ? "Administrador"
-      : "Usuário";
+  function descricaoPerfil() {
+
+    switch (
+      usuario?.role
+    ) {
+
+      case "admin":
+
+        return "Administrador";
+
+      case "qualidade":
+
+        return "Qualidade";
+
+      case "visualizador":
+
+        return "Visualizador";
+
+      default:
+
+        return "Usuário";
+
+    }
+
+  }
 
   const administrador =
     usuario?.role === "admin";
@@ -196,7 +217,7 @@ function Sidebar() {
             </strong>
 
             <span>
-              {descricaoRole}
+              {descricaoPerfil()}
             </span>
 
           </div>

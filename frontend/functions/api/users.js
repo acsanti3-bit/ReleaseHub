@@ -24,9 +24,18 @@ function normalizarRole(
   role
 ) {
 
-  return role === "admin"
-    ? "admin"
-    : "user";
+  const rolesPermitidas = [
+    "admin",
+    "qualidade",
+    "visualizador",
+  ];
+
+
+  return rolesPermitidas.includes(
+    role
+  )
+    ? role
+    : "visualizador";
 
 }
 
@@ -47,7 +56,10 @@ async function emailEmUso(
     email,
   ];
 
-  if (ignorarId !== null) {
+
+  if (
+    ignorarId !== null
+  ) {
 
     query += `
       AND id <> ?
@@ -59,9 +71,11 @@ async function emailEmUso(
 
   }
 
+
   query += `
     LIMIT 1
   `;
+
 
   const usuario =
     await context.env.DB
@@ -71,18 +85,13 @@ async function emailEmUso(
       )
       .first();
 
-  return Boolean(usuario);
+
+  return Boolean(
+    usuario
+  );
 
 }
 
-
-/*
-  GET /api/users
-
-  Lista usuários.
-  Middleware garante que somente
-  administrador chega até aqui.
-*/
 
 export async function onRequestGet(
   context
@@ -107,6 +116,7 @@ export async function onRequestGet(
         )
         .all();
 
+
     return Response.json(
       resultado.results
     );
@@ -118,6 +128,7 @@ export async function onRequestGet(
       erro
     );
 
+
     return respostaErro(
       "Não foi possível listar os usuários."
     );
@@ -126,12 +137,6 @@ export async function onRequestGet(
 
 }
 
-
-/*
-  POST /api/users
-
-  Cria um usuário.
-*/
 
 export async function onRequestPost(
   context
@@ -150,13 +155,16 @@ export async function onRequestPost(
 
     }
 
+
     const body =
       await context.request.json();
+
 
     const nome =
       String(
         body.nome || ""
       ).trim();
+
 
     const email =
       String(
@@ -165,15 +173,18 @@ export async function onRequestPost(
         .trim()
         .toLowerCase();
 
+
     const senha =
       String(
         body.senha || ""
       );
 
+
     const role =
       normalizarRole(
         body.role
       );
+
 
     if (
       !nome ||
@@ -188,6 +199,7 @@ export async function onRequestPost(
 
     }
 
+
     if (
       senha.length < 12
     ) {
@@ -199,13 +211,13 @@ export async function onRequestPost(
 
     }
 
-    const existente =
+
+    if (
       await emailEmUso(
         context,
         email
-      );
-
-    if (existente) {
+      )
+    ) {
 
       return respostaErro(
         "Já existe um usuário cadastrado com este e-mail.",
@@ -213,6 +225,7 @@ export async function onRequestPost(
       );
 
     }
+
 
     const {
       hash,
@@ -222,6 +235,7 @@ export async function onRequestPost(
         senha,
         context.env.AUTH_SECRET
       );
+
 
     const resultado =
       await context.env.DB
@@ -249,6 +263,7 @@ export async function onRequestPost(
         )
         .run();
 
+
     return Response.json(
       {
         id:
@@ -256,11 +271,8 @@ export async function onRequestPost(
             ?.last_row_id,
 
         nome,
-
         email,
-
         role,
-
         ativo: 1,
       },
       {
@@ -275,6 +287,7 @@ export async function onRequestPost(
       erro
     );
 
+
     return respostaErro(
       "Não foi possível criar o usuário."
     );
@@ -283,13 +296,6 @@ export async function onRequestPost(
 
 }
 
-
-/*
-  PUT /api/users
-
-  Edita nome, e-mail, perfil,
-  situação e opcionalmente senha.
-*/
 
 export async function onRequestPut(
   context
@@ -308,18 +314,22 @@ export async function onRequestPut(
 
     }
 
+
     const body =
       await context.request.json();
+
 
     const id =
       Number(
         body.id
       );
 
+
     const nome =
       String(
         body.nome || ""
       ).trim();
+
 
     const email =
       String(
@@ -328,10 +338,12 @@ export async function onRequestPut(
         .trim()
         .toLowerCase();
 
+
     const role =
       normalizarRole(
         body.role
       );
+
 
     const ativo =
       Number(
@@ -340,10 +352,12 @@ export async function onRequestPut(
         ? 0
         : 1;
 
+
     const novaSenha =
       String(
         body.novaSenha || ""
       );
+
 
     if (
       !id ||
@@ -358,12 +372,14 @@ export async function onRequestPut(
 
     }
 
+
     const usuarioAtual =
       context.data.usuario;
 
+
     /*
-      Não deixa a Carol se trancar
-      para fora do próprio sistema.
+      Impede o administrador de
+      desativar o próprio acesso.
     */
 
     if (
@@ -380,6 +396,12 @@ export async function onRequestPut(
 
     }
 
+
+    /*
+      Impede o administrador de
+      remover seu próprio perfil admin.
+    */
+
     if (
       Number(
         usuarioAtual.id
@@ -394,14 +416,14 @@ export async function onRequestPut(
 
     }
 
-    const existente =
+
+    if (
       await emailEmUso(
         context,
         email,
         id
-      );
-
-    if (existente) {
+      )
+    ) {
 
       return respostaErro(
         "Já existe outro usuário com este e-mail.",
@@ -409,6 +431,20 @@ export async function onRequestPut(
       );
 
     }
+
+
+    if (
+      novaSenha &&
+      novaSenha.length < 12
+    ) {
+
+      return respostaErro(
+        "A nova senha deve possuir pelo menos 12 caracteres.",
+        400
+      );
+
+    }
+
 
     await context.env.DB
       .prepare(
@@ -433,23 +469,10 @@ export async function onRequestPut(
       )
       .run();
 
-    /*
-      Senha só é atualizada
-      se uma nova for informada.
-    */
 
-    if (novaSenha) {
-
-      if (
-        novaSenha.length < 12
-      ) {
-
-        return respostaErro(
-          "A nova senha deve possuir pelo menos 12 caracteres.",
-          400
-        );
-
-      }
+    if (
+      novaSenha
+    ) {
 
       const {
         hash,
@@ -459,6 +482,7 @@ export async function onRequestPut(
           novaSenha,
           context.env.AUTH_SECRET
         );
+
 
       await context.env.DB
         .prepare(
@@ -479,10 +503,10 @@ export async function onRequestPut(
         )
         .run();
 
+
       /*
-        Derruba sessões antigas
-        desse usuário depois da troca
-        de senha.
+        Ao trocar a senha,
+        encerra as sessões antigas.
       */
 
       await context.env.DB
@@ -492,10 +516,13 @@ export async function onRequestPut(
             WHERE user_id = ?
           `
         )
-        .bind(id)
+        .bind(
+          id
+        )
         .run();
 
     }
+
 
     return Response.json(
       {
@@ -513,6 +540,7 @@ export async function onRequestPut(
       "Erro ao atualizar usuário:",
       erro
     );
+
 
     return respostaErro(
       "Não foi possível atualizar o usuário."

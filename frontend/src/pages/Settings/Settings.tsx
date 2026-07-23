@@ -26,6 +26,7 @@ import {
 
 import type {
   User,
+  UserRole,
 } from "../../services/UserService";
 
 import "./Settings.css";
@@ -35,7 +36,7 @@ interface FormUsuario {
   nome: string;
   email: string;
   senha: string;
-  role: "admin" | "user";
+  role: UserRole;
   ativo: number;
 }
 
@@ -45,10 +46,36 @@ const formularioVazio:
   nome: "",
   email: "",
   senha: "",
-  role: "user",
+  role: "visualizador",
   ativo: 1,
 
 };
+
+function nomePerfil(
+  role: UserRole
+) {
+
+  switch (role) {
+
+    case "admin":
+
+      return "Administrador";
+
+    case "qualidade":
+
+      return "Qualidade";
+
+    case "visualizador":
+
+      return "Visualizador";
+
+    default:
+
+      return "Visualizador";
+
+  }
+
+}
 
 function Settings() {
 
@@ -345,7 +372,13 @@ function Settings() {
 
       await carregarUsuarios();
 
-      fecharModal();
+      setModalAberto(false);
+
+      setFormulario({
+        ...formularioVazio,
+      });
+
+      setErro("");
 
     } catch (error) {
 
@@ -374,9 +407,7 @@ function Settings() {
           <div>
 
             <span className="settings-eyebrow">
-
               Administração
-
             </span>
 
             <h1>
@@ -384,10 +415,8 @@ function Settings() {
             </h1>
 
             <p>
-
               Gerencie usuários e acessos
               ao IWS ReleaseHub.
-
             </p>
 
           </div>
@@ -499,11 +528,9 @@ function Settings() {
               </h2>
 
               <p>
-
                 Controle quem pode
                 acessar e administrar
                 o sistema.
-
               </p>
 
             </div>
@@ -609,17 +636,15 @@ function Settings() {
 
                         <span
                           className={
-                            usuario.role ===
-                            "admin"
+                            usuario.role === "admin"
                               ? "settings-role admin"
                               : "settings-role"
                           }
                         >
 
-                          {usuario.role ===
-                          "admin"
-                            ? "Administrador"
-                            : "Usuário"}
+                          {nomePerfil(
+                            usuario.role
+                          )}
 
                         </span>
 
@@ -629,8 +654,7 @@ function Settings() {
 
                         <span
                           className={
-                            usuario.ativo ===
-                            1
+                            usuario.ativo === 1
                               ? "settings-status active"
                               : "settings-status inactive"
                           }
@@ -638,8 +662,7 @@ function Settings() {
 
                           <span />
 
-                          {usuario.ativo ===
-                          1
+                          {usuario.ativo === 1
                             ? "Ativo"
                             : "Desativado"}
 
@@ -813,16 +836,19 @@ function Settings() {
                     atual => ({
                       ...atual,
                       role:
-                        event.target.value as
-                          | "admin"
-                          | "user",
+                        event.target
+                          .value as UserRole,
                     })
                   )
                 }
               >
 
-                <option value="user">
-                  Usuário
+                <option value="visualizador">
+                  Visualizador
+                </option>
+
+                <option value="qualidade">
+                  Qualidade
                 </option>
 
                 <option value="admin">
