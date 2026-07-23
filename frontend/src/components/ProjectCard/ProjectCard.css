@@ -1,14 +1,14 @@
-.project-card{
+.release-project-card{
 
     background:#FFF;
 
     border-radius:15px;
 
+    border-left:5px solid #005AA9;
+
     padding:17px 18px;
 
     box-shadow:0 5px 16px rgba(0,0,0,.07);
-
-    border-left:5px solid #F58220;
 
     display:flex;
 
@@ -23,7 +23,7 @@
 }
 
 
-.project-card:hover{
+.release-project-card:hover{
 
     transform:translateY(-2px);
 
@@ -34,7 +34,7 @@
 
 /* HEADER */
 
-.project-header{
+.release-project-header{
 
     display:flex;
 
@@ -42,40 +42,40 @@
 
     align-items:flex-start;
 
-    gap:14px;
+    gap:15px;
 
 }
 
 
-.project-header > div:first-child{
+.release-project-title{
 
     min-width:0;
 
 }
 
 
-.project-header h2{
+.release-project-title h2{
 
     margin:0;
 
     color:#005AA9;
 
-    font-size:23px;
+    font-size:22px;
 
     line-height:1.15;
 
     font-weight:700;
 
+    white-space:nowrap;
+
     overflow:hidden;
 
     text-overflow:ellipsis;
 
-    white-space:nowrap;
-
 }
 
 
-.project-subtitle{
+.release-project-subtitle{
 
     display:flex;
 
@@ -85,21 +85,30 @@
 
     gap:9px;
 
-    margin-top:5px;
+    margin-top:6px;
 
 }
 
 
-.project-subtitle span:first-child{
+.release-project-subtitle > span:first-child{
 
     color:#777;
 
-    font-size:13px;
+    font-size:12px;
 
 }
 
 
-.task-total{
+.release-project-subtitle > span:first-child strong{
+
+    color:#4B5563;
+
+    font-weight:600;
+
+}
+
+
+.release-task-total{
 
     background:#EEF5FF;
 
@@ -111,56 +120,24 @@
 
     font-size:11px;
 
-    font-weight:600;
-
-}
-
-
-/* AÇÕES */
-
-.project-actions{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    flex-shrink:0;
-
-}
-
-
-.status-badge{
-
-    color:#FFF;
-
-    padding:5px 10px;
-
-    border-radius:20px;
-
-    font-size:10px;
-
     font-weight:700;
 
-    letter-spacing:.3px;
-
-    white-space:nowrap;
-
 }
 
 
-.edit-button{
+/* BOTÃO EDITAR */
+
+.release-edit-button{
 
     width:34px;
 
     height:34px;
 
-    border:none;
+    border:1px solid #D5E2EE;
 
-    border-radius:8px;
+    border-radius:9px;
 
-    background:#F5F5F5;
+    background:#FFF;
 
     color:#005AA9;
 
@@ -172,14 +149,18 @@
 
     justify-content:center;
 
+    flex-shrink:0;
+
     transition:.2s;
 
 }
 
 
-.edit-button:hover{
+.release-edit-button:hover{
 
     background:#005AA9;
+
+    border-color:#005AA9;
 
     color:#FFF;
 
@@ -188,66 +169,136 @@
 
 /* INFORMAÇÕES */
 
-.project-info{
+.release-project-info{
 
     display:grid;
 
     grid-template-columns:
-        repeat(3,1fr);
+        1fr
+        1fr
+        1.3fr;
 
-    gap:12px;
+    gap:14px;
 
     padding:11px 0;
 
-    border-top:1px solid #ECECEC;
+    border-top:1px solid #E8EDF2;
 
-    border-bottom:1px solid #ECECEC;
+    border-bottom:1px solid #E8EDF2;
 
 }
 
 
-.project-info div{
+.release-project-info > div{
+
+    min-width:0;
 
     display:flex;
 
     flex-direction:column;
 
-    min-width:0;
-
 }
 
 
-.project-info small{
+.release-project-info small{
 
-    color:#8A8A8A;
+    margin-bottom:4px;
 
-    font-size:10px;
+    color:#8A939D;
+
+    font-size:9px;
+
+    line-height:1;
+
+    font-weight:600;
 
     text-transform:uppercase;
 
-    margin-bottom:3px;
-
 }
 
 
-.project-info strong{
+.release-project-info > div > strong{
 
-    color:#222;
+    color:#263238;
 
     font-size:13px;
 
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
+    line-height:1.2;
 
 }
 
 
-/* PROGRESSO */
+/* SITUAÇÃO DO PRAZO */
 
-.progress-area{
+.release-deadline-status{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:2px;
+
+}
+
+
+.release-deadline-status strong{
+
+    font-size:12px;
+
+    line-height:1.1;
+
+}
+
+
+.release-deadline-status span{
+
+    color:#7A838C;
+
+    font-size:10px;
+
+    line-height:1.1;
+
+}
+
+
+.release-deadline-status.ok strong{
+
+    color:#2E7D32;
+
+}
+
+
+.release-deadline-status.warning strong{
+
+    color:#F57C00;
+
+}
+
+
+.release-deadline-status.late strong{
+
+    color:#D32F2F;
+
+}
+
+
+.release-deadline-status.invalid strong{
+
+    color:#D32F2F;
+
+}
+
+
+.release-deadline-status.neutral strong{
+
+    color:#607D8B;
+
+}
+
+
+/* LISTA DOS STATUS */
+
+.release-status-list{
 
     display:flex;
 
@@ -258,98 +309,33 @@
 }
 
 
-.progress-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
-
-.progress-header span{
-
-    color:#666;
-
-    font-size:12px;
-
-}
-
-
-.progress-header strong{
-
-    color:#005AA9;
-
-    font-size:13px;
-
-}
-
-
-.progress-bar{
-
-    width:100%;
-
-    height:7px;
-
-    background:#ECECEC;
-
-    border-radius:30px;
-
-    overflow:hidden;
-
-}
-
-
-.progress-fill{
-
-    height:100%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #43A047,
-            #66BB6A
-        );
-
-    border-radius:30px;
-
-    transition:.35s;
-
-}
-
-
-/* SITUAÇÕES */
-
-.status-list{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:7px;
-
-}
-
-
-.status-row{
+.release-status-row{
 
     display:grid;
 
     grid-template-columns:
         115px
         minmax(0,1fr)
-        30px;
+        32px;
 
-    gap:9px;
+    gap:10px;
 
     align-items:center;
+
+    min-height:20px;
 
 }
 
 
-.status-name{
+.release-status-label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    min-width:0;
 
     color:#444;
 
@@ -362,33 +348,46 @@
 }
 
 
-.status-bar{
+.release-status-dot{
 
-    width:100%;
+    width:7px;
 
     height:7px;
 
-    background:#ECECEC;
+    border-radius:50%;
 
-    border-radius:30px;
+    flex-shrink:0;
+
+}
+
+
+.release-status-bar{
+
+    width:100%;
+
+    height:6px;
+
+    background:#EDF0F3;
+
+    border-radius:20px;
 
     overflow:hidden;
 
 }
 
 
-.status-fill{
+.release-status-fill{
 
     height:100%;
 
-    border-radius:30px;
+    border-radius:20px;
 
     transition:.3s;
 
 }
 
 
-.status-row strong{
+.release-status-row > strong{
 
     color:#005AA9;
 
@@ -399,34 +398,41 @@
 }
 
 
-/* STATUS DO CARD */
+.release-status-empty{
 
-.project-card.late{
+    padding:10px;
 
-    border-left-color:#E53935;
+    color:#8A939D;
 
-}
+    font-size:12px;
 
-
-.project-card.today{
-
-    border-left-color:#F58220;
+    text-align:center;
 
 }
 
 
-/* RESPONSIVO */
+/* TELAS MENORES */
 
 @media(max-width:1350px){
 
-    .project-header h2{
+    .release-project-title h2{
 
-        font-size:20px;
+        font-size:19px;
 
     }
 
 
-    .status-row{
+    .release-project-info{
+
+        grid-template-columns:
+            1fr
+            1fr
+            1.2fr;
+
+    }
+
+
+    .release-status-row{
 
         grid-template-columns:
             100px
@@ -436,7 +442,7 @@
     }
 
 
-    .status-name{
+    .release-status-label{
 
         font-size:11px;
 
@@ -447,41 +453,29 @@
 
 @media(max-width:900px){
 
-    .project-card{
+    .release-project-card{
 
-        padding:16px;
-
-    }
-
-
-    .project-header{
-
-        flex-direction:column;
-
-        gap:12px;
+        padding:15px;
 
     }
 
 
-    .project-actions{
+    .release-project-info{
 
-        width:100%;
-
-        justify-content:space-between;
-
-    }
-
-
-    .project-info{
-
-        grid-template-columns:1fr;
-
-        gap:8px;
+        grid-template-columns:
+            repeat(2,1fr);
 
     }
 
 
-    .status-row{
+    .release-project-info > div:last-child{
+
+        grid-column:1/-1;
+
+    }
+
+
+    .release-status-row{
 
         grid-template-columns:
             105px

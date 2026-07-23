@@ -1,14 +1,20 @@
 import "./ProjectCard.css";
 
-import { MdEdit } from "react-icons/md";
+import {
+  MdEdit,
+} from "react-icons/md";
 
-import type { Project } from "../../types/project";
+import type {
+  Project,
+} from "../../types/project";
 
 interface Props {
 
   project: Project;
 
-  onOpen: (project: Project) => void;
+  onOpen: (
+    project: Project
+  ) => void;
 
 }
 
@@ -22,6 +28,255 @@ interface StatusItem {
 
 }
 
+interface PrazoInfo {
+
+  texto: string;
+
+  detalhe: string;
+
+  classe:
+    | "ok"
+    | "warning"
+    | "late"
+    | "invalid"
+    | "neutral";
+
+}
+
+function converterDataBrasileira(
+  valor: string
+): Date | null {
+
+  if (!valor) {
+
+    return null;
+
+  }
+
+  const partes =
+    valor.split("/");
+
+  if (
+    partes.length !== 3
+  ) {
+
+    return null;
+
+  }
+
+  const dia =
+    Number(partes[0]);
+
+  const mes =
+    Number(partes[1]);
+
+  const ano =
+    Number(partes[2]);
+
+  if (
+    !dia ||
+    !mes ||
+    !ano
+  ) {
+
+    return null;
+
+  }
+
+  const data =
+    new Date(
+      ano,
+      mes - 1,
+      dia
+    );
+
+  /*
+    Também valida casos impossíveis,
+    como 31/09/2026.
+  */
+
+  if (
+    data.getFullYear() !== ano ||
+    data.getMonth() !== mes - 1 ||
+    data.getDate() !== dia
+  ) {
+
+    return null;
+
+  }
+
+  data.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  return data;
+
+}
+
+function obterSituacaoPrazo(
+  prazoTexto: string
+): PrazoInfo {
+
+  if (!prazoTexto) {
+
+    return {
+
+      texto: "Sem prazo",
+
+      detalhe:
+        "Prazo não informado",
+
+      classe:
+        "neutral",
+
+    };
+
+  }
+
+  const prazo =
+    converterDataBrasileira(
+      prazoTexto
+    );
+
+  if (!prazo) {
+
+    return {
+
+      texto: "Prazo inválido",
+
+      detalhe:
+        prazoTexto,
+
+      classe:
+        "invalid",
+
+    };
+
+  }
+
+  const hoje =
+    new Date();
+
+  hoje.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  const diferenca =
+    Math.round(
+
+      (
+        prazo.getTime() -
+        hoje.getTime()
+      ) /
+
+      86400000
+
+    );
+
+  if (
+    diferenca < 0
+  ) {
+
+    const dias =
+      Math.abs(
+        diferenca
+      );
+
+    return {
+
+      texto:
+        "Atrasado",
+
+      detalhe:
+        dias === 1
+          ? "1 dia em atraso"
+          : `${dias} dias em atraso`,
+
+      classe:
+        "late",
+
+    };
+
+  }
+
+  if (
+    diferenca === 0
+  ) {
+
+    return {
+
+      texto:
+        "Vence hoje",
+
+      detalhe:
+        "Prazo final hoje",
+
+      classe:
+        "warning",
+
+    };
+
+  }
+
+  if (
+    diferenca === 1
+  ) {
+
+    return {
+
+      texto:
+        "Vence amanhã",
+
+      detalhe:
+        "1 dia restante",
+
+      classe:
+        "warning",
+
+    };
+
+  }
+
+  if (
+    diferenca <= 3
+  ) {
+
+    return {
+
+      texto:
+        "Prazo próximo",
+
+      detalhe:
+        `${diferenca} dias restantes`,
+
+      classe:
+        "warning",
+
+    };
+
+  }
+
+  return {
+
+    texto:
+      "Em dia",
+
+    detalhe:
+      `${diferenca} dias restantes`,
+
+    classe:
+      "ok",
+
+  };
+
+}
+
 function ProjectCard({
 
   project,
@@ -30,303 +285,191 @@ function ProjectCard({
 
 }: Props) {
 
-  const total = Object.values(
-
-    project.situacoes
-
-  ).reduce(
-
-    (acc, value) => acc + value,
-
-    0
-
-  );
-
-  const concluidas =
-
-    project.situacoes.desenvolvido +
-
-    project.situacoes.testes;
-
-  const progresso =
-
-    total === 0
-
-      ? 0
-
-      : Math.round(
-
-          (concluidas / total) * 100
-
-        );
-
-  const hoje = new Date();
-
-  hoje.setHours(
-
-    0,
-
-    0,
-
-    0,
-
-    0
-
-  );
-
-  const prazo =
-
-    project.prazo
-
-      ? new Date(project.prazo)
-
-      : null;
-
-  if (prazo) {
-
-    prazo.setHours(
-
-      0,
-
-      0,
-
-      0,
-
-      0
-
-    );
-
-  }
-
-  let statusProjeto = "EM DIA";
-
-  let corStatus = "#43A047";
-
-  if (
-
-    prazo &&
-
-    prazo < hoje
-
-  ) {
-
-    statusProjeto = "ATRASADO";
-
-    corStatus = "#E53935";
-
-  } else if (
-
-    project.situacoes.qualidade > 0
-
-  ) {
-
-    statusProjeto = "EM QUALIDADE";
-
-    corStatus = "#F58220";
-
-  } else if (
-
-    project.situacoes.testes > 0
-
-  ) {
-
-    statusProjeto = "EM TESTES";
-
-    corStatus = "#005AA9";
-
-  } else if (
-
-    project.situacoes.emProgresso > 0
-
-  ) {
-
-    statusProjeto = "EM DESENVOLVIMENTO";
-
-    corStatus = "#29B6F6";
-
-  }
-
-  let textoPrazo = "-";
-
-  if (prazo) {
-
-    const diferenca = Math.floor(
-
+  const total =
+    Object.values(
+      project.situacoes
+    ).reduce(
       (
-
-        prazo.getTime() -
-
-        hoje.getTime()
-
-      ) /
-
-      86400000
-
+        acumulado,
+        valor
+      ) =>
+        acumulado + valor,
+      0
     );
 
-    if (diferenca > 1) {
+  const situacaoPrazo =
+    obterSituacaoPrazo(
+      project.prazo
+    );
 
-      textoPrazo =
-
-        `${diferenca} dias restantes`;
-
-    } else if (
-
-      diferenca === 1
-
-    ) {
-
-      textoPrazo =
-
-        "Vence amanhã";
-
-    } else if (
-
-      diferenca === 0
-
-    ) {
-
-      textoPrazo =
-
-        "Vence hoje";
-
-    } else {
-
-      textoPrazo =
-
-        `Atrasado há ${Math.abs(
-
-          diferenca
-
-        )} dias`;
-
-    }
-
-  }
-
-  const situacoes: StatusItem[] = [
+  const situacoes:
+    StatusItem[] = [
 
     {
 
-      label: "Qualidade",
+      label:
+        "Qualidade",
 
-      value: project.situacoes.qualidade,
+      value:
+        project
+          .situacoes
+          .qualidade,
 
-      color: "#F58220",
+      color:
+        "#F58220",
 
     },
 
     {
 
-      label: "Testes",
+      label:
+        "Testes",
 
-      value: project.situacoes.testes,
+      value:
+        project
+          .situacoes
+          .testes,
 
-      color: "#005AA9",
-
-    },
-
-    {
-
-      label: "Desenvolvido",
-
-      value: project.situacoes.desenvolvido,
-
-      color: "#43A047",
+      color:
+        "#1976D2",
 
     },
 
     {
 
-      label: "Em Progresso",
+      label:
+        "Desenvolvido",
 
-      value: project.situacoes.emProgresso,
+      value:
+        project
+          .situacoes
+          .desenvolvido,
 
-      color: "#29B6F6",
-
-    },
-
-    {
-
-      label: "Aguard. Comp.",
-
-      value: project.situacoes.aguardandoCompilacao,
-
-      color: "#FBC02D",
+      color:
+        "#43A047",
 
     },
 
     {
 
-      label: "Nova",
+      label:
+        "Em Progresso",
 
-      value: project.situacoes.nova,
+      value:
+        project
+          .situacoes
+          .emProgresso,
 
-      color: "#8E24AA",
-
-    },
-
-    {
-
-      label: "Reaberta",
-
-      value: project.situacoes.reaberta,
-
-      color: "#795548",
+      color:
+        "#FBC02D",
 
     },
 
     {
 
-      label: "Rejeitada",
+      label:
+        "Aguard. Comp.",
 
-      value: project.situacoes.rejeitada,
+      value:
+        project
+          .situacoes
+          .aguardandoCompilacao,
 
-      color: "#E53935",
+      color:
+        "#78909C",
 
     },
 
     {
 
-      label: "Interrompida",
+      label:
+        "Nova",
 
-      value: project.situacoes.interrompida,
+      value:
+        project
+          .situacoes
+          .nova,
 
-      color: "#757575",
+      color:
+        "#26A69A",
+
+    },
+
+    {
+
+      label:
+        "Reaberta",
+
+      value:
+        project
+          .situacoes
+          .reaberta,
+
+      color:
+        "#EF5350",
+
+    },
+
+    {
+
+      label:
+        "Rejeitada",
+
+      value:
+        project
+          .situacoes
+          .rejeitada,
+
+      color:
+        "#616161",
+
+    },
+
+    {
+
+      label:
+        "Interrompida",
+
+      value:
+        project
+          .situacoes
+          .interrompida,
+
+      color:
+        "#8E24AA",
 
     },
 
   ].filter(
-
     status =>
-
       status.value > 0
-
   );
 
-    return (
+  return (
 
-    <div className="project-card">
+    <div className="release-project-card">
 
-      <div className="project-header">
+      <div className="release-project-header">
 
-        <div>
+        <div className="release-project-title">
 
           <h2>
-
             {project.nome}
-
           </h2>
 
-          <div className="project-subtitle">
+          <div className="release-project-subtitle">
 
             <span>
 
-              Versão {project.versao || "-"}
+              Versão{" "}
+
+              <strong>
+                {project.versao || "-"}
+              </strong>
 
             </span>
 
-            <span className="task-total">
+            <span className="release-task-total">
 
               {total} tarefas
 
@@ -336,185 +479,151 @@ function ProjectCard({
 
         </div>
 
-        <div className="project-actions">
+        <button
+          type="button"
+          className="release-edit-button"
+          title="Editar projeto"
+          onClick={() =>
+            onOpen(project)
+          }
+        >
 
-          <span
-
-            className="status-badge"
-
-            style={{
-
-              background: corStatus,
-
-            }}
-
-          >
-
-            {statusProjeto}
-
-          </span>
-
-          <button
-
-            className="edit-button"
-
-            onClick={() => onOpen(project)}
-
-          >
-
-            <MdEdit size={20} />
-
-          </button>
-
-        </div>
-
-      </div>
-
-      <div className="project-info">
-
-        <div>
-
-          <small>
-
-            Último Executável
-
-          </small>
-
-          <strong>
-
-            {project.executavel || "-"}
-
-          </strong>
-
-        </div>
-
-        <div>
-
-          <small>
-
-            Prazo
-
-          </small>
-
-          <strong>
-
-            {project.prazo || "-"}
-
-          </strong>
-
-        </div>
-
-        <div>
-
-          <small>
-
-            Situação
-
-          </small>
-
-          <strong>
-
-            {textoPrazo}
-
-          </strong>
-
-        </div>
-
-      </div>
-
-      <div className="progress-area">
-
-        <div className="progress-header">
-
-          <span>
-
-            Progresso: 
-
-          </span>
-
-          <strong>
-
-            {progresso}%
-
-          </strong>
-
-        </div>
-
-        <div className="progress-bar">
-
-          <div
-
-            className="progress-fill"
-
-            style={{
-
-              width: `${progresso}%`,
-
-            }}
-
+          <MdEdit
+            size={19}
           />
 
+        </button>
+
+      </div>
+
+      <div className="release-project-info">
+
+        <div>
+
+          <small>
+            Último Executável
+          </small>
+
+          <strong>
+            {project.executavel || "-"}
+          </strong>
+
+        </div>
+
+        <div>
+
+          <small>
+            Prazo
+          </small>
+
+          <strong>
+            {project.prazo || "-"}
+          </strong>
+
+        </div>
+
+        <div>
+
+          <small>
+            Situação
+          </small>
+
+          <div
+            className={
+              `release-deadline-status ${situacaoPrazo.classe}`
+            }
+          >
+
+            <strong>
+              {situacaoPrazo.texto}
+            </strong>
+
+            <span>
+              {situacaoPrazo.detalhe}
+            </span>
+
+          </div>
+
         </div>
 
       </div>
 
-      <div className="status-list">
+      <div className="release-status-list">
 
-        {situacoes.map(status => {
+        {situacoes.map(
+          status => {
 
-          const porcentagem =
+            const porcentagem =
+              total === 0
+                ? 0
+                : (
+                    status.value /
+                    total
+                  ) * 100;
 
-            total === 0
+            return (
 
-              ? 0
+              <div
+                key={
+                  status.label
+                }
+                className="release-status-row"
+              >
 
-              : (status.value / total) * 100;
+                <div className="release-status-label">
 
-          return (
+                  <span
+                    className="release-status-dot"
+                    style={{
+                      background:
+                        status.color,
+                    }}
+                  />
 
-            <div
+                  <span>
 
-              key={status.label}
+                    {status.label}
 
-              className="status-row"
+                  </span>
 
-            >
+                </div>
 
-              <span className="status-name">
+                <div className="release-status-bar">
 
-                {status.label}
+                  <div
+                    className="release-status-fill"
+                    style={{
+                      width:
+                        `${porcentagem}%`,
+                      background:
+                        status.color,
+                    }}
+                  />
 
-              </span>
+                </div>
 
-              <div className="status-bar">
+                <strong>
 
-                <div
+                  {status.value}
 
-                  className="status-fill"
-
-                  style={{
-
-                    width: `${porcentagem}%`,
-
-                    background: status.color,
-
-                  }}
-
-                />
+                </strong>
 
               </div>
 
-              <strong>
+            );
 
-                {status.value}
+          }
+        )}
 
-              </strong>
+        {situacoes.length === 0 && (
 
-            </div>
+          <div className="release-status-empty">
 
-          );
+            Nenhuma tarefa neste projeto.
 
-        })}
+          </div>
+
+        )}
 
       </div>
 
