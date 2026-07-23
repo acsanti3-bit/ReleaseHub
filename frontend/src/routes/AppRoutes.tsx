@@ -1,7 +1,7 @@
 import {
   BrowserRouter,
-  Routes,
   Route,
+  Routes,
 } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -14,6 +14,10 @@ import Settings from "../pages/Settings/Settings";
 
 import ReleaseEnvironments from "../pages/ReleaseEnvironments/ReleaseEnvironments";
 
+import Login from "../pages/Login/Login";
+
+import ProtectedRoute from "./ProtectedRoute";
+
 function AppRoutes() {
 
   return (
@@ -23,30 +27,69 @@ function AppRoutes() {
       <Routes>
 
         <Route
+          path="/login"
+          element={
+            <Login />
+          }
+        />
+
+        <Route
+          path="/tv"
+          element={
+            <TvDashboard />
+          }
+        />
+
+        <Route
           path="/"
-          element={<Dashboard />}
+          element={
+
+            <ProtectedRoute>
+
+              <Dashboard />
+
+            </ProtectedRoute>
+
+          }
         />
 
         <Route
           path="/projects"
-          element={<Projects />}
+          element={
+
+            <ProtectedRoute>
+
+              <Projects />
+
+            </ProtectedRoute>
+
+          }
         />
 
         <Route
           path="/environments"
           element={
-            <ReleaseEnvironments />
+
+            <ProtectedRoute>
+
+              <ReleaseEnvironments />
+
+            </ProtectedRoute>
+
           }
         />
 
         <Route
           path="/settings"
-          element={<Settings />}
-        />
+          element={
 
-        <Route
-          path="/tv"
-          element={<TvDashboard />}
+            <ProtectedRoute>
+
+              <Settings />
+
+            </ProtectedRoute>
+
+          }
         />
 
       </Routes>

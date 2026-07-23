@@ -1,0 +1,170 @@
+.sidebar{
+
+    position:relative;
+
+    padding-bottom:155px;
+
+}
+
+
+.sidebar-auth{
+
+    position:absolute;
+
+    left:16px;
+
+    right:16px;
+
+    bottom:18px;
+
+    padding-top:15px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.18);
+
+}
+
+
+.sidebar-auth-user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+
+.sidebar-auth-avatar{
+
+    width:36px;
+
+    height:36px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+    background:#F58220;
+
+    color:#FFF;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    font-weight:800;
+
+}
+
+
+.sidebar-auth-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-width:0;
+
+}
+
+
+.sidebar-auth-info strong{
+
+    overflow:hidden;
+
+    color:#FFF;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+
+}
+
+
+.sidebar-auth-info span{
+
+    margin-top:2px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            .65
+        );
+
+    font-size:10px;
+
+}
+
+
+.sidebar-logout{
+
+    width:100%;
+
+    height:36px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:7px;
+
+    margin-top:11px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.20);
+
+    border-radius:8px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .08
+        );
+
+    color:#FFF;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+.sidebar-logout:hover:not(:disabled){
+
+    background:#F58220;
+
+    border-color:#F58220;
+
+}
+
+
+.sidebar-logout:disabled{
+
+    opacity:.6;
+
+    cursor:wait;
+
+}
