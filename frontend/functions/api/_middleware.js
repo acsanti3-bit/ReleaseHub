@@ -20,9 +20,8 @@ export async function onRequest(
       .toUpperCase();
 
   /*
-    Login, logout, setup e verificação
-    de sessão precisam chegar às
-    próprias rotas de autenticação.
+    Rotas responsáveis pelo próprio
+    processo de autenticação.
   */
 
   if (
@@ -36,19 +35,27 @@ export async function onRequest(
   }
 
   /*
-    Leituras continuam públicas.
-
-    Isso mantém o Modo TV funcionando
-    sem necessidade de login.
+    Somente estas consultas GET
+    permanecem públicas para que
+    o Modo TV funcione sem login.
   */
 
-  if (
-    metodo === "GET"
-  ) {
+  const leituraPublica =
+    metodo === "GET" &&
+    (
+      caminho === "/api/projects" ||
+      caminho === "/api/environments"
+    );
+
+  if (leituraPublica) {
 
     return context.next();
 
   }
+
+  /*
+    Todo o restante exige sessão.
+  */
 
   const usuario =
     await buscarUsuarioLogado(
@@ -68,6 +75,33 @@ export async function onRequest(
     );
 
   }
+
+  /*
+    Gestão de usuários é exclusiva
+    para administradores.
+  */
+
+  if (
+    caminho.startsWith(
+      "/api/users"
+    ) &&
+    usuario.role !== "admin"
+  ) {
+
+    return Response.json(
+      {
+        erro:
+          "Você não possui permissão para gerenciar usuários.",
+      },
+      {
+        status: 403,
+      }
+    );
+
+  }
+
+  context.data.usuario =
+    usuario;
 
   return context.next();
 
