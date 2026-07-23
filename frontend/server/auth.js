@@ -1,9 +1,6 @@
 const encoder =
   new TextEncoder();
 
-const PBKDF2_ITERATIONS =
-  600000;
-
 const SESSION_SECONDS =
   60 * 60 * 8;
 
@@ -77,70 +74,75 @@ function randomHex(
 }
 
 
-async function derivarSenha(
-  senha,
-  saltHex
+async function importarChaveAuth(
+  authSecret
 ) {
 
-  const material =
-    await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(senha),
-      "PBKDF2",
-      false,
-      ["deriveBits"]
+  return crypto.subtle.importKey(
+    "raw",
+    encoder.encode(
+      authSecret
+    ),
+    {
+      name: "HMAC",
+      hash: "SHA-256",
+    },
+    false,
+    [
+      "sign",
+    ]
+  );
+
+}
+
+
+async function calcularHashSenha(
+  senha,
+  salt,
+  authSecret
+) {
+
+  const chave =
+    await importarChaveAuth(
+      authSecret
     );
 
-  const resultado =
-    await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-
-        hash: "SHA-256",
-
-        salt:
-          hexToBytes(
-            saltHex
-          ),
-
-        iterations:
-          PBKDF2_ITERATIONS,
-      },
-
-      material,
-
-      256
+  const assinatura =
+    await crypto.subtle.sign(
+      "HMAC",
+      chave,
+      encoder.encode(
+        `${salt}:${senha}`
+      )
     );
 
-  return new Uint8Array(
-    resultado
+  return bytesToHex(
+    new Uint8Array(
+      assinatura
+    )
   );
 
 }
 
 
 export async function criarHashSenha(
-  senha
+  senha,
+  authSecret
 ) {
 
   const salt =
     randomHex(16);
 
-  const hashBytes =
-    await derivarSenha(
+  const hash =
+    await calcularHashSenha(
       senha,
-      salt
+      salt,
+      authSecret
     );
 
   return {
-
     salt,
-
-    hash:
-      bytesToHex(
-        hashBytes
-      ),
-
+    hash,
   };
 
 }
@@ -149,33 +151,45 @@ export async function criarHashSenha(
 export async function verificarSenha(
   senha,
   hashSalvo,
-  salt
+  salt,
+  authSecret
 ) {
 
   const calculado =
-    await derivarSenha(
+    await calcularHashSenha(
       senha,
-      salt
+      salt,
+      authSecret
     );
 
-  const salvo =
+  const calculadoBytes =
+    hexToBytes(
+      calculado
+    );
+
+  const salvoBytes =
     hexToBytes(
       hashSalvo
     );
 
-  if (
-    calculado.byteLength !==
-    salvo.byteLength
-  ) {
+  const mesmoTamanho =
+    calculadoBytes.byteLength ===
+    salvoBytes.byteLength;
 
-    return false;
+  if (!mesmoTamanho) {
+
+    return !crypto.subtle
+      .timingSafeEqual(
+        calculadoBytes,
+        calculadoBytes
+      );
 
   }
 
   return crypto.subtle
     .timingSafeEqual(
-      calculado,
-      salvo
+      calculadoBytes,
+      salvoBytes
     );
 
 }
@@ -210,12 +224,6 @@ export function compararSegredo(
 
   }
 
-  /*
-    Mesmo com tamanhos diferentes,
-    executamos uma comparação para
-    reduzir vazamento por tempo.
-  */
-
   return !crypto.subtle
     .timingSafeEqual(
       recebidoBytes,
@@ -239,7 +247,9 @@ export async function hashToken(
   const resultado =
     await crypto.subtle.digest(
       "SHA-256",
-      encoder.encode(token)
+      encoder.encode(
+        token
+      )
     );
 
   return bytesToHex(
