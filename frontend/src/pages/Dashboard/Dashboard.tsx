@@ -24,16 +24,29 @@ import type {
   Project,
 } from "../../types/project";
 
+import type {
+  ReleaseEnvironment,
+} from "../../types/releaseEnvironment";
+
 import {
-  listarProjetos,
-  editarProjeto,
-  adicionarProjeto,
-  criarProjeto,
-} from "../../services/ProjectService";
+  listarAmbientes,
+  obterAmbienteMaisRecente,
+  ordenarAmbientesPorVersao,
+} from "../../services/ReleaseEnvironmentService";
+
+import {
+  listarProjetosPorAmbiente,
+  salvarProjetoNoAmbiente,
+} from "../../services/ReleaseProjectService";
 
 import {
   buscarSessao,
 } from "../../services/AuthService";
+
+
+const STORAGE_KEY =
+  "releasehub_dashboard_environment";
+
 
 function Dashboard() {
 
@@ -44,8 +57,30 @@ function Dashboard() {
     useState<Project[]>([]);
 
   const [
+    ambientes,
+    setAmbientes,
+  ] =
+    useState<
+      ReleaseEnvironment[]
+    >([]);
+
+  const [
+    ambienteSelecionadoId,
+    setAmbienteSelecionadoId,
+  ] =
+    useState<
+      number | null
+    >(null);
+
+  const [
     carregando,
     setCarregando,
+  ] =
+    useState(true);
+
+  const [
+    carregandoAmbientes,
+    setCarregandoAmbientes,
   ] =
     useState(true);
 
@@ -81,62 +116,329 @@ function Dashboard() {
   ] =
     useState("Nome");
 
-  async function carregarProjetos() {
+
+  /*
+    Carrega os ambientes.
+  */
+
+  useEffect(() => {
+
+    let ativo = true;
+
+    async function carregarAmbientes() {
+
+      try {
+
+        const lista =
+          await listarAmbientes();
+
+        if (!ativo) {
+
+          return;
+
+        }
+
+        const ordenados =
+          ordenarAmbientesPorVersao(
+            lista
+          );
+
+        setAmbientes(
+          ordenados
+        );
+
+
+        const salvo =
+          localStorage.getItem(
+            STORAGE_KEY
+          );
+
+        const idSalvo =
+          salvo
+            ? Number(salvo)
+            : null;
+
+
+        const salvoExiste =
+          idSalvo !== null &&
+          ordenados.some(
+            ambiente =>
+              ambiente.id ===
+              idSalvo
+          );
+
+
+        if (
+          salvoExiste &&
+          idSalvo !== null
+        ) {
+
+          setAmbienteSelecionadoId(
+            idSalvo
+          );
+
+          return;
+
+        }
+
+
+        const maisRecente =
+          obterAmbienteMaisRecente(
+            ordenados
+          );
+
+
+        if (maisRecente) {
+
+          setAmbienteSelecionadoId(
+            maisRecente.id
+          );
+
+          localStorage.setItem(
+            STORAGE_KEY,
+            String(
+              maisRecente.id
+            )
+          );
+
+        }
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao carregar ambientes:",
+          erro
+        );
+
+      } finally {
+
+        if (ativo) {
+
+          setCarregandoAmbientes(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+
+    void carregarAmbientes();
+
+
+    return () => {
+
+      ativo = false;
+
+    };
+
+  }, []);
+
+
+  /*
+    Carrega a permissão.
+  */
+
+  useEffect(() => {
+
+    let ativo = true;
+
+    async function carregarPermissao() {
+
+      try {
+
+        const usuario =
+          await buscarSessao();
+
+        if (!ativo) {
+
+          return;
+
+        }
+
+        setPodeEditar(
+          usuario?.role === "admin" ||
+          usuario?.role === "qualidade"
+        );
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao carregar permissão:",
+          erro
+        );
+
+        if (ativo) {
+
+          setPodeEditar(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+
+    void carregarPermissao();
+
+
+    return () => {
+
+      ativo = false;
+
+    };
+
+  }, []);
+
+
+  /*
+    Busca os projetos específicos
+    da release selecionada.
+  */
+
+  async function carregarProjetos(
+    environmentId: number
+  ) {
 
     try {
 
-      const lista =
-        await listarProjetos();
+      setCarregando(
+        true
+      );
 
-      setProjects(lista);
+      const lista =
+        await listarProjetosPorAmbiente(
+          environmentId
+        );
+
+      setProjects(
+        lista
+      );
 
     } catch (erro) {
 
       console.error(
-        "Erro ao carregar projetos:",
+        "Erro ao carregar projetos da release:",
         erro
+      );
+
+      setProjects(
+        []
       );
 
     } finally {
 
-      setCarregando(false);
+      setCarregando(
+        false
+      );
 
     }
 
   }
 
-  async function carregarPermissao() {
-
-    try {
-
-      const usuario =
-        await buscarSessao();
-
-      setPodeEditar(
-        usuario?.role === "admin" ||
-        usuario?.role === "qualidade"
-      );
-
-    } catch (erro) {
-
-      console.error(
-        "Erro ao carregar permissão:",
-        erro
-      );
-
-      setPodeEditar(false);
-
-    }
-
-  }
 
   useEffect(() => {
 
-    void carregarProjetos();
+    if (
+      ambienteSelecionadoId === null
+    ) {
 
-    void carregarPermissao();
+      setProjects(
+        []
+      );
 
-  }, []);
+      setCarregando(
+        false
+      );
+
+      return;
+
+    }
+
+
+    void carregarProjetos(
+      ambienteSelecionadoId
+    );
+
+  }, [
+    ambienteSelecionadoId,
+  ]);
+
+
+  const ambienteSelecionado =
+    ambientes.find(
+      ambiente =>
+        ambiente.id ===
+        ambienteSelecionadoId
+    );
+
+
+  /*
+    Troca a release.
+
+    IMPORTANTÍSSIMO:
+    filtros da release anterior
+    não devem afetar a nova.
+  */
+
+  function alterarAmbiente(
+    id: number
+  ) {
+
+    setProjectSelecionado(
+      null
+    );
+
+
+    /*
+      Limpamos os filtros para
+      evitar parecer que a nova
+      release está sem projetos.
+    */
+
+    setPesquisa(
+      ""
+    );
+
+    setFiltro(
+      "Todos"
+    );
+
+    setOrdenacao(
+      "Nome"
+    );
+
+
+    /*
+      Limpa os cards antigos
+      enquanto busca a nova release.
+    */
+
+    setProjects(
+      []
+    );
+
+    setCarregando(
+      true
+    );
+
+
+    setAmbienteSelecionadoId(
+      id
+    );
+
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      String(id)
+    );
+
+  }
+
 
   function fecharDrawer() {
 
@@ -146,39 +448,38 @@ function Dashboard() {
 
   }
 
+
+  /*
+    Salva o projeto somente
+    dentro da release selecionada.
+  */
+
   async function salvarProjeto(
     project: Project
   ) {
 
-    if (!podeEditar) {
+    if (
+      !podeEditar ||
+      ambienteSelecionadoId === null
+    ) {
 
       return;
 
     }
 
+
     try {
 
-      const existe =
-        projects.some(
-          p =>
-            p.id === project.id
-        );
+      await salvarProjetoNoAmbiente(
+        ambienteSelecionadoId,
+        project
+      );
 
-      if (existe) {
 
-        await editarProjeto(
-          project
-        );
+      await carregarProjetos(
+        ambienteSelecionadoId
+      );
 
-      } else {
-
-        await adicionarProjeto(
-          project
-        );
-
-      }
-
-      await carregarProjetos();
 
       setProjectSelecionado(
         null
@@ -187,17 +488,18 @@ function Dashboard() {
     } catch (erro) {
 
       console.error(
-        "Erro ao salvar projeto:",
+        "Erro ao salvar projeto da release:",
         erro
       );
 
       alert(
-        "Não foi possível salvar o projeto."
+        "Não foi possível salvar o projeto desta release."
       );
 
     }
 
   }
+
 
   function converterPrazo(
     prazo: string
@@ -209,24 +511,34 @@ function Dashboard() {
 
     }
 
+
     const formatoBrasileiro =
       /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
 
     const resultado =
       prazo.match(
         formatoBrasileiro
       );
 
+
     if (resultado) {
 
       const dia =
-        Number(resultado[1]);
+        Number(
+          resultado[1]
+        );
 
       const mes =
-        Number(resultado[2]);
+        Number(
+          resultado[2]
+        );
 
       const ano =
-        Number(resultado[3]);
+        Number(
+          resultado[3]
+        );
+
 
       const data =
         new Date(
@@ -234,6 +546,7 @@ function Dashboard() {
           mes - 1,
           dia
         );
+
 
       if (
         data.getFullYear() !== ano ||
@@ -245,12 +558,17 @@ function Dashboard() {
 
       }
 
+
       return data.getTime();
 
     }
 
+
     const data =
-      new Date(prazo);
+      new Date(
+        prazo
+      );
+
 
     if (
       Number.isNaN(
@@ -262,9 +580,11 @@ function Dashboard() {
 
     }
 
+
     return data.getTime();
 
   }
+
 
   const projetos =
     useMemo(() => {
@@ -273,15 +593,18 @@ function Dashboard() {
         ...projects,
       ];
 
+
       lista =
         lista.filter(
           project =>
             project.nome
               .toLowerCase()
               .includes(
-                pesquisa.toLowerCase()
+                pesquisa
+                  .toLowerCase()
               )
         );
+
 
       switch (filtro) {
 
@@ -289,57 +612,81 @@ function Dashboard() {
 
           lista =
             lista.filter(
-              p =>
-                p.situacoes.qualidade > 0
+              project =>
+                project
+                  .situacoes
+                  .qualidade >
+                0
             );
 
           break;
+
 
         case "Testes":
 
           lista =
             lista.filter(
-              p =>
-                p.situacoes.testes > 0
+              project =>
+                project
+                  .situacoes
+                  .testes >
+                0
             );
 
           break;
+
 
         case "Em Progresso":
 
           lista =
             lista.filter(
-              p =>
-                p.situacoes.emProgresso > 0
+              project =>
+                project
+                  .situacoes
+                  .emProgresso >
+                0
             );
 
           break;
+
 
         case "Desenvolvido":
 
           lista =
             lista.filter(
-              p =>
-                p.situacoes.desenvolvido > 0 ||
-                p.situacoes.aguardandoCompilacao > 0
+              project =>
+                project
+                  .situacoes
+                  .desenvolvido >
+                  0 ||
+                project
+                  .situacoes
+                  .aguardandoCompilacao >
+                  0
             );
 
           break;
+
 
         case "Aguard. Comp.":
 
           lista =
             lista.filter(
-              p =>
-                p.situacoes.aguardandoCompilacao > 0
+              project =>
+                project
+                  .situacoes
+                  .aguardandoCompilacao >
+                0
             );
 
           break;
+
 
         case "Atrasados": {
 
           const hoje =
             new Date();
+
 
           hoje.setHours(
             0,
@@ -348,15 +695,19 @@ function Dashboard() {
             0
           );
 
+
           lista =
             lista.filter(
               project => {
 
-                if (!project.prazo) {
+                if (
+                  !project.prazo
+                ) {
 
                   return false;
 
                 }
+
 
                 return (
                   converterPrazo(
@@ -368,46 +719,67 @@ function Dashboard() {
               }
             );
 
+
           break;
 
         }
 
       }
 
+
       switch (ordenacao) {
 
         case "Prazo":
 
           lista.sort(
-            (a, b) =>
-              converterPrazo(a.prazo) -
-              converterPrazo(b.prazo)
+            (
+              a,
+              b
+            ) =>
+              converterPrazo(
+                a.prazo
+              ) -
+              converterPrazo(
+                b.prazo
+              )
           );
 
           break;
 
+
         case "Tarefas":
 
           lista.sort(
-            (a, b) => {
+            (
+              a,
+              b
+            ) => {
 
               const totalA =
                 Object.values(
                   a.situacoes
                 ).reduce(
-                  (x, y) =>
+                  (
+                    x,
+                    y
+                  ) =>
                     x + y,
                   0
                 );
+
 
               const totalB =
                 Object.values(
                   b.situacoes
                 ).reduce(
-                  (x, y) =>
+                  (
+                    x,
+                    y
+                  ) =>
                     x + y,
                   0
                 );
+
 
               return (
                 totalB -
@@ -419,16 +791,21 @@ function Dashboard() {
 
           break;
 
+
         default:
 
           lista.sort(
-            (a, b) =>
+            (
+              a,
+              b
+            ) =>
               a.nome.localeCompare(
                 b.nome
               )
           );
 
       }
+
 
       return lista;
 
@@ -439,17 +816,26 @@ function Dashboard() {
       ordenacao,
     ]);
 
+
   const colunaEsquerda =
     projetos.filter(
-      (_, index) =>
+      (
+        _,
+        index
+      ) =>
         index % 2 === 0
     );
 
+
   const colunaDireita =
     projetos.filter(
-      (_, index) =>
+      (
+        _,
+        index
+      ) =>
         index % 2 !== 0
     );
+
 
   return (
 
@@ -466,133 +852,325 @@ function Dashboard() {
             </h1>
 
             <span>
+
               {projects.length} Projetos
+
             </span>
 
           </div>
 
-          {podeEditar && (
 
-            <button
-              className="new-project"
-              onClick={() =>
-                setProjectSelecionado(
-                  criarProjeto()
-                )
+          <div className="dashboard-release-selector">
+
+            <label>
+
+              Release em acompanhamento
+
+            </label>
+
+
+            <select
+              value={
+                ambienteSelecionadoId ??
+                ""
+              }
+              disabled={
+                carregandoAmbientes ||
+                ambientes.length === 0
+              }
+              onChange={
+                event =>
+                  alterarAmbiente(
+                    Number(
+                      event
+                        .target
+                        .value
+                    )
+                  )
               }
             >
 
-              + Novo Projeto
+              {ambientes.length ===
+                0 && (
 
-            </button>
+                <option value="">
 
-          )}
+                  Nenhuma release cadastrada
+
+                </option>
+
+              )}
+
+
+              {ambientes.map(
+                ambiente => (
+
+                  <option
+                    key={
+                      ambiente.id
+                    }
+                    value={
+                      ambiente.id
+                    }
+                  >
+
+                    {ambiente.nome}
+
+                  </option>
+
+                )
+              )}
+
+            </select>
+
+
+            {ambienteSelecionado && (
+
+              <small>
+
+                Intellicash{" "}
+
+                {
+                  ambienteSelecionado
+                    .versoes
+                    .intellicash
+                }
+
+              </small>
+
+            )}
+
+          </div>
 
         </div>
 
+
         <CompatibilityPanel
-          projects={projects}
-          carregando={carregando}
+          projects={
+            projects
+          }
+          carregando={
+            carregando ||
+            carregandoAmbientes
+          }
         />
+
 
         <div className="dashboard-charts">
 
           <TasksChart
-            projects={projects}
+            projects={
+              projects
+            }
           />
 
+
           <TopProjects
-            projects={projects}
+            projects={
+              projects
+            }
           />
 
         </div>
 
+
         <AttentionProjects
-          projects={projects}
+          projects={
+            projects
+          }
         />
+
 
         <div className="dashboard-filters">
 
           <input
             className="dashboard-search"
             placeholder="Pesquisar projeto..."
-            value={pesquisa}
-            onChange={e =>
-              setPesquisa(
-                e.target.value
-              )
+            value={
+              pesquisa
+            }
+            onChange={
+              event =>
+                setPesquisa(
+                  event
+                    .target
+                    .value
+                )
             }
           />
 
+
           <select
             className="dashboard-filter"
-            value={filtro}
-            onChange={e =>
-              setFiltro(
-                e.target.value
-              )
+            value={
+              filtro
+            }
+            onChange={
+              event =>
+                setFiltro(
+                  event
+                    .target
+                    .value
+                )
             }
           >
 
-            <option>Todos</option>
-            <option>Qualidade</option>
-            <option>Testes</option>
-            <option>Em Progresso</option>
-            <option>Desenvolvido</option>
-            <option>Aguard. Comp.</option>
-            <option>Atrasados</option>
+            <option>
+              Todos
+            </option>
+
+            <option>
+              Qualidade
+            </option>
+
+            <option>
+              Testes
+            </option>
+
+            <option>
+              Em Progresso
+            </option>
+
+            <option>
+              Desenvolvido
+            </option>
+
+            <option>
+              Aguard. Comp.
+            </option>
+
+            <option>
+              Atrasados
+            </option>
 
           </select>
 
+
           <select
             className="dashboard-filter"
-            value={ordenacao}
-            onChange={e =>
-              setOrdenacao(
-                e.target.value
-              )
+            value={
+              ordenacao
+            }
+            onChange={
+              event =>
+                setOrdenacao(
+                  event
+                    .target
+                    .value
+                )
             }
           >
 
-            <option>Nome</option>
-            <option>Prazo</option>
-            <option>Tarefas</option>
+            <option>
+              Nome
+            </option>
+
+            <option>
+              Prazo
+            </option>
+
+            <option>
+              Tarefas
+            </option>
 
           </select>
 
         </div>
 
+
         <span className="dashboard-counter">
 
           Exibindo{" "}
-          {projetos.length} de{" "}
-          {projects.length} projetos
+
+          {projetos.length}
+
+          {" "}de{" "}
+
+          {projects.length}
+
+          {" "}projetos
+
+
+          {ambienteSelecionado && (
+
+            <>
+
+              {" • "}
+
+              {
+                ambienteSelecionado
+                  .nome
+              }
+
+            </>
+
+          )}
+
 
           {!podeEditar &&
             " • Somente leitura"}
 
         </span>
 
+
         {carregando ? (
 
           <div className="dashboard-empty">
 
             <h2>
+
               Carregando projetos...
+
             </h2>
+
+          </div>
+
+        ) : projects.length === 0 ? (
+
+          /*
+            Aqui SIM significa que
+            a release realmente não
+            possui projetos.
+          */
+
+          <div className="dashboard-empty">
+
+            <h2>
+
+              Nenhum projeto cadastrado
+
+            </h2>
+
+            <p>
+
+              Esta release ainda não possui
+              projetos vinculados.
+
+            </p>
 
           </div>
 
         ) : projetos.length === 0 ? (
 
+          /*
+            Existem projetos, mas
+            pesquisa/filtro não encontrou.
+          */
+
           <div className="dashboard-empty">
 
             <h2>
-              Nenhum projeto encontrado
+
+              Nenhum resultado encontrado
+
             </h2>
 
             <p>
-              Tente alterar os filtros ou a pesquisa.
+
+              Existem projetos nesta release,
+              mas nenhum corresponde aos
+              filtros selecionados.
+
             </p>
 
           </div>
@@ -607,8 +1185,12 @@ function Dashboard() {
                 project => (
 
                   <ProjectCard
-                    key={project.id}
-                    project={project}
+                    key={
+                      project.id
+                    }
+                    project={
+                      project
+                    }
                     canEdit={
                       podeEditar
                     }
@@ -622,14 +1204,19 @@ function Dashboard() {
 
             </div>
 
+
             <div className="dashboard-column">
 
               {colunaDireita.map(
                 project => (
 
                   <ProjectCard
-                    key={project.id}
-                    project={project}
+                    key={
+                      project.id
+                    }
+                    project={
+                      project
+                    }
                     canEdit={
                       podeEditar
                     }
@@ -649,12 +1236,17 @@ function Dashboard() {
 
       </div>
 
+
       {podeEditar &&
-        projectSelecionado && (
+        projectSelecionado &&
+        ambienteSelecionado && (
 
         <ProjectDrawer
           project={
             projectSelecionado
+          }
+          environment={
+            ambienteSelecionado
           }
           onSave={
             salvarProjeto

@@ -17,9 +17,12 @@ import {
   listarAmbientes,
 } from "../../services/ReleaseEnvironmentService";
 
+
 interface Props {
 
   project: Project;
+
+  environment?: ReleaseEnvironment;
 
   onClose: () => void;
 
@@ -29,9 +32,12 @@ interface Props {
 
 }
 
+
 function ProjectDrawer({
 
   project,
+
+  environment,
 
   onClose,
 
@@ -55,7 +61,26 @@ function ProjectDrawer({
       ReleaseEnvironment[]
     >([]);
 
+
+  const modoRelease =
+    Boolean(
+      environment
+    );
+
+
+  /*
+    Mantém o comportamento antigo
+    caso o Drawer seja utilizado
+    fora do Dashboard por release.
+  */
+
   useEffect(() => {
+
+    if (modoRelease) {
+
+      return;
+
+    }
 
     let ativo = true;
 
@@ -93,12 +118,19 @@ function ProjectDrawer({
 
     };
 
-  }, []);
+  }, [
+    modoRelease,
+  ]);
+
 
   const nomeNormalizado =
     form.nome
       .toLowerCase()
-      .replace(/\s/g, "");
+      .replace(
+        /\s/g,
+        ""
+      );
+
 
   const isIntellicash =
     nomeNormalizado.includes(
@@ -107,6 +139,7 @@ function ProjectDrawer({
     nomeNormalizado.includes(
       "intelicash"
     );
+
 
   const isProjetoVinculado =
     nomeNormalizado.includes(
@@ -128,6 +161,7 @@ function ProjectDrawer({
       "iwb"
     );
 
+
   function alterarCampo(
     campo: keyof Project,
     valor: string
@@ -137,11 +171,13 @@ function ProjectDrawer({
 
       ...form,
 
-      [campo]: valor,
+      [campo]:
+        valor,
 
     });
 
   }
+
 
   function alterarSituacao(
     campo:
@@ -157,13 +193,15 @@ function ProjectDrawer({
 
         ...form.situacoes,
 
-        [campo]: valor,
+        [campo]:
+          valor,
 
       },
 
     });
 
   }
+
 
   const nomesSituacoes: Record<
     keyof Project["situacoes"],
@@ -199,25 +237,61 @@ function ProjectDrawer({
 
   };
 
+
   return (
 
     <>
 
       <div
         className="drawer-backdrop"
-        onClick={onClose}
+        onClick={
+          onClose
+        }
       />
+
 
       <aside className="drawer">
 
         <div className="drawer-header">
 
-          <h2>
-            Projeto
-          </h2>
+          <div>
+
+            <h2>
+              Projeto
+            </h2>
+
+            {environment && (
+
+              <span
+                style={{
+                  display:
+                    "block",
+
+                  marginTop:
+                    "4px",
+
+                  color:
+                    "#7A838C",
+
+                  fontSize:
+                    "11px",
+                }}
+              >
+
+                {environment.nome}
+
+              </span>
+
+            )}
+
+          </div>
+
 
           <button
-            onClick={onClose}
+            type="button"
+            onClick={
+              onClose
+            }
           >
 
             ×
@@ -226,27 +300,147 @@ function ProjectDrawer({
 
         </div>
 
+
         <div className="drawer-body">
+
+          {environment && (
+
+            <div
+              style={{
+                marginBottom:
+                  "20px",
+
+                padding:
+                  "12px 14px",
+
+                background:
+                  "#EEF6FD",
+
+                borderLeft:
+                  "4px solid #005AA9",
+
+                borderRadius:
+                  "8px",
+              }}
+            >
+
+              <strong
+                style={{
+                  display:
+                    "block",
+
+                  color:
+                    "#005AA9",
+
+                  fontSize:
+                    "13px",
+                }}
+              >
+
+                Release em acompanhamento
+
+              </strong>
+
+
+              <span
+                style={{
+                  display:
+                    "block",
+
+                  marginTop:
+                    "4px",
+
+                  color:
+                    "#65717C",
+
+                  fontSize:
+                    "12px",
+                }}
+              >
+
+                {environment.nome}
+
+                {" • Intellicash "}
+
+                {
+                  environment
+                    .versoes
+                    .intellicash
+                }
+
+              </span>
+
+            </div>
+
+          )}
+
 
           <label>
             Nome
           </label>
 
           <input
-            value={form.nome}
+            value={
+              form.nome
+            }
+            readOnly={
+              modoRelease
+            }
             onChange={e =>
               alterarCampo(
                 "nome",
                 e.target.value
               )
             }
+            title={
+              modoRelease
+                ? "O projeto é definido pelo cadastro geral."
+                : ""
+            }
           />
+
+
+          {modoRelease && (
+
+            <div
+              style={{
+                marginTop:
+                  "6px",
+
+                marginBottom:
+                  "12px",
+
+                color:
+                  "#7A838C",
+
+                fontSize:
+                  "11px",
+              }}
+            >
+
+              O nome pertence ao cadastro geral do projeto.
+
+            </div>
+
+          )}
+
 
           <label>
             Versão
           </label>
 
-          {isIntellicash ? (
+
+          {modoRelease ? (
+
+            <input
+              value={
+                form.versao
+              }
+              readOnly
+              title="Versão definida pelo Ambiente da Release."
+            />
+
+          ) : isIntellicash ? (
 
             <select
               value={
@@ -265,6 +459,7 @@ function ProjectDrawer({
                 Selecione o Ambiente da Release
 
               </option>
+
 
               {ambientes.map(
                 ambiente => (
@@ -302,7 +497,9 @@ function ProjectDrawer({
           ) : (
 
             <input
-              value={form.versao}
+              value={
+                form.versao
+              }
               readOnly={
                 isProjetoVinculado
               }
@@ -321,40 +518,87 @@ function ProjectDrawer({
 
           )}
 
-          {isIntellicash && (
+
+          {modoRelease && (
 
             <div
               style={{
-                marginTop: "6px",
-                marginBottom: "12px",
-                color: "#005AA9",
-                fontSize: "12px",
+                marginTop:
+                  "6px",
+
+                marginBottom:
+                  "12px",
+
+                color:
+                  "#005AA9",
+
+                fontSize:
+                  "12px",
+              }}
+            >
+
+              Versão vinculada automaticamente
+              ao ambiente selecionado.
+
+            </div>
+
+          )}
+
+
+          {!modoRelease &&
+            isIntellicash && (
+
+            <div
+              style={{
+                marginTop:
+                  "6px",
+
+                marginBottom:
+                  "12px",
+
+                color:
+                  "#005AA9",
+
+                fontSize:
+                  "12px",
               }}
             >
 
               Ao selecionar uma versão,
-              os demais projetos serão atualizados automaticamente.
+              os demais projetos serão
+              atualizados automaticamente.
 
             </div>
 
           )}
 
-          {isProjetoVinculado && (
+
+          {!modoRelease &&
+            isProjetoVinculado && (
 
             <div
               style={{
-                marginTop: "6px",
-                marginBottom: "12px",
-                color: "#7A838C",
-                fontSize: "12px",
+                marginTop:
+                  "6px",
+
+                marginBottom:
+                  "12px",
+
+                color:
+                  "#7A838C",
+
+                fontSize:
+                  "12px",
               }}
             >
 
-              Versão definida automaticamente pelo Ambiente da Release.
+              Versão definida automaticamente
+              pelo Ambiente da Release.
 
             </div>
 
           )}
+
 
           <label>
             Executável
@@ -364,6 +608,7 @@ function ProjectDrawer({
             value={
               form.executavel
             }
+            placeholder="dd/mm/aaaa"
             onChange={e =>
               alterarCampo(
                 "executavel",
@@ -371,6 +616,7 @@ function ProjectDrawer({
               )
             }
           />
+
 
           <label>
             Prazo
@@ -380,6 +626,7 @@ function ProjectDrawer({
             value={
               form.prazo
             }
+            placeholder="dd/mm/aaaa"
             onChange={e =>
               alterarCampo(
                 "prazo",
@@ -388,17 +635,26 @@ function ProjectDrawer({
             }
           />
 
+
           <h3>
             Situações
           </h3>
 
+
           {Object.entries(
             form.situacoes
           ).map(
-            ([campo, valor]) => (
+            (
+              [
+                campo,
+                valor,
+              ]
+            ) => (
 
               <div
-                key={campo}
+                key={
+                  campo
+                }
                 className="drawer-row"
               >
 
@@ -412,15 +668,21 @@ function ProjectDrawer({
 
                 </span>
 
+
                 <input
                   type="number"
                   min={0}
-                  value={valor}
+                  value={
+                    valor
+                  }
                   onChange={e =>
                     alterarSituacao(
                       campo as keyof Project["situacoes"],
-                      Number(
-                        e.target.value
+                      Math.max(
+                        0,
+                        Number(
+                          e.target.value
+                        )
                       )
                     )
                   }
@@ -431,10 +693,14 @@ function ProjectDrawer({
             )
           )}
 
+
           <button
+            type="button"
             className="drawer-save"
             onClick={() =>
-              onSave(form)
+              onSave(
+                form
+              )
             }
           >
 

@@ -19,6 +19,8 @@
 
     align-items:center;
 
+    gap:24px;
+
     padding-bottom:16px;
 
     border-bottom:1px solid #E2E7EC;
@@ -52,7 +54,7 @@
 }
 
 
-.dashboard-header span{
+.dashboard-title > span{
 
     width:max-content;
 
@@ -71,23 +73,59 @@
 }
 
 
-.new-project{
+/* RELEASE EM ACOMPANHAMENTO */
 
-    height:44px;
+.dashboard-release-selector{
 
-    padding:0 20px;
+    width:300px;
 
-    border:none;
+    display:flex;
 
-    border-radius:10px;
+    flex-direction:column;
 
-    background:#F58220;
+    gap:5px;
 
-    color:#FFF;
+}
 
-    font-size:14px;
 
-    font-weight:600;
+.dashboard-release-selector label{
+
+    color:#68747E;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.4px;
+
+}
+
+
+.dashboard-release-selector select{
+
+    width:100%;
+
+    height:42px;
+
+    padding:0 38px 0 13px;
+
+    box-sizing:border-box;
+
+    border:1px solid #D6E0E8;
+
+    border-radius:9px;
+
+    background:#FFF;
+
+    color:#005AA9;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    outline:none;
 
     cursor:pointer;
 
@@ -96,9 +134,34 @@
 }
 
 
-.new-project:hover{
+.dashboard-release-selector select:hover,
+.dashboard-release-selector select:focus{
 
-    background:#D66E12;
+    border-color:#005AA9;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0,90,169,.07);
+
+}
+
+
+.dashboard-release-selector select:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+
+.dashboard-release-selector small{
+
+    color:#89949D;
+
+    font-size:10px;
+
+    font-weight:600;
 
 }
 
@@ -209,20 +272,17 @@
 }
 
 
-/*
-  PROJETOS
-
-  Duas colunas independentes.
-  Assim um card alto não empurra
-  o card da coluna ao lado.
-*/
+/* PROJETOS */
 
 .dashboard-grid{
 
     display:grid;
 
     grid-template-columns:
-        repeat(2,minmax(0,1fr));
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
 
     gap:14px;
 
@@ -257,6 +317,8 @@
     border-radius:16px;
 
     padding:45px 25px;
+
+    box-sizing:border-box;
 
     text-align:center;
 
@@ -336,11 +398,20 @@
     }
 
 
+    .dashboard-release-selector{
+
+        width:100%;
+
+    }
+
+
     .dashboard-filters{
 
         flex-direction:column;
 
         width:100%;
+
+        box-sizing:border-box;
 
     }
 
@@ -352,12 +423,7 @@
 
         flex:none;
 
-    }
-
-
-    .new-project{
-
-        width:100%;
+        box-sizing:border-box;
 
     }
 

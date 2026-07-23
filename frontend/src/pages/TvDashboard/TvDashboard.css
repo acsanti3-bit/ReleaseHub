@@ -12,13 +12,17 @@
 
     display:grid;
 
-    grid-template-rows:auto auto minmax(0,1fr);
+    grid-template-rows:
+        auto
+        auto
+        minmax(0,1fr);
 
     gap:14px;
 
     overflow:hidden;
 
 }
+
 
 /* HEADER */
 
@@ -42,9 +46,12 @@
 
     gap:24px;
 
-    box-shadow:0 6px 20px rgba(0,0,0,.07);
+    box-shadow:
+        0 6px 20px
+        rgba(0,0,0,.07);
 
 }
+
 
 /* MARCA */
 
@@ -60,6 +67,7 @@
 
 }
 
+
 .tv-logo{
 
     width:auto;
@@ -72,11 +80,13 @@
 
 }
 
+
 .tv-brand-text{
 
     min-width:0;
 
 }
+
 
 .tv-brand-text h1{
 
@@ -94,6 +104,7 @@
 
 }
 
+
 .tv-brand-subtitle{
 
     margin-top:8px;
@@ -106,6 +117,7 @@
 
 }
 
+
 .tv-brand-subtitle > span{
 
     color:#68737D;
@@ -115,6 +127,7 @@
     font-weight:500;
 
 }
+
 
 /* PAINEL ATIVO */
 
@@ -140,6 +153,7 @@
 
 }
 
+
 .tv-online-dot{
 
     width:7px;
@@ -150,9 +164,12 @@
 
     background:#43A047;
 
-    box-shadow:0 0 0 3px rgba(67,160,71,.12);
+    box-shadow:
+        0 0 0 3px
+        rgba(67,160,71,.12);
 
 }
+
 
 /* LADO DIREITO */
 
@@ -162,53 +179,155 @@
 
     align-items:center;
 
-    gap:24px;
+    justify-content:flex-end;
+
+    gap:28px;
 
     flex-shrink:0;
 
 }
 
-/* ÚLTIMA ATUALIZAÇÃO */
 
-.tv-last-update{
+/* SELETOR DE RELEASE */
 
-    padding-right:24px;
+.tv-release-selector{
 
-    border-right:1px solid #E3E7EB;
+    min-width:250px;
 
     display:flex;
 
     flex-direction:column;
 
-    align-items:flex-end;
+    gap:4px;
 
-    gap:3px;
+    padding-right:28px;
+
+    border-right:
+        1px solid #E3E7EB;
 
 }
 
-.tv-last-update span{
+
+.tv-release-selector > span{
 
     color:#98A1AA;
 
-    font-size:10px;
-
-    font-weight:600;
-
-    text-transform:uppercase;
-
-    letter-spacing:.4px;
-
-}
-
-.tv-last-update strong{
-
-    color:#505B65;
-
-    font-size:14px;
+    font-size:9px;
 
     font-weight:700;
 
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
 }
+
+
+.tv-release-select-wrapper{
+
+    position:relative;
+
+}
+
+
+.tv-release-select-wrapper::after{
+
+    content:"▼";
+
+    position:absolute;
+
+    top:50%;
+
+    right:12px;
+
+    transform:
+        translateY(-50%);
+
+    color:#005AA9;
+
+    font-size:9px;
+
+    pointer-events:none;
+
+}
+
+
+.tv-release-selector select{
+
+    width:100%;
+
+    height:34px;
+
+    padding:
+        0
+        34px
+        0
+        11px;
+
+    border:
+        1px solid
+        #D6E0E8;
+
+    border-radius:8px;
+
+    outline:none;
+
+    appearance:none;
+
+    background:#F8FAFC;
+
+    color:#005AA9;
+
+    font-size:12px;
+
+    font-weight:750;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+.tv-release-selector select:hover{
+
+    border-color:#005AA9;
+
+    background:#FFF;
+
+}
+
+
+.tv-release-selector select:focus{
+
+    border-color:#005AA9;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0,90,169,.08);
+
+}
+
+
+.tv-release-selector select:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+
+.tv-release-selector small{
+
+    color:#68737D;
+
+    font-size:9px;
+
+    font-weight:600;
+
+}
+
 
 /* RELÓGIO */
 
@@ -224,6 +343,7 @@
 
 }
 
+
 .tv-clock strong{
 
     color:#005AA9;
@@ -235,6 +355,7 @@
     line-height:1;
 
 }
+
 
 .tv-clock small{
 
@@ -252,23 +373,66 @@
 
 }
 
+
 /* GRID DOS PROJETOS */
 
 .tv-grid{
+
+    position:relative;
 
     min-height:0;
 
     display:grid;
 
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
 
-    grid-template-rows:repeat(2,minmax(0,1fr));
+    grid-template-rows:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
 
     gap:14px;
 
     overflow:hidden;
 
 }
+
+
+/* CARREGAMENTO */
+
+.tv-loading{
+
+    grid-column:
+        1 / -1;
+
+    grid-row:
+        1 / -1;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:220px;
+
+    background:#FFF;
+
+    border-radius:16px;
+
+    color:#66717C;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
 
 /* MONITORES UM POUCO MENORES */
 
@@ -282,6 +446,7 @@
 
     }
 
+
     .tv-header{
 
         min-height:72px;
@@ -290,11 +455,20 @@
 
     }
 
+
     .tv-logo{
 
         height:46px;
 
     }
+
+
+    .tv-brand{
+
+        gap:13px;
+
+    }
+
 
     .tv-brand-text h1{
 
@@ -302,17 +476,36 @@
 
     }
 
+
+    .tv-header-right{
+
+        gap:18px;
+
+    }
+
+
+    .tv-release-selector{
+
+        min-width:215px;
+
+        padding-right:18px;
+
+    }
+
+
     .tv-clock strong{
 
         font-size:31px;
 
     }
 
+
     .tv-clock{
 
         min-width:190px;
 
     }
+
 
     .tv-grid{
 
@@ -321,6 +514,7 @@
     }
 
 }
+
 
 /* FORA DO MODO TV */
 
@@ -338,6 +532,7 @@
 
     }
 
+
     .tv-header{
 
         flex-direction:column;
@@ -346,17 +541,33 @@
 
     }
 
+
     .tv-header-right{
+
+        width:100%;
 
         justify-content:space-between;
 
+        align-items:flex-end;
+
     }
+
+
+    .tv-release-selector{
+
+        flex:1;
+
+        min-width:0;
+
+    }
+
 
     .tv-clock{
 
         min-width:0;
 
     }
+
 
     .tv-grid{
 
@@ -365,6 +576,42 @@
         grid-template-rows:auto;
 
         overflow:visible;
+
+    }
+
+}
+
+
+@media(max-width:650px){
+
+    .tv-header-right{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+
+    .tv-release-selector{
+
+        width:100%;
+
+        padding-right:0;
+
+        padding-bottom:12px;
+
+        border-right:none;
+
+        border-bottom:
+            1px solid #E3E7EB;
+
+    }
+
+
+    .tv-clock{
+
+        align-items:flex-start;
 
     }
 

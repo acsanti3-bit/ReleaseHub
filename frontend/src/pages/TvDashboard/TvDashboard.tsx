@@ -13,12 +13,27 @@ import TvProjectCard from "../../components/TvProjectCard/TvProjectCard";
 import CompatibilityPanel from "../../components/CompatibilityPanel/CompatibilityPanel";
 
 import {
-  listarProjetos,
-} from "../../services/ProjectService";
+  listarAmbientes,
+  obterAmbienteMaisRecente,
+  ordenarAmbientesPorVersao,
+} from "../../services/ReleaseEnvironmentService";
+
+import {
+  listarProjetosPorAmbiente,
+} from "../../services/ReleaseProjectService";
 
 import type {
   Project,
 } from "../../types/project";
+
+import type {
+  ReleaseEnvironment,
+} from "../../types/releaseEnvironment";
+
+
+const STORAGE_KEY =
+  "releasehub_tv_environment";
+
 
 function TvDashboard() {
 
@@ -29,8 +44,30 @@ function TvDashboard() {
     useState<Project[]>([]);
 
   const [
+    ambientes,
+    setAmbientes,
+  ] =
+    useState<
+      ReleaseEnvironment[]
+    >([]);
+
+  const [
+    ambienteSelecionadoId,
+    setAmbienteSelecionadoId,
+  ] =
+    useState<
+      number | null
+    >(null);
+
+  const [
     carregando,
     setCarregando,
+  ] =
+    useState(true);
+
+  const [
+    carregandoAmbientes,
+    setCarregandoAmbientes,
   ] =
     useState(true);
 
@@ -44,7 +81,7 @@ function TvDashboard() {
 
 
   /*
-    Relógio da TV
+    Relógio da TV.
   */
 
   useEffect(() => {
@@ -70,11 +107,13 @@ function TvDashboard() {
 
 
   /*
-    Atualização automática
-    dos dados da TV.
+    Carrega os ambientes disponíveis.
 
-    Consulta novamente a API
-    a cada 10 segundos.
+    Se esta TV já possui uma release
+    escolhida, mantém essa escolha.
+
+    Caso contrário, seleciona
+    automaticamente a mais recente.
   */
 
   useEffect(() => {
@@ -82,12 +121,156 @@ function TvDashboard() {
     let ativo =
       true;
 
+    async function carregarAmbientes() {
+
+      try {
+
+        const lista =
+          await listarAmbientes();
+
+        if (!ativo) {
+
+          return;
+
+        }
+
+        const ordenados =
+          ordenarAmbientesPorVersao(
+            lista
+          );
+
+        setAmbientes(
+          ordenados
+        );
+
+
+        const salvo =
+          localStorage.getItem(
+            STORAGE_KEY
+          );
+
+        const idSalvo =
+          salvo
+            ? Number(salvo)
+            : null;
+
+
+        const ambienteSalvoExiste =
+          idSalvo !== null &&
+          ordenados.some(
+            ambiente =>
+              ambiente.id ===
+              idSalvo
+          );
+
+
+        if (
+          ambienteSalvoExiste &&
+          idSalvo !== null
+        ) {
+
+          setAmbienteSelecionadoId(
+            idSalvo
+          );
+
+          return;
+
+        }
+
+
+        const maisRecente =
+          obterAmbienteMaisRecente(
+            ordenados
+          );
+
+
+        if (maisRecente) {
+
+          setAmbienteSelecionadoId(
+            maisRecente.id
+          );
+
+          localStorage.setItem(
+            STORAGE_KEY,
+            String(
+              maisRecente.id
+            )
+          );
+
+        }
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao carregar ambientes da TV:",
+          erro
+        );
+
+      } finally {
+
+        if (ativo) {
+
+          setCarregandoAmbientes(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+
+    void carregarAmbientes();
+
+
+    return () => {
+
+      ativo =
+        false;
+
+    };
+
+  }, []);
+
+
+  /*
+    Carrega os projetos vinculados
+    especificamente à release
+    selecionada.
+
+    Atualiza automaticamente
+    a cada 10 segundos.
+  */
+
+  useEffect(() => {
+
+    if (
+      ambienteSelecionadoId === null
+    ) {
+
+      setProjects([]);
+
+      setCarregando(false);
+
+      return;
+
+    }
+
+
+    let ativo =
+      true;
+
+
     async function atualizarDados() {
 
       try {
 
         const lista =
-          await listarProjetos();
+          await listarProjetosPorAmbiente(
+            ambienteSelecionadoId!
+          );
+
 
         if (ativo) {
 
@@ -118,7 +301,13 @@ function TvDashboard() {
 
     }
 
+
+    setCarregando(
+      true
+    );
+
     void atualizarDados();
+
 
     const intervalo =
       setInterval(
@@ -129,6 +318,7 @@ function TvDashboard() {
         },
         10000
       );
+
 
     return () => {
 
@@ -141,11 +331,48 @@ function TvDashboard() {
 
     };
 
-  }, []);
+  }, [
+    ambienteSelecionadoId,
+  ]);
 
 
   /*
-    Hora com segundos
+    Troca a release acompanhada.
+
+    A escolha fica salva somente
+    neste navegador/dispositivo.
+  */
+
+  function alterarAmbiente(
+    id: number
+  ) {
+
+    setAmbienteSelecionadoId(
+      id
+    );
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      String(id)
+    );
+
+  }
+
+
+  /*
+    Ambiente atualmente selecionado.
+  */
+
+  const ambienteSelecionado =
+    ambientes.find(
+      ambiente =>
+        ambiente.id ===
+        ambienteSelecionadoId
+    );
+
+
+  /*
+    Hora com segundos.
   */
 
   const hora =
@@ -348,6 +575,83 @@ function TvDashboard() {
 
         <div className="tv-header-right">
 
+          <div className="tv-release-selector">
+
+            <span>
+              Release acompanhada
+            </span>
+
+            <div className="tv-release-select-wrapper">
+
+              <select
+                value={
+                  ambienteSelecionadoId ??
+                  ""
+                }
+                disabled={
+                  carregandoAmbientes ||
+                  ambientes.length === 0
+                }
+                onChange={event =>
+                  alterarAmbiente(
+                    Number(
+                      event.target.value
+                    )
+                  )
+                }
+              >
+
+                {ambientes.length === 0 && (
+
+                  <option value="">
+                    Nenhuma release
+                  </option>
+
+                )}
+
+
+                {ambientes.map(
+                  ambiente => (
+
+                    <option
+                      key={
+                        ambiente.id
+                      }
+                      value={
+                        ambiente.id
+                      }
+                    >
+
+                      {ambiente.nome}
+
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+            {ambienteSelecionado && (
+
+              <small>
+
+                Intellicash{" "}
+
+                {
+                  ambienteSelecionado
+                    .versoes
+                    .intellicash
+                }
+
+              </small>
+
+            )}
+
+          </div>
+
+
           <div className="tv-clock">
 
             <strong>
@@ -377,19 +681,40 @@ function TvDashboard() {
 
       <main className="tv-grid">
 
-        {projetosOrdenados.map(
-          project => (
+        {carregando ? (
 
-            <TvProjectCard
-              key={
-                project.id
-              }
-              project={
-                project
-              }
-            />
+          <div className="tv-loading">
 
+            Carregando release...
+
+          </div>
+
+        ) : projetosOrdenados.length === 0 ? (
+
+          <div className="tv-loading">
+
+            Nenhum projeto encontrado
+            para esta release.
+
+          </div>
+
+        ) : (
+
+          projetosOrdenados.map(
+            project => (
+
+              <TvProjectCard
+                key={
+                  project.id
+                }
+                project={
+                  project
+                }
+              />
+
+            )
           )
+
         )}
 
       </main>

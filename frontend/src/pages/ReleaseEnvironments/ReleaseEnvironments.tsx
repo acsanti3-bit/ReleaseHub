@@ -25,10 +25,6 @@ import {
 } from "../../services/ReleaseEnvironmentService";
 
 import {
-  sincronizarProjetosComAmbienteAtual,
-} from "../../services/ProjectService";
-
-import {
   buscarSessao,
 } from "../../services/AuthService";
 
@@ -66,14 +62,19 @@ function ReleaseEnvironments() {
       ReleaseEnvironment | null
     >(null);
 
+
   async function atualizarLista() {
 
     try {
 
+      setCarregando(true);
+
       const lista =
         await listarAmbientes();
 
-      setAmbientes(lista);
+      setAmbientes(
+        lista
+      );
 
     } catch (erro) {
 
@@ -84,11 +85,14 @@ function ReleaseEnvironments() {
 
     } finally {
 
-      setCarregando(false);
+      setCarregando(
+        false
+      );
 
     }
 
   }
+
 
   async function carregarPermissao() {
 
@@ -109,11 +113,14 @@ function ReleaseEnvironments() {
         erro
       );
 
-      setPodeEditar(false);
+      setPodeEditar(
+        false
+      );
 
     }
 
   }
+
 
   useEffect(() => {
 
@@ -122,6 +129,7 @@ function ReleaseEnvironments() {
     void carregarPermissao();
 
   }, []);
+
 
   function novoAmbiente() {
 
@@ -136,6 +144,7 @@ function ReleaseEnvironments() {
     );
 
   }
+
 
   function editar(
     ambiente: ReleaseEnvironment
@@ -152,6 +161,7 @@ function ReleaseEnvironments() {
     );
 
   }
+
 
   async function salvar(
     ambiente: ReleaseEnvironment
@@ -186,7 +196,14 @@ function ReleaseEnvironments() {
 
       }
 
-      await sincronizarProjetosComAmbienteAtual();
+      /*
+        Não utilizamos mais
+        sincronizarProjetosComAmbienteAtual().
+
+        A própria API de ambientes
+        sincroniza as versões dentro
+        de release_projects.
+      */
 
       await atualizarLista();
 
@@ -208,6 +225,7 @@ function ReleaseEnvironments() {
     }
 
   }
+
 
   async function excluir(
     ambiente: ReleaseEnvironment
@@ -253,6 +271,7 @@ function ReleaseEnvironments() {
 
   }
 
+
   return (
 
     <Layout>
@@ -288,7 +307,9 @@ function ReleaseEnvironments() {
               }
             >
 
-              <MdAdd size={20} />
+              <MdAdd
+                size={20}
+              />
 
               Novo Ambiente
 
@@ -298,9 +319,12 @@ function ReleaseEnvironments() {
 
         </div>
 
+
         <div className="release-info">
 
-          <MdLink size={22} />
+          <MdLink
+            size={22}
+          />
 
           <div>
 
@@ -320,6 +344,7 @@ function ReleaseEnvironments() {
 
         </div>
 
+
         <div className="release-table-container">
 
           <table className="release-table">
@@ -328,19 +353,33 @@ function ReleaseEnvironments() {
 
               <tr>
 
-                <th>Ambiente</th>
+                <th>
+                  Ambiente
+                </th>
 
-                <th>Intellicash</th>
+                <th>
+                  Intellicash
+                </th>
 
-                <th>EasyCash</th>
+                <th>
+                  EasyCash
+                </th>
 
-                <th>EasyCheckout</th>
+                <th>
+                  EasyCheckout
+                </th>
 
-                <th>EasyPDV</th>
+                <th>
+                  EasyPDV
+                </th>
 
-                <th>IntelliStock</th>
+                <th>
+                  IntelliStock
+                </th>
 
-                <th>IWB Server</th>
+                <th>
+                  IWB Server
+                </th>
 
                 {podeEditar && (
 
@@ -353,6 +392,7 @@ function ReleaseEnvironments() {
               </tr>
 
             </thead>
+
 
             <tbody>
 
@@ -375,41 +415,78 @@ function ReleaseEnvironments() {
 
                     </td>
 
+
                     <td className="release-reference-version">
 
-                      {ambiente.versoes.intellicash || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .intellicash ||
+                        "-"
+                      }
 
                     </td>
+
 
                     <td>
 
-                      {ambiente.versoes.easycash || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .easycash ||
+                        "-"
+                      }
 
                     </td>
+
 
                     <td>
 
-                      {ambiente.versoes.easycheckout || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .easycheckout ||
+                        "-"
+                      }
 
                     </td>
+
 
                     <td>
 
-                      {ambiente.versoes.easypdv || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .easypdv ||
+                        "-"
+                      }
 
                     </td>
+
 
                     <td>
 
-                      {ambiente.versoes.intellistock || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .intellistock ||
+                        "-"
+                      }
 
                     </td>
+
 
                     <td>
 
-                      {ambiente.versoes.iwbserver || "-"}
+                      {
+                        ambiente
+                          .versoes
+                          .iwbserver ||
+                        "-"
+                      }
 
                     </td>
+
 
                     {podeEditar && (
 
@@ -432,6 +509,7 @@ function ReleaseEnvironments() {
                             />
 
                           </button>
+
 
                           <button
                             type="button"
@@ -465,6 +543,7 @@ function ReleaseEnvironments() {
 
           </table>
 
+
           {carregando ? (
 
             <div className="release-empty">
@@ -486,6 +565,7 @@ function ReleaseEnvironments() {
         </div>
 
       </div>
+
 
       {podeEditar &&
         ambienteSelecionado && (
