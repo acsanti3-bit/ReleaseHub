@@ -83,7 +83,9 @@ function AppRoutes() {
           path="/settings"
           element={
 
-            <ProtectedRoute>
+            <ProtectedRoute
+              requiredRole="admin"
+            >
 
               <Settings />
 

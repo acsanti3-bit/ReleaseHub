@@ -129,8 +129,10 @@ function Sidebar() {
   const descricaoRole =
     usuario?.role === "admin"
       ? "Administrador"
-      : usuario?.role ||
-        "Usuário";
+      : "Usuário";
+
+  const administrador =
+    usuario?.role === "admin";
 
   return (
 
@@ -166,9 +168,13 @@ function Sidebar() {
           Modo TV
         </NavLink>
 
-        <NavLink to="/settings">
-          Configurações
-        </NavLink>
+        {administrador && (
+
+          <NavLink to="/settings">
+            Configurações
+          </NavLink>
+
+        )}
 
       </nav>
 

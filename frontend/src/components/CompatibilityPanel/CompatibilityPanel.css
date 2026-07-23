@@ -1,52 +1,70 @@
 .compatibility-panel{
 
+    width:100%;
+
+    min-height:72px;
+
+    display:grid;
+
+    grid-template-columns:
+        220px minmax(0,1fr);
+
+    align-items:stretch;
+
     background:#FFF;
 
     border-radius:14px;
 
-    min-height:56px;
-
-    padding:0 20px;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.07);
-
-    display:flex;
-
-    align-items:center;
-
-    gap:20px;
+    box-shadow:
+        0 4px 12px
+        rgba(0,0,0,.07);
 
     box-sizing:border-box;
 
+    overflow:hidden;
+
 }
+
+
+/* AMBIENTE */
 
 .compatibility-title{
 
-    width:185px;
-
-    flex-shrink:0;
+    min-width:0;
 
     display:flex;
 
     flex-direction:column;
 
+    align-items:center;
+
     justify-content:center;
 
-    gap:3px;
+    gap:4px;
 
-    white-space:nowrap;
+    padding:0 15px;
+
+    text-align:center;
+
+    box-sizing:border-box;
 
 }
+
 
 .compatibility-title strong{
 
     color:#005AA9;
 
-    font-size:16px;
+    font-size:17px;
 
-    font-weight:700;
+    font-weight:750;
+
+    line-height:1.2;
+
+    white-space:nowrap;
 
 }
+
 
 .compatibility-title small{
 
@@ -56,21 +74,30 @@
 
     font-weight:700;
 
+    line-height:1.2;
+
+    white-space:nowrap;
+
 }
+
+
+/* LINHA DOS SISTEMAS */
 
 .compatibility-line{
 
-    flex:1;
+    min-width:0;
 
     display:grid;
 
-    grid-template-columns:repeat(6,minmax(0,1fr));
+    grid-template-columns:
+        repeat(6,minmax(0,1fr));
 
-    align-items:center;
-
-    height:100%;
+    align-items:stretch;
 
 }
+
+
+/* SISTEMA */
 
 .compatibility-version{
 
@@ -82,29 +109,36 @@
 
     justify-content:center;
 
-    gap:8px;
+    gap:10px;
 
-    padding:0 12px;
+    padding:0 8px;
 
     box-sizing:border-box;
+
+    border-left:
+        1px solid #DDE3EA;
 
     color:#005AA9;
 
 }
 
-.compatibility-version:not(:first-child){
 
-    border-left:1px solid #DDE3EA;
-
-}
+/* ÍCONE */
 
 .compatibility-version svg{
+
+    width:20px;
+
+    height:20px;
 
     flex-shrink:0;
 
     color:#005AA9;
 
 }
+
+
+/* TEXTO */
 
 .compatibility-version span{
 
@@ -116,37 +150,48 @@
 
     justify-content:center;
 
-    gap:2px;
+    align-items:flex-start;
+
+    gap:3px;
 
 }
+
 
 .compatibility-version strong{
 
     color:#005AA9;
 
-    font-size:12px;
+    font-size:13px;
 
-    font-weight:700;
+    font-weight:750;
+
+    line-height:1.15;
 
     white-space:nowrap;
 
 }
 
+
 .compatibility-version small{
 
-    color:#4D5964;
+    color:#34495A;
 
     font-size:12px;
 
     font-weight:600;
 
+    line-height:1.15;
+
     white-space:nowrap;
 
 }
 
+
+/* CARREGAMENTO / VAZIO */
+
 .compatibility-empty{
 
-    flex:1;
+    min-width:0;
 
     display:flex;
 
@@ -154,39 +199,72 @@
 
     justify-content:center;
 
+    padding:0 20px;
+
+    border-left:
+        1px solid #DDE3EA;
+
     color:#777;
 
     font-size:13px;
 
+    text-align:center;
+
 }
 
+
 .compatibility-empty strong{
+
+    margin-left:4px;
 
     color:#005AA9;
 
 }
 
-@media(max-width:1500px){
 
-    .compatibility-title{
+/* TELAS MENORES */
 
-        width:155px;
+@media(max-width:1250px){
+
+    .compatibility-panel{
+
+        grid-template-columns:
+            190px minmax(0,1fr);
 
     }
+
+
+    .compatibility-title strong{
+
+        font-size:15px;
+
+    }
+
 
     .compatibility-version{
 
-        padding:0 6px;
+        gap:7px;
 
-        gap:5px;
+        padding:0 5px;
 
     }
+
+
+    .compatibility-version svg{
+
+        width:18px;
+
+        height:18px;
+
+    }
+
 
     .compatibility-version strong{
 
         font-size:11px;
 
     }
+
 
     .compatibility-version small{
 
@@ -196,37 +274,94 @@
 
 }
 
+
+/* RESPONSIVO */
+
 @media(max-width:1000px){
 
     .compatibility-panel{
+
+        display:flex;
 
         flex-direction:column;
 
         align-items:stretch;
 
-        padding:14px;
+        padding:15px;
+
+        gap:14px;
+
+        overflow:visible;
 
     }
+
 
     .compatibility-title{
 
-        width:auto;
+        width:100%;
+
+        padding:0;
+
+        align-items:flex-start;
+
+        text-align:left;
 
     }
 
+
     .compatibility-line{
 
-        grid-template-columns:repeat(2,1fr);
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
 
         gap:10px;
 
     }
 
+
     .compatibility-version{
+
+        min-height:55px;
 
         justify-content:flex-start;
 
-        border-left:none !important;
+        padding:0 14px;
+
+        border:1px solid #E2E7EC;
+
+        border-radius:9px;
+
+        background:#FAFBFC;
+
+    }
+
+
+    .compatibility-empty{
+
+        min-height:45px;
+
+        padding:0;
+
+        border-left:none;
+
+        justify-content:flex-start;
+
+        text-align:left;
+
+    }
+
+}
+
+
+@media(max-width:600px){
+
+    .compatibility-line{
+
+        grid-template-columns:1fr;
 
     }
 

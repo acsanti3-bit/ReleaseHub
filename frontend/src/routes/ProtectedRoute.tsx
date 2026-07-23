@@ -1,10 +1,7 @@
 import {
   useEffect,
   useState,
-} from "react";
-
-import type {
-  ReactNode,
+  type ReactNode,
 } from "react";
 
 import {
@@ -16,14 +13,20 @@ import {
   buscarSessao,
 } from "../services/AuthService";
 
+import type {
+  AuthUser,
+} from "../services/AuthService";
+
 import "./ProtectedRoute.css";
 
 interface Props {
   children: ReactNode;
+  requiredRole?: "admin";
 }
 
 function ProtectedRoute({
   children,
+  requiredRole,
 }: Props) {
 
   const location =
@@ -36,10 +39,12 @@ function ProtectedRoute({
     useState(true);
 
   const [
-    autenticado,
-    setAutenticado,
+    usuario,
+    setUsuario,
   ] =
-    useState(false);
+    useState<AuthUser | null>(
+      null
+    );
 
   useEffect(() => {
 
@@ -49,13 +54,13 @@ function ProtectedRoute({
 
       try {
 
-        const usuario =
+        const sessao =
           await buscarSessao();
 
         if (ativo) {
 
-          setAutenticado(
-            Boolean(usuario)
+          setUsuario(
+            sessao
           );
 
         }
@@ -69,8 +74,8 @@ function ProtectedRoute({
 
         if (ativo) {
 
-          setAutenticado(
-            false
+          setUsuario(
+            null
           );
 
         }
@@ -121,7 +126,7 @@ function ProtectedRoute({
 
   }
 
-  if (!autenticado) {
+  if (!usuario) {
 
     return (
 
@@ -132,6 +137,22 @@ function ProtectedRoute({
           from:
             location.pathname,
         }}
+      />
+
+    );
+
+  }
+
+  if (
+    requiredRole &&
+    usuario.role !== requiredRole
+  ) {
+
+    return (
+
+      <Navigate
+        to="/"
+        replace
       />
 
     );
