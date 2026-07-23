@@ -12,8 +12,6 @@ import ProjectDrawer from "../../components/ProjectDrawer/ProjectDrawer";
 
 import CompatibilityPanel from "../../components/CompatibilityPanel/CompatibilityPanel";
 
-import DashboardStats from "../../components/DashboardStats/DashboardStats";
-
 import TasksChart from "../../components/TasksChart/TasksChart";
 
 import TopProjects from "../../components/TopProjects/TopProjects";
@@ -239,8 +237,7 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-                p.situacoes
-                  .qualidade > 0
+                p.situacoes.qualidade > 0
             );
 
           break;
@@ -250,8 +247,7 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-                p.situacoes
-                  .testes > 0
+                p.situacoes.testes > 0
             );
 
           break;
@@ -261,8 +257,7 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-                p.situacoes
-                  .emProgresso > 0
+                p.situacoes.emProgresso > 0
             );
 
           break;
@@ -272,11 +267,8 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-                p.situacoes
-                  .desenvolvido > 0 ||
-                p.situacoes
-                  .aguardandoCompilacao >
-                  0
+                p.situacoes.desenvolvido > 0 ||
+                p.situacoes.aguardandoCompilacao > 0
             );
 
           break;
@@ -286,9 +278,7 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-                p.situacoes
-                  .aguardandoCompilacao >
-                0
+                p.situacoes.aguardandoCompilacao > 0
             );
 
           break;
@@ -309,9 +299,7 @@ function Dashboard() {
             lista.filter(
               project => {
 
-                if (
-                  !project.prazo
-                ) {
+                if (!project.prazo) {
 
                   return false;
 
@@ -417,9 +405,7 @@ function Dashboard() {
             </h1>
 
             <span>
-
               {projects.length} Projetos
-
             </span>
 
           </div>
@@ -442,11 +428,6 @@ function Dashboard() {
         <CompatibilityPanel
           projects={projects}
           carregando={carregando}
-        />
-
-        <DashboardStats
-          projects={projects}
-          onFilter={setFiltro}
         />
 
         <div className="dashboard-charts">
@@ -488,11 +469,17 @@ function Dashboard() {
             }
           >
 
-            <option>Todos</option>
+            <option>
+              Todos
+            </option>
 
-            <option>Qualidade</option>
+            <option>
+              Qualidade
+            </option>
 
-            <option>Testes</option>
+            <option>
+              Testes
+            </option>
 
             <option>
               Em Progresso
@@ -522,11 +509,17 @@ function Dashboard() {
             }
           >
 
-            <option>Nome</option>
+            <option>
+              Nome
+            </option>
 
-            <option>Prazo</option>
+            <option>
+              Prazo
+            </option>
 
-            <option>Tarefas</option>
+            <option>
+              Tarefas
+            </option>
 
           </select>
 

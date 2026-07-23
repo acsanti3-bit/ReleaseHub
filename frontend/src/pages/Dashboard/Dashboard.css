@@ -4,9 +4,12 @@
 
     flex-direction:column;
 
-    gap:30px;
+    gap:18px;
 
 }
+
+
+/* HEADER */
 
 .dashboard-header{
 
@@ -16,11 +19,12 @@
 
     align-items:center;
 
-    padding-bottom:20px;
+    padding-bottom:16px;
 
-    border-bottom:2px solid #ECECEC;
+    border-bottom:1px solid #E2E7EC;
 
 }
+
 
 .dashboard-title{
 
@@ -28,9 +32,10 @@
 
     flex-direction:column;
 
-    gap:10px;
+    gap:7px;
 
 }
+
 
 .dashboard-header h1{
 
@@ -38,11 +43,14 @@
 
     color:#005AA9;
 
-    font-size:40px;
+    font-size:38px;
+
+    line-height:1;
 
     font-weight:700;
 
 }
+
 
 .dashboard-header span{
 
@@ -52,21 +60,22 @@
 
     color:#FFF;
 
-    padding:8px 18px;
+    padding:6px 15px;
 
     border-radius:25px;
 
-    font-size:14px;
+    font-size:13px;
 
     font-weight:600;
 
 }
 
+
 .new-project{
 
-    height:48px;
+    height:44px;
 
-    padding:0 22px;
+    padding:0 20px;
 
     border:none;
 
@@ -76,7 +85,7 @@
 
     color:#FFF;
 
-    font-size:15px;
+    font-size:14px;
 
     font-weight:600;
 
@@ -86,35 +95,61 @@
 
 }
 
+
 .new-project:hover{
 
-    background:#d66e12;
+    background:#D66E12;
 
 }
+
+
+/* GRÁFICOS */
+
+.dashboard-charts{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:16px;
+
+}
+
+
+/* FILTROS */
 
 .dashboard-filters{
 
     display:flex;
 
-    gap:15px;
+    gap:12px;
 
     align-items:center;
 
+    background:#FFF;
+
+    padding:14px 16px;
+
+    border-radius:14px;
+
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+
 }
+
 
 .dashboard-search{
 
     flex:1;
 
-    height:46px;
+    height:42px;
 
     border:1px solid #D9D9D9;
 
-    border-radius:10px;
+    border-radius:9px;
 
-    padding:0 16px;
+    padding:0 14px;
 
-    font-size:15px;
+    font-size:14px;
 
     outline:none;
 
@@ -122,25 +157,27 @@
 
 }
 
+
 .dashboard-search:focus{
 
     border-color:#005AA9;
 
 }
 
+
 .dashboard-filter{
 
-    width:220px;
+    width:190px;
 
-    height:46px;
+    height:42px;
 
     border:1px solid #D9D9D9;
 
-    border-radius:10px;
+    border-radius:9px;
 
-    padding:0 14px;
+    padding:0 12px;
 
-    font-size:15px;
+    font-size:14px;
 
     background:#FFF;
 
@@ -152,39 +189,50 @@
 
 }
 
-.dashboard-filter:hover{
 
-    border-color:#005AA9;
-
-}
-
+.dashboard-filter:hover,
 .dashboard-filter:focus{
 
     border-color:#005AA9;
 
 }
 
+
+/* CONTADOR */
+
 .dashboard-counter{
 
-    color:#666;
+    margin-top:-5px;
 
-    font-size:15px;
+    color:#6B7280;
+
+    font-size:13px;
 
     font-weight:600;
 
 }
 
+
+/* GRID DOS PROJETOS */
+
 .dashboard-grid{
 
     display:grid;
 
-    grid-template-columns:repeat(auto-fit,minmax(650px,1fr));
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
 
-    gap:24px;
+    gap:16px;
 
     align-items:start;
 
 }
+
+
+/* SEM RESULTADOS */
 
 .dashboard-empty{
 
@@ -194,13 +242,14 @@
 
     border:2px dashed #D8D8D8;
 
-    border-radius:18px;
+    border-radius:16px;
 
-    padding:70px 30px;
+    padding:45px 25px;
 
     text-align:center;
 
 }
+
 
 .dashboard-empty h2{
 
@@ -208,21 +257,36 @@
 
     color:#005AA9;
 
-    font-size:30px;
+    font-size:25px;
 
 }
+
 
 .dashboard-empty p{
 
-    margin-top:12px;
+    margin-top:8px;
 
     color:#777;
 
-    font-size:16px;
+    font-size:14px;
 
 }
 
-@media(max-width:1600px){
+
+/* TELAS MENORES */
+
+@media(max-width:1200px){
+
+    .dashboard-charts{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+
+@media(max-width:1100px){
 
     .dashboard-grid{
 
@@ -232,7 +296,15 @@
 
 }
 
+
 @media(max-width:900px){
+
+    .dashboard{
+
+        gap:14px;
+
+    }
+
 
     .dashboard-header{
 
@@ -240,9 +312,17 @@
 
         align-items:flex-start;
 
-        gap:20px;
+        gap:16px;
 
     }
+
+
+    .dashboard-header h1{
+
+        font-size:31px;
+
+    }
+
 
     .dashboard-filters{
 
@@ -252,17 +332,16 @@
 
     }
 
-    .dashboard-search{
 
-        width:100%;
-
-    }
-
+    .dashboard-search,
     .dashboard-filter{
 
         width:100%;
 
+        flex:none;
+
     }
+
 
     .new-project{
 
@@ -270,47 +349,8 @@
 
     }
 
+
     .dashboard-grid{
-
-        grid-template-columns:1fr;
-
-    }
-
-}
-
-.dashboard-filters{
-
-    display:flex;
-
-    gap:15px;
-
-    align-items:center;
-
-    background:#FFF;
-
-    padding:20px;
-
-    border-radius:16px;
-
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
-
-}
-
-.dashboard-charts{
-
-    display:grid;
-
-    grid-template-columns:2fr 1fr;
-
-    gap:24px;
-
-    margin-bottom:24px;
-
-}
-
-@media(max-width:1200px){
-
-    .dashboard-charts{
 
         grid-template-columns:1fr;
 
