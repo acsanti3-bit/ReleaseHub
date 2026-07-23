@@ -38,24 +38,28 @@ function TvDashboard() {
     agora,
     setAgora,
   ] =
-    useState(new Date());
+    useState(
+      new Date()
+    );
 
-  const [
-    ultimaAtualizacao,
-    setUltimaAtualizacao,
-  ] =
-    useState(new Date());
+
+  /*
+    Relógio da TV
+  */
 
   useEffect(() => {
 
     const intervalo =
-      setInterval(() => {
+      setInterval(
+        () => {
 
-        setAgora(
-          new Date()
-        );
+          setAgora(
+            new Date()
+          );
 
-      }, 1000);
+        },
+        1000
+      );
 
     return () =>
       clearInterval(
@@ -64,9 +68,19 @@ function TvDashboard() {
 
   }, []);
 
+
+  /*
+    Atualização automática
+    dos dados da TV.
+
+    Consulta novamente a API
+    a cada 10 segundos.
+  */
+
   useEffect(() => {
 
-    let ativo = true;
+    let ativo =
+      true;
 
     async function atualizarDados() {
 
@@ -75,24 +89,18 @@ function TvDashboard() {
         const lista =
           await listarProjetos();
 
-        if (!ativo) {
+        if (ativo) {
 
-          return;
+          setProjects(
+            lista
+          );
 
         }
-
-        setProjects(
-          lista
-        );
-
-        setUltimaAtualizacao(
-          new Date()
-        );
 
       } catch (erro) {
 
         console.error(
-          "Erro ao atualizar TV:",
+          "Erro ao atualizar dados da TV:",
           erro
         );
 
@@ -124,7 +132,8 @@ function TvDashboard() {
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
       clearInterval(
         intervalo
@@ -134,34 +143,50 @@ function TvDashboard() {
 
   }, []);
 
+
+  /*
+    Hora com segundos
+  */
+
   const hora =
     agora.toLocaleTimeString(
       "pt-BR",
       {
-        hour: "2-digit",
-        minute: "2-digit",
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        second:
+          "2-digit",
       }
     );
+
 
   const data =
     agora.toLocaleDateString(
       "pt-BR",
       {
-        weekday: "long",
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
+        weekday:
+          "long",
+
+        day:
+          "2-digit",
+
+        month:
+          "long",
+
+        year:
+          "numeric",
       }
     );
 
-  const horaAtualizacao =
-    ultimaAtualizacao.toLocaleTimeString(
-      "pt-BR",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-      }
-    );
+
+  /*
+    Ordem fixa dos projetos
+    no painel da TV.
+  */
 
   function getOrdemProjeto(
     nome: string
@@ -170,7 +195,11 @@ function TvDashboard() {
     const projeto =
       nome
         .toLowerCase()
-        .replace(/\s/g, "");
+        .replace(
+          /\s/g,
+          ""
+        );
+
 
     if (
       projeto.includes(
@@ -185,6 +214,7 @@ function TvDashboard() {
 
     }
 
+
     if (
       projeto.includes(
         "easycash"
@@ -194,6 +224,7 @@ function TvDashboard() {
       return 2;
 
     }
+
 
     if (
       projeto.includes(
@@ -205,6 +236,7 @@ function TvDashboard() {
 
     }
 
+
     if (
       projeto.includes(
         "easypdv"
@@ -215,45 +247,63 @@ function TvDashboard() {
 
     }
 
+
     if (
       projeto.includes(
         "intellistock"
       ) ||
-      projeto.includes("isa")
+      projeto.includes(
+        "isa"
+      )
     ) {
 
       return 5;
 
     }
 
+
     if (
-      projeto.includes("iwb")
+      projeto.includes(
+        "iwb"
+      )
     ) {
 
       return 6;
 
     }
 
+
     return 99;
 
   }
 
+
   const projetosOrdenados =
-    useMemo(() => {
+    useMemo(
+      () => {
 
-      return [
-        ...projects,
-      ].sort(
-        (a, b) =>
-          getOrdemProjeto(
-            a.nome
-          ) -
-          getOrdemProjeto(
-            b.nome
-          )
-      );
+        return [
+          ...projects,
+        ].sort(
+          (
+            a,
+            b
+          ) =>
 
-    }, [projects]);
+            getOrdemProjeto(
+              a.nome
+            ) -
+            getOrdemProjeto(
+              b.nome
+            )
+        );
+
+      },
+      [
+        projects,
+      ]
+    );
+
 
   return (
 
@@ -295,19 +345,8 @@ function TvDashboard() {
 
         </div>
 
+
         <div className="tv-header-right">
-
-          <div className="tv-last-update">
-
-            <span>
-              Última atualização
-            </span>
-
-            <strong>
-              {horaAtualizacao}
-            </strong>
-
-          </div>
 
           <div className="tv-clock">
 
@@ -325,10 +364,16 @@ function TvDashboard() {
 
       </header>
 
+
       <CompatibilityPanel
-        projects={projects}
-        carregando={carregando}
+        projects={
+          projects
+        }
+        carregando={
+          carregando
+        }
       />
+
 
       <main className="tv-grid">
 
@@ -336,8 +381,12 @@ function TvDashboard() {
           project => (
 
             <TvProjectCard
-              key={project.id}
-              project={project}
+              key={
+                project.id
+              }
+              project={
+                project
+              }
             />
 
           )
