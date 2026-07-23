@@ -1,6 +1,10 @@
 .tv-project-card{
 
+    color-scheme:only light;
+
     background:#FFF;
+
+    color:#263238;
 
     border-radius:18px;
 
@@ -24,6 +28,9 @@
 
 }
 
+
+/* CABEÇALHO */
+
 .tv-card-header{
 
     display:flex;
@@ -42,6 +49,7 @@
 
 }
 
+
 .tv-card-title{
 
     display:flex;
@@ -53,6 +61,7 @@
     min-width:0;
 
 }
+
 
 .tv-project-dot{
 
@@ -66,11 +75,14 @@
 
 }
 
+
 .tv-card-header h3{
 
     margin:0;
 
     font-size:23px;
+
+    line-height:1.15;
 
     font-weight:700;
 
@@ -81,6 +93,7 @@
     text-overflow:ellipsis;
 
 }
+
 
 .tv-version{
 
@@ -94,6 +107,8 @@
 
     font-size:13px;
 
+    line-height:1;
+
     font-weight:700;
 
     white-space:nowrap;
@@ -101,6 +116,7 @@
     flex-shrink:0;
 
 }
+
 
 /* STATUS */
 
@@ -110,15 +126,18 @@
 
     flex-direction:column;
 
-    justify-content:space-evenly;
-
-    flex:1;
+    flex:1 1 auto;
 
     min-height:0;
 
+    overflow:hidden;
+
     padding:6px 0;
 
+    gap:1px;
+
 }
+
 
 .tv-status-row{
 
@@ -128,7 +147,11 @@
 
     align-items:center;
 
-    min-height:25px;
+    flex:1 1 0;
+
+    min-height:0;
+
+    max-height:30px;
 
     padding:2px 7px;
 
@@ -138,11 +161,13 @@
 
 }
 
+
 .tv-status-row:nth-child(even){
 
     background:#F8FAFC;
 
 }
+
 
 .tv-status-name{
 
@@ -152,13 +177,18 @@
 
     gap:9px;
 
+    min-width:0;
+
     color:#4B5563;
 
     font-size:14px;
 
+    line-height:1;
+
     font-weight:600;
 
 }
+
 
 .tv-status-dot{
 
@@ -172,6 +202,7 @@
 
 }
 
+
 .tv-status-row strong{
 
     min-width:32px;
@@ -180,9 +211,12 @@
 
     font-size:18px;
 
+    line-height:1;
+
     font-weight:800;
 
 }
+
 
 /* STATUS ZERADO */
 
@@ -194,6 +228,7 @@
 
 }
 
+
 .tv-status-zero strong{
 
     color:#222 !important;
@@ -202,9 +237,14 @@
 
 }
 
+
 /* DATAS */
 
 .tv-dates{
+
+    position:relative;
+
+    z-index:2;
 
     display:grid;
 
@@ -216,15 +256,19 @@
 
     border-top:1px solid #ECECEC;
 
+    background:#FFF;
+
     flex-shrink:0;
 
 }
+
 
 .tv-dates div{
 
     min-width:0;
 
 }
+
 
 .tv-dates small{
 
@@ -236,11 +280,14 @@
 
     font-size:10px;
 
+    line-height:1;
+
     font-weight:600;
 
     text-transform:uppercase;
 
 }
+
 
 .tv-dates strong{
 
@@ -250,6 +297,8 @@
 
     font-size:13px;
 
+    line-height:1.15;
+
     font-weight:700;
 
     white-space:nowrap;
@@ -257,5 +306,148 @@
     overflow:hidden;
 
     text-overflow:ellipsis;
+
+}
+
+
+/*
+  TELAS / TVs COM MENOS ALTURA
+
+  Diminui levemente os elementos
+  sem desmontar o card.
+*/
+
+@media(max-height:820px){
+
+    .tv-project-card{
+
+        padding:11px 15px;
+
+        border-top-width:5px;
+
+    }
+
+
+    .tv-card-header{
+
+        padding-bottom:8px;
+
+    }
+
+
+    .tv-card-header h3{
+
+        font-size:20px;
+
+    }
+
+
+    .tv-project-dot{
+
+        width:9px;
+
+        height:9px;
+
+    }
+
+
+    .tv-version{
+
+        padding:5px 10px;
+
+        font-size:12px;
+
+    }
+
+
+    .tv-status-list{
+
+        padding:4px 0;
+
+    }
+
+
+    .tv-status-row{
+
+        max-height:25px;
+
+        padding:1px 6px;
+
+    }
+
+
+    .tv-status-name{
+
+        gap:7px;
+
+        font-size:13px;
+
+    }
+
+
+    .tv-status-dot{
+
+        width:7px;
+
+        height:7px;
+
+    }
+
+
+    .tv-status-row strong{
+
+        font-size:16px;
+
+    }
+
+
+    .tv-dates{
+
+        padding-top:7px;
+
+    }
+
+
+    .tv-dates small{
+
+        font-size:9px;
+
+    }
+
+
+    .tv-dates strong{
+
+        font-size:12px;
+
+    }
+
+}
+
+
+/*
+  MONITORES MAIS ESTREITOS
+*/
+
+@media(max-width:1400px){
+
+    .tv-card-header h3{
+
+        font-size:20px;
+
+    }
+
+
+    .tv-status-name{
+
+        font-size:13px;
+
+    }
+
+
+    .tv-status-row strong{
+
+        font-size:16px;
+
+    }
 
 }

@@ -1,20 +1,98 @@
+:root{
+  color-scheme:only light;
+
+  font-family:"Segoe UI", Arial, sans-serif;
+
+  background:#EEF3F8;
+
+  color:#1F2937;
+}
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
 }
 
-html,
-body,
-#root{
+html{
   width:100%;
   height:100%;
-  margin:0;
-  padding:0;
-  background:#eef3f8;
-  font-family:Segoe UI, sans-serif;
+
+  color-scheme:only light;
+
+  background:#EEF3F8 !important;
 }
 
 body{
+  width:100%;
+  height:100%;
+
+  margin:0;
+  padding:0;
+
   overflow:hidden;
+
+  background:#EEF3F8 !important;
+
+  color:#1F2937 !important;
+
+  font-family:"Segoe UI", Arial, sans-serif;
+}
+
+#root{
+  width:100%;
+  height:100%;
+
+  margin:0;
+  padding:0;
+
+  background:#EEF3F8 !important;
+
+  color:#1F2937;
+
+  isolation:isolate;
+}
+
+/*
+  Impede que inputs, selects e botões
+  adotem automaticamente o tema escuro
+  do sistema operacional ou navegador.
+*/
+
+button,
+input,
+select,
+textarea{
+  font-family:inherit;
+
+  color-scheme:only light;
+}
+
+input,
+select,
+textarea{
+  background:#FFF;
+
+  color:#1F2937;
+}
+
+/*
+  Mesmo que o sistema operacional esteja
+  configurado em modo escuro, o ReleaseHub
+  continuará utilizando o tema claro.
+*/
+
+@media (prefers-color-scheme: dark){
+
+  :root,
+  html,
+  body,
+  #root{
+    color-scheme:only light;
+
+    background:#EEF3F8 !important;
+
+    color:#1F2937 !important;
+  }
+
 }
