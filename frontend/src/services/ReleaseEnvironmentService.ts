@@ -1,103 +1,128 @@
-import type { ReleaseEnvironment } from "../types/releaseEnvironment";
+import type {
+  ReleaseEnvironment,
+} from "../types/releaseEnvironment";
 
-import {
-  releaseEnvironments as mockEnvironments,
-} from "../mock/releaseEnvironments";
+const API_URL =
+  "/api/environments";
 
-const STORAGE_KEY =
-  "iws-releasehub-environments";
+async function requisicao<T>(
+  url: string,
+  options?: RequestInit
+): Promise<T> {
 
-export function listarAmbientes(): ReleaseEnvironment[] {
-
-  const dados =
-    localStorage.getItem(STORAGE_KEY);
-
-  if (!dados) {
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(mockEnvironments)
+  const response =
+    await fetch(
+      url,
+      options
     );
 
-    return mockEnvironments;
+  if (!response.ok) {
+
+    const texto =
+      await response.text();
+
+    throw new Error(
+      texto ||
+      "Erro ao comunicar com a API."
+    );
 
   }
 
-  return JSON.parse(dados);
+  return response.json();
 
 }
 
-export function salvarAmbientes(
-  ambientes: ReleaseEnvironment[]
-) {
+export async function listarAmbientes():
+  Promise<ReleaseEnvironment[]> {
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(ambientes)
-  );
+  return requisicao<
+    ReleaseEnvironment[]
+  >(API_URL);
 
 }
 
-export function buscarAmbientePorIntellicash(
+export async function buscarAmbientePorIntellicash(
   versaoIntellicash: string
-): ReleaseEnvironment | undefined {
+): Promise<
+  ReleaseEnvironment | undefined
+> {
 
-  return listarAmbientes().find(
+  const ambientes =
+    await listarAmbientes();
 
+  return ambientes.find(
     ambiente =>
       ambiente.versoes.intellicash ===
       versaoIntellicash
-
   );
 
 }
 
-export function adicionarAmbiente(
+export async function adicionarAmbiente(
   ambiente: ReleaseEnvironment
-) {
+): Promise<ReleaseEnvironment> {
 
-  const lista = listarAmbientes();
+  return requisicao<ReleaseEnvironment>(
+    API_URL,
+    {
 
-  lista.push(ambiente);
+      method: "POST",
 
-  salvarAmbientes(lista);
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
 
-}
+      body:
+        JSON.stringify(
+          ambiente
+        ),
 
-export function editarAmbiente(
-  ambiente: ReleaseEnvironment
-) {
-
-  const lista = listarAmbientes();
-
-  const novaLista = lista.map(item =>
-
-    item.id === ambiente.id
-      ? ambiente
-      : item
-
+    }
   );
 
-  salvarAmbientes(novaLista);
+}
+
+export async function editarAmbiente(
+  ambiente: ReleaseEnvironment
+): Promise<ReleaseEnvironment> {
+
+  return requisicao<ReleaseEnvironment>(
+    API_URL,
+    {
+
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
+
+      body:
+        JSON.stringify(
+          ambiente
+        ),
+
+    }
+  );
 
 }
 
-export function excluirAmbiente(
+export async function excluirAmbiente(
   id: number
-) {
+): Promise<void> {
 
-  const lista = listarAmbientes().filter(
-
-    ambiente =>
-      ambiente.id !== id
-
+  await requisicao(
+    `${API_URL}?id=${id}`,
+    {
+      method: "DELETE",
+    }
   );
-
-  salvarAmbientes(lista);
 
 }
 
-export function criarAmbiente(): ReleaseEnvironment {
+export function criarAmbiente():
+  ReleaseEnvironment {
 
   return {
 

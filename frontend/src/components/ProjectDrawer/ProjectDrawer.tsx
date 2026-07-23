@@ -1,10 +1,17 @@
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import "./ProjectDrawer.css";
 
 import type {
   Project,
 } from "../../types/project";
+
+import type {
+  ReleaseEnvironment,
+} from "../../types/releaseEnvironment";
 
 import {
   listarAmbientes,
@@ -32,17 +39,61 @@ function ProjectDrawer({
 
 }: Props) {
 
-  const [form, setForm] =
+  const [
+    form,
+    setForm,
+  ] =
     useState<Project>(
       project
     );
 
-  const ambientes =
-    useMemo(
-      () =>
-        listarAmbientes(),
-      []
-    );
+  const [
+    ambientes,
+    setAmbientes,
+  ] =
+    useState<
+      ReleaseEnvironment[]
+    >([]);
+
+  useEffect(() => {
+
+    let ativo = true;
+
+    async function carregarAmbientes() {
+
+      try {
+
+        const lista =
+          await listarAmbientes();
+
+        if (ativo) {
+
+          setAmbientes(
+            lista
+          );
+
+        }
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao carregar ambientes:",
+          erro
+        );
+
+      }
+
+    }
+
+    void carregarAmbientes();
+
+    return () => {
+
+      ativo = false;
+
+    };
+
+  }, []);
 
   const nomeNormalizado =
     form.nome
@@ -58,27 +109,21 @@ function ProjectDrawer({
     );
 
   const isProjetoVinculado =
-
     nomeNormalizado.includes(
       "easycash"
     ) ||
-
     nomeNormalizado.includes(
       "easycheckout"
     ) ||
-
     nomeNormalizado.includes(
       "easypdv"
     ) ||
-
     nomeNormalizado.includes(
       "intellistock"
     ) ||
-
     nomeNormalizado.includes(
       "isa"
     ) ||
-
     nomeNormalizado.includes(
       "iwb"
     );
@@ -174,7 +219,9 @@ function ProjectDrawer({
           <button
             onClick={onClose}
           >
+
             ×
+
           </button>
 
         </div>
@@ -223,17 +270,14 @@ function ProjectDrawer({
                 ambiente => (
 
                   <option
-
                     key={
                       ambiente.id
                     }
-
                     value={
                       ambiente
                         .versoes
                         .intellicash
                     }
-
                   >
 
                     {
@@ -289,8 +333,7 @@ function ProjectDrawer({
             >
 
               Ao selecionar uma versão,
-              os demais projetos serão
-              atualizados automaticamente.
+              os demais projetos serão atualizados automaticamente.
 
             </div>
 
@@ -307,9 +350,7 @@ function ProjectDrawer({
               }}
             >
 
-              Versão definida
-              automaticamente pelo
-              Ambiente da Release.
+              Versão definida automaticamente pelo Ambiente da Release.
 
             </div>
 
@@ -377,13 +418,10 @@ function ProjectDrawer({
                   value={valor}
                   onChange={e =>
                     alterarSituacao(
-
                       campo as keyof Project["situacoes"],
-
                       Number(
                         e.target.value
                       )
-
                     )
                   }
                 />

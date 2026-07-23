@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -13,15 +14,10 @@ import type {
 } from "../../types/project";
 
 import {
-
   listarProjetos,
-
   adicionarProjeto,
-
   editarProjeto,
-
   excluirProjeto,
-
 } from "../../services/ProjectService";
 
 function Projects() {
@@ -30,9 +26,13 @@ function Projects() {
     projects,
     setProjects,
   ] =
-    useState<Project[]>(
-      listarProjetos()
-    );
+    useState<Project[]>([]);
+
+  const [
+    carregando,
+    setCarregando,
+  ] =
+    useState(true);
 
   const [
     openModal,
@@ -48,47 +48,84 @@ function Projects() {
       Project | undefined
     >();
 
-  function atualizarLista() {
+  async function atualizarLista() {
 
-    setProjects(
-      listarProjetos()
-    );
+    try {
 
-  }
+      const lista =
+        await listarProjetos();
 
-  function handleSaveProject(
-    project: Project
-  ) {
+      setProjects(lista);
 
-    const exists =
-      projects.some(
-        p =>
-          p.id === project.id
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar projetos:",
+        erro
       );
 
-    if (exists) {
+    } finally {
 
-      editarProjeto(
-        project
-      );
-
-    } else {
-
-      adicionarProjeto(
-        project
-      );
+      setCarregando(false);
 
     }
 
-    atualizarLista();
+  }
 
-    setSelectedProject(
-      undefined
-    );
+  useEffect(() => {
 
-    setOpenModal(
-      false
-    );
+    void atualizarLista();
+
+  }, []);
+
+  async function handleSaveProject(
+    project: Project
+  ) {
+
+    try {
+
+      const exists =
+        projects.some(
+          p =>
+            p.id === project.id
+        );
+
+      if (exists) {
+
+        await editarProjeto(
+          project
+        );
+
+      } else {
+
+        await adicionarProjeto(
+          project
+        );
+
+      }
+
+      await atualizarLista();
+
+      setSelectedProject(
+        undefined
+      );
+
+      setOpenModal(
+        false
+      );
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao salvar projeto:",
+        erro
+      );
+
+      alert(
+        "Não foi possível salvar o projeto."
+      );
+
+    }
 
   }
 
@@ -118,7 +155,7 @@ function Projects() {
 
   }
 
-  function handleDeleteProject(
+  async function handleDeleteProject(
     id: number
   ) {
 
@@ -133,11 +170,24 @@ function Projects() {
 
     }
 
-    excluirProjeto(
-      id
-    );
+    try {
 
-    atualizarLista();
+      await excluirProjeto(id);
+
+      await atualizarLista();
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao excluir projeto:",
+        erro
+      );
+
+      alert(
+        "Não foi possível excluir o projeto."
+      );
+
+    }
 
   }
 
@@ -178,7 +228,15 @@ function Projects() {
 
         <div className="projects-list">
 
-          {projects.length === 0 ? (
+          {carregando ? (
+
+            <div className="projects-empty">
+
+              Carregando projetos...
+
+            </div>
+
+          ) : projects.length === 0 ? (
 
             <div className="projects-empty">
 
@@ -199,9 +257,7 @@ function Projects() {
                   <div className="project-info">
 
                     <h2>
-
                       {project.nome}
-
                     </h2>
 
                     <p>
@@ -237,7 +293,7 @@ function Projects() {
                     <button
                       type="button"
                       onClick={() =>
-                        handleDeleteProject(
+                        void handleDeleteProject(
                           project.id
                         )
                       }
@@ -263,11 +319,9 @@ function Projects() {
       {openModal && (
 
         <ProjectModal
-
           project={
             selectedProject
           }
-
           onClose={() => {
 
             setOpenModal(
@@ -279,11 +333,9 @@ function Projects() {
             );
 
           }}
-
           onSave={
             handleSaveProject
           }
-
         />
 
       )}

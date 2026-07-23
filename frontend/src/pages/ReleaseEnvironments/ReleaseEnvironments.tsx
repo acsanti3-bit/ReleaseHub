@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
   MdAdd,
@@ -31,26 +34,57 @@ import type {
 
 function ReleaseEnvironments() {
 
-  const [ambientes, setAmbientes] =
-    useState<ReleaseEnvironment[]>(
-      listarAmbientes()
-    );
+  const [
+    ambientes,
+    setAmbientes,
+  ] =
+    useState<
+      ReleaseEnvironment[]
+    >([]);
+
+  const [
+    carregando,
+    setCarregando,
+  ] =
+    useState(true);
 
   const [
     ambienteSelecionado,
     setAmbienteSelecionado,
   ] =
-    useState<ReleaseEnvironment | null>(
-      null
-    );
+    useState<
+      ReleaseEnvironment | null
+    >(null);
 
-  function atualizarLista() {
+  async function atualizarLista() {
 
-    setAmbientes(
-      listarAmbientes()
-    );
+    try {
+
+      const lista =
+        await listarAmbientes();
+
+      setAmbientes(lista);
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar ambientes:",
+        erro
+      );
+
+    } finally {
+
+      setCarregando(false);
+
+    }
 
   }
+
+  useEffect(() => {
+
+    void atualizarLista();
+
+  }, []);
 
   function novoAmbiente() {
 
@@ -70,56 +104,63 @@ function ReleaseEnvironments() {
 
   }
 
-  function salvar(
+  async function salvar(
     ambiente: ReleaseEnvironment
   ) {
 
-    const existe =
-      ambientes.some(
-        item =>
-          item.id ===
-          ambiente.id
+    try {
+
+      const existe =
+        ambientes.some(
+          item =>
+            item.id ===
+            ambiente.id
+        );
+
+      if (existe) {
+
+        await editarAmbiente(
+          ambiente
+        );
+
+      } else {
+
+        await adicionarAmbiente(
+          ambiente
+        );
+
+      }
+
+      await sincronizarProjetosComAmbienteAtual();
+
+      await atualizarLista();
+
+      setAmbienteSelecionado(
+        null
       );
 
-    if (existe) {
+    } catch (erro) {
 
-      editarAmbiente(
-        ambiente
+      console.error(
+        "Erro ao salvar ambiente:",
+        erro
       );
 
-    } else {
-
-      adicionarAmbiente(
-        ambiente
+      alert(
+        "Não foi possível salvar o ambiente."
       );
 
     }
 
-    /*
-      Depois de salvar o ambiente,
-      atualizamos automaticamente
-      as versões dos projetos.
-    */
-
-    sincronizarProjetosComAmbienteAtual();
-
-    atualizarLista();
-
-    setAmbienteSelecionado(
-      null
-    );
-
   }
 
-  function excluir(
+  async function excluir(
     ambiente: ReleaseEnvironment
   ) {
 
     const confirmar =
       window.confirm(
-
         `Excluir o ambiente "${ambiente.nome}"?`
-
       );
 
     if (!confirmar) {
@@ -128,11 +169,26 @@ function ReleaseEnvironments() {
 
     }
 
-    excluirAmbiente(
-      ambiente.id
-    );
+    try {
 
-    atualizarLista();
+      await excluirAmbiente(
+        ambiente.id
+      );
+
+      await atualizarLista();
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao excluir ambiente:",
+        erro
+      );
+
+      alert(
+        "Não foi possível excluir o ambiente."
+      );
+
+    }
 
   }
 
@@ -152,8 +208,7 @@ function ReleaseEnvironments() {
 
             <p>
 
-              Configure a relação
-              entre as versões dos projetos.
+              Configure a relação entre as versões dos projetos.
 
             </p>
 
@@ -167,9 +222,7 @@ function ReleaseEnvironments() {
             }
           >
 
-            <MdAdd
-              size={20}
-            />
+            <MdAdd size={20} />
 
             Novo Ambiente
 
@@ -179,25 +232,19 @@ function ReleaseEnvironments() {
 
         <div className="release-info">
 
-          <MdLink
-            size={22}
-          />
+          <MdLink size={22} />
 
           <div>
 
             <strong>
-
               Versões amarradas
-
             </strong>
 
             <span>
 
-              Ao identificar a versão
-              do Intellicash, o ReleaseHub
-              encontra automaticamente
-              as versões correspondentes
-              dos demais projetos.
+              Ao identificar a versão do Intellicash,
+              o ReleaseHub encontra automaticamente
+              as versões correspondentes dos demais projetos.
 
             </span>
 
@@ -213,38 +260,22 @@ function ReleaseEnvironments() {
 
               <tr>
 
-                <th>
-                  Ambiente
-                </th>
+                <th>Ambiente</th>
 
-                <th>
-                  Intellicash
-                </th>
+                <th>Intellicash</th>
 
-                <th>
-                  EasyCash
-                </th>
+                <th>EasyCash</th>
 
-                <th>
-                  EasyCheckout
-                </th>
+                <th>EasyCheckout</th>
 
-                <th>
-                  EasyPDV
-                </th>
+                <th>EasyPDV</th>
 
-                <th>
-                  IntelliStock
-                </th>
+                <th>IntelliStock</th>
 
-                <th>
-                  IWB Server
-                </th>
+                <th>IWB Server</th>
 
                 <th className="release-actions-column">
-
                   Ações
-
                 </th>
 
               </tr>
@@ -266,9 +297,7 @@ function ReleaseEnvironments() {
 
                       <strong className="release-name">
 
-                        {
-                          ambiente.nome
-                        }
+                        {ambiente.nome}
 
                       </strong>
 
@@ -276,67 +305,37 @@ function ReleaseEnvironments() {
 
                     <td className="release-reference-version">
 
-                      {
-                        ambiente
-                          .versoes
-                          .intellicash ||
-                        "-"
-                      }
+                      {ambiente.versoes.intellicash || "-"}
 
                     </td>
 
                     <td>
 
-                      {
-                        ambiente
-                          .versoes
-                          .easycash ||
-                        "-"
-                      }
+                      {ambiente.versoes.easycash || "-"}
 
                     </td>
 
                     <td>
 
-                      {
-                        ambiente
-                          .versoes
-                          .easycheckout ||
-                        "-"
-                      }
+                      {ambiente.versoes.easycheckout || "-"}
 
                     </td>
 
                     <td>
 
-                      {
-                        ambiente
-                          .versoes
-                          .easypdv ||
-                        "-"
-                      }
+                      {ambiente.versoes.easypdv || "-"}
 
                     </td>
 
                     <td>
 
-                      {
-                        ambiente
-                          .versoes
-                          .intellistock ||
-                        "-"
-                      }
+                      {ambiente.versoes.intellistock || "-"}
 
                     </td>
 
                     <td>
 
-                      {
-                        ambiente
-                          .versoes
-                          .iwbserver ||
-                        "-"
-                      }
+                      {ambiente.versoes.iwbserver || "-"}
 
                     </td>
 
@@ -365,7 +364,7 @@ function ReleaseEnvironments() {
                           title="Excluir"
                           className="delete-environment"
                           onClick={() =>
-                            excluir(
+                            void excluir(
                               ambiente
                             )
                           }
@@ -390,12 +389,19 @@ function ReleaseEnvironments() {
 
           </table>
 
-          {ambientes.length === 0 && (
+          {carregando ? (
 
             <div className="release-empty">
 
-              Nenhum ambiente
-              cadastrado.
+              Carregando ambientes...
+
+            </div>
+
+          ) : ambientes.length === 0 && (
+
+            <div className="release-empty">
+
+              Nenhum ambiente cadastrado.
 
             </div>
 
@@ -408,21 +414,17 @@ function ReleaseEnvironments() {
       {ambienteSelecionado && (
 
         <ReleaseEnvironmentDrawer
-
           environment={
             ambienteSelecionado
           }
-
           onClose={() =>
             setAmbienteSelecionado(
               null
             )
           }
-
           onSave={
             salvar
           }
-
         />
 
       )}

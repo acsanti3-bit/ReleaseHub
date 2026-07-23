@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -26,15 +27,10 @@ import type {
 } from "../../types/project";
 
 import {
-
   listarProjetos,
-
   editarProjeto,
-
   adicionarProjeto,
-
   criarProjeto,
-
 } from "../../services/ProjectService";
 
 function Dashboard() {
@@ -43,9 +39,13 @@ function Dashboard() {
     projects,
     setProjects,
   ] =
-    useState<Project[]>(
-      listarProjetos()
-    );
+    useState<Project[]>([]);
+
+  const [
+    carregando,
+    setCarregando,
+  ] =
+    useState(true);
 
   const [
     projectSelecionado,
@@ -73,6 +73,36 @@ function Dashboard() {
   ] =
     useState("Nome");
 
+  async function carregarProjetos() {
+
+    try {
+
+      const lista =
+        await listarProjetos();
+
+      setProjects(lista);
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar projetos:",
+        erro
+      );
+
+    } finally {
+
+      setCarregando(false);
+
+    }
+
+  }
+
+  useEffect(() => {
+
+    void carregarProjetos();
+
+  }, []);
+
   function fecharDrawer() {
 
     setProjectSelecionado(
@@ -81,37 +111,50 @@ function Dashboard() {
 
   }
 
-  function salvarProjeto(
+  async function salvarProjeto(
     project: Project
   ) {
 
-    const existe =
-      projects.some(
-        p =>
-          p.id === project.id
+    try {
+
+      const existe =
+        projects.some(
+          p =>
+            p.id === project.id
+        );
+
+      if (existe) {
+
+        await editarProjeto(
+          project
+        );
+
+      } else {
+
+        await adicionarProjeto(
+          project
+        );
+
+      }
+
+      await carregarProjetos();
+
+      setProjectSelecionado(
+        null
       );
 
-    if (existe) {
+    } catch (erro) {
 
-      editarProjeto(
-        project
+      console.error(
+        "Erro ao salvar projeto:",
+        erro
       );
 
-    } else {
-
-      adicionarProjeto(
-        project
+      alert(
+        "Não foi possível salvar o projeto."
       );
 
     }
-
-    setProjects(
-      listarProjetos()
-    );
-
-    setProjectSelecionado(
-      null
-    );
 
   }
 
@@ -229,13 +272,11 @@ function Dashboard() {
           lista =
             lista.filter(
               p =>
-
                 p.situacoes
                   .desenvolvido > 0 ||
-
                 p.situacoes
-                  .aguardandoCompilacao > 0
-
+                  .aguardandoCompilacao >
+                  0
             );
 
           break;
@@ -246,7 +287,8 @@ function Dashboard() {
             lista.filter(
               p =>
                 p.situacoes
-                  .aguardandoCompilacao > 0
+                  .aguardandoCompilacao >
+                0
             );
 
           break;
@@ -297,7 +339,6 @@ function Dashboard() {
 
           lista.sort(
             (a, b) =>
-
               converterPrazo(
                 a.prazo
               ) -
@@ -345,7 +386,6 @@ function Dashboard() {
 
           lista.sort(
             (a, b) =>
-
               a.nome.localeCompare(
                 b.nome
               )
@@ -356,15 +396,10 @@ function Dashboard() {
       return lista;
 
     }, [
-
       projects,
-
       pesquisa,
-
       filtro,
-
       ordenacao,
-
     ]);
 
   return (
@@ -378,9 +413,7 @@ function Dashboard() {
           <div className="dashboard-title">
 
             <h1>
-
               IWS ReleaseHub
-
             </h1>
 
             <span>
@@ -394,11 +427,9 @@ function Dashboard() {
           <button
             className="new-project"
             onClick={() =>
-
               setProjectSelecionado(
                 criarProjeto()
               )
-
             }
           >
 
@@ -408,7 +439,10 @@ function Dashboard() {
 
         </div>
 
-        <CompatibilityPanel />
+        <CompatibilityPanel
+          projects={projects}
+          carregando={carregando}
+        />
 
         <DashboardStats
           projects={projects}
@@ -454,17 +488,11 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Todos
-            </option>
+            <option>Todos</option>
 
-            <option>
-              Qualidade
-            </option>
+            <option>Qualidade</option>
 
-            <option>
-              Testes
-            </option>
+            <option>Testes</option>
 
             <option>
               Em Progresso
@@ -494,17 +522,11 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Nome
-            </option>
+            <option>Nome</option>
 
-            <option>
-              Prazo
-            </option>
+            <option>Prazo</option>
 
-            <option>
-              Tarefas
-            </option>
+            <option>Tarefas</option>
 
           </select>
 
@@ -520,20 +542,26 @@ function Dashboard() {
 
         <div className="dashboard-grid">
 
-          {projetos.length === 0 ? (
+          {carregando ? (
 
             <div className="dashboard-empty">
 
               <h2>
+                Carregando projetos...
+              </h2>
 
+            </div>
+
+          ) : projetos.length === 0 ? (
+
+            <div className="dashboard-empty">
+
+              <h2>
                 Nenhum projeto encontrado
-
               </h2>
 
               <p>
-
                 Tente alterar os filtros ou a pesquisa.
-
               </p>
 
             </div>
@@ -563,19 +591,15 @@ function Dashboard() {
       {projectSelecionado && (
 
         <ProjectDrawer
-
           project={
             projectSelecionado
           }
-
           onSave={
             salvarProjeto
           }
-
           onClose={
             fecharDrawer
           }
-
         />
 
       )}

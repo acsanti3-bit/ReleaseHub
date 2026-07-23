@@ -9,6 +9,7 @@ import "./TvDashboard.css";
 import logo from "../../assets/images/logo.png";
 
 import TvProjectCard from "../../components/TvProjectCard/TvProjectCard";
+
 import CompatibilityPanel from "../../components/CompatibilityPanel/CompatibilityPanel";
 
 import {
@@ -21,67 +22,115 @@ import type {
 
 function TvDashboard() {
 
-  const [projects, setProjects] =
-    useState<Project[]>(
-      listarProjetos()
-    );
+  const [
+    projects,
+    setProjects,
+  ] =
+    useState<Project[]>([]);
 
-  const [agora, setAgora] =
+  const [
+    carregando,
+    setCarregando,
+  ] =
+    useState(true);
+
+  const [
+    agora,
+    setAgora,
+  ] =
     useState(new Date());
 
-  const [ultimaAtualizacao, setUltimaAtualizacao] =
+  const [
+    ultimaAtualizacao,
+    setUltimaAtualizacao,
+  ] =
     useState(new Date());
-
-  /*
-    Relógio
-  */
 
   useEffect(() => {
 
-    const intervalo = setInterval(() => {
+    const intervalo =
+      setInterval(() => {
 
-      setAgora(new Date());
+        setAgora(
+          new Date()
+        );
 
-    }, 1000);
+      }, 1000);
 
     return () =>
-      clearInterval(intervalo);
+      clearInterval(
+        intervalo
+      );
 
   }, []);
 
-  /*
-    Atualização automática dos dados.
-
-    Enquanto estamos usando localStorage,
-    a TV verifica os dados a cada 10 segundos.
-
-    Depois, quando entrar o backend,
-    essa mesma lógica passa a consultar a API.
-  */
-
   useEffect(() => {
 
-    const atualizarDados = () => {
+    let ativo = true;
 
-      setProjects(
-        listarProjetos()
+    async function atualizarDados() {
+
+      try {
+
+        const lista =
+          await listarProjetos();
+
+        if (!ativo) {
+
+          return;
+
+        }
+
+        setProjects(
+          lista
+        );
+
+        setUltimaAtualizacao(
+          new Date()
+        );
+
+      } catch (erro) {
+
+        console.error(
+          "Erro ao atualizar TV:",
+          erro
+        );
+
+      } finally {
+
+        if (ativo) {
+
+          setCarregando(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+    void atualizarDados();
+
+    const intervalo =
+      setInterval(
+        () => {
+
+          void atualizarDados();
+
+        },
+        10000
       );
 
-      setUltimaAtualizacao(
-        new Date()
+    return () => {
+
+      ativo = false;
+
+      clearInterval(
+        intervalo
       );
 
     };
-
-    atualizarDados();
-
-    const intervalo = setInterval(
-      atualizarDados,
-      10000
-    );
-
-    return () =>
-      clearInterval(intervalo);
 
   }, []);
 
@@ -124,41 +173,65 @@ function TvDashboard() {
         .replace(/\s/g, "");
 
     if (
-      projeto.includes("intellicash") ||
-      projeto.includes("intelicash")
+      projeto.includes(
+        "intellicash"
+      ) ||
+      projeto.includes(
+        "intelicash"
+      )
     ) {
+
       return 1;
+
     }
 
     if (
-      projeto.includes("easycash")
+      projeto.includes(
+        "easycash"
+      )
     ) {
+
       return 2;
+
     }
 
     if (
-      projeto.includes("easycheckout")
+      projeto.includes(
+        "easycheckout"
+      )
     ) {
+
       return 3;
+
     }
 
     if (
-      projeto.includes("easypdv")
+      projeto.includes(
+        "easypdv"
+      )
     ) {
+
       return 4;
+
     }
 
     if (
-      projeto.includes("intellistock") ||
+      projeto.includes(
+        "intellistock"
+      ) ||
       projeto.includes("isa")
     ) {
+
       return 5;
+
     }
 
     if (
       projeto.includes("iwb")
     ) {
+
       return 6;
+
     }
 
     return 99;
@@ -168,13 +241,16 @@ function TvDashboard() {
   const projetosOrdenados =
     useMemo(() => {
 
-      return [...projects].sort(
-
+      return [
+        ...projects,
+      ].sort(
         (a, b) =>
-
-          getOrdemProjeto(a.nome) -
-          getOrdemProjeto(b.nome)
-
+          getOrdemProjeto(
+            a.nome
+          ) -
+          getOrdemProjeto(
+            b.nome
+          )
       );
 
     }, [projects]);
@@ -249,7 +325,10 @@ function TvDashboard() {
 
       </header>
 
-      <CompatibilityPanel />
+      <CompatibilityPanel
+        projects={projects}
+        carregando={carregando}
+      />
 
       <main className="tv-grid">
 
