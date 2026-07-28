@@ -1,10 +1,15 @@
-import { useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
 
 import "./ReleaseEnvironmentDrawer.css";
 
 import type {
   ReleaseEnvironment,
+  ReleaseSystemVersion,
 } from "../../types/releaseEnvironment";
+
 
 interface Props {
 
@@ -18,6 +23,101 @@ interface Props {
 
 }
 
+
+function obterSistemasIniciais(
+  environment: ReleaseEnvironment
+): ReleaseSystemVersion[] {
+
+  /*
+    Se a API já devolveu os sistemas
+    dinâmicos, utilizamos eles.
+  */
+
+  if (
+    environment.sistemas &&
+    environment.sistemas.length > 0
+  ) {
+
+    return environment.sistemas.map(
+      sistema => ({
+        ...sistema,
+      })
+    );
+
+  }
+
+
+  /*
+    Fallback para ambientes antigos.
+  */
+
+  return [
+
+    {
+      chave: "intellicash",
+      nome: "Intellicash",
+      versao:
+        environment
+          .versoes
+          .intellicash,
+      ordem: 1,
+    },
+
+    {
+      chave: "easycash",
+      nome: "EasyCash",
+      versao:
+        environment
+          .versoes
+          .easycash,
+      ordem: 2,
+    },
+
+    {
+      chave: "easycheckout",
+      nome: "EasyCheckout",
+      versao:
+        environment
+          .versoes
+          .easycheckout,
+      ordem: 3,
+    },
+
+    {
+      chave: "easypdv",
+      nome: "EasyPDV",
+      versao:
+        environment
+          .versoes
+          .easypdv,
+      ordem: 4,
+    },
+
+    {
+      chave: "intellistock",
+      nome: "IntelliStock",
+      versao:
+        environment
+          .versoes
+          .intellistock,
+      ordem: 5,
+    },
+
+    {
+      chave: "iwbserver",
+      nome: "IWB Server",
+      versao:
+        environment
+          .versoes
+          .iwbserver,
+      ordem: 6,
+    },
+
+  ];
+
+}
+
+
 function ReleaseEnvironmentDrawer({
 
   environment,
@@ -28,35 +128,208 @@ function ReleaseEnvironmentDrawer({
 
 }: Props) {
 
-  const [form, setForm] =
+  const [
+    form,
+    setForm,
+  ] =
     useState<ReleaseEnvironment>(
-      environment
+      {
+        ...environment,
+
+        sistemas:
+          obterSistemasIniciais(
+            environment
+          ),
+      }
     );
 
-  function alterarVersao(
-    campo: keyof ReleaseEnvironment["versoes"],
+
+  /*
+    Ordena os sistemas conforme
+    a ordem cadastrada.
+  */
+
+  const sistemas =
+    useMemo(
+      () => {
+
+        return [
+          ...(
+            form.sistemas ??
+            []
+          ),
+        ].sort(
+          (
+            a,
+            b
+          ) =>
+            a.ordem -
+            b.ordem
+        );
+
+      },
+      [
+        form.sistemas,
+      ]
+    );
+
+
+  /*
+    Altera nome ou versão
+    de um sistema.
+  */
+
+  function alterarSistema(
+    chave: string,
+    campo:
+      "nome" |
+      "versao",
     valor: string
   ) {
 
-    setForm({
+    const atualizados =
+      (
+        form.sistemas ??
+        []
+      ).map(
+        sistema => {
 
-      ...form,
+          if (
+            sistema.chave !==
+            chave
+          ) {
 
-      versoes: {
+            return sistema;
 
-        ...form.versoes,
+          }
 
-        [campo]: valor,
 
-      },
+          return {
 
-    });
+            ...sistema,
+
+            [campo]:
+              valor,
+
+          };
+
+        }
+      );
+
+
+    setForm(
+      {
+        ...form,
+
+        sistemas:
+          atualizados,
+      }
+    );
 
   }
 
+
+  /*
+    Adiciona um novo sistema
+    dinamicamente.
+  */
+
+  function adicionarSistema() {
+
+    const lista =
+      form.sistemas ??
+      [];
+
+
+    const maiorOrdem =
+      lista.reduce(
+        (
+          maior,
+          sistema
+        ) =>
+          Math.max(
+            maior,
+            sistema.ordem
+          ),
+        0
+      );
+
+
+    setForm(
+      {
+        ...form,
+
+        sistemas: [
+
+          ...lista,
+
+          {
+            chave:
+              `novo-${Date.now()}`,
+
+            nome:
+              "",
+
+            versao:
+              "",
+
+            ordem:
+              maiorOrdem + 1,
+          },
+
+        ],
+      }
+    );
+
+  }
+
+
+  /*
+    Remove um sistema.
+
+    Intellicash nunca pode
+    ser removido porque é
+    nossa versão de referência.
+  */
+
+  function removerSistema(
+    chave: string
+  ) {
+
+    if (
+      chave ===
+      "intellicash"
+    ) {
+
+      return;
+
+    }
+
+
+    setForm(
+      {
+        ...form,
+
+        sistemas:
+          (
+            form.sistemas ??
+            []
+          ).filter(
+            sistema =>
+              sistema.chave !==
+              chave
+          ),
+      }
+    );
+
+  }
+
+
   function salvar() {
 
-    if (!form.nome.trim()) {
+    if (
+      !form.nome.trim()
+    ) {
 
       alert(
         "Informe o nome do ambiente."
@@ -66,8 +339,22 @@ function ReleaseEnvironmentDrawer({
 
     }
 
+
+    const intellicash =
+      (
+        form.sistemas ??
+        []
+      ).find(
+        sistema =>
+          sistema.chave ===
+          "intellicash"
+      );
+
+
     if (
-      !form.versoes.intellicash.trim()
+      !intellicash
+        ?.versao
+        .trim()
     ) {
 
       alert(
@@ -78,9 +365,102 @@ function ReleaseEnvironmentDrawer({
 
     }
 
-    onSave(form);
+
+    const sistemaSemNome =
+      (
+        form.sistemas ??
+        []
+      ).some(
+        sistema =>
+          !sistema.nome.trim()
+      );
+
+
+    if (
+      sistemaSemNome
+    ) {
+
+      alert(
+        "Informe o nome de todos os sistemas."
+      );
+
+      return;
+
+    }
+
+
+    /*
+      Mantemos as propriedades antigas
+      para compatibilidade com as partes
+      do sistema que ainda utilizam
+      ambiente.versoes.
+    */
+
+    const encontrarVersao =
+      (
+        chave: string
+      ) => {
+
+        return (
+          (
+            form.sistemas ??
+            []
+          ).find(
+            sistema =>
+              sistema.chave ===
+              chave
+          )?.versao ??
+          ""
+        );
+
+      };
+
+
+    const versoes = {
+
+      intellicash:
+        encontrarVersao(
+          "intellicash"
+        ),
+
+      easycash:
+        encontrarVersao(
+          "easycash"
+        ),
+
+      easycheckout:
+        encontrarVersao(
+          "easycheckout"
+        ),
+
+      easypdv:
+        encontrarVersao(
+          "easypdv"
+        ),
+
+      intellistock:
+        encontrarVersao(
+          "intellistock"
+        ),
+
+      iwbserver:
+        encontrarVersao(
+          "iwbserver"
+        ),
+
+    };
+
+
+    onSave(
+      {
+        ...form,
+
+        versoes,
+      }
+    );
 
   }
+
 
   return (
 
@@ -88,8 +468,11 @@ function ReleaseEnvironmentDrawer({
 
       <div
         className="release-drawer-backdrop"
-        onClick={onClose}
+        onClick={
+          onClose
+        }
       />
+
 
       <aside className="release-drawer">
 
@@ -107,9 +490,12 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
+
           <button
             type="button"
-            onClick={onClose}
+            onClick={
+              onClose
+            }
           >
 
             ×
@@ -117,6 +503,7 @@ function ReleaseEnvironmentDrawer({
           </button>
 
         </div>
+
 
         <div className="release-drawer-body">
 
@@ -126,22 +513,29 @@ function ReleaseEnvironmentDrawer({
               Nome do Ambiente
             </label>
 
+
             <input
               placeholder="Ex.: Release 3.1.021"
-              value={form.nome}
-              onChange={e =>
-                setForm({
+              value={
+                form.nome
+              }
+              onChange={
+                event =>
+                  setForm(
+                    {
+                      ...form,
 
-                  ...form,
-
-                  nome:
-                    e.target.value,
-
-                })
+                      nome:
+                        event
+                          .target
+                          .value,
+                    }
+                  )
               }
             />
 
           </div>
+
 
           <div className="release-reference">
 
@@ -152,148 +546,222 @@ function ReleaseEnvironmentDrawer({
             <span>
 
               O Intellicash identifica
-              automaticamente todo o ambiente.
+              automaticamente todo
+              o ambiente.
 
             </span>
 
           </div>
 
-          <div className="release-field release-main-version">
-
-            <label>
-              Intellicash
-            </label>
-
-            <input
-              placeholder="3.1.021.000"
-              value={
-                form.versoes.intellicash
-              }
-              onChange={e =>
-                alterarVersao(
-                  "intellicash",
-                  e.target.value
-                )
-              }
-            />
-
-          </div>
 
           <div className="release-divider">
 
-            Projetos vinculados
+            Sistemas da Release
 
           </div>
 
-          <div className="release-field">
 
-            <label>
-              EasyCash
-            </label>
+          {sistemas.map(
+            sistema => (
 
-            <input
-              placeholder="1.5.5.0"
-              value={
-                form.versoes.easycash
-              }
-              onChange={e =>
-                alterarVersao(
-                  "easycash",
-                  e.target.value
-                )
-              }
-            />
+              <div
+                key={
+                  sistema.chave
+                }
+                style={{
+                  marginBottom:
+                    "14px",
 
-          </div>
+                  padding:
+                    "12px",
 
-          <div className="release-field">
+                  border:
+                    sistema.chave ===
+                    "intellicash"
+                      ? "1px solid #BFD9EF"
+                      : "1px solid #E2E7EC",
 
-            <label>
-              EasyCheckout
-            </label>
+                  borderRadius:
+                    "10px",
 
-            <input
-              placeholder="1.0.6.0"
-              value={
-                form.versoes.easycheckout
-              }
-              onChange={e =>
-                alterarVersao(
-                  "easycheckout",
-                  e.target.value
-                )
-              }
-            />
+                  background:
+                    sistema.chave ===
+                    "intellicash"
+                      ? "#F4F9FD"
+                      : "#FFF",
+                }}
+              >
 
-          </div>
+                <div className="release-field">
 
-          <div className="release-field">
+                  <label>
 
-            <label>
-              EasyPDV
-            </label>
+                    Sistema
 
-            <input
-              placeholder="2.1.3.0"
-              value={
-                form.versoes.easypdv
-              }
-              onChange={e =>
-                alterarVersao(
-                  "easypdv",
-                  e.target.value
-                )
-              }
-            />
+                    {sistema.chave ===
+                      "intellicash" &&
+                      " • Referência"}
 
-          </div>
+                  </label>
 
-          <div className="release-field">
 
-            <label>
-              IntelliStock
-            </label>
+                  <input
+                    value={
+                      sistema.nome
+                    }
+                    readOnly={
+                      sistema.chave ===
+                      "intellicash"
+                    }
+                    onChange={
+                      event =>
+                        alterarSistema(
+                          sistema.chave,
+                          "nome",
+                          event
+                            .target
+                            .value
+                        )
+                    }
+                  />
 
-            <input
-              placeholder="1.1.2.0"
-              value={
-                form.versoes.intellistock
-              }
-              onChange={e =>
-                alterarVersao(
-                  "intellistock",
-                  e.target.value
-                )
-              }
-            />
+                </div>
 
-          </div>
 
-          <div className="release-field">
+                <div
+                  className="release-field"
+                  style={{
+                    marginTop:
+                      "10px",
+                  }}
+                >
 
-            <label>
-              IWB Server
-            </label>
+                  <label>
+                    Versão
+                  </label>
 
-            <input
-              placeholder="1.0.0.9"
-              value={
-                form.versoes.iwbserver
-              }
-              onChange={e =>
-                alterarVersao(
-                  "iwbserver",
-                  e.target.value
-                )
-              }
-            />
 
-          </div>
+                  <input
+                    placeholder="Informe a versão"
+                    value={
+                      sistema.versao
+                    }
+                    onChange={
+                      event =>
+                        alterarSistema(
+                          sistema.chave,
+                          "versao",
+                          event
+                            .target
+                            .value
+                        )
+                    }
+                  />
+
+                </div>
+
+
+                {sistema.chave !==
+                  "intellicash" && (
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removerSistema(
+                        sistema.chave
+                      )
+                    }
+                    style={{
+                      marginTop:
+                        "8px",
+
+                      padding:
+                        "0",
+
+                      border:
+                        "none",
+
+                      background:
+                        "transparent",
+
+                      color:
+                        "#C62828",
+
+                      fontSize:
+                        "11px",
+
+                      fontWeight:
+                        700,
+
+                      cursor:
+                        "pointer",
+                    }}
+                  >
+
+                    Remover sistema
+
+                  </button>
+
+                )}
+
+              </div>
+
+            )
+          )}
+
+
+          <button
+            type="button"
+            onClick={
+              adicionarSistema
+            }
+            style={{
+              width:
+                "100%",
+
+              height:
+                "42px",
+
+              marginTop:
+                "4px",
+
+              marginBottom:
+                "16px",
+
+              border:
+                "1px dashed #005AA9",
+
+              borderRadius:
+                "9px",
+
+              background:
+                "#F6FAFD",
+
+              color:
+                "#005AA9",
+
+              fontSize:
+                "13px",
+
+              fontWeight:
+                700,
+
+              cursor:
+                "pointer",
+            }}
+          >
+
+            + Adicionar sistema
+
+          </button>
+
 
           <button
             type="button"
             className="release-save"
-            onClick={salvar}
+            onClick={
+              salvar
+            }
           >
 
             Salvar Ambiente
@@ -309,5 +777,6 @@ function ReleaseEnvironmentDrawer({
   );
 
 }
+
 
 export default ReleaseEnvironmentDrawer;

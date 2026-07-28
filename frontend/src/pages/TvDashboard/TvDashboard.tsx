@@ -35,6 +35,10 @@ const STORAGE_KEY =
   "releasehub_tv_environment";
 
 
+type ChaveVersao =
+  keyof ReleaseEnvironment["versoes"];
+
+
 function TvDashboard() {
 
   const [
@@ -98,6 +102,7 @@ function TvDashboard() {
         1000
       );
 
+
     return () =>
       clearInterval(
         intervalo
@@ -107,19 +112,18 @@ function TvDashboard() {
 
 
   /*
-    Carrega os ambientes disponíveis.
+    Carrega as releases.
 
-    Se esta TV já possui uma release
-    escolhida, mantém essa escolha.
-
-    Caso contrário, seleciona
-    automaticamente a mais recente.
+    A lista já fica ordenada
+    da versão mais recente
+    para a mais antiga.
   */
 
   useEffect(() => {
 
     let ativo =
       true;
+
 
     async function carregarAmbientes() {
 
@@ -128,16 +132,19 @@ function TvDashboard() {
         const lista =
           await listarAmbientes();
 
+
         if (!ativo) {
 
           return;
 
         }
 
+
         const ordenados =
           ordenarAmbientesPorVersao(
             lista
           );
+
 
         setAmbientes(
           ordenados
@@ -148,6 +155,7 @@ function TvDashboard() {
           localStorage.getItem(
             STORAGE_KEY
           );
+
 
         const idSalvo =
           salvo
@@ -189,6 +197,7 @@ function TvDashboard() {
           setAmbienteSelecionadoId(
             maisRecente.id
           );
+
 
           localStorage.setItem(
             STORAGE_KEY,
@@ -235,11 +244,10 @@ function TvDashboard() {
 
 
   /*
-    Carrega os projetos vinculados
-    especificamente à release
-    selecionada.
+    Carrega os projetos específicos
+    da release selecionada.
 
-    Atualiza automaticamente
+    Atualização automática
     a cada 10 segundos.
   */
 
@@ -258,6 +266,19 @@ function TvDashboard() {
     }
 
 
+    /*
+      Criamos uma constante local
+      depois da validação.
+
+      Assim o TypeScript sabe
+      definitivamente que o valor
+      é number e não null.
+    */
+
+    const environmentId =
+      ambienteSelecionadoId;
+
+
     let ativo =
       true;
 
@@ -268,7 +289,7 @@ function TvDashboard() {
 
         const lista =
           await listarProjetosPorAmbiente(
-            ambienteSelecionadoId!
+            environmentId
           );
 
 
@@ -306,6 +327,7 @@ function TvDashboard() {
       true
     );
 
+
     void atualizarDados();
 
 
@@ -338,18 +360,20 @@ function TvDashboard() {
 
   /*
     Troca a release acompanhada.
-
-    A escolha fica salva somente
-    neste navegador/dispositivo.
   */
 
   function alterarAmbiente(
     id: number
   ) {
 
+    setProjects([]);
+
+    setCarregando(true);
+
     setAmbienteSelecionadoId(
       id
     );
+
 
     localStorage.setItem(
       STORAGE_KEY,
@@ -372,7 +396,314 @@ function TvDashboard() {
 
 
   /*
-    Hora com segundos.
+    Descobre qual é a release
+    imediatamente anterior.
+
+    Como os ambientes estão
+    ordenados do mais novo
+    para o mais antigo:
+
+    índice atual + 1
+    =
+    release anterior.
+  */
+
+  const ambienteAnterior =
+    useMemo(
+      () => {
+
+        if (
+          ambienteSelecionadoId === null
+        ) {
+
+          return null;
+
+        }
+
+
+        const indice =
+          ambientes.findIndex(
+            ambiente =>
+              ambiente.id ===
+              ambienteSelecionadoId
+          );
+
+
+        if (
+          indice === -1 ||
+          indice + 1 >=
+            ambientes.length
+        ) {
+
+          return null;
+
+        }
+
+
+        return (
+          ambientes[
+            indice + 1
+          ]
+        );
+
+      },
+      [
+        ambientes,
+        ambienteSelecionadoId,
+      ]
+    );
+
+
+  /*
+    Identifica qual campo do
+    ambiente pertence ao projeto.
+  */
+
+  function obterChaveProjeto(
+    nome: string
+  ): ChaveVersao | null {
+
+    const projeto =
+      nome
+        .toLowerCase()
+        .replace(
+          /\s/g,
+          ""
+        );
+
+
+    if (
+      projeto.includes(
+        "intellicash"
+      ) ||
+      projeto.includes(
+        "intelicash"
+      )
+    ) {
+
+      return "intellicash";
+
+    }
+
+
+    if (
+      projeto.includes(
+        "easycash"
+      )
+    ) {
+
+      return "easycash";
+
+    }
+
+
+    if (
+      projeto.includes(
+        "easycheckout"
+      )
+    ) {
+
+      return "easycheckout";
+
+    }
+
+
+    if (
+      projeto.includes(
+        "easypdv"
+      )
+    ) {
+
+      return "easypdv";
+
+    }
+
+
+    if (
+      projeto.includes(
+        "intellistock"
+      ) ||
+      projeto.includes(
+        "isa"
+      )
+    ) {
+
+      return "intellistock";
+
+    }
+
+
+    if (
+      projeto.includes(
+        "iwb"
+      )
+    ) {
+
+      return "iwbserver";
+
+    }
+
+
+    return null;
+
+  }
+
+
+  /*
+    Verifica se o projeto possui
+    alguma tarefa na release.
+  */
+
+  function possuiTarefas(
+    project: Project
+  ) {
+
+    return (
+      Object.values(
+        project.situacoes
+      ).reduce(
+        (
+          total,
+          quantidade
+        ) =>
+          total +
+          quantidade,
+        0
+      ) > 0
+    );
+
+  }
+
+
+  /*
+    Verifica se houve alteração
+    de versão em comparação
+    com a release anterior.
+  */
+
+  function possuiNovaVersao(
+    project: Project
+  ) {
+
+    if (
+      !ambienteSelecionado
+    ) {
+
+      return false;
+
+    }
+
+
+    const chave =
+      obterChaveProjeto(
+        project.nome
+      );
+
+
+    /*
+      Projetos ainda não mapeados
+      no ambiente usam a própria
+      versão cadastrada.
+    */
+
+    if (!chave) {
+
+      return Boolean(
+        project.versao
+      );
+
+    }
+
+
+    const versaoAtual =
+      ambienteSelecionado
+        .versoes[chave] ??
+      "";
+
+
+    /*
+      Sem versão na release atual
+      significa que o projeto
+      não participa dela.
+    */
+
+    if (!versaoAtual) {
+
+      return false;
+
+    }
+
+
+    /*
+      Caso seja a release mais antiga,
+      não existe uma release anterior
+      cadastrada para comparação.
+
+      Se houver versão, consideramos
+      que o projeto participa dela.
+    */
+
+    if (
+      !ambienteAnterior
+    ) {
+
+      return true;
+
+    }
+
+
+    const versaoAnterior =
+      ambienteAnterior
+        .versoes[chave] ??
+      "";
+
+
+    return (
+      versaoAtual !==
+      versaoAnterior
+    );
+
+  }
+
+
+  /*
+    REGRA DO MODO TV:
+
+    O projeto aparece quando:
+
+    - possui tarefas
+           OU
+    - possui versão nova.
+
+    Projeto sem movimentação e
+    sem versão nova fica oculto.
+  */
+
+  const projetosAtivos =
+    useMemo(
+      () => {
+
+        return projects.filter(
+          project =>
+            possuiTarefas(
+              project
+            ) ||
+            possuiNovaVersao(
+              project
+            )
+        );
+
+      },
+      [
+        projects,
+        ambienteSelecionado,
+        ambienteAnterior,
+      ]
+    );
+
+
+  /*
+    Hora e data.
   */
 
   const hora =
@@ -411,8 +742,7 @@ function TvDashboard() {
 
 
   /*
-    Ordem fixa dos projetos
-    no painel da TV.
+    Ordem dos cards.
   */
 
   function getOrdemProjeto(
@@ -510,7 +840,7 @@ function TvDashboard() {
       () => {
 
         return [
-          ...projects,
+          ...projetosAtivos,
         ].sort(
           (
             a,
@@ -527,7 +857,7 @@ function TvDashboard() {
 
       },
       [
-        projects,
+        projetosAtivos,
       ]
     );
 
@@ -546,17 +876,20 @@ function TvDashboard() {
             className="tv-logo"
           />
 
+
           <div className="tv-brand-text">
 
             <h1>
               IWS ReleaseHub
             </h1>
 
+
             <div className="tv-brand-subtitle">
 
               <span>
                 Painel da Qualidade
               </span>
+
 
               <div className="tv-online">
 
@@ -581,6 +914,7 @@ function TvDashboard() {
               Release acompanhada
             </span>
 
+
             <div className="tv-release-select-wrapper">
 
               <select
@@ -592,19 +926,25 @@ function TvDashboard() {
                   carregandoAmbientes ||
                   ambientes.length === 0
                 }
-                onChange={event =>
-                  alterarAmbiente(
-                    Number(
-                      event.target.value
+                onChange={
+                  event =>
+                    alterarAmbiente(
+                      Number(
+                        event
+                          .target
+                          .value
+                      )
                     )
-                  )
                 }
               >
 
-                {ambientes.length === 0 && (
+                {ambientes.length ===
+                  0 && (
 
                   <option value="">
+
                     Nenhuma release
+
                   </option>
 
                 )}
@@ -632,6 +972,7 @@ function TvDashboard() {
               </select>
 
             </div>
+
 
             {ambienteSelecionado && (
 
@@ -669,6 +1010,17 @@ function TvDashboard() {
       </header>
 
 
+      {/*
+        O CompatibilityPanel
+        continua recebendo TODOS
+        os projetos.
+
+        Não utilizamos projetosAtivos
+        aqui porque a compatibilidade
+        deve mostrar o ecossistema
+        completo da release.
+      */}
+
       <CompatibilityPanel
         projects={
           projects
@@ -689,12 +1041,13 @@ function TvDashboard() {
 
           </div>
 
-        ) : projetosOrdenados.length === 0 ? (
+        ) : projetosOrdenados.length ===
+            0 ? (
 
           <div className="tv-loading">
 
-            Nenhum projeto encontrado
-            para esta release.
+            Nenhum projeto com movimentação
+            nesta release.
 
           </div>
 
@@ -724,5 +1077,6 @@ function TvDashboard() {
   );
 
 }
+
 
 export default TvDashboard;
