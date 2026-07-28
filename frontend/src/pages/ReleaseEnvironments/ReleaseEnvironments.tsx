@@ -32,6 +32,7 @@ import type {
   ReleaseEnvironment,
 } from "../../types/releaseEnvironment";
 
+
 function ReleaseEnvironments() {
 
   const [
@@ -47,6 +48,12 @@ function ReleaseEnvironments() {
     setCarregando,
   ] =
     useState(true);
+
+  const [
+    salvando,
+    setSalvando,
+  ] =
+    useState(false);
 
   const [
     podeEditar,
@@ -85,9 +92,7 @@ function ReleaseEnvironments() {
 
     } finally {
 
-      setCarregando(
-        false
-      );
+      setCarregando(false);
 
     }
 
@@ -113,9 +118,7 @@ function ReleaseEnvironments() {
         erro
       );
 
-      setPodeEditar(
-        false
-      );
+      setPodeEditar(false);
 
     }
 
@@ -167,13 +170,18 @@ function ReleaseEnvironments() {
     ambiente: ReleaseEnvironment
   ) {
 
-    if (!podeEditar) {
+    if (
+      !podeEditar ||
+      salvando
+    ) {
 
       return;
 
     }
 
     try {
+
+      setSalvando(true);
 
       const existe =
         ambientes.some(
@@ -182,34 +190,81 @@ function ReleaseEnvironments() {
             ambiente.id
         );
 
+
+      let ambienteSalvo:
+        ReleaseEnvironment;
+
+
       if (existe) {
 
-        await editarAmbiente(
-          ambiente
-        );
+        ambienteSalvo =
+          await editarAmbiente(
+            ambiente
+          );
 
       } else {
 
-        await adicionarAmbiente(
-          ambiente
-        );
+        ambienteSalvo =
+          await adicionarAmbiente(
+            ambiente
+          );
 
       }
 
-      /*
-        Não utilizamos mais
-        sincronizarProjetosComAmbienteAtual().
 
-        A própria API de ambientes
-        sincroniza as versões dentro
-        de release_projects.
+      /*
+        Atualiza imediatamente o estado
+        da tela com a resposta da API.
+
+        Não precisamos mais executar
+        sincronização pelo ProjectService.
       */
 
-      await atualizarLista();
+      setAmbientes(
+        lista => {
+
+          const jaExiste =
+            lista.some(
+              item =>
+                item.id ===
+                ambienteSalvo.id
+            );
+
+
+          if (jaExiste) {
+
+            return lista.map(
+              item =>
+                item.id ===
+                ambienteSalvo.id
+                  ? ambienteSalvo
+                  : item
+            );
+
+          }
+
+
+          return [
+            ...lista,
+            ambienteSalvo,
+          ];
+
+        }
+      );
+
 
       setAmbienteSelecionado(
         null
       );
+
+
+      /*
+        Recarrega em seguida somente
+        para garantir que a interface
+        esteja igual ao D1.
+      */
+
+      void atualizarLista();
 
     } catch (erro) {
 
@@ -221,6 +276,10 @@ function ReleaseEnvironments() {
       alert(
         "Não foi possível salvar o ambiente."
       );
+
+    } finally {
+
+      setSalvando(false);
 
     }
 
@@ -237,10 +296,12 @@ function ReleaseEnvironments() {
 
     }
 
+
     const confirmar =
       window.confirm(
         `Excluir o ambiente "${ambiente.nome}"?`
       );
+
 
     if (!confirmar) {
 
@@ -248,13 +309,22 @@ function ReleaseEnvironments() {
 
     }
 
+
     try {
 
       await excluirAmbiente(
         ambiente.id
       );
 
-      await atualizarLista();
+
+      setAmbientes(
+        lista =>
+          lista.filter(
+            item =>
+              item.id !==
+              ambiente.id
+          )
+      );
 
     } catch (erro) {
 
@@ -288,7 +358,8 @@ function ReleaseEnvironments() {
 
             <p>
 
-              Configure a relação entre as versões dos projetos.
+              Configure a relação entre
+              as versões dos projetos.
 
               {!podeEditar &&
                 " • Somente leitura"}
@@ -296,6 +367,7 @@ function ReleaseEnvironments() {
             </p>
 
           </div>
+
 
           {podeEditar && (
 
@@ -307,9 +379,7 @@ function ReleaseEnvironments() {
               }
             >
 
-              <MdAdd
-                size={20}
-              />
+              <MdAdd size={20} />
 
               Novo Ambiente
 
@@ -322,9 +392,7 @@ function ReleaseEnvironments() {
 
         <div className="release-info">
 
-          <MdLink
-            size={22}
-          />
+          <MdLink size={22} />
 
           <div>
 
@@ -381,10 +449,13 @@ function ReleaseEnvironments() {
                   IWB Server
                 </th>
 
+
                 {podeEditar && (
 
                   <th className="release-actions-column">
+
                     Ações
+
                   </th>
 
                 )}
@@ -591,5 +662,6 @@ function ReleaseEnvironments() {
   );
 
 }
+
 
 export default ReleaseEnvironments;

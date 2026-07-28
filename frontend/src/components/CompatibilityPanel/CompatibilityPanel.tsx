@@ -6,12 +6,13 @@ import {
 import "./CompatibilityPanel.css";
 
 import {
+  MdApps,
+  MdCloud,
   MdDns,
+  MdInventory,
   MdPointOfSale,
   MdShoppingCart,
   MdStore,
-  MdInventory,
-  MdCloud,
 } from "react-icons/md";
 
 import {
@@ -24,7 +25,9 @@ import type {
 
 import type {
   ReleaseEnvironment,
+  ReleaseSystemVersion,
 } from "../../types/releaseEnvironment";
+
 
 interface Props {
 
@@ -33,6 +36,166 @@ interface Props {
   carregando?: boolean;
 
 }
+
+
+function obterSistemas(
+  ambiente: ReleaseEnvironment
+): ReleaseSystemVersion[] {
+
+  /*
+    Estrutura nova e dinâmica.
+  */
+
+  if (
+    ambiente.sistemas &&
+    ambiente.sistemas.length > 0
+  ) {
+
+    return [
+      ...ambiente.sistemas,
+    ].sort(
+      (
+        a,
+        b
+      ) =>
+        a.ordem -
+        b.ordem
+    );
+
+  }
+
+
+  /*
+    Fallback para ambientes antigos.
+  */
+
+  return [
+
+    {
+      chave: "intellicash",
+      nome: "Intellicash",
+      versao:
+        ambiente
+          .versoes
+          .intellicash,
+      ordem: 1,
+    },
+
+    {
+      chave: "easycash",
+      nome: "EasyCash",
+      versao:
+        ambiente
+          .versoes
+          .easycash,
+      ordem: 2,
+    },
+
+    {
+      chave: "easycheckout",
+      nome: "EasyCheckout",
+      versao:
+        ambiente
+          .versoes
+          .easycheckout,
+      ordem: 3,
+    },
+
+    {
+      chave: "easypdv",
+      nome: "EasyPDV",
+      versao:
+        ambiente
+          .versoes
+          .easypdv,
+      ordem: 4,
+    },
+
+    {
+      chave: "intellistock",
+      nome: "IntelliStock",
+      versao:
+        ambiente
+          .versoes
+          .intellistock,
+      ordem: 5,
+    },
+
+    {
+      chave: "iwbserver",
+      nome: "IWB Server",
+      versao:
+        ambiente
+          .versoes
+          .iwbserver,
+      ordem: 6,
+    },
+
+  ];
+
+}
+
+
+function obterIcone(
+  chave: string
+) {
+
+  switch (
+    chave
+  ) {
+
+    case "intellicash":
+
+      return (
+        <MdDns />
+      );
+
+
+    case "easycash":
+
+      return (
+        <MdPointOfSale />
+      );
+
+
+    case "easycheckout":
+
+      return (
+        <MdStore />
+      );
+
+
+    case "easypdv":
+
+      return (
+        <MdShoppingCart />
+      );
+
+
+    case "intellistock":
+
+      return (
+        <MdInventory />
+      );
+
+
+    case "iwbserver":
+
+      return (
+        <MdCloud />
+      );
+
+
+    default:
+
+      return (
+        <MdApps />
+      );
+
+  }
+
+}
+
 
 function CompatibilityPanel({
 
@@ -50,49 +213,66 @@ function CompatibilityPanel({
       ReleaseEnvironment | null
     >(null);
 
+
   const [
     carregandoAmbiente,
     setCarregandoAmbiente,
   ] =
     useState(false);
 
+
   const intellicash =
-    projects.find(project => {
+    projects.find(
+      project => {
 
-      const nome =
-        project.nome.toLowerCase();
+        const nome =
+          project.nome
+            .toLowerCase();
 
-      return (
-        nome.includes(
-          "intellicash"
-        ) ||
-        nome.includes(
-          "intelicash"
-        )
-      );
 
-    });
+        return (
+          nome.includes(
+            "intellicash"
+          ) ||
+          nome.includes(
+            "intelicash"
+          )
+        );
+
+      }
+    );
+
 
   const versaoIntellicash =
-    intellicash?.versao ?? "";
+    intellicash?.versao ??
+    "";
+
 
   useEffect(() => {
 
-    let ativo = true;
+    let ativo =
+      true;
+
 
     async function carregarAmbiente() {
 
-      if (!versaoIntellicash) {
+      if (
+        !versaoIntellicash
+      ) {
 
-        setAmbiente(null);
+        setAmbiente(
+          null
+        );
 
         return;
 
       }
 
+
       setCarregandoAmbiente(
         true
       );
+
 
       try {
 
@@ -101,10 +281,14 @@ function CompatibilityPanel({
             versaoIntellicash
           );
 
-        if (ativo) {
+
+        if (
+          ativo
+        ) {
 
           setAmbiente(
-            encontrado ?? null
+            encontrado ??
+            null
           );
 
         }
@@ -116,15 +300,22 @@ function CompatibilityPanel({
           erro
         );
 
-        if (ativo) {
 
-          setAmbiente(null);
+        if (
+          ativo
+        ) {
+
+          setAmbiente(
+            null
+          );
 
         }
 
       } finally {
 
-        if (ativo) {
+        if (
+          ativo
+        ) {
 
           setCarregandoAmbiente(
             false
@@ -136,15 +327,21 @@ function CompatibilityPanel({
 
     }
 
+
     void carregarAmbiente();
+
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
-  }, [versaoIntellicash]);
+  }, [
+    versaoIntellicash,
+  ]);
+
 
   if (
     carregando ||
@@ -157,9 +354,12 @@ function CompatibilityPanel({
 
         <div className="compatibility-title">
 
-          Ambiente da Release
+          <strong>
+            Ambiente da Release
+          </strong>
 
         </div>
+
 
         <div className="compatibility-empty">
 
@@ -173,7 +373,10 @@ function CompatibilityPanel({
 
   }
 
-  if (!intellicash) {
+
+  if (
+    !intellicash
+  ) {
 
     return (
 
@@ -181,9 +384,12 @@ function CompatibilityPanel({
 
         <div className="compatibility-title">
 
-          Ambiente da Release
+          <strong>
+            Ambiente da Release
+          </strong>
 
         </div>
+
 
         <div className="compatibility-empty">
 
@@ -197,7 +403,10 @@ function CompatibilityPanel({
 
   }
 
-  if (!ambiente) {
+
+  if (
+    !ambiente
+  ) {
 
     return (
 
@@ -205,16 +414,25 @@ function CompatibilityPanel({
 
         <div className="compatibility-title">
 
-          Ambiente da Release
+          <strong>
+            Ambiente da Release
+          </strong>
 
         </div>
 
+
         <div className="compatibility-empty">
 
-          Nenhum ambiente cadastrado para a versão{" "}
+          Nenhum ambiente cadastrado
+          para a versão{" "}
 
           <strong>
-            {intellicash.versao}
+
+            {
+              intellicash
+                .versao
+            }
+
           </strong>
 
         </div>
@@ -225,63 +443,12 @@ function CompatibilityPanel({
 
   }
 
-  const sistemas = [
 
-    {
-      nome: "Intellicash",
-      versao:
-        ambiente.versoes
-          .intellicash,
-      icon:
-        <MdDns size={17} />,
-    },
+  const sistemas =
+    obterSistemas(
+      ambiente
+    );
 
-    {
-      nome: "EasyCash",
-      versao:
-        ambiente.versoes
-          .easycash,
-      icon:
-        <MdPointOfSale size={17} />,
-    },
-
-    {
-      nome: "EasyCheckout",
-      versao:
-        ambiente.versoes
-          .easycheckout,
-      icon:
-        <MdStore size={17} />,
-    },
-
-    {
-      nome: "EasyPDV",
-      versao:
-        ambiente.versoes
-          .easypdv,
-      icon:
-        <MdShoppingCart size={17} />,
-    },
-
-    {
-      nome: "IntelliStock",
-      versao:
-        ambiente.versoes
-          .intellistock,
-      icon:
-        <MdInventory size={17} />,
-    },
-
-    {
-      nome: "IWB Server",
-      versao:
-        ambiente.versoes
-          .iwbserver,
-      icon:
-        <MdCloud size={17} />,
-    },
-
-  ];
 
   return (
 
@@ -299,26 +466,43 @@ function CompatibilityPanel({
 
       </div>
 
+
       <div className="compatibility-line">
 
         {sistemas.map(
-          item => (
+          sistema => (
 
             <div
-              key={item.nome}
+              key={
+                sistema.chave
+              }
               className="compatibility-version"
             >
 
-              {item.icon}
+              {
+                obterIcone(
+                  sistema.chave
+                )
+              }
+
 
               <span>
 
                 <strong>
-                  {item.nome}
+
+                  {
+                    sistema.nome
+                  }
+
                 </strong>
 
                 <small>
-                  {item.versao || "-"}
+
+                  {
+                    sistema.versao ||
+                    "-"
+                  }
+
                 </small>
 
               </span>
@@ -335,5 +519,6 @@ function CompatibilityPanel({
   );
 
 }
+
 
 export default CompatibilityPanel;
