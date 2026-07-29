@@ -38,13 +38,108 @@ interface Props {
 }
 
 
+function getSystemIcon(
+  chave: string
+) {
+
+  const sistema =
+    chave.toLowerCase();
+
+
+  if (
+    sistema.includes(
+      "intellicash"
+    )
+  ) {
+
+    return (
+      <MdDns size={17} />
+    );
+
+  }
+
+
+  if (
+    sistema.includes(
+      "easycash"
+    )
+  ) {
+
+    return (
+      <MdPointOfSale
+        size={17}
+      />
+    );
+
+  }
+
+
+  if (
+    sistema.includes(
+      "easycheckout"
+    )
+  ) {
+
+    return (
+      <MdStore size={17} />
+    );
+
+  }
+
+
+  if (
+    sistema.includes(
+      "easypdv"
+    )
+  ) {
+
+    return (
+      <MdShoppingCart
+        size={17}
+      />
+    );
+
+  }
+
+
+  if (
+    sistema.includes(
+      "intellistock"
+    )
+  ) {
+
+    return (
+      <MdInventory
+        size={17}
+      />
+    );
+
+  }
+
+
+  if (
+    sistema.includes(
+      "iwb"
+    )
+  ) {
+
+    return (
+      <MdCloud size={17} />
+    );
+
+  }
+
+
+  return (
+    <MdApps size={17} />
+  );
+
+}
+
+
 function obterSistemas(
   ambiente: ReleaseEnvironment
 ): ReleaseSystemVersion[] {
-
-  /*
-    Estrutura nova e dinâmica.
-  */
 
   if (
     ambiente.sistemas &&
@@ -65,134 +160,105 @@ function obterSistemas(
   }
 
 
-  /*
-    Fallback para ambientes antigos.
-  */
-
   return [
 
     {
-      chave: "intellicash",
-      nome: "Intellicash",
+      chave:
+        "intellicash",
+
+      nome:
+        "Intellicash",
+
       versao:
         ambiente
           .versoes
           .intellicash,
-      ordem: 1,
+
+      ordem:
+        1,
     },
 
     {
-      chave: "easycash",
-      nome: "EasyCash",
+      chave:
+        "easycash",
+
+      nome:
+        "EasyCash",
+
       versao:
         ambiente
           .versoes
           .easycash,
-      ordem: 2,
+
+      ordem:
+        2,
     },
 
     {
-      chave: "easycheckout",
-      nome: "EasyCheckout",
+      chave:
+        "easycheckout",
+
+      nome:
+        "EasyCheckout",
+
       versao:
         ambiente
           .versoes
           .easycheckout,
-      ordem: 3,
+
+      ordem:
+        3,
     },
 
     {
-      chave: "easypdv",
-      nome: "EasyPDV",
+      chave:
+        "easypdv",
+
+      nome:
+        "EasyPDV",
+
       versao:
         ambiente
           .versoes
           .easypdv,
-      ordem: 4,
+
+      ordem:
+        4,
     },
 
     {
-      chave: "intellistock",
-      nome: "IntelliStock",
+      chave:
+        "intellistock",
+
+      nome:
+        "IntelliStock",
+
       versao:
         ambiente
           .versoes
           .intellistock,
-      ordem: 5,
+
+      ordem:
+        5,
     },
 
     {
-      chave: "iwbserver",
-      nome: "IWB Server",
+      chave:
+        "iwbserver",
+
+      nome:
+        "IWB Server",
+
       versao:
         ambiente
           .versoes
           .iwbserver,
-      ordem: 6,
+
+      ordem:
+        6,
     },
 
   ];
-
-}
-
-
-function obterIcone(
-  chave: string
-) {
-
-  switch (
-    chave
-  ) {
-
-    case "intellicash":
-
-      return (
-        <MdDns />
-      );
-
-
-    case "easycash":
-
-      return (
-        <MdPointOfSale />
-      );
-
-
-    case "easycheckout":
-
-      return (
-        <MdStore />
-      );
-
-
-    case "easypdv":
-
-      return (
-        <MdShoppingCart />
-      );
-
-
-    case "intellistock":
-
-      return (
-        <MdInventory />
-      );
-
-
-    case "iwbserver":
-
-      return (
-        <MdCloud />
-      );
-
-
-    default:
-
-      return (
-        <MdApps />
-      );
-
-  }
 
 }
 
@@ -226,17 +292,21 @@ function CompatibilityPanel({
       project => {
 
         const nome =
-          project.nome
+          project
+            .nome
             .toLowerCase();
 
 
         return (
+
           nome.includes(
             "intellicash"
           ) ||
+
           nome.includes(
             "intelicash"
           )
+
         );
 
       }
@@ -355,15 +425,19 @@ function CompatibilityPanel({
         <div className="compatibility-title">
 
           <strong>
-            Ambiente da Release
+            Compatibilidade
           </strong>
+
+          <small>
+            Sistemas da release
+          </small>
 
         </div>
 
 
         <div className="compatibility-empty">
 
-          Carregando ambiente...
+          Carregando compatibilidade...
 
         </div>
 
@@ -385,8 +459,12 @@ function CompatibilityPanel({
         <div className="compatibility-title">
 
           <strong>
-            Ambiente da Release
+            Compatibilidade
           </strong>
+
+          <small>
+            Sistemas da release
+          </small>
 
         </div>
 
@@ -415,8 +493,12 @@ function CompatibilityPanel({
         <div className="compatibility-title">
 
           <strong>
-            Ambiente da Release
+            Compatibilidade
           </strong>
+
+          <small>
+            Sistemas da release
+          </small>
 
         </div>
 
@@ -427,12 +509,7 @@ function CompatibilityPanel({
           para a versão{" "}
 
           <strong>
-
-            {
-              intellicash
-                .versao
-            }
-
+            {intellicash.versao}
           </strong>
 
         </div>
@@ -457,11 +534,14 @@ function CompatibilityPanel({
       <div className="compatibility-title">
 
         <strong>
-          Ambiente da Release
+          Compatibilidade
         </strong>
 
         <small>
-          {ambiente.nome}
+          {sistemas.length}{" "}
+          {sistemas.length === 1
+            ? "sistema"
+            : "sistemas"}
         </small>
 
       </div>
@@ -479,30 +559,19 @@ function CompatibilityPanel({
               className="compatibility-version"
             >
 
-              {
-                obterIcone(
-                  sistema.chave
-                )
-              }
+              {getSystemIcon(
+                sistema.chave
+              )}
 
 
               <span>
 
                 <strong>
-
-                  {
-                    sistema.nome
-                  }
-
+                  {sistema.nome}
                 </strong>
 
                 <small>
-
-                  {
-                    sistema.versao ||
-                    "-"
-                  }
-
+                  {sistema.versao || "-"}
                 </small>
 
               </span>

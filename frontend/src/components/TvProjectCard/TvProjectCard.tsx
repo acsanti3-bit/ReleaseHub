@@ -1,208 +1,361 @@
 import "./TvProjectCard.css";
 
-import type { Project } from "../../types/project";
+import type {
+  Project,
+} from "../../types/project";
+
 
 interface Props {
+
   project: Project;
+
 }
 
-function getProjectColor(nome: string) {
 
-  const projeto = nome.toLowerCase();
+function getProjectColor(
+  nome: string
+) {
 
-  if (projeto.includes("intellicash")) return "#005AA9";
-  if (projeto.includes("easycash")) return "#F58220";
-  if (projeto.includes("easycheckout")) return "#43A047";
-  if (projeto.includes("easypdv")) return "#8E24AA";
-  if (projeto.includes("intellistock")) return "#E53935";
-  if (projeto.includes("iwb")) return "#546E7A";
+  const projeto =
+    nome.toLowerCase();
+
+
+  if (
+    projeto.includes(
+      "intellicash"
+    )
+  ) {
+
+    return "#005AA9";
+
+  }
+
+
+  if (
+    projeto.includes(
+      "easycash"
+    )
+  ) {
+
+    return "#F58220";
+
+  }
+
+
+  if (
+    projeto.includes(
+      "easycheckout"
+    )
+  ) {
+
+    return "#43A047";
+
+  }
+
+
+  if (
+    projeto.includes(
+      "easypdv"
+    )
+  ) {
+
+    return "#8E24AA";
+
+  }
+
+
+  if (
+    projeto.includes(
+      "intellistock"
+    ) ||
+    projeto.includes(
+      "isa"
+    )
+  ) {
+
+    return "#E53935";
+
+  }
+
+
+  if (
+    projeto.includes(
+      "iwb"
+    )
+  ) {
+
+    return "#546E7A";
+
+  }
+
 
   return "#005AA9";
 
 }
 
-function TvProjectCard({ project }: Props) {
 
-  const projectColor = getProjectColor(project.nome);
+function TvProjectCard({
+
+  project,
+
+}: Props) {
+
+  const projectColor =
+    getProjectColor(
+      project.nome
+    );
+
 
   const status = [
 
     {
-      nome: "Qualidade",
-      valor: project.situacoes.qualidade,
-      cor: "#F58220",
-    },
+      nome:
+        "Qualidade",
 
-    {
-      nome: "Testes",
-      valor: project.situacoes.testes,
-      cor: "#1976D2",
-    },
-
-    {
-      nome: "Desenvolvido",
       valor:
-        project.situacoes.desenvolvido +
-        project.situacoes.aguardandoCompilacao,
-      cor: "#43A047",
+        project
+          .situacoes
+          .qualidade,
+
+      cor:
+        "#F58220",
     },
 
     {
-      nome: "Em Progresso",
-      valor: project.situacoes.emProgresso,
-      cor: "#FBC02D",
+      nome:
+        "Testes",
+
+      valor:
+        project
+          .situacoes
+          .testes,
+
+      cor:
+        "#1976D2",
     },
 
     {
-      nome: "Nova",
-      valor: project.situacoes.nova,
-      cor: "#26A69A",
+      nome:
+        "Desenvolvido",
+
+      valor:
+        project
+          .situacoes
+          .desenvolvido +
+        project
+          .situacoes
+          .aguardandoCompilacao,
+
+      cor:
+        "#43A047",
     },
 
     {
-      nome: "Reaberta",
-      valor: project.situacoes.reaberta,
-      cor: "#E53935",
+      nome:
+        "Em Progresso",
+
+      valor:
+        project
+          .situacoes
+          .emProgresso,
+
+      cor:
+        "#F9A825",
     },
 
     {
-      nome: "Rejeitada",
-      valor: project.situacoes.rejeitada,
-      cor: "#616161",
+      nome:
+        "Nova",
+
+      valor:
+        project
+          .situacoes
+          .nova,
+
+      cor:
+        "#26A69A",
     },
 
     {
-      nome: "Interrompida",
-      valor: project.situacoes.interrompida,
-      cor: "#8E24AA",
+      nome:
+        "Reaberta",
+
+      valor:
+        project
+          .situacoes
+          .reaberta,
+
+      cor:
+        "#E53935",
+    },
+
+    {
+      nome:
+        "Rejeitada",
+
+      valor:
+        project
+          .situacoes
+          .rejeitada,
+
+      cor:
+        "#616161",
+    },
+
+    {
+      nome:
+        "Interrompida",
+
+      valor:
+        project
+          .situacoes
+          .interrompida,
+
+      cor:
+        "#8E24AA",
     },
 
   ];
 
+
   return (
 
-    <div
+    <article
       className="tv-project-card"
       style={{
-        borderTopColor: projectColor,
-      }}
+        "--project-color":
+          projectColor,
+      } as React.CSSProperties}
     >
 
-      <div className="tv-card-header">
+      <header className="tv-card-header">
 
-        <div className="tv-card-title">
+        <div className="tv-card-heading">
 
-          <span
-            className="tv-project-dot"
-            style={{
-              backgroundColor: projectColor,
-            }}
-          />
+          <span className="tv-card-project-label">
+            Projeto
+          </span>
 
-          <h3
-            style={{
-              color: projectColor,
-            }}
-          >
+          <h3>
             {project.nome}
           </h3>
 
         </div>
 
-        <span className="tv-version">
 
-          {project.versao || "-"}
+        <div className="tv-card-version">
 
-        </span>
+          <small>
+            Versão
+          </small>
 
-      </div>
+          <strong>
+            {project.versao || "-"}
+          </strong>
 
-      <div className="tv-status-list">
+        </div>
 
-        {status.map(item => {
+      </header>
 
-          const zerado = item.valor === 0;
 
-          return (
+      <div className="tv-status-grid">
 
-            <div
-              key={item.nome}
-              className={`tv-status-row ${
-                zerado ? "tv-status-zero" : ""
-              }`}
-            >
+        {status.map(
+          item => {
 
-              <div className="tv-status-name">
+            const zerado =
+              item.valor === 0;
 
-                <span
-                  className="tv-status-dot"
+
+            return (
+
+              <div
+                key={
+                  item.nome
+                }
+                className={`tv-status-card ${
+                  zerado
+                    ? "tv-status-card-zero"
+                    : ""
+                }`}
+              >
+
+                <div className="tv-status-card-top">
+
+                  <span
+                    className="tv-status-indicator"
+                    style={{
+                      backgroundColor:
+                        zerado
+                          ? "#CAD1D8"
+                          : item.cor,
+                    }}
+                  />
+
+                  <span>
+                    {item.nome}
+                  </span>
+
+                </div>
+
+
+                <strong
                   style={{
-                    backgroundColor: zerado
-                      ? "#444"
-                      : item.cor,
+                    color:
+                      zerado
+                        ? "#7B858F"
+                        : item.cor,
                   }}
-                />
+                >
 
-                <span>
+                  {item.valor}
 
-                  {item.nome}
-
-                </span>
+                </strong>
 
               </div>
 
-              <strong
-                style={{
-                  color: zerado
-                    ? "#222"
-                    : item.cor,
-                }}
-              >
+            );
 
-                {item.valor}
-
-              </strong>
-
-            </div>
-
-          );
-
-        })}
+          }
+        )}
 
       </div>
 
-      <div className="tv-dates">
 
-        <div>
+      <footer className="tv-card-footer">
 
-          <small>Executável</small>
+        <div className="tv-card-date">
+
+          <small>
+            Executável
+          </small>
 
           <strong>
-
             {project.executavel || "-"}
-
           </strong>
 
         </div>
 
-        <div>
 
-          <small>Prazo</small>
+        <div className="tv-card-date">
+
+          <small>
+            Prazo
+          </small>
 
           <strong>
-
             {project.prazo || "-"}
-
           </strong>
 
         </div>
 
-      </div>
+      </footer>
 
-    </div>
+    </article>
 
   );
 
 }
+
 
 export default TvProjectCard;

@@ -1,6 +1,24 @@
 .tv-project-card{
 
+    --project-color:#005AA9;
+
     color-scheme:only light;
+
+    position:relative;
+
+    height:100%;
+
+    min-height:0;
+
+    padding:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    box-sizing:border-box;
 
     background:#FFF;
 
@@ -8,81 +26,108 @@
 
     border-radius:18px;
 
-    border-top:6px solid #005AA9;
+    border:1px solid #E1E7ED;
 
-    padding:15px 18px;
+    box-shadow:
+        0 7px 20px
+        rgba(35,55,75,.07);
 
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+
+.tv-project-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:0;
+
+    width:4px;
+
+    height:100%;
+
+    background:
+        var(--project-color);
+
+}
+
+
+/* HEADER */
+
+.tv-card-header{
+
+    min-height:68px;
+
+    padding:
+        12px
+        18px
+        11px
+        21px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:18px;
+
+    box-sizing:border-box;
+
+    border-bottom:
+        1px solid
+        #E9EDF1;
+
+    flex-shrink:0;
+
+}
+
+
+.tv-card-heading{
+
+    min-width:0;
 
     display:flex;
 
     flex-direction:column;
 
-    height:100%;
-
-    min-height:0;
-
-    box-sizing:border-box;
-
-    overflow:hidden;
+    gap:4px;
 
 }
 
 
-/* CABEÇALHO */
+.tv-card-project-label{
 
-.tv-card-header{
+    color:#A0A8B0;
 
-    display:flex;
+    font-size:9px;
 
-    justify-content:space-between;
+    line-height:1;
 
-    align-items:center;
+    font-weight:400;
 
-    gap:16px;
+    text-transform:uppercase;
 
-    padding-bottom:11px;
-
-    border-bottom:1px solid #ECECEC;
-
-    flex-shrink:0;
+    letter-spacing:.7px;
 
 }
 
 
-.tv-card-title{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    min-width:0;
-
-}
-
-
-.tv-project-dot{
-
-    width:11px;
-
-    height:11px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
-}
-
-
-.tv-card-header h3{
+.tv-card-heading h3{
 
     margin:0;
 
-    font-size:23px;
+    max-width:100%;
 
-    line-height:1.15;
+    color:
+        var(--project-color);
+
+    font-size:22px;
+
+    line-height:1.08;
 
     font-weight:700;
 
@@ -95,211 +140,153 @@
 }
 
 
-.tv-version{
+/* VERSÃO */
 
-    background:#F3F6F9;
+.tv-card-version{
 
-    color:#4A5560;
+    flex-shrink:0;
 
-    padding:6px 12px;
+    display:flex;
 
-    border-radius:20px;
+    flex-direction:column;
 
-    font-size:13px;
+    align-items:flex-end;
+
+    gap:3px;
+
+}
+
+
+.tv-card-version small{
+
+    color:#9AA3AC;
+
+    font-size:8px;
 
     line-height:1;
 
-    font-weight:700;
+    font-weight:400;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+}
+
+
+.tv-card-version strong{
+
+    padding:
+        6px
+        11px;
+
+    background:#F3F6F8;
+
+    border-radius:20px;
+
+    color:#45515C;
+
+    font-size:12px;
+
+    line-height:1;
+
+    font-weight:600;
 
     white-space:nowrap;
-
-    flex-shrink:0;
 
 }
 
 
 /* STATUS */
 
-.tv-status-list{
+.tv-status-grid{
 
-    display:flex;
-
-    flex-direction:column;
-
-    flex:1 1 auto;
+    flex:1;
 
     min-height:0;
 
-    overflow:hidden;
+    padding:
+        11px
+        15px
+        9px
+        20px;
 
-    padding:6px 0;
+    display:grid;
 
-    gap:1px;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
 
-}
+    grid-template-rows:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
 
-
-.tv-status-row{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    flex:1 1 0;
-
-    min-height:0;
-
-    max-height:30px;
-
-    padding:2px 7px;
-
-    border-radius:7px;
+    gap:7px;
 
     box-sizing:border-box;
 
 }
 
 
-.tv-status-row:nth-child(even){
+.tv-status-card{
 
-    background:#F8FAFC;
+    min-width:0;
 
-}
+    min-height:0;
 
-
-.tv-status-name{
+    padding:
+        6px
+        10px;
 
     display:flex;
 
     align-items:center;
 
-    gap:9px;
+    justify-content:space-between;
+
+    gap:8px;
+
+    box-sizing:border-box;
+
+    border:
+        1px solid
+        #E8EDF1;
+
+    border-radius:10px;
+
+    background:#FAFBFC;
+
+}
+
+
+.tv-status-card-top{
 
     min-width:0;
 
-    color:#4B5563;
+    display:flex;
 
-    font-size:14px;
+    align-items:center;
 
-    line-height:1;
+    gap:7px;
+
+    color:#596571;
+
+    font-size:12px;
+
+    line-height:1.1;
 
     font-weight:600;
 
 }
 
 
-.tv-status-dot{
-
-    width:8px;
-
-    height:8px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
-}
-
-
-.tv-status-row strong{
-
-    min-width:32px;
-
-    text-align:right;
-
-    font-size:18px;
-
-    line-height:1;
-
-    font-weight:800;
-
-}
-
-
-/* STATUS ZERADO */
-
-.tv-status-zero .tv-status-name{
-
-    color:#222;
-
-    font-weight:400;
-
-}
-
-
-.tv-status-zero strong{
-
-    color:#222 !important;
-
-    font-weight:400;
-
-}
-
-
-/* DATAS */
-
-.tv-dates{
-
-    position:relative;
-
-    z-index:2;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:12px;
-
-    padding-top:9px;
-
-    border-top:1px solid #ECECEC;
-
-    background:#FFF;
-
-    flex-shrink:0;
-
-}
-
-
-.tv-dates div{
+.tv-status-card-top span:last-child{
 
     min-width:0;
-
-}
-
-
-.tv-dates small{
-
-    display:block;
-
-    margin-bottom:3px;
-
-    color:#8A939D;
-
-    font-size:10px;
-
-    line-height:1;
-
-    font-weight:600;
-
-    text-transform:uppercase;
-
-}
-
-
-.tv-dates strong{
-
-    display:block;
-
-    color:#263238;
-
-    font-size:13px;
-
-    line-height:1.15;
-
-    font-weight:700;
 
     white-space:nowrap;
 
@@ -310,143 +297,263 @@
 }
 
 
-/*
-  TELAS / TVs COM MENOS ALTURA
+.tv-status-indicator{
 
-  Diminui levemente os elementos
-  sem desmontar o card.
-*/
+    width:6px;
+
+    height:6px;
+
+    border-radius:2px;
+
+    flex-shrink:0;
+
+}
+
+
+/* NÚMEROS */
+
+.tv-status-card strong{
+
+    flex-shrink:0;
+
+    min-width:28px;
+
+    text-align:right;
+
+    font-size:20px;
+
+    line-height:1;
+
+    font-weight:500;
+
+}
+
+
+/* STATUS ZERADOS */
+
+.tv-status-card-zero{
+
+    background:#FCFDFE;
+
+}
+
+
+.tv-status-card-zero .tv-status-card-top{
+
+    color:#8C969F;
+
+    font-weight:500;
+
+}
+
+
+.tv-status-card-zero strong{
+
+    color:#8C969F !important;
+
+    font-weight:400;
+
+}
+
+
+/* FOOTER */
+
+.tv-card-footer{
+
+    min-height:54px;
+
+    padding:
+        8px
+        18px
+        9px
+        21px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:12px;
+
+    box-sizing:border-box;
+
+    background:#F7F9FB;
+
+    border-top:
+        1px solid
+        #E5EAF0;
+
+    flex-shrink:0;
+
+}
+
+
+.tv-card-date{
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    gap:4px;
+
+}
+
+
+.tv-card-date small{
+
+    color:#929CA5;
+
+    font-size:9px;
+
+    line-height:1;
+
+    font-weight:400;
+
+    text-transform:uppercase;
+
+    letter-spacing:.3px;
+
+}
+
+
+.tv-card-date strong{
+
+    color:#36414B;
+
+    font-size:12px;
+
+    line-height:1;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+/* TVs COM MENOS ALTURA */
 
 @media(max-height:820px){
 
-    .tv-project-card{
-
-        padding:11px 15px;
-
-        border-top-width:5px;
-
-    }
-
-
     .tv-card-header{
 
-        padding-bottom:8px;
+        min-height:56px;
+
+        padding:
+            9px
+            14px
+            8px
+            18px;
 
     }
 
 
-    .tv-card-header h3{
+    .tv-card-heading h3{
 
-        font-size:20px;
-
-    }
-
-
-    .tv-project-dot{
-
-        width:9px;
-
-        height:9px;
+        font-size:18px;
 
     }
 
 
-    .tv-version{
+    .tv-card-version strong{
 
-        padding:5px 10px;
-
-        font-size:12px;
+        font-size:11px;
 
     }
 
 
-    .tv-status-list{
+    .tv-status-grid{
 
-        padding:4px 0;
+        padding:
+            7px
+            11px
+            7px
+            16px;
 
-    }
-
-
-    .tv-status-row{
-
-        max-height:25px;
-
-        padding:1px 6px;
+        gap:5px;
 
     }
 
 
-    .tv-status-name{
+    .tv-status-card{
 
-        gap:7px;
+        padding:
+            4px
+            7px;
 
-        font-size:13px;
-
-    }
-
-
-    .tv-status-dot{
-
-        width:7px;
-
-        height:7px;
+        border-radius:8px;
 
     }
 
 
-    .tv-status-row strong{
+    .tv-status-card-top{
+
+        font-size:10px;
+
+    }
+
+
+    .tv-status-card strong{
 
         font-size:16px;
 
     }
 
 
-    .tv-dates{
+    .tv-card-footer{
 
-        padding-top:7px;
+        min-height:43px;
+
+        padding:
+            5px
+            14px
+            6px
+            18px;
 
     }
 
 
-    .tv-dates small{
+    .tv-card-date strong{
 
-        font-size:9px;
-
-    }
-
-
-    .tv-dates strong{
-
-        font-size:12px;
+        font-size:11px;
 
     }
 
 }
 
 
-/*
-  MONITORES MAIS ESTREITOS
-*/
+/* MONITORES MAIS ESTREITOS */
 
 @media(max-width:1400px){
 
-    .tv-card-header h3{
+    .tv-card-heading h3{
 
-        font-size:20px;
-
-    }
-
-
-    .tv-status-name{
-
-        font-size:13px;
+        font-size:19px;
 
     }
 
 
-    .tv-status-row strong{
+    .tv-status-card-top{
 
-        font-size:16px;
+        font-size:11px;
+
+    }
+
+
+    .tv-status-card strong{
+
+        font-size:18px;
 
     }
 

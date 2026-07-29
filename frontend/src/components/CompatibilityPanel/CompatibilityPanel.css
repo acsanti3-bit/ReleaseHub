@@ -2,12 +2,13 @@
 
     width:100%;
 
-    min-height:72px;
+    min-height:66px;
 
     display:grid;
 
     grid-template-columns:
-        220px minmax(0,1fr);
+        155px
+        minmax(0,1fr);
 
     align-items:stretch;
 
@@ -17,7 +18,7 @@
 
     box-shadow:
         0 4px 12px
-        rgba(0,0,0,.07);
+        rgba(0,0,0,.06);
 
     box-sizing:border-box;
 
@@ -26,7 +27,7 @@
 }
 
 
-/* AMBIENTE */
+/* TÍTULO */
 
 .compatibility-title{
 
@@ -42,11 +43,17 @@
 
     gap:4px;
 
-    padding:0 15px;
+    padding:
+        0
+        14px;
+
+    box-sizing:border-box;
 
     text-align:center;
 
-    box-sizing:border-box;
+    border-right:
+        1px solid
+        #E2E7EC;
 
 }
 
@@ -55,11 +62,11 @@
 
     color:#005AA9;
 
-    font-size:17px;
+    font-size:14px;
 
-    font-weight:750;
+    line-height:1.1;
 
-    line-height:1.2;
+    font-weight:600;
 
     white-space:nowrap;
 
@@ -68,20 +75,20 @@
 
 .compatibility-title small{
 
-    color:#F58220;
+    color:#8C969F;
 
-    font-size:11px;
+    font-size:9px;
 
-    font-weight:700;
+    line-height:1.1;
 
-    line-height:1.2;
+    font-weight:400;
 
     white-space:nowrap;
 
 }
 
 
-/* LINHA DOS SISTEMAS */
+/* SISTEMAS */
 
 .compatibility-line{
 
@@ -90,18 +97,26 @@
     display:grid;
 
     grid-template-columns:
-        repeat(6,minmax(0,1fr));
+        repeat(
+            auto-fit,
+            minmax(
+                125px,
+                1fr
+            )
+        );
 
     align-items:stretch;
 
 }
 
 
-/* SISTEMA */
+/* ITEM */
 
 .compatibility-version{
 
     min-width:0;
+
+    min-height:66px;
 
     display:flex;
 
@@ -109,14 +124,21 @@
 
     justify-content:center;
 
-    gap:10px;
+    gap:8px;
 
-    padding:0 8px;
+    padding:
+        7px
+        9px;
 
     box-sizing:border-box;
 
-    border-left:
-        1px solid #DDE3EA;
+    border-right:
+        1px solid
+        #E7EBEF;
+
+    border-bottom:
+        1px solid
+        #EEF1F4;
 
     color:#005AA9;
 
@@ -127,9 +149,9 @@
 
 .compatibility-version svg{
 
-    width:20px;
+    width:18px;
 
-    height:20px;
+    height:18px;
 
     flex-shrink:0;
 
@@ -138,9 +160,9 @@
 }
 
 
-/* TEXTO */
+/* INFORMAÇÃO */
 
-.compatibility-version span{
+.compatibility-version > span{
 
     min-width:0;
 
@@ -159,39 +181,53 @@
 
 .compatibility-version strong{
 
+    max-width:100%;
+
     color:#005AA9;
 
-    font-size:13px;
+    font-size:11px;
 
-    font-weight:750;
+    line-height:1.1;
 
-    line-height:1.15;
+    font-weight:600;
 
     white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 
 }
 
 
 .compatibility-version small{
 
-    color:#34495A;
+    max-width:100%;
 
-    font-size:12px;
+    color:#45515C;
 
-    font-weight:600;
+    font-size:10px;
 
-    line-height:1.15;
+    line-height:1.1;
+
+    font-weight:400;
 
     white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 
 }
 
 
-/* CARREGAMENTO / VAZIO */
+/* VAZIO / CARREGAMENTO */
 
 .compatibility-empty{
 
     min-width:0;
+
+    min-height:66px;
 
     display:flex;
 
@@ -199,14 +235,17 @@
 
     justify-content:center;
 
-    padding:0 20px;
+    padding:
+        0
+        20px;
 
-    border-left:
-        1px solid #DDE3EA;
+    box-sizing:border-box;
 
-    color:#777;
+    color:#7D8790;
 
-    font-size:13px;
+    font-size:11px;
+
+    font-weight:400;
 
     text-align:center;
 
@@ -219,56 +258,74 @@
 
     color:#005AA9;
 
+    font-weight:600;
+
 }
 
 
-/* TELAS MENORES */
+/*
+  MAIS SISTEMAS
 
-@media(max-width:1250px){
+  Conforme a quantidade aumenta,
+  os itens vão criando novas colunas
+  e linhas automaticamente.
+*/
+
+@media(max-width:1500px){
 
     .compatibility-panel{
 
         grid-template-columns:
-            190px minmax(0,1fr);
+            140px
+            minmax(0,1fr);
 
     }
 
 
-    .compatibility-title strong{
+    .compatibility-line{
 
-        font-size:15px;
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(
+                    110px,
+                    1fr
+                )
+            );
 
     }
 
 
     .compatibility-version{
 
-        gap:7px;
+        padding:
+            6px
+            7px;
 
-        padding:0 5px;
+        gap:6px;
 
     }
 
 
     .compatibility-version svg{
 
-        width:18px;
+        width:16px;
 
-        height:18px;
+        height:16px;
 
     }
 
 
     .compatibility-version strong{
 
-        font-size:11px;
+        font-size:10px;
 
     }
 
 
     .compatibility-version small{
 
-        font-size:11px;
+        font-size:9px;
 
     }
 
@@ -287,10 +344,6 @@
 
         align-items:stretch;
 
-        padding:15px;
-
-        gap:14px;
-
         overflow:visible;
 
     }
@@ -298,13 +351,21 @@
 
     .compatibility-title{
 
-        width:100%;
-
-        padding:0;
+        min-height:55px;
 
         align-items:flex-start;
 
+        padding:
+            10px
+            14px;
+
         text-align:left;
+
+        border-right:none;
+
+        border-bottom:
+            1px solid
+            #E2E7EC;
 
     }
 
@@ -316,9 +377,10 @@
         display:grid;
 
         grid-template-columns:
-            repeat(2,minmax(0,1fr));
-
-        gap:10px;
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
 
     }
 
@@ -329,24 +391,16 @@
 
         justify-content:flex-start;
 
-        padding:0 14px;
-
-        border:1px solid #E2E7EC;
-
-        border-radius:9px;
-
-        background:#FAFBFC;
+        padding:
+            8px
+            14px;
 
     }
 
 
     .compatibility-empty{
 
-        min-height:45px;
-
-        padding:0;
-
-        border-left:none;
+        min-height:55px;
 
         justify-content:flex-start;
 
@@ -361,7 +415,8 @@
 
     .compatibility-line{
 
-        grid-template-columns:1fr;
+        grid-template-columns:
+            1fr;
 
     }
 

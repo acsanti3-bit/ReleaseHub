@@ -81,7 +81,7 @@ function TvDashboard() {
 
 
   /*
-    Relógio da TV.
+    Relógio.
   */
 
   useEffect(() => {
@@ -108,7 +108,7 @@ function TvDashboard() {
 
 
   /*
-    Carrega as releases.
+    Ambientes disponíveis.
   */
 
   useEffect(() => {
@@ -184,7 +184,9 @@ function TvDashboard() {
           );
 
 
-        if (maisRecente) {
+        if (
+          maisRecente
+        ) {
 
           setAmbienteSelecionadoId(
             maisRecente.id
@@ -236,11 +238,7 @@ function TvDashboard() {
 
 
   /*
-    Carrega os projetos específicos
-    da release selecionada.
-
-    Atualiza automaticamente
-    a cada 10 segundos.
+    Projetos da release selecionada.
   */
 
   useEffect(() => {
@@ -276,7 +274,9 @@ function TvDashboard() {
           );
 
 
-        if (ativo) {
+        if (
+          ativo
+        ) {
 
           setProjects(
             lista
@@ -293,7 +293,9 @@ function TvDashboard() {
 
       } finally {
 
-        if (ativo) {
+        if (
+          ativo
+        ) {
 
           setCarregando(
             false
@@ -342,12 +344,22 @@ function TvDashboard() {
 
 
   /*
-    Troca a release acompanhada.
+    Troca de release.
   */
 
   function alterarAmbiente(
     id: number
   ) {
+
+    if (
+      id ===
+      ambienteSelecionadoId
+    ) {
+
+      return;
+
+    }
+
 
     setProjects([]);
 
@@ -367,8 +379,88 @@ function TvDashboard() {
 
 
   /*
-    Ambiente atual.
+    Nome curto utilizado
+    nas abas.
+
+    3.1.020.001 -> 20.01
+    3.1.020.002 -> 20.02
+    3.1.021.000 -> 21
+    3.1.021.001 -> 21.01
   */
+
+  function obterNomeCurtoRelease(
+    ambiente: ReleaseEnvironment
+  ) {
+
+    const versao =
+      ambiente
+        .versoes
+        .intellicash;
+
+
+    const partes =
+      versao.split(".");
+
+
+    if (
+      partes.length < 4
+    ) {
+
+      return ambiente.nome;
+
+    }
+
+
+    const principal =
+      Number(
+        partes[2]
+      );
+
+
+    const revisao =
+      Number(
+        partes[3]
+      );
+
+
+    if (
+      Number.isNaN(
+        principal
+      ) ||
+      Number.isNaN(
+        revisao
+      )
+    ) {
+
+      return ambiente.nome;
+
+    }
+
+
+    const principalCurto =
+      String(
+        principal
+      );
+
+
+    if (
+      revisao === 0
+    ) {
+
+      return principalCurto;
+
+    }
+
+
+    return `${principalCurto}.${String(
+      revisao
+    ).padStart(
+      2,
+      "0"
+    )}`;
+
+  }
+
 
   const ambienteSelecionado =
     ambientes.find(
@@ -379,14 +471,8 @@ function TvDashboard() {
 
 
   /*
-    REGRA DOS CARDS:
-
-    Só aparecem projetos que possuem
-    pelo menos uma tarefa em qualquer
-    situação da release.
-
-    Ter versão cadastrada NÃO é
-    suficiente para criar um card.
+    Só aparecem cards
+    que possuem tarefas.
   */
 
   function possuiTarefas(
@@ -420,10 +506,6 @@ function TvDashboard() {
       ]
     );
 
-
-  /*
-    Hora e data.
-  */
 
   const hora =
     agora.toLocaleTimeString(
@@ -459,10 +541,6 @@ function TvDashboard() {
       }
     );
 
-
-  /*
-    Ordem dos cards.
-  */
 
   function getOrdemProjeto(
     nome: string
@@ -625,116 +703,120 @@ function TvDashboard() {
         </div>
 
 
-        <div className="tv-header-right">
+        <div className="tv-clock">
 
-          <div className="tv-release-selector">
+          <strong>
+            {hora}
+          </strong>
 
-            <span>
-              Release acompanhada
-            </span>
-
-
-            <div className="tv-release-select-wrapper">
-
-              <select
-                value={
-                  ambienteSelecionadoId ??
-                  ""
-                }
-                disabled={
-                  carregandoAmbientes ||
-                  ambientes.length === 0
-                }
-                onChange={
-                  event =>
-                    alterarAmbiente(
-                      Number(
-                        event
-                          .target
-                          .value
-                      )
-                    )
-                }
-              >
-
-                {ambientes.length ===
-                  0 && (
-
-                  <option value="">
-
-                    Nenhuma release
-
-                  </option>
-
-                )}
-
-
-                {ambientes.map(
-                  ambiente => (
-
-                    <option
-                      key={
-                        ambiente.id
-                      }
-                      value={
-                        ambiente.id
-                      }
-                    >
-
-                      {ambiente.nome}
-
-                    </option>
-
-                  )
-                )}
-
-              </select>
-
-            </div>
-
-
-            {ambienteSelecionado && (
-
-              <small>
-
-                Intellicash{" "}
-
-                {
-                  ambienteSelecionado
-                    .versoes
-                    .intellicash
-                }
-
-              </small>
-
-            )}
-
-          </div>
-
-
-          <div className="tv-clock">
-
-            <strong>
-              {hora}
-            </strong>
-
-            <small>
-              {data}
-            </small>
-
-          </div>
+          <small>
+            {data}
+          </small>
 
         </div>
 
       </header>
 
 
-      {/*
-        Compatibilidade continua
-        recebendo TODOS os projetos
-        e mostra TODOS os sistemas
-        do ambiente.
-  */}
+      <section className="tv-release-area">
+
+        <div className="tv-release-tabs-header">
+
+          <span>
+            Releases
+          </span>
+
+          {ambienteSelecionado && (
+
+            <small>
+
+              {
+                ambienteSelecionado
+                  .nome
+              }
+
+            </small>
+
+          )}
+
+        </div>
+
+
+        <div className="tv-release-tabs">
+
+          {carregandoAmbientes ? (
+
+            <span className="tv-release-tabs-loading">
+
+              Carregando releases...
+
+            </span>
+
+          ) : (
+
+            ambientes.map(
+              ambiente => {
+
+                const ativo =
+                  ambiente.id ===
+                  ambienteSelecionadoId;
+
+
+                return (
+
+                  <button
+                    type="button"
+                    key={
+                      ambiente.id
+                    }
+                    className={`tv-release-tab ${
+                      ativo
+                        ? "tv-release-tab-active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      alterarAmbiente(
+                        ambiente.id
+                      )
+                    }
+                    title={
+                      ambiente.nome
+                    }
+                  >
+
+                    <span>
+
+                      {
+                        obterNomeCurtoRelease(
+                          ambiente
+                        )
+                      }
+
+                    </span>
+
+                    <small>
+
+                      {
+                        ambiente
+                          .versoes
+                          .intellicash
+                      }
+
+                    </small>
+
+                  </button>
+
+                );
+
+              }
+            )
+
+          )}
+
+        </div>
+
+      </section>
+
 
       <CompatibilityPanel
         projects={
