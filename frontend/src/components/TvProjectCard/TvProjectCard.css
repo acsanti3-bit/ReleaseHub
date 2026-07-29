@@ -206,7 +206,7 @@
     min-height:0;
 
     padding:
-        11px
+        10px
         15px
         9px
         20px;
@@ -219,13 +219,22 @@
             minmax(0,1fr)
         );
 
+    /*
+        Agora existem 10 situações:
+        2 colunas x 5 linhas.
+
+        Todas as linhas recebem
+        exatamente a mesma altura
+        dentro do espaço disponível.
+    */
+
     grid-template-rows:
         repeat(
-            4,
+            5,
             minmax(0,1fr)
         );
 
-    gap:7px;
+    gap:6px;
 
     box-sizing:border-box;
 
@@ -239,7 +248,7 @@
     min-height:0;
 
     padding:
-        6px
+        4px
         10px;
 
     display:flex;
@@ -473,41 +482,31 @@
     }
 
 
-    .tv-status-grid {
-    flex: 1;
+    .tv-status-grid{
 
-    min-height: 0;
+        padding:
+            6px
+            11px
+            6px
+            16px;
 
-    padding:
-        11px
-        15px
-        9px
-        20px;
+        grid-template-rows:
+            repeat(
+                5,
+                minmax(0,1fr)
+            );
 
-    display: grid;
+        gap:4px;
 
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    grid-template-rows:
-        repeat(
-            5,
-            minmax(0, 1fr)
-        );
-
-    gap: 7px;
-
-    box-sizing: border-box;
-}
+    }
 
 
     .tv-status-card{
 
+        min-height:0;
+
         padding:
-            4px
+            3px
             7px;
 
         border-radius:8px;
