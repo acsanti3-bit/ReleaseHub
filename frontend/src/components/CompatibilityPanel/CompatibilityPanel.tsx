@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   useEffect,
   useState,
 } from "react";
@@ -38,6 +39,15 @@ interface Props {
 }
 
 
+interface CompatibilityStyle
+  extends CSSProperties {
+
+  "--compatibility-columns":
+    number;
+
+}
+
+
 function getSystemIcon(
   chave: string
 ) {
@@ -53,7 +63,7 @@ function getSystemIcon(
   ) {
 
     return (
-      <MdDns size={17} />
+      <MdDns />
     );
 
   }
@@ -66,9 +76,7 @@ function getSystemIcon(
   ) {
 
     return (
-      <MdPointOfSale
-        size={17}
-      />
+      <MdPointOfSale />
     );
 
   }
@@ -81,7 +89,7 @@ function getSystemIcon(
   ) {
 
     return (
-      <MdStore size={17} />
+      <MdStore />
     );
 
   }
@@ -94,9 +102,7 @@ function getSystemIcon(
   ) {
 
     return (
-      <MdShoppingCart
-        size={17}
-      />
+      <MdShoppingCart />
     );
 
   }
@@ -105,13 +111,14 @@ function getSystemIcon(
   if (
     sistema.includes(
       "intellistock"
+    ) ||
+    sistema.includes(
+      "isa"
     )
   ) {
 
     return (
-      <MdInventory
-        size={17}
-      />
+      <MdInventory />
     );
 
   }
@@ -124,14 +131,14 @@ function getSystemIcon(
   ) {
 
     return (
-      <MdCloud size={17} />
+      <MdCloud />
     );
 
   }
 
 
   return (
-    <MdApps size={17} />
+    <MdApps />
   );
 
 }
@@ -263,6 +270,48 @@ function obterSistemas(
 }
 
 
+function obterQuantidadeColunas(
+  quantidadeSistemas: number
+) {
+
+  if (
+    quantidadeSistemas <= 0
+  ) {
+
+    return 1;
+
+  }
+
+
+  if (
+    quantidadeSistemas <= 6
+  ) {
+
+    return quantidadeSistemas;
+
+  }
+
+
+  /*
+    Acima de seis sistemas,
+    distribui os itens em linhas
+    equilibradas.
+
+    15 sistemas:
+    8 na primeira linha
+    7 na segunda.
+  */
+
+  return Math.min(
+    8,
+    Math.ceil(
+      quantidadeSistemas / 2
+    )
+  );
+
+}
+
+
 function CompatibilityPanel({
 
   projects,
@@ -298,15 +347,12 @@ function CompatibilityPanel({
 
 
         return (
-
           nome.includes(
             "intellicash"
           ) ||
-
           nome.includes(
             "intelicash"
           )
-
         );
 
       }
@@ -332,6 +378,10 @@ function CompatibilityPanel({
 
         setAmbiente(
           null
+        );
+
+        setCarregandoAmbiente(
+          false
         );
 
         return;
@@ -527,6 +577,21 @@ function CompatibilityPanel({
     );
 
 
+  const quantidadeColunas =
+    obterQuantidadeColunas(
+      sistemas.length
+    );
+
+
+  const compatibilityStyle:
+    CompatibilityStyle = {
+
+    "--compatibility-columns":
+      quantidadeColunas,
+
+  };
+
+
   return (
 
     <section className="compatibility-panel">
@@ -538,47 +603,80 @@ function CompatibilityPanel({
         </strong>
 
         <small>
+
           {sistemas.length}{" "}
+
           {sistemas.length === 1
             ? "sistema"
             : "sistemas"}
+
         </small>
 
       </div>
 
 
-      <div className="compatibility-line">
+      <div
+        className="compatibility-line"
+        style={
+          compatibilityStyle
+        }
+      >
 
         {sistemas.map(
-          sistema => (
+          sistema => {
 
-            <div
-              key={
-                sistema.chave
-              }
-              className="compatibility-version"
-            >
-
-              {getSystemIcon(
-                sistema.chave
-              )}
+            const possuiVersao =
+              Boolean(
+                sistema.versao?.trim()
+              );
 
 
-              <span>
+            return (
 
-                <strong>
-                  {sistema.nome}
-                </strong>
+              <div
+                key={
+                  sistema.chave
+                }
+                className={`compatibility-version ${
+                  possuiVersao
+                    ? ""
+                    : "compatibility-version-empty"
+                }`}
+                title={`${sistema.nome}: ${
+                  sistema.versao || "-"
+                }`}
+              >
 
-                <small>
-                  {sistema.versao || "-"}
-                </small>
+                <div className="compatibility-icon">
 
-              </span>
+                  {getSystemIcon(
+                    sistema.chave
+                  )}
 
-            </div>
+                </div>
 
-          )
+
+                <div className="compatibility-system-info">
+
+                  <strong>
+
+                    {sistema.nome}
+
+                  </strong>
+
+                  <small>
+
+                    {sistema.versao || "-"}
+
+                  </small>
+
+                </div>
+
+              </div>
+
+            );
+
+          }
         )}
 
       </div>

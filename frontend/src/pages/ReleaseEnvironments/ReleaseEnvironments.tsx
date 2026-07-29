@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
+import { useEffect, useState } from "react";
 import {
   MdAdd,
   MdDeleteOutline,
@@ -13,7 +9,6 @@ import {
 import "./ReleaseEnvironments.css";
 
 import Layout from "../../components/layout/Layout";
-
 import ReleaseEnvironmentDrawer from "../../components/ReleaseEnvironmentDrawer/ReleaseEnvironmentDrawer";
 
 import {
@@ -24,250 +19,184 @@ import {
   listarAmbientes,
 } from "../../services/ReleaseEnvironmentService";
 
-import {
-  buscarSessao,
-} from "../../services/AuthService";
+import { buscarSessao } from "../../services/AuthService";
 
 import type {
   ReleaseEnvironment,
+  ReleaseSystemVersion,
 } from "../../types/releaseEnvironment";
 
 
+function obterSistemasDoAmbiente(
+  ambiente: ReleaseEnvironment
+): ReleaseSystemVersion[] {
+  if (ambiente.sistemas && ambiente.sistemas.length > 0) {
+    return [...ambiente.sistemas].sort(
+      (a, b) => a.ordem - b.ordem
+    );
+  }
+
+  return [
+    {
+      chave: "intellicash",
+      nome: "Intellicash",
+      versao: ambiente.versoes.intellicash,
+      ordem: 1,
+    },
+    {
+      chave: "easycash",
+      nome: "EasyCash",
+      versao: ambiente.versoes.easycash,
+      ordem: 2,
+    },
+    {
+      chave: "easycheckout",
+      nome: "EasyCheckout",
+      versao: ambiente.versoes.easycheckout,
+      ordem: 3,
+    },
+    {
+      chave: "easypdv",
+      nome: "EasyPDV",
+      versao: ambiente.versoes.easypdv,
+      ordem: 4,
+    },
+    {
+      chave: "intellistock",
+      nome: "IntelliStock",
+      versao: ambiente.versoes.intellistock,
+      ordem: 5,
+    },
+    {
+      chave: "iwbserver",
+      nome: "IWB Server",
+      versao: ambiente.versoes.iwbserver,
+      ordem: 6,
+    },
+  ];
+}
+
+
 function ReleaseEnvironments() {
+  const [ambientes, setAmbientes] = useState<ReleaseEnvironment[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [salvando, setSalvando] = useState(false);
+  const [podeEditar, setPodeEditar] = useState(false);
 
-  const [
-    ambientes,
-    setAmbientes,
-  ] =
-    useState<
-      ReleaseEnvironment[]
-    >([]);
-
-  const [
-    carregando,
-    setCarregando,
-  ] =
-    useState(true);
-
-  const [
-    salvando,
-    setSalvando,
-  ] =
-    useState(false);
-
-  const [
-    podeEditar,
-    setPodeEditar,
-  ] =
-    useState(false);
-
-  const [
-    ambienteSelecionado,
-    setAmbienteSelecionado,
-  ] =
-    useState<
-      ReleaseEnvironment | null
-    >(null);
+  const [ambienteSelecionado, setAmbienteSelecionado] =
+    useState<ReleaseEnvironment | null>(null);
 
 
   async function atualizarLista() {
-
     try {
-
       setCarregando(true);
 
-      const lista =
-        await listarAmbientes();
+      const lista = await listarAmbientes();
 
-      setAmbientes(
-        lista
-      );
-
+      setAmbientes(lista);
     } catch (erro) {
-
-      console.error(
-        "Erro ao carregar ambientes:",
-        erro
-      );
-
+      console.error("Erro ao carregar ambientes:", erro);
     } finally {
-
       setCarregando(false);
-
     }
-
   }
 
 
   async function carregarPermissao() {
-
     try {
-
-      const usuario =
-        await buscarSessao();
+      const usuario = await buscarSessao();
 
       setPodeEditar(
         usuario?.role === "admin" ||
         usuario?.role === "qualidade"
       );
-
     } catch (erro) {
-
-      console.error(
-        "Erro ao carregar permissão:",
-        erro
-      );
+      console.error("Erro ao carregar permissão:", erro);
 
       setPodeEditar(false);
-
     }
-
   }
 
 
   useEffect(() => {
-
     void atualizarLista();
-
     void carregarPermissao();
-
   }, []);
 
 
   function novoAmbiente() {
-
     if (!podeEditar) {
-
       return;
-
     }
 
     setAmbienteSelecionado(
       criarAmbiente()
     );
-
   }
 
 
-  function editar(
+  function abrirEdicao(
     ambiente: ReleaseEnvironment
   ) {
-
     if (!podeEditar) {
-
       return;
-
     }
 
     setAmbienteSelecionado(
       ambiente
     );
-
   }
 
 
   async function salvar(
     ambiente: ReleaseEnvironment
   ) {
-
-    if (
-      !podeEditar ||
-      salvando
-    ) {
-
+    if (!podeEditar || salvando) {
       return;
-
     }
 
     try {
-
       setSalvando(true);
 
-      const existe =
-        ambientes.some(
-          item =>
-            item.id ===
-            ambiente.id
+      const ambienteJaExiste = ambientes.some(
+        item => item.id === ambiente.id
+      );
+
+      let ambienteSalvo: ReleaseEnvironment;
+
+      if (ambienteJaExiste) {
+        ambienteSalvo = await editarAmbiente(
+          ambiente
         );
-
-
-      let ambienteSalvo:
-        ReleaseEnvironment;
-
-
-      if (existe) {
-
-        ambienteSalvo =
-          await editarAmbiente(
-            ambiente
-          );
-
       } else {
-
-        ambienteSalvo =
-          await adicionarAmbiente(
-            ambiente
-          );
-
+        ambienteSalvo = await adicionarAmbiente(
+          ambiente
+        );
       }
 
+      setAmbientes(listaAtual => {
+        const existeNaLista = listaAtual.some(
+          item => item.id === ambienteSalvo.id
+        );
 
-      /*
-        Atualiza imediatamente o estado
-        da tela com a resposta da API.
-
-        Não precisamos mais executar
-        sincronização pelo ProjectService.
-      */
-
-      setAmbientes(
-        lista => {
-
-          const jaExiste =
-            lista.some(
-              item =>
-                item.id ===
-                ambienteSalvo.id
-            );
-
-
-          if (jaExiste) {
-
-            return lista.map(
-              item =>
-                item.id ===
-                ambienteSalvo.id
-                  ? ambienteSalvo
-                  : item
-            );
-
-          }
-
-
-          return [
-            ...lista,
-            ambienteSalvo,
-          ];
-
+        if (existeNaLista) {
+          return listaAtual.map(item =>
+            item.id === ambienteSalvo.id
+              ? ambienteSalvo
+              : item
+          );
         }
-      );
 
+        return [
+          ...listaAtual,
+          ambienteSalvo,
+        ];
+      });
 
-      setAmbienteSelecionado(
-        null
-      );
+      setAmbienteSelecionado(null);
 
-
-      /*
-        Recarrega em seguida somente
-        para garantir que a interface
-        esteja igual ao D1.
-      */
-
-      void atualizarLista();
-
+      await atualizarLista();
     } catch (erro) {
-
       console.error(
         "Erro ao salvar ambiente:",
         erro
@@ -276,58 +205,38 @@ function ReleaseEnvironments() {
       alert(
         "Não foi possível salvar o ambiente."
       );
-
     } finally {
-
       setSalvando(false);
-
     }
-
   }
 
 
-  async function excluir(
+  async function removerAmbiente(
     ambiente: ReleaseEnvironment
   ) {
-
     if (!podeEditar) {
-
       return;
-
     }
 
-
-    const confirmar =
-      window.confirm(
-        `Excluir o ambiente "${ambiente.nome}"?`
-      );
-
+    const confirmar = window.confirm(
+      `Excluir o ambiente "${ambiente.nome}"?`
+    );
 
     if (!confirmar) {
-
       return;
-
     }
 
-
     try {
-
       await excluirAmbiente(
         ambiente.id
       );
 
-
-      setAmbientes(
-        lista =>
-          lista.filter(
-            item =>
-              item.id !==
-              ambiente.id
-          )
+      setAmbientes(listaAtual =>
+        listaAtual.filter(
+          item => item.id !== ambiente.id
+        )
       );
-
     } catch (erro) {
-
       console.error(
         "Erro ao excluir ambiente:",
         erro
@@ -336,331 +245,207 @@ function ReleaseEnvironments() {
       alert(
         "Não foi possível excluir o ambiente."
       );
-
     }
-
   }
 
 
   return (
-
     <Layout>
-
       <div className="release-page">
-
         <div className="release-page-header">
-
           <div>
-
             <h1>
               Ambientes da Release
             </h1>
 
             <p>
-
-              Configure a relação entre
-              as versões dos projetos.
-
-              {!podeEditar &&
-                " • Somente leitura"}
-
+              Configure a relação entre as versões dos projetos.
+              {!podeEditar && " • Somente leitura"}
             </p>
-
           </div>
 
-
           {podeEditar && (
-
             <button
               type="button"
               className="new-environment-button"
-              onClick={
-                novoAmbiente
-              }
+              onClick={novoAmbiente}
             >
-
               <MdAdd size={20} />
 
               Novo Ambiente
-
             </button>
-
           )}
-
         </div>
 
 
         <div className="release-info">
-
           <MdLink size={22} />
 
           <div>
-
             <strong>
-              Versões amarradas
+              Versões relacionadas
             </strong>
 
             <span>
-
-              Ao identificar a versão do Intellicash,
-              o ReleaseHub encontra automaticamente
-              as versões correspondentes dos demais projetos.
-
+              Cada ambiente reúne as versões compatíveis de todos
+              os sistemas pertencentes à release.
             </span>
-
           </div>
-
         </div>
 
 
-        <div className="release-table-container">
+        {carregando ? (
+          <div className="release-empty">
+            Carregando ambientes...
+          </div>
+        ) : ambientes.length === 0 ? (
+          <div className="release-empty">
+            Nenhum ambiente cadastrado.
+          </div>
+        ) : (
+          <div className="release-environments-list">
+            {ambientes.map(ambiente => {
+              const sistemas =
+                obterSistemasDoAmbiente(
+                  ambiente
+                );
 
-          <table className="release-table">
+              const sistemaIntellicash =
+                sistemas.find(sistema =>
+                  sistema.chave
+                    .toLowerCase()
+                    .includes("intellicash")
+                );
 
-            <thead>
+              const versaoIntellicash =
+                sistemaIntellicash?.versao ||
+                ambiente.versoes.intellicash ||
+                "-";
 
-              <tr>
+              return (
+                <article
+                  key={ambiente.id}
+                  className="release-environment-card"
+                >
+                  <header className="release-environment-card-header">
+                    <div className="release-environment-heading">
+                      <span className="release-environment-label">
+                        Ambiente
+                      </span>
 
-                <th>
-                  Ambiente
-                </th>
-
-                <th>
-                  Intellicash
-                </th>
-
-                <th>
-                  EasyCash
-                </th>
-
-                <th>
-                  EasyCheckout
-                </th>
-
-                <th>
-                  EasyPDV
-                </th>
-
-                <th>
-                  IntelliStock
-                </th>
-
-                <th>
-                  IWB Server
-                </th>
-
-
-                {podeEditar && (
-
-                  <th className="release-actions-column">
-
-                    Ações
-
-                  </th>
-
-                )}
-
-              </tr>
-
-            </thead>
-
-
-            <tbody>
-
-              {ambientes.map(
-                ambiente => (
-
-                  <tr
-                    key={
-                      ambiente.id
-                    }
-                  >
-
-                    <td>
-
-                      <strong className="release-name">
-
+                      <h2>
                         {ambiente.nome}
+                      </h2>
 
-                      </strong>
+                      <div className="release-environment-summary">
+                        <span className="release-environment-reference">
+                          Intellicash{" "}
 
-                    </td>
+                          <strong>
+                            {versaoIntellicash}
+                          </strong>
+                        </span>
 
-
-                    <td className="release-reference-version">
-
-                      {
-                        ambiente
-                          .versoes
-                          .intellicash ||
-                        "-"
-                      }
-
-                    </td>
-
-
-                    <td>
-
-                      {
-                        ambiente
-                          .versoes
-                          .easycash ||
-                        "-"
-                      }
-
-                    </td>
-
-
-                    <td>
-
-                      {
-                        ambiente
-                          .versoes
-                          .easycheckout ||
-                        "-"
-                      }
-
-                    </td>
-
-
-                    <td>
-
-                      {
-                        ambiente
-                          .versoes
-                          .easypdv ||
-                        "-"
-                      }
-
-                    </td>
-
-
-                    <td>
-
-                      {
-                        ambiente
-                          .versoes
-                          .intellistock ||
-                        "-"
-                      }
-
-                    </td>
-
-
-                    <td>
-
-                      {
-                        ambiente
-                          .versoes
-                          .iwbserver ||
-                        "-"
-                      }
-
-                    </td>
+                        <span>
+                          {sistemas.length}{" "}
+                          {sistemas.length === 1
+                            ? "sistema"
+                            : "sistemas"}
+                        </span>
+                      </div>
+                    </div>
 
 
                     {podeEditar && (
+                      <div className="release-actions">
+                        <button
+                          type="button"
+                          title="Editar ambiente"
+                          onClick={() =>
+                            abrirEdicao(
+                              ambiente
+                            )
+                          }
+                        >
+                          <MdEdit size={18} />
+                        </button>
 
-                      <td>
-
-                        <div className="release-actions">
-
-                          <button
-                            type="button"
-                            title="Editar"
-                            onClick={() =>
-                              editar(
-                                ambiente
-                              )
-                            }
-                          >
-
-                            <MdEdit
-                              size={18}
-                            />
-
-                          </button>
-
-
-                          <button
-                            type="button"
-                            title="Excluir"
-                            className="delete-environment"
-                            onClick={() =>
-                              void excluir(
-                                ambiente
-                              )
-                            }
-                          >
-
-                            <MdDeleteOutline
-                              size={19}
-                            />
-
-                          </button>
-
-                        </div>
-
-                      </td>
-
+                        <button
+                          type="button"
+                          title="Excluir ambiente"
+                          className="delete-environment"
+                          onClick={() => {
+                            void removerAmbiente(
+                              ambiente
+                            );
+                          }}
+                        >
+                          <MdDeleteOutline size={19} />
+                        </button>
+                      </div>
                     )}
-
-                  </tr>
-
-                )
-              )}
-
-            </tbody>
-
-          </table>
+                  </header>
 
 
-          {carregando ? (
+                  <div className="release-systems-grid">
+                    {sistemas.map(sistema => {
+                      const possuiVersao =
+                        Boolean(
+                          sistema.versao?.trim()
+                        );
 
-            <div className="release-empty">
+                      const sistemaReferencia =
+                        sistema.chave
+                          .toLowerCase()
+                          .includes("intellicash");
 
-              Carregando ambientes...
+                      const classes = [
+                        "release-system-item",
+                        sistemaReferencia
+                          ? "release-system-reference"
+                          : "",
+                        !possuiVersao
+                          ? "release-system-empty"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
 
-            </div>
+                      return (
+                        <div
+                          key={sistema.chave}
+                          className={classes}
+                        >
+                          <span>
+                            {sistema.nome}
+                          </span>
 
-          ) : ambientes.length === 0 && (
-
-            <div className="release-empty">
-
-              Nenhum ambiente cadastrado.
-
-            </div>
-
-          )}
-
-        </div>
-
+                          <strong>
+                            {sistema.versao || "-"}
+                          </strong>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
 
 
-      {podeEditar &&
-        ambienteSelecionado && (
-
+      {podeEditar && ambienteSelecionado && (
         <ReleaseEnvironmentDrawer
-          environment={
-            ambienteSelecionado
-          }
+          environment={ambienteSelecionado}
           onClose={() =>
-            setAmbienteSelecionado(
-              null
-            )
+            setAmbienteSelecionado(null)
           }
-          onSave={
-            salvar
-          }
+          onSave={salvar}
         />
-
       )}
-
     </Layout>
-
   );
-
 }
 
 

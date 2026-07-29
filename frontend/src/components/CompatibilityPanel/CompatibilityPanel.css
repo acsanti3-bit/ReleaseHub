@@ -7,7 +7,7 @@
     display:grid;
 
     grid-template-columns:
-        155px
+        135px
         minmax(0,1fr);
 
     align-items:stretch;
@@ -44,8 +44,8 @@
     gap:4px;
 
     padding:
-        0
-        14px;
+        12px
+        10px;
 
     box-sizing:border-box;
 
@@ -88,9 +88,11 @@
 }
 
 
-/* SISTEMAS */
+/* GRID DINÂMICO */
 
 .compatibility-line{
+
+    --compatibility-columns:6;
 
     min-width:0;
 
@@ -98,11 +100,16 @@
 
     grid-template-columns:
         repeat(
-            auto-fit,
-            minmax(
-                125px,
-                1fr
-            )
+            var(
+                --compatibility-columns
+            ),
+            minmax(0,1fr)
+        );
+
+    grid-auto-rows:
+        minmax(
+            57px,
+            auto
         );
 
     align-items:stretch;
@@ -116,19 +123,19 @@
 
     min-width:0;
 
-    min-height:66px;
+    min-height:57px;
 
     display:flex;
 
     align-items:center;
 
-    justify-content:center;
+    justify-content:flex-start;
 
     gap:8px;
 
     padding:
-        7px
-        9px;
+        8px
+        10px;
 
     box-sizing:border-box;
 
@@ -138,20 +145,28 @@
 
     border-bottom:
         1px solid
-        #EEF1F4;
+        #E7EBEF;
 
     color:#005AA9;
+
+    background:#FFF;
 
 }
 
 
 /* ÍCONE */
 
-.compatibility-version svg{
+.compatibility-icon{
 
     width:18px;
 
     height:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
 
     flex-shrink:0;
 
@@ -160,9 +175,18 @@
 }
 
 
-/* INFORMAÇÃO */
+.compatibility-icon svg{
 
-.compatibility-version > span{
+    width:17px;
+
+    height:17px;
+
+}
+
+
+/* INFORMAÇÕES */
+
+.compatibility-system-info{
 
     min-width:0;
 
@@ -179,44 +203,74 @@
 }
 
 
-.compatibility-version strong{
+.compatibility-system-info strong{
 
     max-width:100%;
 
     color:#005AA9;
 
-    font-size:11px;
+    font-size:10px;
 
-    line-height:1.1;
+    line-height:1.15;
 
     font-weight:600;
 
-    white-space:nowrap;
+    white-space:normal;
 
-    overflow:hidden;
+    overflow-wrap:anywhere;
 
-    text-overflow:ellipsis;
+    word-break:normal;
 
 }
 
 
-.compatibility-version small{
+.compatibility-system-info small{
 
     max-width:100%;
 
     color:#45515C;
 
-    font-size:10px;
+    font-size:9px;
 
     line-height:1.1;
 
     font-weight:400;
 
-    white-space:nowrap;
+    white-space:normal;
 
-    overflow:hidden;
+    overflow-wrap:anywhere;
 
-    text-overflow:ellipsis;
+}
+
+
+/* SEM VERSÃO */
+
+.compatibility-version-empty{
+
+    background:#FCFDFE;
+
+}
+
+
+.compatibility-version-empty .compatibility-icon{
+
+    color:#9CA6AF;
+
+}
+
+
+.compatibility-version-empty
+.compatibility-system-info strong{
+
+    color:#66717C;
+
+}
+
+
+.compatibility-version-empty
+.compatibility-system-info small{
+
+    color:#A2ABB3;
 
 }
 
@@ -263,69 +317,58 @@
 }
 
 
-/*
-  MAIS SISTEMAS
+/* TELAS MENORES */
 
-  Conforme a quantidade aumenta,
-  os itens vão criando novas colunas
-  e linhas automaticamente.
-*/
-
-@media(max-width:1500px){
+@media(max-width:1400px){
 
     .compatibility-panel{
 
         grid-template-columns:
-            140px
+            120px
             minmax(0,1fr);
-
-    }
-
-
-    .compatibility-line{
-
-        grid-template-columns:
-            repeat(
-                auto-fit,
-                minmax(
-                    110px,
-                    1fr
-                )
-            );
 
     }
 
 
     .compatibility-version{
 
-        padding:
-            6px
-            7px;
-
         gap:6px;
 
-    }
-
-
-    .compatibility-version svg{
-
-        width:16px;
-
-        height:16px;
+        padding:
+            7px
+            7px;
 
     }
 
 
-    .compatibility-version strong{
+    .compatibility-icon{
 
-        font-size:10px;
+        width:15px;
+
+        height:15px;
 
     }
 
 
-    .compatibility-version small{
+    .compatibility-icon svg{
+
+        width:15px;
+
+        height:15px;
+
+    }
+
+
+    .compatibility-system-info strong{
 
         font-size:9px;
+
+    }
+
+
+    .compatibility-system-info small{
+
+        font-size:8px;
 
     }
 
@@ -351,7 +394,7 @@
 
     .compatibility-title{
 
-        min-height:55px;
+        min-height:54px;
 
         align-items:flex-start;
 
@@ -374,49 +417,49 @@
 
         width:100%;
 
-        display:grid;
-
         grid-template-columns:
             repeat(
-                2,
+                3,
                 minmax(0,1fr)
-            );
+            ) !important;
 
     }
 
 
     .compatibility-version{
 
-        min-height:55px;
-
-        justify-content:flex-start;
+        min-height:58px;
 
         padding:
-            8px
-            14px;
-
-    }
-
-
-    .compatibility-empty{
-
-        min-height:55px;
-
-        justify-content:flex-start;
-
-        text-align:left;
+            9px
+            12px;
 
     }
 
 }
 
 
-@media(max-width:600px){
+@media(max-width:650px){
 
     .compatibility-line{
 
         grid-template-columns:
-            1fr;
+            repeat(
+                2,
+                minmax(0,1fr)
+            ) !important;
+
+    }
+
+}
+
+
+@media(max-width:420px){
+
+    .compatibility-line{
+
+        grid-template-columns:
+            1fr !important;
 
     }
 
