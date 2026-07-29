@@ -36,9 +36,7 @@
 
     gap: 4px;
 
-    padding:
-        12px
-        10px;
+    padding: 12px 10px;
 
     box-sizing: border-box;
 
@@ -77,7 +75,7 @@
 /* LISTA DINÂMICA */
 
 .compatibility-line {
-    --compatibility-columns: 6;
+    --compatibility-columns: 8;
 
     min-width: 0;
 
@@ -90,13 +88,11 @@
 
 
 /*
-    Cada sistema ocupa uma fração
-    baseada na quantidade de colunas
+    Os sistemas são distribuídos
+    conforme a quantidade de colunas
     calculada pelo componente.
 
-    Exemplo com 15 sistemas:
-    primeira linha = 8
-    segunda linha = 7 centralizados
+    Todas as linhas ficam centralizadas.
 */
 
 .compatibility-version {
@@ -124,9 +120,7 @@
 
     gap: 8px;
 
-    padding:
-        8px
-        10px;
+    padding: 8px 9px;
 
     box-sizing: border-box;
 
@@ -141,6 +135,8 @@
     color: #005aa9;
 
     background: #ffffff;
+
+    text-align: center;
 }
 
 
@@ -175,14 +171,17 @@
     display: flex;
     flex-direction: column;
 
+    align-items: center;
     justify-content: center;
-    align-items: flex-start;
 
     gap: 3px;
+
+    text-align: center;
 }
 
 
 .compatibility-system-info strong {
+    width: 100%;
     max-width: 100%;
 
     color: #005aa9;
@@ -196,10 +195,13 @@
 
     overflow-wrap: anywhere;
     word-break: normal;
+
+    text-align: center;
 }
 
 
 .compatibility-system-info small {
+    width: 100%;
     max-width: 100%;
 
     color: #45515c;
@@ -212,6 +214,9 @@
     white-space: normal;
 
     overflow-wrap: anywhere;
+    word-break: normal;
+
+    text-align: center;
 }
 
 
@@ -222,15 +227,22 @@
 }
 
 
+/*
+    O nome permanece azul.
+
+    Somente o ícone e a versão vazia
+    ficam mais discretos.
+*/
+
 .compatibility-version-empty
 .compatibility-icon {
-    color: #9ca6af;
+    color: #8fa2b2;
 }
 
 
 .compatibility-version-empty
 .compatibility-system-info strong {
-    color: #66717c;
+    color: #005aa9;
 }
 
 
@@ -251,9 +263,7 @@
     align-items: center;
     justify-content: center;
 
-    padding:
-        0
-        20px;
+    padding: 0 20px;
 
     box-sizing: border-box;
 
@@ -275,9 +285,52 @@
 }
 
 
-/* TELAS MENORES */
+/*
+    TELAS INTERMEDIÁRIAS
 
-@media (max-width: 1400px) {
+    Reduz a quantidade de sistemas
+    por linha para preservar a leitura.
+*/
+
+@media (max-width: 1600px) {
+    .compatibility-line {
+        --compatibility-columns: 6 !important;
+    }
+
+
+    .compatibility-panel {
+        grid-template-columns:
+            125px
+            minmax(0, 1fr);
+    }
+
+
+    .compatibility-version {
+        gap: 7px;
+
+        padding: 7px 9px;
+    }
+
+
+    .compatibility-system-info strong {
+        font-size: 9.5px;
+    }
+
+
+    .compatibility-system-info small {
+        font-size: 8.5px;
+    }
+}
+
+
+/* MONITORES MENORES */
+
+@media (max-width: 1300px) {
+    .compatibility-line {
+        --compatibility-columns: 5 !important;
+    }
+
+
     .compatibility-panel {
         grid-template-columns:
             120px
@@ -286,17 +339,13 @@
 
 
     .compatibility-version {
-        gap: 6px;
-
-        padding:
-            7px
-            7px;
+        min-height: 55px;
     }
 
 
     .compatibility-icon {
-        width: 15px;
-        height: 15px;
+        width: 16px;
+        height: 16px;
     }
 
 
@@ -333,13 +382,12 @@
     .compatibility-title {
         min-height: 54px;
 
-        align-items: flex-start;
+        align-items: center;
+        justify-content: center;
 
-        padding:
-            10px
-            14px;
+        padding: 10px 14px;
 
-        text-align: left;
+        text-align: center;
 
         border-right: none;
 
@@ -350,6 +398,8 @@
 
 
     .compatibility-line {
+        --compatibility-columns: 3 !important;
+
         width: 100%;
 
         justify-content: center;
@@ -357,41 +407,22 @@
 
 
     .compatibility-version {
-        flex:
-            0
-            0
-            33.3333%;
-
-        max-width: 33.3333%;
-
         min-height: 58px;
 
-        padding:
-            9px
-            12px;
+        padding: 9px 12px;
     }
 }
 
 
 @media (max-width: 650px) {
-    .compatibility-version {
-        flex:
-            0
-            0
-            50%;
-
-        max-width: 50%;
+    .compatibility-line {
+        --compatibility-columns: 2 !important;
     }
 }
 
 
 @media (max-width: 420px) {
-    .compatibility-version {
-        flex:
-            0
-            0
-            100%;
-
-        max-width: 100%;
+    .compatibility-line {
+        --compatibility-columns: 1 !important;
     }
 }
