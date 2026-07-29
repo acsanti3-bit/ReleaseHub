@@ -18,6 +18,7 @@ export interface Task {
     | "Desenvolvido"
     | "Aguardando Compilação"
     | "Reaberta"
+    | "Resolvidas"
     | "Interrompida"
     | "Rejeitada";
 

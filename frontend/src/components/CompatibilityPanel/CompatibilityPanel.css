@@ -34,7 +34,7 @@
     align-items: center;
     justify-content: center;
 
-    gap: 4px;
+    gap: 5px;
 
     padding: 12px 10px;
 
@@ -48,10 +48,15 @@
 }
 
 
+/*
+    Mantido no tamanho atual,
+    conforme solicitado.
+*/
+
 .compatibility-title strong {
     color: #005aa9;
 
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.1;
 
     font-weight: 600;
@@ -60,10 +65,12 @@
 }
 
 
+/* Quantidade de sistemas */
+
 .compatibility-title small {
     color: #8c969f;
 
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1.1;
 
     font-weight: 400;
@@ -88,16 +95,13 @@
 
 
 /*
-    Os sistemas são distribuídos
-    conforme a quantidade de colunas
-    calculada pelo componente.
-
-    Todas as linhas ficam centralizadas.
+    Todas as linhas ficam
+    centralizadas.
 */
 
 .compatibility-version {
     min-width: 0;
-    min-height: 57px;
+    min-height: 63px;
 
     flex:
         0
@@ -118,9 +122,9 @@
     align-items: center;
     justify-content: center;
 
-    gap: 8px;
+    gap: 9px;
 
-    padding: 8px 9px;
+    padding: 9px 10px;
 
     box-sizing: border-box;
 
@@ -143,8 +147,8 @@
 /* ÍCONE */
 
 .compatibility-icon {
-    width: 18px;
-    height: 18px;
+    width: 21px;
+    height: 21px;
 
     display: flex;
 
@@ -158,8 +162,8 @@
 
 
 .compatibility-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
 
@@ -174,11 +178,13 @@
     align-items: center;
     justify-content: center;
 
-    gap: 3px;
+    gap: 4px;
 
     text-align: center;
 }
 
+
+/* NOME DO SISTEMA */
 
 .compatibility-system-info strong {
     width: 100%;
@@ -186,8 +192,8 @@
 
     color: #005aa9;
 
-    font-size: 10px;
-    line-height: 1.15;
+    font-size: 12px;
+    line-height: 1.2;
 
     font-weight: 600;
 
@@ -200,14 +206,16 @@
 }
 
 
+/* VERSÃO */
+
 .compatibility-system-info small {
     width: 100%;
     max-width: 100%;
 
     color: #45515c;
 
-    font-size: 9px;
-    line-height: 1.1;
+    font-size: 11px;
+    line-height: 1.15;
 
     font-weight: 400;
 
@@ -227,18 +235,16 @@
 }
 
 
-/*
-    O nome permanece azul.
-
-    Somente o ícone e a versão vazia
-    ficam mais discretos.
-*/
-
 .compatibility-version-empty
 .compatibility-icon {
     color: #8fa2b2;
 }
 
+
+/*
+    Nome continua azul mesmo
+    quando não existe versão.
+*/
 
 .compatibility-version-empty
 .compatibility-system-info strong {
@@ -269,7 +275,7 @@
 
     color: #7d8790;
 
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 400;
 
     text-align: center;
@@ -285,12 +291,7 @@
 }
 
 
-/*
-    TELAS INTERMEDIÁRIAS
-
-    Reduz a quantidade de sistemas
-    por linha para preservar a leitura.
-*/
+/* TELAS INTERMEDIÁRIAS */
 
 @media (max-width: 1600px) {
     .compatibility-line {
@@ -306,19 +307,38 @@
 
 
     .compatibility-version {
-        gap: 7px;
+        min-height: 61px;
 
-        padding: 7px 9px;
+        gap: 8px;
+
+        padding: 8px 9px;
+    }
+
+
+    .compatibility-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+
+    .compatibility-icon svg {
+        width: 19px;
+        height: 19px;
     }
 
 
     .compatibility-system-info strong {
-        font-size: 9.5px;
+        font-size: 11.5px;
     }
 
 
     .compatibility-system-info small {
-        font-size: 8.5px;
+        font-size: 10.5px;
+    }
+
+
+    .compatibility-title small {
+        font-size: 10.5px;
     }
 }
 
@@ -339,29 +359,34 @@
 
 
     .compatibility-version {
-        min-height: 55px;
+        min-height: 60px;
     }
 
 
     .compatibility-icon {
-        width: 16px;
-        height: 16px;
+        width: 19px;
+        height: 19px;
     }
 
 
     .compatibility-icon svg {
-        width: 15px;
-        height: 15px;
+        width: 18px;
+        height: 18px;
     }
 
 
     .compatibility-system-info strong {
-        font-size: 9px;
+        font-size: 11px;
     }
 
 
     .compatibility-system-info small {
-        font-size: 8px;
+        font-size: 10px;
+    }
+
+
+    .compatibility-title small {
+        font-size: 10px;
     }
 }
 
@@ -380,7 +405,7 @@
 
 
     .compatibility-title {
-        min-height: 54px;
+        min-height: 56px;
 
         align-items: center;
         justify-content: center;
@@ -407,9 +432,19 @@
 
 
     .compatibility-version {
-        min-height: 58px;
+        min-height: 63px;
 
-        padding: 9px 12px;
+        padding: 10px 12px;
+    }
+
+
+    .compatibility-system-info strong {
+        font-size: 12px;
+    }
+
+
+    .compatibility-system-info small {
+        font-size: 11px;
     }
 }
 

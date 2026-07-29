@@ -141,13 +141,23 @@ function TvProjectCard({
       valor:
         project
           .situacoes
-          .desenvolvido +
+          .desenvolvido,
+
+      cor:
+        "#43A047",
+    },
+
+    {
+      nome:
+        "Aguard. Comp.",
+
+      valor:
         project
           .situacoes
           .aguardandoCompilacao,
 
       cor:
-        "#43A047",
+        "#78909C",
     },
 
     {
@@ -187,6 +197,19 @@ function TvProjectCard({
 
       cor:
         "#E53935",
+    },
+
+    {
+      nome:
+        "Resolvidas",
+
+      valor:
+        project
+          .situacoes
+          .resolvidas,
+
+      cor:
+        "#2E7D32",
     },
 
     {
@@ -233,11 +256,15 @@ function TvProjectCard({
         <div className="tv-card-heading">
 
           <span className="tv-card-project-label">
+
             Projeto
+
           </span>
 
           <h3>
+
             {project.nome}
+
           </h3>
 
         </div>
@@ -250,7 +277,12 @@ function TvProjectCard({
           </small>
 
           <strong>
-            {project.versao || "-"}
+
+            {
+              project.versao ||
+              "-"
+            }
+
           </strong>
 
         </div>
@@ -293,7 +325,9 @@ function TvProjectCard({
                   />
 
                   <span>
+
                     {item.nome}
+
                   </span>
 
                 </div>
@@ -331,7 +365,12 @@ function TvProjectCard({
           </small>
 
           <strong>
-            {project.executavel || "-"}
+
+            {
+              project.executavel ||
+              "-"
+            }
+
           </strong>
 
         </div>
@@ -344,7 +383,12 @@ function TvProjectCard({
           </small>
 
           <strong>
-            {project.prazo || "-"}
+
+            {
+              project.prazo ||
+              "-"
+            }
+
           </strong>
 
         </div>

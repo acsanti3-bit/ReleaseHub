@@ -10,11 +10,14 @@ import {
   buscarAmbientePorIntellicash,
 } from "./ReleaseEnvironmentService";
 
+
 const API_URL =
   "/api/projects";
 
+
 type ChaveVersao =
   keyof ReleaseEnvironment["versoes"];
+
 
 async function requisicao<T>(
   url: string,
@@ -27,10 +30,14 @@ async function requisicao<T>(
       options
     );
 
-  if (!response.ok) {
+
+  if (
+    !response.ok
+  ) {
 
     const texto =
       await response.text();
+
 
     throw new Error(
       texto ||
@@ -39,9 +46,11 @@ async function requisicao<T>(
 
   }
 
+
   return response.json();
 
 }
+
 
 function obterChaveProjeto(
   nome: string
@@ -50,24 +59,36 @@ function obterChaveProjeto(
   const projeto =
     nome
       .toLowerCase()
-      .replace(/\s/g, "");
+      .replace(
+        /\s/g,
+        ""
+      );
+
 
   if (
-    projeto.includes("intellicash") ||
-    projeto.includes("intelicash")
+    projeto.includes(
+      "intellicash"
+    ) ||
+    projeto.includes(
+      "intelicash"
+    )
   ) {
 
     return "intellicash";
 
   }
 
+
   if (
-    projeto.includes("easycash")
+    projeto.includes(
+      "easycash"
+    )
   ) {
 
     return "easycash";
 
   }
+
 
   if (
     projeto.includes(
@@ -79,36 +100,47 @@ function obterChaveProjeto(
 
   }
 
+
   if (
-    projeto.includes("easypdv")
+    projeto.includes(
+      "easypdv"
+    )
   ) {
 
     return "easypdv";
 
   }
 
+
   if (
     projeto.includes(
       "intellistock"
     ) ||
-    projeto.includes("isa")
+    projeto.includes(
+      "isa"
+    )
   ) {
 
     return "intellistock";
 
   }
 
+
   if (
-    projeto.includes("iwb")
+    projeto.includes(
+      "iwb"
+    )
   ) {
 
     return "iwbserver";
 
   }
 
+
   return null;
 
 }
+
 
 async function atualizarProjetoNaApi(
   project: Project
@@ -118,11 +150,14 @@ async function atualizarProjetoNaApi(
     API_URL,
     {
 
-      method: "PUT",
+      method:
+        "PUT",
 
       headers: {
+
         "Content-Type":
           "application/json",
+
       },
 
       body:
@@ -135,14 +170,18 @@ async function atualizarProjetoNaApi(
 
 }
 
+
 export async function listarProjetos():
   Promise<Project[]> {
 
   return requisicao<
     Project[]
-  >(API_URL);
+  >(
+    API_URL
+  );
 
 }
+
 
 export async function editarProjeto(
   project: Project
@@ -153,19 +192,22 @@ export async function editarProjeto(
       project
     );
 
+
   const chave =
     obterChaveProjeto(
       project.nome
     );
 
+
   /*
-    Se o Intellicash mudar de
-    versão, atualizamos todo
-    o ambiente automaticamente.
+    Se o Intellicash mudar de versão,
+    atualizamos todo o ambiente
+    automaticamente.
   */
 
   if (
-    chave === "intellicash" &&
+    chave ===
+      "intellicash" &&
     project.versao
   ) {
 
@@ -175,9 +217,11 @@ export async function editarProjeto(
 
   }
 
+
   return projetoAtualizado;
 
 }
+
 
 export async function adicionarProjeto(
   project: Project
@@ -187,10 +231,12 @@ export async function adicionarProjeto(
     ...project,
   };
 
+
   const chave =
     obterChaveProjeto(
       project.nome
     );
+
 
   /*
     Se estiver adicionando um
@@ -201,19 +247,23 @@ export async function adicionarProjeto(
 
   if (
     chave &&
-    chave !== "intellicash"
+    chave !==
+      "intellicash"
   ) {
 
     const projetos =
       await listarProjetos();
+
 
     const intellicash =
       projetos.find(
         item =>
           obterChaveProjeto(
             item.nome
-          ) === "intellicash"
+          ) ===
+          "intellicash"
       );
+
 
     if (
       intellicash?.versao
@@ -224,7 +274,10 @@ export async function adicionarProjeto(
           intellicash.versao
         );
 
-      if (ambiente) {
+
+      if (
+        ambiente
+      ) {
 
         projetoParaSalvar = {
 
@@ -232,7 +285,9 @@ export async function adicionarProjeto(
 
           versao:
             ambiente
-              .versoes[chave],
+              .versoes[
+                chave
+              ],
 
         };
 
@@ -242,16 +297,20 @@ export async function adicionarProjeto(
 
   }
 
+
   const novoProjeto =
     await requisicao<Project>(
       API_URL,
       {
 
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
+
           "Content-Type":
             "application/json",
+
         },
 
         body:
@@ -262,8 +321,10 @@ export async function adicionarProjeto(
       }
     );
 
+
   if (
-    chave === "intellicash" &&
+    chave ===
+      "intellicash" &&
     novoProjeto.versao
   ) {
 
@@ -273,9 +334,11 @@ export async function adicionarProjeto(
 
   }
 
+
   return novoProjeto;
 
 }
+
 
 export async function excluirProjeto(
   id: number
@@ -284,60 +347,85 @@ export async function excluirProjeto(
   await requisicao(
     `${API_URL}?id=${id}`,
     {
-      method: "DELETE",
+
+      method:
+        "DELETE",
+
     }
   );
 
 }
 
+
 export async function removerProjeto(
   id: number
 ): Promise<void> {
 
-  await excluirProjeto(id);
+  await excluirProjeto(
+    id
+  );
 
 }
+
 
 export function criarProjeto():
   Project {
 
   return {
 
-    id: Date.now(),
+    id:
+      Date.now(),
 
-    nome: "",
+    nome:
+      "",
 
-    versao: "",
+    versao:
+      "",
 
-    executavel: "",
+    executavel:
+      "",
 
-    prazo: "",
+    prazo:
+      "",
 
     situacoes: {
 
-      qualidade: 0,
+      qualidade:
+        0,
 
-      testes: 0,
+      testes:
+        0,
 
-      desenvolvido: 0,
+      desenvolvido:
+        0,
 
-      emProgresso: 0,
+      aguardandoCompilacao:
+        0,
 
-      aguardandoCompilacao: 0,
+      emProgresso:
+        0,
 
-      nova: 0,
+      nova:
+        0,
 
-      reaberta: 0,
+      reaberta:
+        0,
 
-      rejeitada: 0,
+      resolvidas:
+        0,
 
-      interrompida: 0,
+      rejeitada:
+        0,
+
+      interrompida:
+        0,
 
     },
 
   };
 
 }
+
 
 export async function sincronizarProjetosComAmbienteAtual(
   versaoIntellicash?: string
@@ -346,60 +434,80 @@ export async function sincronizarProjetosComAmbienteAtual(
   const projetos =
     await listarProjetos();
 
+
   const intellicash =
     projetos.find(
       project =>
         obterChaveProjeto(
           project.nome
-        ) === "intellicash"
+        ) ===
+        "intellicash"
     );
+
 
   const versao =
     versaoIntellicash ||
     intellicash?.versao;
 
-  if (!versao) {
+
+  if (
+    !versao
+  ) {
 
     return projetos;
 
   }
+
 
   const ambiente =
     await buscarAmbientePorIntellicash(
       versao
     );
 
-  if (!ambiente) {
+
+  if (
+    !ambiente
+  ) {
 
     return projetos;
 
   }
 
+
   const projetosAtualizados =
-    projetos.map(project => {
+    projetos.map(
+      project => {
 
-      const chave =
-        obterChaveProjeto(
-          project.nome
-        );
+        const chave =
+          obterChaveProjeto(
+            project.nome
+          );
 
-      if (!chave) {
 
-        return project;
+        if (
+          !chave
+        ) {
+
+          return project;
+
+        }
+
+
+        return {
+
+          ...project,
+
+          versao:
+            ambiente
+              .versoes[
+                chave
+              ],
+
+        };
 
       }
+    );
 
-      return {
-
-        ...project,
-
-        versao:
-          ambiente
-            .versoes[chave],
-
-      };
-
-    });
 
   const alterados =
     projetosAtualizados.filter(
@@ -412,6 +520,7 @@ export async function sincronizarProjetosComAmbienteAtual(
               projetoAtualizado.id
           );
 
+
         return (
           original &&
           original.versao !==
@@ -420,6 +529,7 @@ export async function sincronizarProjetosComAmbienteAtual(
 
       }
     );
+
 
   await Promise.all(
 
@@ -431,6 +541,7 @@ export async function sincronizarProjetosComAmbienteAtual(
     )
 
   );
+
 
   return projetosAtualizados;
 

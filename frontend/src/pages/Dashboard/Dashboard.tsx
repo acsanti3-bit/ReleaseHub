@@ -56,6 +56,7 @@ function Dashboard() {
   ] =
     useState<Project[]>([]);
 
+
   const [
     ambientes,
     setAmbientes,
@@ -63,6 +64,7 @@ function Dashboard() {
     useState<
       ReleaseEnvironment[]
     >([]);
+
 
   const [
     ambienteSelecionadoId,
@@ -72,11 +74,13 @@ function Dashboard() {
       number | null
     >(null);
 
+
   const [
     carregando,
     setCarregando,
   ] =
     useState(true);
+
 
   const [
     carregandoAmbientes,
@@ -84,11 +88,13 @@ function Dashboard() {
   ] =
     useState(true);
 
+
   const [
     podeEditar,
     setPodeEditar,
   ] =
     useState(false);
+
 
   const [
     projectSelecionado,
@@ -98,17 +104,20 @@ function Dashboard() {
       null
     );
 
+
   const [
     pesquisa,
     setPesquisa,
   ] =
     useState("");
 
+
   const [
     filtro,
     setFiltro,
   ] =
     useState("Todos");
+
 
   const [
     ordenacao,
@@ -123,7 +132,9 @@ function Dashboard() {
 
   useEffect(() => {
 
-    let ativo = true;
+    let ativo =
+      true;
+
 
     async function carregarAmbientes() {
 
@@ -132,16 +143,21 @@ function Dashboard() {
         const lista =
           await listarAmbientes();
 
-        if (!ativo) {
+
+        if (
+          !ativo
+        ) {
 
           return;
 
         }
 
+
         const ordenados =
           ordenarAmbientesPorVersao(
             lista
           );
+
 
         setAmbientes(
           ordenados
@@ -152,6 +168,7 @@ function Dashboard() {
           localStorage.getItem(
             STORAGE_KEY
           );
+
 
         const idSalvo =
           salvo
@@ -188,11 +205,14 @@ function Dashboard() {
           );
 
 
-        if (maisRecente) {
+        if (
+          maisRecente
+        ) {
 
           setAmbienteSelecionadoId(
             maisRecente.id
           );
+
 
           localStorage.setItem(
             STORAGE_KEY,
@@ -212,7 +232,9 @@ function Dashboard() {
 
       } finally {
 
-        if (ativo) {
+        if (
+          ativo
+        ) {
 
           setCarregandoAmbientes(
             false
@@ -230,7 +252,8 @@ function Dashboard() {
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
@@ -243,7 +266,9 @@ function Dashboard() {
 
   useEffect(() => {
 
-    let ativo = true;
+    let ativo =
+      true;
+
 
     async function carregarPermissao() {
 
@@ -252,15 +277,21 @@ function Dashboard() {
         const usuario =
           await buscarSessao();
 
-        if (!ativo) {
+
+        if (
+          !ativo
+        ) {
 
           return;
 
         }
 
+
         setPodeEditar(
-          usuario?.role === "admin" ||
-          usuario?.role === "qualidade"
+          usuario?.role ===
+            "admin" ||
+          usuario?.role ===
+            "qualidade"
         );
 
       } catch (erro) {
@@ -270,7 +301,10 @@ function Dashboard() {
           erro
         );
 
-        if (ativo) {
+
+        if (
+          ativo
+        ) {
 
           setPodeEditar(
             false
@@ -288,7 +322,8 @@ function Dashboard() {
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
@@ -310,10 +345,12 @@ function Dashboard() {
         true
       );
 
+
       const lista =
         await listarProjetosPorAmbiente(
           environmentId
         );
+
 
       setProjects(
         lista
@@ -325,6 +362,7 @@ function Dashboard() {
         "Erro ao carregar projetos da release:",
         erro
       );
+
 
       setProjects(
         []
@@ -344,16 +382,19 @@ function Dashboard() {
   useEffect(() => {
 
     if (
-      ambienteSelecionadoId === null
+      ambienteSelecionadoId ===
+      null
     ) {
 
       setProjects(
         []
       );
 
+
       setCarregando(
         false
       );
+
 
       return;
 
@@ -380,8 +421,7 @@ function Dashboard() {
   /*
     Troca a release.
 
-    IMPORTANTÍSSIMO:
-    filtros da release anterior
+    Os filtros da release anterior
     não devem afetar a nova.
   */
 
@@ -394,33 +434,25 @@ function Dashboard() {
     );
 
 
-    /*
-      Limpamos os filtros para
-      evitar parecer que a nova
-      release está sem projetos.
-    */
-
     setPesquisa(
       ""
     );
 
+
     setFiltro(
       "Todos"
     );
+
 
     setOrdenacao(
       "Nome"
     );
 
 
-    /*
-      Limpa os cards antigos
-      enquanto busca a nova release.
-    */
-
     setProjects(
       []
     );
+
 
     setCarregando(
       true
@@ -460,7 +492,8 @@ function Dashboard() {
 
     if (
       !podeEditar ||
-      ambienteSelecionadoId === null
+      ambienteSelecionadoId ===
+        null
     ) {
 
       return;
@@ -492,6 +525,7 @@ function Dashboard() {
         erro
       );
 
+
       alert(
         "Não foi possível salvar o projeto desta release."
       );
@@ -501,11 +535,18 @@ function Dashboard() {
   }
 
 
+  /*
+    Converte o prazo para ordenação
+    e validação dos projetos atrasados.
+  */
+
   function converterPrazo(
     prazo: string
   ): number {
 
-    if (!prazo) {
+    if (
+      !prazo
+    ) {
 
       return Number.MAX_SAFE_INTEGER;
 
@@ -522,17 +563,21 @@ function Dashboard() {
       );
 
 
-    if (resultado) {
+    if (
+      resultado
+    ) {
 
       const dia =
         Number(
           resultado[1]
         );
 
+
       const mes =
         Number(
           resultado[2]
         );
+
 
       const ano =
         Number(
@@ -549,9 +594,12 @@ function Dashboard() {
 
 
       if (
-        data.getFullYear() !== ano ||
-        data.getMonth() !== mes - 1 ||
-        data.getDate() !== dia
+        data.getFullYear() !==
+          ano ||
+        data.getMonth() !==
+          mes - 1 ||
+        data.getDate() !==
+          dia
       ) {
 
         return Number.MAX_SAFE_INTEGER;
@@ -586,6 +634,10 @@ function Dashboard() {
   }
 
 
+  /*
+    Pesquisa, filtros e ordenação.
+  */
+
   const projetos =
     useMemo(() => {
 
@@ -593,6 +645,10 @@ function Dashboard() {
         ...projects,
       ];
 
+
+      /*
+        Pesquisa pelo nome.
+      */
 
       lista =
         lista.filter(
@@ -606,7 +662,13 @@ function Dashboard() {
         );
 
 
-      switch (filtro) {
+      /*
+        Filtros por situação.
+      */
+
+      switch (
+        filtro
+      ) {
 
         case "Qualidade":
 
@@ -650,6 +712,12 @@ function Dashboard() {
           break;
 
 
+        /*
+          Desenvolvido agora é
+          totalmente independente
+          de Aguardando Compilação.
+        */
+
         case "Desenvolvido":
 
           lista =
@@ -658,11 +726,7 @@ function Dashboard() {
                 project
                   .situacoes
                   .desenvolvido >
-                  0 ||
-                project
-                  .situacoes
-                  .aguardandoCompilacao >
-                  0
+                0
             );
 
           break;
@@ -676,6 +740,24 @@ function Dashboard() {
                 project
                   .situacoes
                   .aguardandoCompilacao >
+                0
+            );
+
+          break;
+
+
+        /*
+          Nova situação.
+        */
+
+        case "Resolvidas":
+
+          lista =
+            lista.filter(
+              project =>
+                project
+                  .situacoes
+                  .resolvidas >
                 0
             );
 
@@ -727,7 +809,13 @@ function Dashboard() {
       }
 
 
-      switch (ordenacao) {
+      /*
+        Ordenação.
+      */
+
+      switch (
+        ordenacao
+      ) {
 
         case "Prazo":
 
@@ -817,6 +905,11 @@ function Dashboard() {
     ]);
 
 
+  /*
+    Distribuição dos cards
+    em duas colunas.
+  */
+
   const colunaEsquerda =
     projetos.filter(
       (
@@ -850,6 +943,7 @@ function Dashboard() {
             <h1>
               IWS ReleaseHub
             </h1>
+
 
             <span>
 
@@ -1019,25 +1113,36 @@ function Dashboard() {
               Todos
             </option>
 
+
             <option>
               Qualidade
             </option>
+
 
             <option>
               Testes
             </option>
 
+
             <option>
               Em Progresso
             </option>
+
 
             <option>
               Desenvolvido
             </option>
 
+
             <option>
               Aguard. Comp.
             </option>
+
+
+            <option>
+              Resolvidas
+            </option>
+
 
             <option>
               Atrasados
@@ -1065,9 +1170,11 @@ function Dashboard() {
               Nome
             </option>
 
+
             <option>
               Prazo
             </option>
+
 
             <option>
               Tarefas
@@ -1125,13 +1232,8 @@ function Dashboard() {
 
           </div>
 
-        ) : projects.length === 0 ? (
-
-          /*
-            Aqui SIM significa que
-            a release realmente não
-            possui projetos.
-          */
+        ) : projects.length ===
+            0 ? (
 
           <div className="dashboard-empty">
 
@@ -1140,6 +1242,7 @@ function Dashboard() {
               Nenhum projeto cadastrado
 
             </h2>
+
 
             <p>
 
@@ -1150,12 +1253,8 @@ function Dashboard() {
 
           </div>
 
-        ) : projetos.length === 0 ? (
-
-          /*
-            Existem projetos, mas
-            pesquisa/filtro não encontrou.
-          */
+        ) : projetos.length ===
+            0 ? (
 
           <div className="dashboard-empty">
 
@@ -1164,6 +1263,7 @@ function Dashboard() {
               Nenhum resultado encontrado
 
             </h2>
+
 
             <p>
 
@@ -1263,5 +1363,6 @@ function Dashboard() {
   );
 
 }
+
 
 export default Dashboard;

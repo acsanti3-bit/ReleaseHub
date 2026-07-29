@@ -2,6 +2,7 @@ import type {
   Project,
 } from "../types/project";
 
+
 export const projects: Project[] = [
 
   {
@@ -24,13 +25,15 @@ export const projects: Project[] = [
 
       desenvolvido: 8,
 
-      emProgresso: 2,
-
       aguardandoCompilacao: 1,
+
+      emProgresso: 2,
 
       nova: 5,
 
       reaberta: 1,
+
+      resolvidas: 0,
 
       rejeitada: 0,
 
@@ -39,6 +42,7 @@ export const projects: Project[] = [
     },
 
   },
+
 
   {
 
@@ -60,13 +64,15 @@ export const projects: Project[] = [
 
       desenvolvido: 6,
 
-      emProgresso: 1,
-
       aguardandoCompilacao: 0,
+
+      emProgresso: 1,
 
       nova: 2,
 
       reaberta: 0,
+
+      resolvidas: 0,
 
       rejeitada: 0,
 
@@ -75,6 +81,7 @@ export const projects: Project[] = [
     },
 
   },
+
 
   {
 
@@ -96,13 +103,15 @@ export const projects: Project[] = [
 
       desenvolvido: 10,
 
-      emProgresso: 0,
-
       aguardandoCompilacao: 0,
+
+      emProgresso: 0,
 
       nova: 0,
 
       reaberta: 0,
+
+      resolvidas: 0,
 
       rejeitada: 0,
 

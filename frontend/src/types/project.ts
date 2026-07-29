@@ -18,13 +18,15 @@ export interface Project {
 
     desenvolvido: number;
 
-    emProgresso: number;
-
     aguardandoCompilacao: number;
+
+    emProgresso: number;
 
     nova: number;
 
     reaberta: number;
+
+    resolvidas: number;
 
     rejeitada: number;
 

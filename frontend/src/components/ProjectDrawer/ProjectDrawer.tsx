@@ -53,6 +53,7 @@ function ProjectDrawer({
       project
     );
 
+
   const [
     ambientes,
     setAmbientes,
@@ -68,21 +69,20 @@ function ProjectDrawer({
     );
 
 
-  /*
-    Mantém o comportamento antigo
-    caso o Drawer seja utilizado
-    fora do Dashboard por release.
-  */
-
   useEffect(() => {
 
-    if (modoRelease) {
+    if (
+      modoRelease
+    ) {
 
       return;
 
     }
 
-    let ativo = true;
+
+    let ativo =
+      true;
+
 
     async function carregarAmbientes() {
 
@@ -91,7 +91,10 @@ function ProjectDrawer({
         const lista =
           await listarAmbientes();
 
-        if (ativo) {
+
+        if (
+          ativo
+        ) {
 
           setAmbientes(
             lista
@@ -110,11 +113,14 @@ function ProjectDrawer({
 
     }
 
+
     void carregarAmbientes();
+
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
@@ -168,12 +174,10 @@ function ProjectDrawer({
   ) {
 
     setForm({
-
       ...form,
 
       [campo]:
         valor,
-
     });
 
   }
@@ -186,18 +190,14 @@ function ProjectDrawer({
   ) {
 
     setForm({
-
       ...form,
 
       situacoes: {
-
         ...form.situacoes,
 
         [campo]:
           valor,
-
       },
-
     });
 
   }
@@ -217,17 +217,20 @@ function ProjectDrawer({
     desenvolvido:
       "Desenvolvido",
 
-    emProgresso:
-      "Em Progresso",
-
     aguardandoCompilacao:
       "Aguardando Compilação",
+
+    emProgresso:
+      "Em Progresso",
 
     nova:
       "Nova",
 
     reaberta:
       "Reaberta",
+
+    resolvidas:
+      "Resolvidas",
 
     rejeitada:
       "Rejeitada",
@@ -236,6 +239,34 @@ function ProjectDrawer({
       "Interrompida",
 
   };
+
+
+  const ordemSituacoes:
+    Array<
+      keyof Project["situacoes"]
+    > = [
+
+      "qualidade",
+
+      "testes",
+
+      "desenvolvido",
+
+      "aguardandoCompilacao",
+
+      "emProgresso",
+
+      "nova",
+
+      "reaberta",
+
+      "resolvidas",
+
+      "rejeitada",
+
+      "interrompida",
+
+    ];
 
 
   return (
@@ -260,21 +291,15 @@ function ProjectDrawer({
               Projeto
             </h2>
 
+
             {environment && (
 
               <span
                 style={{
-                  display:
-                    "block",
-
-                  marginTop:
-                    "4px",
-
-                  color:
-                    "#7A838C",
-
-                  fontSize:
-                    "11px",
+                  display: "block",
+                  marginTop: "4px",
+                  color: "#7A838C",
+                  fontSize: "11px",
                 }}
               >
 
@@ -293,9 +318,7 @@ function ProjectDrawer({
               onClose
             }
           >
-
             ×
-
           </button>
 
         </div>
@@ -307,33 +330,19 @@ function ProjectDrawer({
 
             <div
               style={{
-                marginBottom:
-                  "20px",
-
-                padding:
-                  "12px 14px",
-
-                background:
-                  "#EEF6FD",
-
-                borderLeft:
-                  "4px solid #005AA9",
-
-                borderRadius:
-                  "8px",
+                marginBottom: "20px",
+                padding: "12px 14px",
+                background: "#EEF6FD",
+                borderLeft: "4px solid #005AA9",
+                borderRadius: "8px",
               }}
             >
 
               <strong
                 style={{
-                  display:
-                    "block",
-
-                  color:
-                    "#005AA9",
-
-                  fontSize:
-                    "13px",
+                  display: "block",
+                  color: "#005AA9",
+                  fontSize: "13px",
                 }}
               >
 
@@ -344,17 +353,10 @@ function ProjectDrawer({
 
               <span
                 style={{
-                  display:
-                    "block",
-
-                  marginTop:
-                    "4px",
-
-                  color:
-                    "#65717C",
-
-                  fontSize:
-                    "12px",
+                  display: "block",
+                  marginTop: "4px",
+                  color: "#65717C",
+                  fontSize: "12px",
                 }}
               >
 
@@ -379,6 +381,7 @@ function ProjectDrawer({
             Nome
           </label>
 
+
           <input
             value={
               form.nome
@@ -386,11 +389,12 @@ function ProjectDrawer({
             readOnly={
               modoRelease
             }
-            onChange={e =>
-              alterarCampo(
-                "nome",
-                e.target.value
-              )
+            onChange={
+              event =>
+                alterarCampo(
+                  "nome",
+                  event.target.value
+                )
             }
             title={
               modoRelease
@@ -404,17 +408,10 @@ function ProjectDrawer({
 
             <div
               style={{
-                marginTop:
-                  "6px",
-
-                marginBottom:
-                  "12px",
-
-                color:
-                  "#7A838C",
-
-                fontSize:
-                  "11px",
+                marginTop: "6px",
+                marginBottom: "12px",
+                color: "#7A838C",
+                fontSize: "11px",
               }}
             >
 
@@ -446,11 +443,12 @@ function ProjectDrawer({
               value={
                 form.versao
               }
-              onChange={e =>
-                alterarCampo(
-                  "versao",
-                  e.target.value
-                )
+              onChange={
+                event =>
+                  alterarCampo(
+                    "versao",
+                    event.target.value
+                  )
               }
             >
 
@@ -483,9 +481,7 @@ function ProjectDrawer({
 
                     {" — "}
 
-                    {
-                      ambiente.nome
-                    }
+                    {ambiente.nome}
 
                   </option>
 
@@ -503,11 +499,12 @@ function ProjectDrawer({
               readOnly={
                 isProjetoVinculado
               }
-              onChange={e =>
-                alterarCampo(
-                  "versao",
-                  e.target.value
-                )
+              onChange={
+                event =>
+                  alterarCampo(
+                    "versao",
+                    event.target.value
+                  )
               }
               title={
                 isProjetoVinculado
@@ -523,17 +520,10 @@ function ProjectDrawer({
 
             <div
               style={{
-                marginTop:
-                  "6px",
-
-                marginBottom:
-                  "12px",
-
-                color:
-                  "#005AA9",
-
-                fontSize:
-                  "12px",
+                marginTop: "6px",
+                marginBottom: "12px",
+                color: "#005AA9",
+                fontSize: "12px",
               }}
             >
 
@@ -545,75 +535,22 @@ function ProjectDrawer({
           )}
 
 
-          {!modoRelease &&
-            isIntellicash && (
-
-            <div
-              style={{
-                marginTop:
-                  "6px",
-
-                marginBottom:
-                  "12px",
-
-                color:
-                  "#005AA9",
-
-                fontSize:
-                  "12px",
-              }}
-            >
-
-              Ao selecionar uma versão,
-              os demais projetos serão
-              atualizados automaticamente.
-
-            </div>
-
-          )}
-
-
-          {!modoRelease &&
-            isProjetoVinculado && (
-
-            <div
-              style={{
-                marginTop:
-                  "6px",
-
-                marginBottom:
-                  "12px",
-
-                color:
-                  "#7A838C",
-
-                fontSize:
-                  "12px",
-              }}
-            >
-
-              Versão definida automaticamente
-              pelo Ambiente da Release.
-
-            </div>
-
-          )}
-
-
           <label>
             Executável
           </label>
+
 
           <input
             value={
               form.executavel
             }
             placeholder="dd/mm/aaaa"
-            onChange={e =>
-              alterarCampo(
-                "executavel",
-                e.target.value
-              )
+            onChange={
+              event =>
+                alterarCampo(
+                  "executavel",
+                  event.target.value
+                )
             }
           />
 
@@ -622,16 +559,18 @@ function ProjectDrawer({
             Prazo
           </label>
 
+
           <input
             value={
               form.prazo
             }
             placeholder="dd/mm/aaaa"
-            onChange={e =>
-              alterarCampo(
-                "prazo",
-                e.target.value
-              )
+            onChange={
+              event =>
+                alterarCampo(
+                  "prazo",
+                  event.target.value
+                )
             }
           />
 
@@ -641,15 +580,8 @@ function ProjectDrawer({
           </h3>
 
 
-          {Object.entries(
-            form.situacoes
-          ).map(
-            (
-              [
-                campo,
-                valor,
-              ]
-            ) => (
+          {ordemSituacoes.map(
+            campo => (
 
               <div
                 key={
@@ -662,7 +594,7 @@ function ProjectDrawer({
 
                   {
                     nomesSituacoes[
-                      campo as keyof Project["situacoes"]
+                      campo
                     ]
                   }
 
@@ -673,18 +605,24 @@ function ProjectDrawer({
                   type="number"
                   min={0}
                   value={
-                    valor
+                    form
+                      .situacoes[
+                        campo
+                      ] ?? 0
                   }
-                  onChange={e =>
-                    alterarSituacao(
-                      campo as keyof Project["situacoes"],
-                      Math.max(
-                        0,
-                        Number(
-                          e.target.value
+                  onChange={
+                    event =>
+                      alterarSituacao(
+                        campo,
+                        Math.max(
+                          0,
+                          Number(
+                            event
+                              .target
+                              .value
+                          )
                         )
                       )
-                    )
                   }
                 />
 
@@ -717,5 +655,6 @@ function ProjectDrawer({
   );
 
 }
+
 
 export default ProjectDrawer;

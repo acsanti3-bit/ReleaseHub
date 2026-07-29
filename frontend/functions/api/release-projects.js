@@ -6,55 +6,84 @@ function numero(valor) {
     : 0;
 }
 
+
 function transformarProjeto(row) {
   return {
     id: row.project_id,
 
     nome: row.nome,
 
-    versao: row.versao ?? "",
+    versao:
+      row.versao ?? "",
 
-    executavel: row.executavel ?? "",
+    executavel:
+      row.executavel ?? "",
 
-    prazo: row.prazo ?? "",
+    prazo:
+      row.prazo ?? "",
 
     situacoes: {
+
       qualidade:
-        numero(row.qualidade),
+        numero(
+          row.qualidade
+        ),
 
       testes:
-        numero(row.testes),
+        numero(
+          row.testes
+        ),
 
       desenvolvido:
-        numero(row.desenvolvido),
-
-      emProgresso:
-        numero(row.em_progresso),
+        numero(
+          row.desenvolvido
+        ),
 
       aguardandoCompilacao:
         numero(
           row.aguardando_compilacao
         ),
 
+      emProgresso:
+        numero(
+          row.em_progresso
+        ),
+
       nova:
-        numero(row.nova),
+        numero(
+          row.nova
+        ),
 
       reaberta:
-        numero(row.reaberta),
+        numero(
+          row.reaberta
+        ),
+
+      resolvidas:
+        numero(
+          row.resolvidas
+        ),
 
       rejeitada:
-        numero(row.rejeitada),
+        numero(
+          row.rejeitada
+        ),
 
       interrompida:
-        numero(row.interrompida),
+        numero(
+          row.interrompida
+        ),
+
     },
   };
 }
+
 
 function respostaErro(
   mensagem,
   status = 500
 ) {
+
   return Response.json(
     {
       erro: mensagem,
@@ -63,6 +92,7 @@ function respostaErro(
       status,
     }
   );
+
 }
 
 
@@ -75,11 +105,14 @@ function respostaErro(
 export async function onRequestGet(
   context
 ) {
+
   try {
+
     const url =
       new URL(
         context.request.url
       );
+
 
     const environmentId =
       Number(
@@ -88,20 +121,29 @@ export async function onRequestGet(
         )
       );
 
-    if (!environmentId) {
+
+    if (
+      !environmentId
+    ) {
+
       return respostaErro(
         "O ambiente da release é obrigatório.",
         400
       );
+
     }
+
 
     const ambiente =
       await context.env.DB
         .prepare(
           `
             SELECT id
+
             FROM release_environments
+
             WHERE id = ?
+
             LIMIT 1
           `
         )
@@ -110,12 +152,18 @@ export async function onRequestGet(
         )
         .first();
 
-    if (!ambiente) {
+
+    if (
+      !ambiente
+    ) {
+
       return respostaErro(
         "Ambiente da release não encontrado.",
         404
       );
+
     }
+
 
     const resultado =
       await context.env.DB
@@ -132,10 +180,11 @@ export async function onRequestGet(
               rp.qualidade,
               rp.testes,
               rp.desenvolvido,
-              rp.em_progresso,
               rp.aguardando_compilacao,
+              rp.em_progresso,
               rp.nova,
               rp.reaberta,
+              rp.resolvidas,
               rp.rejeitada,
               rp.interrompida
 
@@ -154,24 +203,31 @@ export async function onRequestGet(
         )
         .all();
 
+
     const projetos =
       resultado.results.map(
         transformarProjeto
       );
 
+
     return Response.json(
       projetos
     );
+
   } catch (erro) {
+
     console.error(
       "Erro ao listar projetos da release:",
       erro
     );
 
+
     return respostaErro(
       "Não foi possível carregar os projetos da release."
     );
+
   }
+
 }
 
 
@@ -185,34 +241,50 @@ export async function onRequestGet(
 export async function onRequestPut(
   context
 ) {
+
   try {
+
     const body =
       await context.request.json();
+
 
     const environmentId =
       Number(
         body.environmentId
       );
 
+
     const project =
       body.project;
 
-    if (!environmentId) {
+
+    if (
+      !environmentId
+    ) {
+
       return respostaErro(
         "O ambiente da release é obrigatório.",
         400
       );
+
     }
 
-    if (!project?.id) {
+
+    if (
+      !project?.id
+    ) {
+
       return respostaErro(
         "O projeto é obrigatório.",
         400
       );
+
     }
+
 
     const situacoes =
       project.situacoes ?? {};
+
 
     await context.env.DB
       .prepare(
@@ -226,10 +298,11 @@ export async function onRequestPut(
             qualidade,
             testes,
             desenvolvido,
-            em_progresso,
             aguardando_compilacao,
+            em_progresso,
             nova,
             reaberta,
+            resolvidas,
             rejeitada,
             interrompida
           )
@@ -237,7 +310,7 @@ export async function onRequestPut(
           VALUES (
             ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?
+            ?, ?, ?, ?, ?
           )
 
           ON CONFLICT(
@@ -246,6 +319,7 @@ export async function onRequestPut(
           )
 
           DO UPDATE SET
+
             versao =
               excluded.versao,
 
@@ -264,17 +338,20 @@ export async function onRequestPut(
             desenvolvido =
               excluded.desenvolvido,
 
-            em_progresso =
-              excluded.em_progresso,
-
             aguardando_compilacao =
               excluded.aguardando_compilacao,
+
+            em_progresso =
+              excluded.em_progresso,
 
             nova =
               excluded.nova,
 
             reaberta =
               excluded.reaberta,
+
+            resolvidas =
+              excluded.resolvidas,
 
             rejeitada =
               excluded.rejeitada,
@@ -310,11 +387,11 @@ export async function onRequestPut(
         ),
 
         numero(
-          situacoes.emProgresso
+          situacoes.aguardandoCompilacao
         ),
 
         numero(
-          situacoes.aguardandoCompilacao
+          situacoes.emProgresso
         ),
 
         numero(
@@ -323,6 +400,10 @@ export async function onRequestPut(
 
         numero(
           situacoes.reaberta
+        ),
+
+        numero(
+          situacoes.resolvidas
         ),
 
         numero(
@@ -335,17 +416,23 @@ export async function onRequestPut(
       )
       .run();
 
+
     return Response.json(
       project
     );
+
   } catch (erro) {
+
     console.error(
       "Erro ao salvar projeto da release:",
       erro
     );
 
+
     return respostaErro(
       "Não foi possível salvar o projeto da release."
     );
+
   }
+
 }
