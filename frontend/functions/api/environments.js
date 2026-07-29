@@ -1,8 +1,86 @@
+const SISTEMAS_FIXOS = [
+  {
+    chave: "intellicash",
+    nome: "Intellicash",
+    ordem: 1,
+  },
+  {
+    chave: "easycash",
+    nome: "EasyCash",
+    ordem: 2,
+  },
+  {
+    chave: "easycheckout",
+    nome: "EasyCheckout",
+    ordem: 3,
+  },
+  {
+    chave: "easypdv",
+    nome: "EasyPDV",
+    ordem: 4,
+  },
+  {
+    chave: "intellistock",
+    nome: "IntelliStock",
+    ordem: 5,
+  },
+  {
+    chave: "iwbserver",
+    nome: "IWB Server",
+    ordem: 6,
+  },
+  {
+    chave: "enterpriseserver",
+    nome: "Enterprise Server",
+    ordem: 7,
+  },
+  {
+    chave: "nfedestinadas",
+    nome: "NFeDestinadas",
+    ordem: 8,
+  },
+  {
+    chave: "intellifood",
+    nome: "IntelliFood",
+    ordem: 9,
+  },
+  {
+    chave: "pcp",
+    nome: "PCP",
+    ordem: 10,
+  },
+  {
+    chave: "gerenciadordepromocoes",
+    nome: "Gerenciador de promoções",
+    ordem: 11,
+  },
+  {
+    chave: "sincronizadormatrizxfilial",
+    nome: "Sincronizador Matriz X Filial",
+    ordem: 12,
+  },
+  {
+    chave: "sincronizadorlabfiscal",
+    nome: "Sincronizador Lab Fiscal",
+    ordem: 13,
+  },
+  {
+    chave: "sincronizadorecommerce",
+    nome: "Sincronizador E-Commerce",
+    ordem: 14,
+  },
+  {
+    chave: "bi",
+    nome: "BI",
+    ordem: 15,
+  },
+];
+
+
 function respostaErro(
   mensagem,
   status = 500
 ) {
-
   return Response.json(
     {
       erro: mensagem,
@@ -11,22 +89,11 @@ function respostaErro(
       status,
     }
   );
-
 }
 
 
-/*
-  Normaliza textos para facilitar
-  comparação entre nomes de projetos.
-*/
-
-function normalizarTexto(
-  valor
-) {
-
-  return String(
-    valor ?? ""
-  )
+function normalizarTexto(valor) {
+  return String(valor ?? "")
     .normalize("NFD")
     .replace(
       /[\u0300-\u036f]/g,
@@ -37,316 +104,134 @@ function normalizarTexto(
       /[^a-z0-9]/g,
       ""
     );
-
 }
 
 
-/*
-  Gera a chave interna de
-  um novo sistema.
-
-  Exemplo:
-  "BI" -> "bi"
-  "Intelli Food" -> "intellifood"
-*/
-
-function criarChave(
-  nome
+function obterVersaoLegada(
+  versoes,
+  chave
 ) {
+  const mapa = {
+    intellicash:
+      versoes?.intellicash ?? "",
 
-  return normalizarTexto(
-    nome
-  );
+    easycash:
+      versoes?.easycash ?? "",
 
+    easycheckout:
+      versoes?.easycheckout ?? "",
+
+    easypdv:
+      versoes?.easypdv ?? "",
+
+    intellistock:
+      versoes?.intellistock ?? "",
+
+    iwbserver:
+      versoes?.iwbserver ?? "",
+  };
+
+  return mapa[chave] ?? "";
 }
 
 
 /*
-  Sistemas antigos.
+  Sempre retorna exatamente
+  os 15 sistemas do catálogo.
 
-  Esse fallback garante que
-  ambientes antigos continuem
-  funcionando normalmente.
+  As versões já cadastradas
+  são preservadas.
 */
-
-function obterSistemasPadrao(
+function normalizarSistemas(
+  sistemas = [],
   versoes = {}
 ) {
+  const mapa =
+    new Map();
 
-  return [
-
-    {
-      chave:
-        "intellicash",
-
-      nome:
-        "Intellicash",
-
-      versao:
-        versoes.intellicash ?? "",
-
-      ordem: 1,
-    },
-
-    {
-      chave:
-        "easycash",
-
-      nome:
-        "EasyCash",
-
-      versao:
-        versoes.easycash ?? "",
-
-      ordem: 2,
-    },
-
-    {
-      chave:
-        "easycheckout",
-
-      nome:
-        "EasyCheckout",
-
-      versao:
-        versoes.easycheckout ?? "",
-
-      ordem: 3,
-    },
-
-    {
-      chave:
-        "easypdv",
-
-      nome:
-        "EasyPDV",
-
-      versao:
-        versoes.easypdv ?? "",
-
-      ordem: 4,
-    },
-
-    {
-      chave:
-        "intellistock",
-
-      nome:
-        "IntelliStock",
-
-      versao:
-        versoes.intellistock ?? "",
-
-      ordem: 5,
-    },
-
-    {
-      chave:
-        "iwbserver",
-
-      nome:
-        "IWB Server",
-
-      versao:
-        versoes.iwbserver ?? "",
-
-      ordem: 6,
-    },
-
-  ];
-
-}
-
-
-/*
-  Normaliza os sistemas recebidos
-  pelo frontend.
-
-  Sistemas novos chegam inicialmente
-  com chave "novo-123456...".
-
-  Aqui transformamos, por exemplo:
-
-  novo-123456
-  nome: BI
-
-  em:
-
-  chave: bi
-*/
-
-function normalizarSistemas(
-  sistemas,
-  versoes
-) {
-
-  const origem =
-    Array.isArray(
-      sistemas
-    ) &&
-    sistemas.length > 0
-
-      ? sistemas
-
-      : obterSistemasPadrao(
-          versoes
+  if (Array.isArray(sistemas)) {
+    for (const sistema of sistemas) {
+      const chave =
+        normalizarTexto(
+          sistema.chave
         );
 
-
-  const chavesUsadas =
-    new Set();
-
-
-  return origem
-    .map(
-      (
-        sistema,
-        index
-      ) => {
-
-        const nome =
-          String(
-            sistema.nome ?? ""
-          ).trim();
-
-
-        let chave =
-          String(
-            sistema.chave ?? ""
-          ).trim();
-
-
-        if (
-          !chave ||
-          chave.startsWith(
-            "novo-"
-          )
-        ) {
-
-          chave =
-            criarChave(
-              nome
-            );
-
-        }
-
-
-        if (
-          !nome ||
-          !chave
-        ) {
-
-          return null;
-
-        }
-
-
-        /*
-          Evita duas chaves iguais
-          dentro do mesmo ambiente.
-        */
-
-        let chaveFinal =
-          chave;
-
-        let contador =
-          2;
-
-
-        while (
-          chavesUsadas.has(
-            chaveFinal
-          )
-        ) {
-
-          chaveFinal =
-            `${chave}${contador}`;
-
-          contador++;
-
-        }
-
-
-        chavesUsadas.add(
-          chaveFinal
+      const nome =
+        normalizarTexto(
+          sistema.nome
         );
 
-
-        return {
-
-          chave:
-            chaveFinal,
-
-          nome,
-
-          versao:
-            String(
-              sistema.versao ?? ""
-            ).trim(),
-
-          ordem:
-            Number(
-              sistema.ordem
-            ) ||
-            index + 1,
-
-        };
-
+      if (chave) {
+        mapa.set(
+          chave,
+          sistema
+        );
       }
-    )
-    .filter(Boolean);
 
+      if (nome) {
+        mapa.set(
+          nome,
+          sistema
+        );
+      }
+    }
+  }
+
+  return SISTEMAS_FIXOS.map(
+    sistemaCatalogo => {
+      const encontrado =
+        mapa.get(
+          normalizarTexto(
+            sistemaCatalogo.chave
+          )
+        ) ??
+        mapa.get(
+          normalizarTexto(
+            sistemaCatalogo.nome
+          )
+        );
+
+      return {
+        ...sistemaCatalogo,
+
+        versao:
+          String(
+            encontrado?.versao ??
+            obterVersaoLegada(
+              versoes,
+              sistemaCatalogo.chave
+            ) ??
+            ""
+          ).trim(),
+      };
+    }
+  );
 }
 
-
-/*
-  Obtém a versão de um sistema
-  dentro da lista dinâmica.
-*/
 
 function obterVersaoSistema(
   sistemas,
   chave
 ) {
-
   return (
     sistemas.find(
       sistema =>
-        sistema.chave ===
-        chave
+        sistema.chave === chave
     )?.versao ??
     ""
   );
-
 }
 
-
-/*
-  Converte o registro do banco
-  para o formato utilizado
-  pelo frontend.
-*/
 
 function transformarAmbiente(
   row,
   sistemas
 ) {
-
   return {
-
-    id:
-      row.id,
-
-    nome:
-      row.nome,
-
-    /*
-      Estrutura antiga mantida
-      por compatibilidade.
-    */
+    id: row.id,
+    nome: row.nome,
 
     versoes: {
-
       intellicash:
         row.intellicash ?? "",
 
@@ -364,30 +249,16 @@ function transformarAmbiente(
 
       iwbserver:
         row.iwbserver ?? "",
-
     },
 
-
-    /*
-      Estrutura nova e dinâmica.
-    */
-
     sistemas,
-
   };
-
 }
 
-
-/*
-  Busca todos os sistemas
-  cadastrados por ambiente.
-*/
 
 async function listarSistemas(
   context
 ) {
-
   const resultado =
     await context.env.DB
       .prepare(
@@ -409,98 +280,53 @@ async function listarSistemas(
       )
       .all();
 
-
   const mapa =
     new Map();
 
-
-  for (
-    const row of
-    resultado.results
-  ) {
-
+  for (const row of resultado.results) {
     if (
       !mapa.has(
         row.environment_id
       )
     ) {
-
       mapa.set(
         row.environment_id,
         []
       );
-
     }
 
-
     mapa
-      .get(
-        row.environment_id
-      )
-      .push(
-        {
-
-          chave:
-            row.chave,
-
-          nome:
-            row.nome,
-
-          versao:
-            row.versao ?? "",
-
-          ordem:
-            Number(
-              row.ordem
-            ) || 0,
-
-        }
-      );
-
+      .get(row.environment_id)
+      .push({
+        chave: row.chave,
+        nome: row.nome,
+        versao:
+          row.versao ?? "",
+        ordem:
+          Number(row.ordem) || 0,
+      });
   }
 
-
   return mapa;
-
 }
 
-
-/*
-  Salva os sistemas de
-  um ambiente.
-
-  Primeiro removemos a configuração
-  anterior daquele ambiente.
-
-  Depois gravamos exatamente
-  a configuração atual do Drawer.
-*/
 
 async function salvarSistemas(
   context,
   environmentId,
   sistemas
 ) {
-
   await context.env.DB
     .prepare(
       `
         DELETE FROM release_environment_versions
-
         WHERE environment_id = ?
       `
     )
-    .bind(
-      environmentId
-    )
+    .bind(environmentId)
     .run();
 
-
-  for (
-    const sistema of
-    sistemas
-  ) {
-
+  for (const sistema of sistemas) {
     await context.env.DB
       .prepare(
         `
@@ -511,10 +337,7 @@ async function salvarSistemas(
             versao,
             ordem
           )
-
-          VALUES (
-            ?, ?, ?, ?, ?
-          )
+          VALUES (?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -525,139 +348,71 @@ async function salvarSistemas(
         sistema.ordem
       )
       .run();
-
   }
-
 }
 
-
-/*
-  Descobre qual versão do ambiente
-  pertence a determinado projeto.
-*/
 
 function obterVersaoProjeto(
   nome,
   sistemas
 ) {
-
   const projeto =
-    normalizarTexto(
-      nome
-    );
-
-
-  /*
-    Projetos já conhecidos.
-  */
+    normalizarTexto(nome);
 
   const conhecidos = [
-
     {
       termos: [
         "intellicash",
         "intelicash",
       ],
-
-      chave:
-        "intellicash",
+      chave: "intellicash",
     },
-
     {
-      termos: [
-        "easycash",
-      ],
-
-      chave:
-        "easycash",
+      termos: ["easycash"],
+      chave: "easycash",
     },
-
     {
-      termos: [
-        "easycheckout",
-      ],
-
-      chave:
-        "easycheckout",
+      termos: ["easycheckout"],
+      chave: "easycheckout",
     },
-
     {
-      termos: [
-        "easypdv",
-      ],
-
-      chave:
-        "easypdv",
+      termos: ["easypdv"],
+      chave: "easypdv",
     },
-
     {
       termos: [
         "intellistock",
         "isa",
       ],
-
-      chave:
-        "intellistock",
+      chave: "intellistock",
     },
-
     {
       termos: [
         "iwbserver",
         "iwb",
       ],
-
-      chave:
-        "iwbserver",
+      chave: "iwbserver",
     },
-
   ];
 
-
-  for (
-    const conhecido of
-    conhecidos
-  ) {
-
+  for (const conhecido of conhecidos) {
     const encontrou =
       conhecido.termos.some(
         termo =>
-          projeto.includes(
-            termo
-          )
+          projeto.includes(termo)
       );
 
-
-    if (
-      encontrou
-    ) {
-
+    if (encontrou) {
       return obterVersaoSistema(
         sistemas,
         conhecido.chave
       );
-
     }
-
   }
-
-
-  /*
-    Sistemas futuros.
-
-    Exemplo:
-    BI
-    DW
-    Enterprise
-    IntelliFood
-
-    Tentamos associar automaticamente
-    utilizando nome ou chave.
-  */
 
   const encontrado =
     sistemas.find(
       sistema => {
-
         const chave =
           normalizarTexto(
             sistema.chave
@@ -668,77 +423,43 @@ function obterVersaoProjeto(
             sistema.nome
           );
 
-
         if (
           !chave ||
           !nomeSistema
         ) {
-
           return false;
-
         }
 
-
-        /*
-          Para nomes muito pequenos
-          como BI e DW, exigimos
-          igualdade para não gerar
-          associações incorretas.
-        */
-
         if (
-          chave.length <= 2 ||
-          nomeSistema.length <= 2
+          chave.length <= 3 ||
+          nomeSistema.length <= 3
         ) {
-
           return (
             projeto === chave ||
             projeto === nomeSistema
           );
-
         }
-
 
         return (
           projeto === chave ||
           projeto === nomeSistema ||
-          projeto.includes(
-            chave
-          ) ||
+          projeto.includes(chave) ||
           projeto.includes(
             nomeSistema
           )
         );
-
       }
     );
 
-
-  return (
-    encontrado?.versao ??
-    ""
-  );
-
+  return encontrado?.versao ?? "";
 }
 
-
-/*
-  Sincroniza somente a versão
-  dos projetos existentes
-  dentro da release.
-
-  NÃO altera:
-  - tarefas
-  - prazo
-  - executável
-*/
 
 async function sincronizarProjetos(
   context,
   environmentId,
   sistemas
 ) {
-
   const resultado =
     await context.env.DB
       .prepare(
@@ -754,18 +475,15 @@ async function sincronizarProjetos(
       )
       .all();
 
-
   for (
     const projeto of
     resultado.results
   ) {
-
     const versao =
       obterVersaoProjeto(
         projeto.nome,
         sistemas
       );
-
 
     await context.env.DB
       .prepare(
@@ -775,23 +493,15 @@ async function sincronizarProjetos(
             project_id,
             versao
           )
-
-          VALUES (
-            ?, ?, ?
-          )
+          VALUES (?, ?, ?)
 
           ON CONFLICT (
             environment_id,
             project_id
           )
-
           DO UPDATE SET
-
-            versao =
-              excluded.versao,
-
-            updated_at =
-              CURRENT_TIMESTAMP
+            versao = excluded.versao,
+            updated_at = CURRENT_TIMESTAMP
         `
       )
       .bind(
@@ -800,22 +510,69 @@ async function sincronizarProjetos(
         versao
       )
       .run();
-
   }
+}
 
+
+function criarRespostaAmbiente(
+  id,
+  nome,
+  sistemas
+) {
+  return {
+    id,
+    nome,
+
+    versoes: {
+      intellicash:
+        obterVersaoSistema(
+          sistemas,
+          "intellicash"
+        ),
+
+      easycash:
+        obterVersaoSistema(
+          sistemas,
+          "easycash"
+        ),
+
+      easycheckout:
+        obterVersaoSistema(
+          sistemas,
+          "easycheckout"
+        ),
+
+      easypdv:
+        obterVersaoSistema(
+          sistemas,
+          "easypdv"
+        ),
+
+      intellistock:
+        obterVersaoSistema(
+          sistemas,
+          "intellistock"
+        ),
+
+      iwbserver:
+        obterVersaoSistema(
+          sistemas,
+          "iwbserver"
+        ),
+    },
+
+    sistemas,
+  };
 }
 
 
 /*
   GET /api/environments
 */
-
 export async function onRequestGet(
   context
 ) {
-
   try {
-
     const resultado =
       await context.env.DB
         .prepare(
@@ -837,81 +594,69 @@ export async function onRequestGet(
         )
         .all();
 
-
     const sistemasPorAmbiente =
       await listarSistemas(
         context
       );
 
-
     const ambientes =
       resultado.results.map(
         row => {
-
-          const sistemas =
+          const sistemasSalvos =
             sistemasPorAmbiente.get(
               row.id
-            ) ??
-            obterSistemasPadrao(
+            ) ?? [];
+
+          /*
+            Mesmo que o ambiente antigo
+            possua apenas seis registros,
+            a resposta já conterá os 15.
+          */
+          const sistemas =
+            normalizarSistemas(
+              sistemasSalvos,
               row
             );
-
 
           return transformarAmbiente(
             row,
             sistemas
           );
-
         }
       );
-
 
     return Response.json(
       ambientes
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao listar ambientes:",
       erro
     );
 
-
     return respostaErro(
       "Não foi possível listar os ambientes."
     );
-
   }
-
 }
 
 
 /*
   POST /api/environments
 */
-
 export async function onRequestPost(
   context
 ) {
-
   try {
-
     const body =
       await context.request.json();
 
-
-    if (
-      !body.nome?.trim()
-    ) {
-
+    if (!body.nome?.trim()) {
       return respostaErro(
         "O nome do ambiente é obrigatório.",
         400
       );
-
     }
-
 
     const sistemas =
       normalizarSistemas(
@@ -919,30 +664,21 @@ export async function onRequestPost(
         body.versoes
       );
 
-
     const intellicash =
       obterVersaoSistema(
         sistemas,
         "intellicash"
       );
 
-
-    if (
-      !intellicash
-    ) {
-
+    if (!intellicash) {
       return respostaErro(
         "A versão do Intellicash é obrigatória.",
         400
       );
-
     }
 
-
     const id =
-      body.id ??
-      Date.now();
-
+      body.id ?? Date.now();
 
     await context.env.DB
       .prepare(
@@ -957,39 +693,29 @@ export async function onRequestPost(
             intellistock,
             iwbserver
           )
-
-          VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?
-          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
         id,
-
         body.nome.trim(),
-
         intellicash,
-
         obterVersaoSistema(
           sistemas,
           "easycash"
         ),
-
         obterVersaoSistema(
           sistemas,
           "easycheckout"
         ),
-
         obterVersaoSistema(
           sistemas,
           "easypdv"
         ),
-
         obterVersaoSistema(
           sistemas,
           "intellistock"
         ),
-
         obterVersaoSistema(
           sistemas,
           "iwbserver"
@@ -997,13 +723,11 @@ export async function onRequestPost(
       )
       .run();
 
-
     await salvarSistemas(
       context,
       id,
       sistemas
     );
-
 
     await sincronizarProjetos(
       context,
@@ -1011,113 +735,52 @@ export async function onRequestPost(
       sistemas
     );
 
-
     return Response.json(
-      {
-
+      criarRespostaAmbiente(
         id,
-
-        nome:
-          body.nome.trim(),
-
-        versoes: {
-
-          intellicash,
-
-          easycash:
-            obterVersaoSistema(
-              sistemas,
-              "easycash"
-            ),
-
-          easycheckout:
-            obterVersaoSistema(
-              sistemas,
-              "easycheckout"
-            ),
-
-          easypdv:
-            obterVersaoSistema(
-              sistemas,
-              "easypdv"
-            ),
-
-          intellistock:
-            obterVersaoSistema(
-              sistemas,
-              "intellistock"
-            ),
-
-          iwbserver:
-            obterVersaoSistema(
-              sistemas,
-              "iwbserver"
-            ),
-
-        },
-
-        sistemas,
-
-      },
+        body.nome.trim(),
+        sistemas
+      ),
       {
         status: 201,
       }
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao criar ambiente:",
       erro
     );
 
-
     return respostaErro(
       "Não foi possível criar o ambiente."
     );
-
   }
-
 }
 
 
 /*
   PUT /api/environments
 */
-
 export async function onRequestPut(
   context
 ) {
-
   try {
-
     const body =
       await context.request.json();
 
-
-    if (
-      !body.id
-    ) {
-
+    if (!body.id) {
       return respostaErro(
         "O ID do ambiente é obrigatório.",
         400
       );
-
     }
 
-
-    if (
-      !body.nome?.trim()
-    ) {
-
+    if (!body.nome?.trim()) {
       return respostaErro(
         "O nome do ambiente é obrigatório.",
         400
       );
-
     }
-
 
     const sistemas =
       normalizarSistemas(
@@ -1125,31 +788,23 @@ export async function onRequestPut(
         body.versoes
       );
 
-
     const intellicash =
       obterVersaoSistema(
         sistemas,
         "intellicash"
       );
 
-
-    if (
-      !intellicash
-    ) {
-
+    if (!intellicash) {
       return respostaErro(
         "A versão do Intellicash é obrigatória.",
         400
       );
-
     }
-
 
     await context.env.DB
       .prepare(
         `
           UPDATE release_environments
-
           SET
             nome = ?,
             intellicash = ?,
@@ -1158,51 +813,35 @@ export async function onRequestPut(
             easypdv = ?,
             intellistock = ?,
             iwbserver = ?
-
           WHERE id = ?
         `
       )
       .bind(
         body.nome.trim(),
-
         intellicash,
-
         obterVersaoSistema(
           sistemas,
           "easycash"
         ),
-
         obterVersaoSistema(
           sistemas,
           "easycheckout"
         ),
-
         obterVersaoSistema(
           sistemas,
           "easypdv"
         ),
-
         obterVersaoSistema(
           sistemas,
           "intellistock"
         ),
-
         obterVersaoSistema(
           sistemas,
           "iwbserver"
         ),
-
         body.id
       )
       .run();
-
-
-    /*
-      AQUI estava faltando no seu arquivo.
-
-      Agora TODOS os sistemas
-      são persistidos no D1.
-    */
 
     await salvarSistemas(
       context,
@@ -1210,101 +849,43 @@ export async function onRequestPut(
       sistemas
     );
 
-
-    /*
-      Depois sincronizamos as versões
-      dos projetos da release.
-    */
-
     await sincronizarProjetos(
       context,
       body.id,
       sistemas
     );
 
-
     return Response.json(
-      {
-
-        id:
-          body.id,
-
-        nome:
-          body.nome.trim(),
-
-        versoes: {
-
-          intellicash,
-
-          easycash:
-            obterVersaoSistema(
-              sistemas,
-              "easycash"
-            ),
-
-          easycheckout:
-            obterVersaoSistema(
-              sistemas,
-              "easycheckout"
-            ),
-
-          easypdv:
-            obterVersaoSistema(
-              sistemas,
-              "easypdv"
-            ),
-
-          intellistock:
-            obterVersaoSistema(
-              sistemas,
-              "intellistock"
-            ),
-
-          iwbserver:
-            obterVersaoSistema(
-              sistemas,
-              "iwbserver"
-            ),
-
-        },
-
-        sistemas,
-
-      }
+      criarRespostaAmbiente(
+        body.id,
+        body.nome.trim(),
+        sistemas
+      )
     );
-
   } catch (erro) {
-
     console.error(
       "Erro ao atualizar ambiente:",
       erro
     );
 
-
     return respostaErro(
       "Não foi possível atualizar o ambiente."
     );
-
   }
-
 }
 
 
 /*
   DELETE /api/environments?id=123
 */
-
 export async function onRequestDelete(
   context
 ) {
-
   try {
-
     const url =
       new URL(
         context.request.url
       );
-
 
     const id =
       Number(
@@ -1313,93 +894,54 @@ export async function onRequestDelete(
         )
       );
 
-
-    if (
-      !id
-    ) {
-
+    if (!id) {
       return respostaErro(
         "O ID do ambiente é obrigatório.",
         400
       );
-
     }
-
-
-    /*
-      Remove sistemas dinâmicos.
-    */
 
     await context.env.DB
       .prepare(
         `
           DELETE FROM release_environment_versions
-
           WHERE environment_id = ?
         `
       )
-      .bind(
-        id
-      )
+      .bind(id)
       .run();
-
-
-    /*
-      Remove os dados dos projetos
-      daquela release.
-    */
 
     await context.env.DB
       .prepare(
         `
           DELETE FROM release_projects
-
           WHERE environment_id = ?
         `
       )
-      .bind(
-        id
-      )
+      .bind(id)
       .run();
-
-
-    /*
-      Finalmente remove o ambiente.
-    */
 
     await context.env.DB
       .prepare(
         `
           DELETE FROM release_environments
-
           WHERE id = ?
         `
       )
-      .bind(
-        id
-      )
+      .bind(id)
       .run();
 
-
-    return Response.json(
-      {
-        sucesso:
-          true,
-      }
-    );
-
+    return Response.json({
+      sucesso: true,
+    });
   } catch (erro) {
-
     console.error(
       "Erro ao excluir ambiente:",
       erro
     );
 
-
     return respostaErro(
       "Não foi possível excluir o ambiente."
     );
-
   }
-
 }

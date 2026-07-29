@@ -1,9 +1,15 @@
+import {
+  criarSistemasFixos,
+} from "../types/releaseEnvironment";
+
 import type {
   ReleaseEnvironment,
 } from "../types/releaseEnvironment";
 
+
 const API_URL =
   "/api/environments";
+
 
 async function requisicao<T>(
   url: string,
@@ -13,9 +19,7 @@ async function requisicao<T>(
     await fetch(
       url,
       {
-        credentials:
-          "include",
-
+        credentials: "include",
         ...options,
       }
     );
@@ -33,12 +37,14 @@ async function requisicao<T>(
   return response.json();
 }
 
+
 export async function listarAmbientes():
   Promise<ReleaseEnvironment[]> {
   return requisicao<
     ReleaseEnvironment[]
   >(API_URL);
 }
+
 
 export async function buscarAmbientePorId(
   id: number
@@ -54,6 +60,7 @@ export async function buscarAmbientePorId(
   );
 }
 
+
 export async function buscarAmbientePorIntellicash(
   versaoIntellicash: string
 ): Promise<
@@ -64,10 +71,13 @@ export async function buscarAmbientePorIntellicash(
 
   return ambientes.find(
     ambiente =>
-      ambiente.versoes.intellicash ===
+      ambiente
+        .versoes
+        .intellicash ===
       versaoIntellicash
   );
 }
+
 
 function compararVersoes(
   versaoA: string,
@@ -106,25 +116,19 @@ function compararVersoes(
     const valorB =
       partesB[index] ?? 0;
 
-    if (
-      valorA !== valorB
-    ) {
-      return (
-        valorA -
-        valorB
-      );
+    if (valorA !== valorB) {
+      return valorA - valorB;
     }
   }
 
   return 0;
 }
 
+
 export function ordenarAmbientesPorVersao(
   ambientes: ReleaseEnvironment[]
 ): ReleaseEnvironment[] {
-  return [
-    ...ambientes,
-  ].sort(
+  return [...ambientes].sort(
     (a, b) =>
       compararVersoes(
         b.versoes.intellicash,
@@ -132,6 +136,7 @@ export function ordenarAmbientesPorVersao(
       )
   );
 }
+
 
 export function obterAmbienteMaisRecente(
   ambientes: ReleaseEnvironment[]
@@ -141,14 +146,14 @@ export function obterAmbienteMaisRecente(
   )[0];
 }
 
+
 export async function adicionarAmbiente(
   ambiente: ReleaseEnvironment
 ): Promise<ReleaseEnvironment> {
   return requisicao<ReleaseEnvironment>(
     API_URL,
     {
-      method:
-        "POST",
+      method: "POST",
 
       headers: {
         "Content-Type":
@@ -162,6 +167,7 @@ export async function adicionarAmbiente(
     }
   );
 }
+
 
 export async function editarAmbiente(
   ambiente: ReleaseEnvironment
@@ -169,8 +175,7 @@ export async function editarAmbiente(
   return requisicao<ReleaseEnvironment>(
     API_URL,
     {
-      method:
-        "PUT",
+      method: "PUT",
 
       headers: {
         "Content-Type":
@@ -185,45 +190,38 @@ export async function editarAmbiente(
   );
 }
 
+
 export async function excluirAmbiente(
   id: number
 ): Promise<void> {
   await requisicao(
     `${API_URL}?id=${id}`,
     {
-      method:
-        "DELETE",
+      method: "DELETE",
     }
   );
 }
 
+
 export function criarAmbiente():
   ReleaseEnvironment {
+  const versoes = {
+    intellicash: "",
+    easycash: "",
+    easycheckout: "",
+    easypdv: "",
+    intellistock: "",
+    iwbserver: "",
+  };
+
   return {
-    id:
-      Date.now(),
-
-    nome:
-      "",
-
-    versoes: {
-      intellicash:
-        "",
-
-      easycash:
-        "",
-
-      easycheckout:
-        "",
-
-      easypdv:
-        "",
-
-      intellistock:
-        "",
-
-      iwbserver:
-        "",
-    },
+    id: Date.now(),
+    nome: "",
+    versoes,
+    sistemas:
+      criarSistemasFixos(
+        [],
+        versoes
+      ),
   };
 }

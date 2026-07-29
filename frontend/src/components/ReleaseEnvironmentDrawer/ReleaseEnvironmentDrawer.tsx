@@ -5,14 +5,16 @@ import {
 
 import "./ReleaseEnvironmentDrawer.css";
 
+import {
+  criarSistemasFixos,
+} from "../../types/releaseEnvironment";
+
 import type {
   ReleaseEnvironment,
-  ReleaseSystemVersion,
 } from "../../types/releaseEnvironment";
 
 
 interface Props {
-
   environment: ReleaseEnvironment;
 
   onClose: () => void;
@@ -20,404 +22,102 @@ interface Props {
   onSave: (
     environment: ReleaseEnvironment
   ) => void;
-
-}
-
-
-function obterSistemasIniciais(
-  environment: ReleaseEnvironment
-): ReleaseSystemVersion[] {
-
-  /*
-    Se a API já devolveu os sistemas
-    dinâmicos, utilizamos eles.
-  */
-
-  if (
-    environment.sistemas &&
-    environment.sistemas.length > 0
-  ) {
-
-    return environment.sistemas.map(
-      sistema => ({
-        ...sistema,
-      })
-    );
-
-  }
-
-
-  /*
-    Fallback para ambientes antigos.
-  */
-
-  return [
-
-    {
-      chave: "intellicash",
-      nome: "Intellicash",
-      versao:
-        environment
-          .versoes
-          .intellicash,
-      ordem: 1,
-    },
-
-    {
-      chave: "easycash",
-      nome: "EasyCash",
-      versao:
-        environment
-          .versoes
-          .easycash,
-      ordem: 2,
-    },
-
-    {
-      chave: "easycheckout",
-      nome: "EasyCheckout",
-      versao:
-        environment
-          .versoes
-          .easycheckout,
-      ordem: 3,
-    },
-
-    {
-      chave: "easypdv",
-      nome: "EasyPDV",
-      versao:
-        environment
-          .versoes
-          .easypdv,
-      ordem: 4,
-    },
-
-    {
-      chave: "intellistock",
-      nome: "IntelliStock",
-      versao:
-        environment
-          .versoes
-          .intellistock,
-      ordem: 5,
-    },
-
-    {
-      chave: "iwbserver",
-      nome: "IWB Server",
-      versao:
-        environment
-          .versoes
-          .iwbserver,
-      ordem: 6,
-    },
-
-  ];
-
 }
 
 
 function ReleaseEnvironmentDrawer({
-
   environment,
-
   onClose,
-
   onSave,
-
 }: Props) {
-
-  const [
-    form,
-    setForm,
-  ] =
+  const [form, setForm] =
     useState<ReleaseEnvironment>(
-      {
+      () => ({
         ...environment,
 
         sistemas:
-          obterSistemasIniciais(
-            environment
+          criarSistemasFixos(
+            environment.sistemas,
+            environment.versoes
           ),
-      }
+      })
     );
 
-
-  /*
-    Ordena os sistemas conforme
-    a ordem cadastrada.
-  */
 
   const sistemas =
     useMemo(
-      () => {
-
-        return [
-          ...(
-            form.sistemas ??
-            []
+      () =>
+        [...(form.sistemas ?? [])]
+          .sort(
+            (a, b) =>
+              a.ordem - b.ordem
           ),
-        ].sort(
-          (
-            a,
-            b
-          ) =>
-            a.ordem -
-            b.ordem
-        );
-
-      },
-      [
-        form.sistemas,
-      ]
+      [form.sistemas]
     );
 
 
-  /*
-    Altera nome ou versão
-    de um sistema.
-  */
-
-  function alterarSistema(
+  function alterarVersao(
     chave: string,
-    campo:
-      "nome" |
-      "versao",
     valor: string
   ) {
-
-    const atualizados =
-      (
-        form.sistemas ??
-        []
-      ).map(
-        sistema => {
-
-          if (
-            sistema.chave !==
-            chave
-          ) {
-
-            return sistema;
-
-          }
-
-
-          return {
-
-            ...sistema,
-
-            [campo]:
-              valor,
-
-          };
-
-        }
-      );
-
-
     setForm(
-      {
-        ...form,
-
-        sistemas:
-          atualizados,
-      }
-    );
-
-  }
-
-
-  /*
-    Adiciona um novo sistema
-    dinamicamente.
-  */
-
-  function adicionarSistema() {
-
-    const lista =
-      form.sistemas ??
-      [];
-
-
-    const maiorOrdem =
-      lista.reduce(
-        (
-          maior,
-          sistema
-        ) =>
-          Math.max(
-            maior,
-            sistema.ordem
-          ),
-        0
-      );
-
-
-    setForm(
-      {
-        ...form,
-
-        sistemas: [
-
-          ...lista,
-
-          {
-            chave:
-              `novo-${Date.now()}`,
-
-            nome:
-              "",
-
-            versao:
-              "",
-
-            ordem:
-              maiorOrdem + 1,
-          },
-
-        ],
-      }
-    );
-
-  }
-
-
-  /*
-    Remove um sistema.
-
-    Intellicash nunca pode
-    ser removido porque é
-    nossa versão de referência.
-  */
-
-  function removerSistema(
-    chave: string
-  ) {
-
-    if (
-      chave ===
-      "intellicash"
-    ) {
-
-      return;
-
-    }
-
-
-    setForm(
-      {
-        ...form,
+      estadoAtual => ({
+        ...estadoAtual,
 
         sistemas:
           (
-            form.sistemas ??
+            estadoAtual.sistemas ??
             []
-          ).filter(
+          ).map(
             sistema =>
-              sistema.chave !==
-              chave
+              sistema.chave === chave
+                ? {
+                    ...sistema,
+                    versao: valor,
+                  }
+                : sistema
           ),
-      }
+      })
     );
-
   }
 
 
   function salvar() {
-
-    if (
-      !form.nome.trim()
-    ) {
-
+    if (!form.nome.trim()) {
       alert(
         "Informe o nome do ambiente."
       );
 
       return;
-
     }
 
-
     const intellicash =
-      (
-        form.sistemas ??
-        []
-      ).find(
+      sistemas.find(
         sistema =>
           sistema.chave ===
           "intellicash"
       );
-
 
     if (
       !intellicash
         ?.versao
         .trim()
     ) {
-
       alert(
         "Informe a versão do Intellicash."
       );
 
       return;
-
     }
-
-
-    const sistemaSemNome =
-      (
-        form.sistemas ??
-        []
-      ).some(
-        sistema =>
-          !sistema.nome.trim()
-      );
-
-
-    if (
-      sistemaSemNome
-    ) {
-
-      alert(
-        "Informe o nome de todos os sistemas."
-      );
-
-      return;
-
-    }
-
-
-    /*
-      Mantemos as propriedades antigas
-      para compatibilidade com as partes
-      do sistema que ainda utilizam
-      ambiente.versoes.
-    */
 
     const encontrarVersao =
-      (
-        chave: string
-      ) => {
-
-        return (
-          (
-            form.sistemas ??
-            []
-          ).find(
-            sistema =>
-              sistema.chave ===
-              chave
-          )?.versao ??
-          ""
-        );
-
-      };
-
+      (chave: string) =>
+        sistemas.find(
+          sistema =>
+            sistema.chave === chave
+        )?.versao ?? "";
 
     const versoes = {
-
       intellicash:
         encontrarVersao(
           "intellicash"
@@ -447,335 +147,159 @@ function ReleaseEnvironmentDrawer({
         encontrarVersao(
           "iwbserver"
         ),
-
     };
 
-
-    onSave(
-      {
-        ...form,
-
-        versoes,
-      }
-    );
-
+    onSave({
+      ...form,
+      nome: form.nome.trim(),
+      versoes,
+      sistemas,
+    });
   }
 
 
   return (
-
     <>
-
       <div
         className="release-drawer-backdrop"
-        onClick={
-          onClose
-        }
+        onClick={onClose}
       />
 
-
       <aside className="release-drawer">
-
-        <div className="release-drawer-header">
-
+        <header className="release-drawer-header">
           <div>
-
             <h2>
               Ambiente da Release
             </h2>
 
             <span>
-              Amarração entre versões
+              Informe as versões dos
+              sistemas deste ambiente
             </span>
-
           </div>
-
 
           <button
             type="button"
-            onClick={
-              onClose
-            }
+            onClick={onClose}
+            aria-label="Fechar"
           >
-
             ×
-
           </button>
-
-        </div>
+        </header>
 
 
         <div className="release-drawer-body">
-
           <div className="release-field">
-
             <label>
               Nome do Ambiente
             </label>
 
-
             <input
-              placeholder="Ex.: Release 3.1.021"
-              value={
-                form.nome
-              }
+              placeholder="Ex.: Release 3.1.021.000"
+              value={form.nome}
               onChange={
                 event =>
                   setForm(
-                    {
-                      ...form,
+                    estadoAtual => ({
+                      ...estadoAtual,
 
                       nome:
                         event
                           .target
                           .value,
-                    }
+                    })
                   )
               }
             />
-
           </div>
 
 
           <div className="release-reference">
-
             <strong>
-              Versão de referência
+              Catálogo fixo
             </strong>
 
             <span>
-
-              O Intellicash identifica
-              automaticamente todo
-              o ambiente.
-
+              Todos os ambientes possuem
+              os mesmos 15 sistemas. Informe
+              somente as versões disponíveis.
             </span>
-
           </div>
 
 
           <div className="release-divider">
-
             Sistemas da Release
-
           </div>
 
 
-          {sistemas.map(
-            sistema => (
+          <div className="release-system-list">
+            {sistemas.map(
+              sistema => {
+                const referencia =
+                  sistema.chave ===
+                  "intellicash";
 
-              <div
-                key={
-                  sistema.chave
-                }
-                style={{
-                  marginBottom:
-                    "14px",
-
-                  padding:
-                    "12px",
-
-                  border:
-                    sistema.chave ===
-                    "intellicash"
-                      ? "1px solid #BFD9EF"
-                      : "1px solid #E2E7EC",
-
-                  borderRadius:
-                    "10px",
-
-                  background:
-                    sistema.chave ===
-                    "intellicash"
-                      ? "#F4F9FD"
-                      : "#FFF",
-                }}
-              >
-
-                <div className="release-field">
-
-                  <label>
-
-                    Sistema
-
-                    {sistema.chave ===
-                      "intellicash" &&
-                      " • Referência"}
-
-                  </label>
-
-
-                  <input
-                    value={
-                      sistema.nome
-                    }
-                    readOnly={
-                      sistema.chave ===
-                      "intellicash"
-                    }
-                    onChange={
-                      event =>
-                        alterarSistema(
-                          sistema.chave,
-                          "nome",
-                          event
-                            .target
-                            .value
-                        )
-                    }
-                  />
-
-                </div>
-
-
-                <div
-                  className="release-field"
-                  style={{
-                    marginTop:
-                      "10px",
-                  }}
-                >
-
-                  <label>
-                    Versão
-                  </label>
-
-
-                  <input
-                    placeholder="Informe a versão"
-                    value={
-                      sistema.versao
-                    }
-                    onChange={
-                      event =>
-                        alterarSistema(
-                          sistema.chave,
-                          "versao",
-                          event
-                            .target
-                            .value
-                        )
-                    }
-                  />
-
-                </div>
-
-
-                {sistema.chave !==
-                  "intellicash" && (
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      removerSistema(
-                        sistema.chave
-                      )
-                    }
-                    style={{
-                      marginTop:
-                        "8px",
-
-                      padding:
-                        "0",
-
-                      border:
-                        "none",
-
-                      background:
-                        "transparent",
-
-                      color:
-                        "#C62828",
-
-                      fontSize:
-                        "11px",
-
-                      fontWeight:
-                        700,
-
-                      cursor:
-                        "pointer",
-                    }}
+                return (
+                  <div
+                    key={sistema.chave}
+                    className={`release-system-row ${
+                      referencia
+                        ? "release-system-row-reference"
+                        : ""
+                    }`}
                   >
+                    <label
+                      htmlFor={
+                        `version-${sistema.chave}`
+                      }
+                    >
+                      <span>
+                        {sistema.nome}
+                      </span>
 
-                    Remover sistema
+                      {referencia && (
+                        <small>
+                          Referência
+                        </small>
+                      )}
+                    </label>
 
-                  </button>
-
-                )}
-
-              </div>
-
-            )
-          )}
-
-
-          <button
-            type="button"
-            onClick={
-              adicionarSistema
-            }
-            style={{
-              width:
-                "100%",
-
-              height:
-                "42px",
-
-              marginTop:
-                "4px",
-
-              marginBottom:
-                "16px",
-
-              border:
-                "1px dashed #005AA9",
-
-              borderRadius:
-                "9px",
-
-              background:
-                "#F6FAFD",
-
-              color:
-                "#005AA9",
-
-              fontSize:
-                "13px",
-
-              fontWeight:
-                700,
-
-              cursor:
-                "pointer",
-            }}
-          >
-
-            + Adicionar sistema
-
-          </button>
+                    <input
+                      id={
+                        `version-${sistema.chave}`
+                      }
+                      placeholder="Sem versão"
+                      value={
+                        sistema.versao
+                      }
+                      onChange={
+                        event =>
+                          alterarVersao(
+                            sistema.chave,
+                            event
+                              .target
+                              .value
+                          )
+                      }
+                    />
+                  </div>
+                );
+              }
+            )}
+          </div>
 
 
           <button
             type="button"
             className="release-save"
-            onClick={
-              salvar
-            }
+            onClick={salvar}
           >
-
             Salvar Ambiente
-
           </button>
-
         </div>
-
       </aside>
-
     </>
-
   );
-
 }
 
 

@@ -1,466 +1,397 @@
-.compatibility-panel{
+.compatibility-panel {
+    width: 100%;
+    min-height: 66px;
 
-    width:100%;
-
-    min-height:66px;
-
-    display:grid;
-
+    display: grid;
     grid-template-columns:
         135px
-        minmax(0,1fr);
+        minmax(0, 1fr);
 
-    align-items:stretch;
+    align-items: stretch;
 
-    background:#FFF;
+    background: #ffffff;
 
-    border-radius:14px;
+    border-radius: 14px;
 
     box-shadow:
         0 4px 12px
-        rgba(0,0,0,.06);
+        rgba(0, 0, 0, 0.06);
 
-    box-sizing:border-box;
+    box-sizing: border-box;
 
-    overflow:hidden;
-
+    overflow: hidden;
 }
 
 
 /* TÍTULO */
 
-.compatibility-title{
+.compatibility-title {
+    min-width: 0;
 
-    min-width:0;
+    display: flex;
+    flex-direction: column;
 
-    display:flex;
+    align-items: center;
+    justify-content: center;
 
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:4px;
+    gap: 4px;
 
     padding:
         12px
         10px;
 
-    box-sizing:border-box;
+    box-sizing: border-box;
 
-    text-align:center;
+    text-align: center;
 
     border-right:
         1px solid
-        #E2E7EC;
-
+        #e2e7ec;
 }
 
 
-.compatibility-title strong{
+.compatibility-title strong {
+    color: #005aa9;
 
-    color:#005AA9;
+    font-size: 14px;
+    line-height: 1.1;
 
-    font-size:14px;
+    font-weight: 600;
 
-    line-height:1.1;
-
-    font-weight:600;
-
-    white-space:nowrap;
-
+    white-space: nowrap;
 }
 
 
-.compatibility-title small{
+.compatibility-title small {
+    color: #8c969f;
 
-    color:#8C969F;
+    font-size: 9px;
+    line-height: 1.1;
 
-    font-size:9px;
+    font-weight: 400;
 
-    line-height:1.1;
-
-    font-weight:400;
-
-    white-space:nowrap;
-
+    white-space: nowrap;
 }
 
 
-/* GRID DINÂMICO */
+/* LISTA DINÂMICA */
 
-.compatibility-line{
+.compatibility-line {
+    --compatibility-columns: 6;
 
-    --compatibility-columns:6;
+    min-width: 0;
 
-    min-width:0;
+    display: flex;
+    flex-wrap: wrap;
 
-    display:grid;
+    align-content: center;
+    justify-content: center;
+}
 
-    grid-template-columns:
-        repeat(
-            var(
-                --compatibility-columns
-            ),
-            minmax(0,1fr)
+
+/*
+    Cada sistema ocupa uma fração
+    baseada na quantidade de colunas
+    calculada pelo componente.
+
+    Exemplo com 15 sistemas:
+    primeira linha = 8
+    segunda linha = 7 centralizados
+*/
+
+.compatibility-version {
+    min-width: 0;
+    min-height: 57px;
+
+    flex:
+        0
+        0
+        calc(
+            100% /
+            var(--compatibility-columns)
         );
 
-    grid-auto-rows:
-        minmax(
-            57px,
-            auto
+    max-width:
+        calc(
+            100% /
+            var(--compatibility-columns)
         );
 
-    align-items:stretch;
+    display: flex;
 
-}
+    align-items: center;
+    justify-content: center;
 
-
-/* ITEM */
-
-.compatibility-version{
-
-    min-width:0;
-
-    min-height:57px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:flex-start;
-
-    gap:8px;
+    gap: 8px;
 
     padding:
         8px
         10px;
 
-    box-sizing:border-box;
+    box-sizing: border-box;
 
     border-right:
         1px solid
-        #E7EBEF;
+        #e7ebef;
 
     border-bottom:
         1px solid
-        #E7EBEF;
+        #e7ebef;
 
-    color:#005AA9;
+    color: #005aa9;
 
-    background:#FFF;
-
+    background: #ffffff;
 }
 
 
 /* ÍCONE */
 
-.compatibility-icon{
+.compatibility-icon {
+    width: 18px;
+    height: 18px;
 
-    width:18px;
+    display: flex;
 
-    height:18px;
+    align-items: center;
+    justify-content: center;
 
-    display:flex;
+    flex-shrink: 0;
 
-    align-items:center;
-
-    justify-content:center;
-
-    flex-shrink:0;
-
-    color:#005AA9;
-
+    color: #005aa9;
 }
 
 
-.compatibility-icon svg{
-
-    width:17px;
-
-    height:17px;
-
+.compatibility-icon svg {
+    width: 17px;
+    height: 17px;
 }
 
 
 /* INFORMAÇÕES */
 
-.compatibility-system-info{
+.compatibility-system-info {
+    min-width: 0;
 
-    min-width:0;
+    display: flex;
+    flex-direction: column;
 
-    display:flex;
+    justify-content: center;
+    align-items: flex-start;
 
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:flex-start;
-
-    gap:3px;
-
+    gap: 3px;
 }
 
 
-.compatibility-system-info strong{
+.compatibility-system-info strong {
+    max-width: 100%;
 
-    max-width:100%;
+    color: #005aa9;
 
-    color:#005AA9;
+    font-size: 10px;
+    line-height: 1.15;
 
-    font-size:10px;
+    font-weight: 600;
 
-    line-height:1.15;
+    white-space: normal;
 
-    font-weight:600;
-
-    white-space:normal;
-
-    overflow-wrap:anywhere;
-
-    word-break:normal;
-
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 
-.compatibility-system-info small{
+.compatibility-system-info small {
+    max-width: 100%;
 
-    max-width:100%;
+    color: #45515c;
 
-    color:#45515C;
+    font-size: 9px;
+    line-height: 1.1;
 
-    font-size:9px;
+    font-weight: 400;
 
-    line-height:1.1;
+    white-space: normal;
 
-    font-weight:400;
-
-    white-space:normal;
-
-    overflow-wrap:anywhere;
-
+    overflow-wrap: anywhere;
 }
 
 
-/* SEM VERSÃO */
+/* SISTEMA SEM VERSÃO */
 
-.compatibility-version-empty{
-
-    background:#FCFDFE;
-
-}
-
-
-.compatibility-version-empty .compatibility-icon{
-
-    color:#9CA6AF;
-
+.compatibility-version-empty {
+    background: #fcfdfe;
 }
 
 
 .compatibility-version-empty
-.compatibility-system-info strong{
-
-    color:#66717C;
-
+.compatibility-icon {
+    color: #9ca6af;
 }
 
 
 .compatibility-version-empty
-.compatibility-system-info small{
-
-    color:#A2ABB3;
-
+.compatibility-system-info strong {
+    color: #66717c;
 }
 
 
-/* VAZIO / CARREGAMENTO */
+.compatibility-version-empty
+.compatibility-system-info small {
+    color: #a2abb3;
+}
 
-.compatibility-empty{
 
-    min-width:0;
+/* VAZIO OU CARREGAMENTO */
 
-    min-height:66px;
+.compatibility-empty {
+    min-width: 0;
+    min-height: 66px;
 
-    display:flex;
+    display: flex;
 
-    align-items:center;
-
-    justify-content:center;
+    align-items: center;
+    justify-content: center;
 
     padding:
         0
         20px;
 
-    box-sizing:border-box;
+    box-sizing: border-box;
 
-    color:#7D8790;
+    color: #7d8790;
 
-    font-size:11px;
+    font-size: 11px;
+    font-weight: 400;
 
-    font-weight:400;
-
-    text-align:center;
-
+    text-align: center;
 }
 
 
-.compatibility-empty strong{
+.compatibility-empty strong {
+    margin-left: 4px;
 
-    margin-left:4px;
+    color: #005aa9;
 
-    color:#005AA9;
-
-    font-weight:600;
-
+    font-weight: 600;
 }
 
 
 /* TELAS MENORES */
 
-@media(max-width:1400px){
-
-    .compatibility-panel{
-
+@media (max-width: 1400px) {
+    .compatibility-panel {
         grid-template-columns:
             120px
-            minmax(0,1fr);
-
+            minmax(0, 1fr);
     }
 
 
-    .compatibility-version{
-
-        gap:6px;
+    .compatibility-version {
+        gap: 6px;
 
         padding:
             7px
             7px;
-
     }
 
 
-    .compatibility-icon{
-
-        width:15px;
-
-        height:15px;
-
+    .compatibility-icon {
+        width: 15px;
+        height: 15px;
     }
 
 
-    .compatibility-icon svg{
-
-        width:15px;
-
-        height:15px;
-
+    .compatibility-icon svg {
+        width: 15px;
+        height: 15px;
     }
 
 
-    .compatibility-system-info strong{
-
-        font-size:9px;
-
+    .compatibility-system-info strong {
+        font-size: 9px;
     }
 
 
-    .compatibility-system-info small{
-
-        font-size:8px;
-
+    .compatibility-system-info small {
+        font-size: 8px;
     }
-
 }
 
 
 /* RESPONSIVO */
 
-@media(max-width:1000px){
+@media (max-width: 1000px) {
+    .compatibility-panel {
+        display: flex;
+        flex-direction: column;
 
-    .compatibility-panel{
+        align-items: stretch;
 
-        display:flex;
-
-        flex-direction:column;
-
-        align-items:stretch;
-
-        overflow:visible;
-
+        overflow: visible;
     }
 
 
-    .compatibility-title{
+    .compatibility-title {
+        min-height: 54px;
 
-        min-height:54px;
-
-        align-items:flex-start;
+        align-items: flex-start;
 
         padding:
             10px
             14px;
 
-        text-align:left;
+        text-align: left;
 
-        border-right:none;
+        border-right: none;
 
         border-bottom:
             1px solid
-            #E2E7EC;
-
+            #e2e7ec;
     }
 
 
-    .compatibility-line{
+    .compatibility-line {
+        width: 100%;
 
-        width:100%;
-
-        grid-template-columns:
-            repeat(
-                3,
-                minmax(0,1fr)
-            ) !important;
-
+        justify-content: center;
     }
 
 
-    .compatibility-version{
+    .compatibility-version {
+        flex:
+            0
+            0
+            33.3333%;
 
-        min-height:58px;
+        max-width: 33.3333%;
+
+        min-height: 58px;
 
         padding:
             9px
             12px;
-
     }
-
 }
 
 
-@media(max-width:650px){
+@media (max-width: 650px) {
+    .compatibility-version {
+        flex:
+            0
+            0
+            50%;
 
-    .compatibility-line{
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0,1fr)
-            ) !important;
-
+        max-width: 50%;
     }
-
 }
 
 
-@media(max-width:420px){
+@media (max-width: 420px) {
+    .compatibility-version {
+        flex:
+            0
+            0
+            100%;
 
-    .compatibility-line{
-
-        grid-template-columns:
-            1fr !important;
-
+        max-width: 100%;
     }
-
 }
