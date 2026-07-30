@@ -73,11 +73,24 @@
 }
 
 
-/* RELEASE EM ACOMPANHAMENTO */
+/* CONTROLE DA RELEASE */
+
+.dashboard-release-control{
+
+    width:330px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
 
 .dashboard-release-selector{
 
-    width:300px;
+    width:100%;
 
     display:flex;
 
@@ -166,6 +179,93 @@
 }
 
 
+/* SINCRONIZAÇÃO REDMINE */
+
+.dashboard-redmine-sync{
+
+    width:100%;
+
+    min-height:42px;
+
+    padding:0 16px;
+
+    border:none;
+
+    border-radius:9px;
+
+    background:#F58220;
+
+    color:#FFF;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:
+        background .2s,
+        transform .2s,
+        opacity .2s;
+
+}
+
+
+.dashboard-redmine-sync:hover:not(:disabled){
+
+    background:#D96C10;
+
+    transform:translateY(-1px);
+
+}
+
+
+.dashboard-redmine-sync:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+
+.dashboard-redmine-message{
+
+    padding:9px 11px;
+
+    border-radius:8px;
+
+    font-size:11px;
+
+    line-height:1.35;
+
+    font-weight:600;
+
+}
+
+
+.dashboard-redmine-message.success{
+
+    color:#2E7D32;
+
+    background:#EDF7EE;
+
+    border:1px solid #CFE7D1;
+
+}
+
+
+.dashboard-redmine-message.error{
+
+    color:#C62828;
+
+    background:#FFF1F1;
+
+    border:1px solid #F1CCCC;
+
+}
+
+
 /* GRÁFICOS */
 
 .dashboard-charts{
@@ -195,7 +295,9 @@
 
     border-radius:14px;
 
-    box-shadow:0 4px 14px rgba(0,0,0,.06);
+    box-shadow:
+        0 4px 14px
+        rgba(0,0,0,.06);
 
 }
 
@@ -394,6 +496,13 @@
     .dashboard-header h1{
 
         font-size:31px;
+
+    }
+
+
+    .dashboard-release-control{
+
+        width:100%;
 
     }
 

@@ -37,6 +37,7 @@ import {
 import {
   listarProjetosPorAmbiente,
   salvarProjetoNoAmbiente,
+  sincronizarProjetosComRedmine,
 } from "../../services/ReleaseProjectService";
 
 import {
@@ -46,6 +47,19 @@ import {
 
 const STORAGE_KEY =
   "releasehub_dashboard_environment";
+
+
+interface MensagemRedmine {
+
+  tipo:
+    | "success"
+    | "error";
+
+  texto: string;
+
+  detalhes?: string;
+
+}
 
 
 function Dashboard() {
@@ -126,9 +140,21 @@ function Dashboard() {
     useState("Nome");
 
 
-  /*
-    Carrega os ambientes.
-  */
+  const [
+    sincronizandoRedmine,
+    setSincronizandoRedmine,
+  ] =
+    useState(false);
+
+
+  const [
+    mensagemRedmine,
+    setMensagemRedmine,
+  ] =
+    useState<
+      MensagemRedmine | null
+    >(null);
+
 
   useEffect(() => {
 
@@ -147,9 +173,7 @@ function Dashboard() {
         if (
           !ativo
         ) {
-
           return;
-
         }
 
 
@@ -189,13 +213,11 @@ function Dashboard() {
           salvoExiste &&
           idSalvo !== null
         ) {
-
           setAmbienteSelecionadoId(
             idSalvo
           );
 
           return;
-
         }
 
 
@@ -208,11 +230,9 @@ function Dashboard() {
         if (
           maisRecente
         ) {
-
           setAmbienteSelecionadoId(
             maisRecente.id
           );
-
 
           localStorage.setItem(
             STORAGE_KEY,
@@ -220,7 +240,6 @@ function Dashboard() {
               maisRecente.id
             )
           );
-
         }
 
       } catch (erro) {
@@ -235,11 +254,9 @@ function Dashboard() {
         if (
           ativo
         ) {
-
           setCarregandoAmbientes(
             false
           );
-
         }
 
       }
@@ -251,18 +268,12 @@ function Dashboard() {
 
 
     return () => {
-
       ativo =
         false;
-
     };
 
   }, []);
 
-
-  /*
-    Carrega a permissão.
-  */
 
   useEffect(() => {
 
@@ -281,9 +292,7 @@ function Dashboard() {
         if (
           !ativo
         ) {
-
           return;
-
         }
 
 
@@ -305,11 +314,9 @@ function Dashboard() {
         if (
           ativo
         ) {
-
           setPodeEditar(
             false
           );
-
         }
 
       }
@@ -321,19 +328,12 @@ function Dashboard() {
 
 
     return () => {
-
       ativo =
         false;
-
     };
 
   }, []);
 
-
-  /*
-    Busca os projetos específicos
-    da release selecionada.
-  */
 
   async function carregarProjetos(
     environmentId: number
@@ -385,19 +385,15 @@ function Dashboard() {
       ambienteSelecionadoId ===
       null
     ) {
-
       setProjects(
         []
       );
-
 
       setCarregando(
         false
       );
 
-
       return;
-
     }
 
 
@@ -418,13 +414,6 @@ function Dashboard() {
     );
 
 
-  /*
-    Troca a release.
-
-    Os filtros da release anterior
-    não devem afetar a nova.
-  */
-
   function alterarAmbiente(
     id: number
   ) {
@@ -433,36 +422,33 @@ function Dashboard() {
       null
     );
 
+    setMensagemRedmine(
+      null
+    );
 
     setPesquisa(
       ""
     );
 
-
     setFiltro(
       "Todos"
     );
-
 
     setOrdenacao(
       "Nome"
     );
 
-
     setProjects(
       []
     );
-
 
     setCarregando(
       true
     );
 
-
     setAmbienteSelecionadoId(
       id
     );
-
 
     localStorage.setItem(
       STORAGE_KEY,
@@ -481,11 +467,6 @@ function Dashboard() {
   }
 
 
-  /*
-    Salva o projeto somente
-    dentro da release selecionada.
-  */
-
   async function salvarProjeto(
     project: Project
   ) {
@@ -495,9 +476,7 @@ function Dashboard() {
       ambienteSelecionadoId ===
         null
     ) {
-
       return;
-
     }
 
 
@@ -535,10 +514,150 @@ function Dashboard() {
   }
 
 
-  /*
-    Converte o prazo para ordenação
-    e validação dos projetos atrasados.
-  */
+  async function sincronizarRedmine() {
+
+    if (
+      !podeEditar ||
+      ambienteSelecionadoId ===
+        null ||
+      sincronizandoRedmine
+    ) {
+      return;
+    }
+
+
+    const environmentId =
+      ambienteSelecionadoId;
+
+
+    try {
+
+      setSincronizandoRedmine(
+        true
+      );
+
+      setMensagemRedmine(
+        null
+      );
+
+
+      const resultado =
+        await sincronizarProjetosComRedmine(
+          environmentId
+        );
+
+
+      await carregarProjetos(
+        environmentId
+      );
+
+
+      const ignorados =
+        resultado
+          .projetosIgnorados
+          .length;
+
+
+      const statusIgnorados =
+        resultado
+          .statusIgnorados
+          .reduce(
+            (
+              total,
+              status
+            ) =>
+              total +
+              status.quantidade,
+            0
+          );
+
+
+      let texto =
+        `${resultado.tarefasSincronizadas} tarefas sincronizadas em ${resultado.projetosAtualizados} projetos.`;
+
+
+      if (
+        ignorados > 0
+      ) {
+        texto +=
+          ` ${ignorados} projetos não foram atualizados.`;
+      }
+
+
+      if (
+        statusIgnorados > 0
+      ) {
+        texto +=
+          ` ${statusIgnorados} tarefas possuem situações ainda não mapeadas.`;
+      }
+
+
+      const detalhesProjetos =
+        resultado
+          .projetosIgnorados
+          .map(
+            item =>
+              `${item.projeto}: ${item.motivo}`
+          );
+
+
+      const detalhesStatus =
+        resultado
+          .statusIgnorados
+          .map(
+            item =>
+              `${item.status}: ${item.quantidade}`
+          );
+
+
+      const detalhes =
+        [
+          ...detalhesProjetos,
+          ...detalhesStatus,
+        ].join(
+          "\n"
+        );
+
+
+      setMensagemRedmine({
+        tipo:
+          "success",
+
+        texto,
+
+        detalhes:
+          detalhes ||
+          undefined,
+      });
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao sincronizar Redmine:",
+        erro
+      );
+
+
+      setMensagemRedmine({
+        tipo:
+          "error",
+
+        texto:
+          erro instanceof Error
+            ? erro.message
+            : "Não foi possível sincronizar os dados com o Redmine.",
+      });
+
+    } finally {
+
+      setSincronizandoRedmine(
+        false
+      );
+
+    }
+
+  }
+
 
   function converterPrazo(
     prazo: string
@@ -547,9 +666,7 @@ function Dashboard() {
     if (
       !prazo
     ) {
-
       return Number.MAX_SAFE_INTEGER;
-
     }
 
 
@@ -572,12 +689,10 @@ function Dashboard() {
           resultado[1]
         );
 
-
       const mes =
         Number(
           resultado[2]
         );
-
 
       const ano =
         Number(
@@ -601,9 +716,7 @@ function Dashboard() {
         data.getDate() !==
           dia
       ) {
-
         return Number.MAX_SAFE_INTEGER;
-
       }
 
 
@@ -623,9 +736,7 @@ function Dashboard() {
         data.getTime()
       )
     ) {
-
       return Number.MAX_SAFE_INTEGER;
-
     }
 
 
@@ -634,10 +745,6 @@ function Dashboard() {
   }
 
 
-  /*
-    Pesquisa, filtros e ordenação.
-  */
-
   const projetos =
     useMemo(() => {
 
@@ -645,10 +752,6 @@ function Dashboard() {
         ...projects,
       ];
 
-
-      /*
-        Pesquisa pelo nome.
-      */
 
       lista =
         lista.filter(
@@ -661,10 +764,6 @@ function Dashboard() {
               )
         );
 
-
-      /*
-        Filtros por situação.
-      */
 
       switch (
         filtro
@@ -712,12 +811,6 @@ function Dashboard() {
           break;
 
 
-        /*
-          Desenvolvido agora é
-          totalmente independente
-          de Aguardando Compilação.
-        */
-
         case "Desenvolvido":
 
           lista =
@@ -745,10 +838,6 @@ function Dashboard() {
 
           break;
 
-
-        /*
-          Nova situação.
-        */
 
         case "Resolvidas":
 
@@ -785,9 +874,7 @@ function Dashboard() {
                 if (
                   !project.prazo
                 ) {
-
                   return false;
-
                 }
 
 
@@ -808,10 +895,6 @@ function Dashboard() {
 
       }
 
-
-      /*
-        Ordenação.
-      */
 
       switch (
         ordenacao
@@ -905,11 +988,6 @@ function Dashboard() {
     ]);
 
 
-  /*
-    Distribuição dos cards
-    em duas colunas.
-  */
-
   const colunaEsquerda =
     projetos.filter(
       (
@@ -954,83 +1032,130 @@ function Dashboard() {
           </div>
 
 
-          <div className="dashboard-release-selector">
+          <div className="dashboard-release-control">
 
-            <label>
+            <div className="dashboard-release-selector">
 
-              Release em acompanhamento
+              <label>
 
-            </label>
+                Release em acompanhamento
+
+              </label>
 
 
-            <select
-              value={
-                ambienteSelecionadoId ??
-                ""
-              }
-              disabled={
-                carregandoAmbientes ||
-                ambientes.length === 0
-              }
-              onChange={
-                event =>
-                  alterarAmbiente(
-                    Number(
-                      event
-                        .target
-                        .value
+              <select
+                value={
+                  ambienteSelecionadoId ??
+                  ""
+                }
+                disabled={
+                  carregandoAmbientes ||
+                  ambientes.length === 0 ||
+                  sincronizandoRedmine
+                }
+                onChange={
+                  event =>
+                    alterarAmbiente(
+                      Number(
+                        event
+                          .target
+                          .value
+                      )
                     )
-                  )
-              }
-            >
+                }
+              >
 
-              {ambientes.length ===
-                0 && (
+                {ambientes.length ===
+                  0 && (
 
-                <option value="">
+                  <option value="">
 
-                  Nenhuma release cadastrada
-
-                </option>
-
-              )}
-
-
-              {ambientes.map(
-                ambiente => (
-
-                  <option
-                    key={
-                      ambiente.id
-                    }
-                    value={
-                      ambiente.id
-                    }
-                  >
-
-                    {ambiente.nome}
+                    Nenhuma release cadastrada
 
                   </option>
 
-                )
+                )}
+
+
+                {ambientes.map(
+                  ambiente => (
+
+                    <option
+                      key={
+                        ambiente.id
+                      }
+                      value={
+                        ambiente.id
+                      }
+                    >
+
+                      {ambiente.nome}
+
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+
+              {ambienteSelecionado && (
+
+                <small>
+
+                  Intellicash{" "}
+
+                  {
+                    ambienteSelecionado
+                      .versoes
+                      .intellicash
+                  }
+
+                </small>
+
               )}
 
-            </select>
+            </div>
 
 
-            {ambienteSelecionado && (
+            {podeEditar && (
 
-              <small>
-
-                Intellicash{" "}
-
-                {
-                  ambienteSelecionado
-                    .versoes
-                    .intellicash
+              <button
+                type="button"
+                className="dashboard-redmine-sync"
+                disabled={
+                  ambienteSelecionadoId ===
+                    null ||
+                  sincronizandoRedmine ||
+                  carregando ||
+                  carregandoAmbientes
                 }
+                onClick={
+                  sincronizarRedmine
+                }
+              >
 
-              </small>
+                {sincronizandoRedmine
+                  ? "Sincronizando Redmine..."
+                  : "Sincronizar com o Redmine"}
+
+              </button>
+
+            )}
+
+
+            {mensagemRedmine && (
+
+              <span
+                className={`dashboard-redmine-message ${mensagemRedmine.tipo}`}
+                title={
+                  mensagemRedmine.detalhes
+                }
+              >
+
+                {mensagemRedmine.texto}
+
+              </span>
 
             )}
 
@@ -1109,44 +1234,21 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Todos
-            </option>
+            <option>Todos</option>
 
+            <option>Qualidade</option>
 
-            <option>
-              Qualidade
-            </option>
+            <option>Testes</option>
 
+            <option>Em Progresso</option>
 
-            <option>
-              Testes
-            </option>
+            <option>Desenvolvido</option>
 
+            <option>Aguard. Comp.</option>
 
-            <option>
-              Em Progresso
-            </option>
+            <option>Resolvidas</option>
 
-
-            <option>
-              Desenvolvido
-            </option>
-
-
-            <option>
-              Aguard. Comp.
-            </option>
-
-
-            <option>
-              Resolvidas
-            </option>
-
-
-            <option>
-              Atrasados
-            </option>
+            <option>Atrasados</option>
 
           </select>
 
@@ -1166,19 +1268,11 @@ function Dashboard() {
             }
           >
 
-            <option>
-              Nome
-            </option>
+            <option>Nome</option>
 
+            <option>Prazo</option>
 
-            <option>
-              Prazo
-            </option>
-
-
-            <option>
-              Tarefas
-            </option>
+            <option>Tarefas</option>
 
           </select>
 
@@ -1225,9 +1319,7 @@ function Dashboard() {
           <div className="dashboard-empty">
 
             <h2>
-
               Carregando projetos...
-
             </h2>
 
           </div>
@@ -1238,11 +1330,8 @@ function Dashboard() {
           <div className="dashboard-empty">
 
             <h2>
-
               Nenhum projeto cadastrado
-
             </h2>
-
 
             <p>
 
@@ -1259,11 +1348,8 @@ function Dashboard() {
           <div className="dashboard-empty">
 
             <h2>
-
               Nenhum resultado encontrado
-
             </h2>
-
 
             <p>
 
