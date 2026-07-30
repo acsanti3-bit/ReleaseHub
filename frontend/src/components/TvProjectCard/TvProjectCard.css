@@ -219,15 +219,6 @@
             minmax(0,1fr)
         );
 
-    /*
-        Agora existem 10 situações:
-        2 colunas x 5 linhas.
-
-        Todas as linhas recebem
-        exatamente a mesma altura
-        dentro do espaço disponível.
-    */
-
     grid-template-rows:
         repeat(
             5,
@@ -347,7 +338,8 @@
 }
 
 
-.tv-status-card-zero .tv-status-card-top{
+.tv-status-card-zero
+.tv-status-card-top{
 
     color:#8C969F;
 
@@ -537,6 +529,132 @@
             14px
             6px
             18px;
+
+    }
+
+
+    .tv-card-date strong{
+
+        font-size:11px;
+
+    }
+
+}
+
+
+/*
+    TELAS MUITO LARGAS E BAIXAS
+
+    Como os projetos ficam em uma
+    única fileira, recuperamos o
+    tamanho confortável das letras.
+*/
+
+@media(max-height:700px) and (min-width:1500px){
+
+    .tv-card-header{
+
+        min-height:60px;
+
+        padding:
+            9px
+            14px
+            8px
+            18px;
+
+    }
+
+
+    .tv-card-heading{
+
+        gap:3px;
+
+    }
+
+
+    .tv-card-project-label{
+
+        font-size:8px;
+
+    }
+
+
+    .tv-card-heading h3{
+
+        font-size:20px;
+
+    }
+
+
+    .tv-card-version strong{
+
+        padding:
+            5px
+            9px;
+
+        font-size:11px;
+
+    }
+
+
+    .tv-status-grid{
+
+        padding:
+            9px
+            10px
+            8px
+            15px;
+
+        gap:6px;
+
+    }
+
+
+    .tv-status-card{
+
+        padding:
+            5px
+            8px;
+
+        border-radius:8px;
+
+    }
+
+
+    .tv-status-card-top{
+
+        gap:6px;
+
+        font-size:11px;
+
+    }
+
+
+    .tv-status-card strong{
+
+        min-width:24px;
+
+        font-size:18px;
+
+    }
+
+
+    .tv-card-footer{
+
+        min-height:48px;
+
+        padding:
+            6px
+            14px
+            7px
+            18px;
+
+    }
+
+
+    .tv-card-date small{
+
+        font-size:8px;
 
     }
 

@@ -636,6 +636,239 @@
 }
 
 
+/*
+    TELAS MUITO LARGAS E BAIXAS
+
+    Exemplo:
+    TVs ultrawide e monitores
+    com pouca altura disponível.
+
+    Os projetos passam para uma
+    única fileira, evitando cards
+    achatados verticalmente.
+*/
+
+@media(max-height:700px) and (min-width:1500px){
+
+    .tv-dashboard{
+
+        padding:8px;
+
+        gap:6px;
+
+    }
+
+
+    .tv-header{
+
+        min-height:58px;
+
+        padding:
+            7px
+            16px;
+
+        border-radius:13px;
+
+    }
+
+
+    .tv-brand{
+
+        gap:12px;
+
+    }
+
+
+    .tv-logo{
+
+        height:39px;
+
+    }
+
+
+    .tv-brand-text h1{
+
+        font-size:22px;
+
+    }
+
+
+    .tv-brand-subtitle{
+
+        margin-top:4px;
+
+        gap:8px;
+
+    }
+
+
+    .tv-brand-subtitle > span{
+
+        font-size:10px;
+
+    }
+
+
+    .tv-online{
+
+        padding:
+            3px
+            7px;
+
+        font-size:9px;
+
+    }
+
+
+    .tv-online-dot{
+
+        width:6px;
+
+        height:6px;
+
+    }
+
+
+    .tv-clock{
+
+        min-width:190px;
+
+    }
+
+
+    .tv-clock strong{
+
+        font-size:28px;
+
+    }
+
+
+    .tv-clock small{
+
+        margin-top:3px;
+
+        font-size:9px;
+
+    }
+
+
+    .tv-release-area{
+
+        min-height:48px;
+
+        padding:
+            5px
+            10px;
+
+        grid-template-columns:
+            125px
+            minmax(0,1fr);
+
+        gap:10px;
+
+        border-radius:12px;
+
+    }
+
+
+    .tv-release-tabs-header{
+
+        gap:2px;
+
+    }
+
+
+    .tv-release-tabs-header > span{
+
+        font-size:12px;
+
+    }
+
+
+    .tv-release-tabs-header small{
+
+        font-size:8px;
+
+    }
+
+
+    .tv-release-tabs{
+
+        gap:6px;
+
+    }
+
+
+    .tv-release-tab{
+
+        min-width:78px;
+
+        min-height:36px;
+
+        padding:
+            4px
+            9px;
+
+        border-radius:8px;
+
+    }
+
+
+    .tv-release-tab span{
+
+        font-size:13px;
+
+    }
+
+
+    .tv-release-tab small{
+
+        font-size:7px;
+
+    }
+
+
+    .tv-grid{
+
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(280px,1fr)
+            );
+
+        grid-template-rows:
+            minmax(0,1fr);
+
+        grid-auto-rows:
+            minmax(0,1fr);
+
+        gap:8px;
+
+    }
+
+
+    /*
+        Remove as regras especiais
+        de duas fileiras nesta tela.
+    */
+
+    .tv-grid > .tv-project-card,
+    .tv-grid > .tv-project-card:nth-last-child(2):nth-child(4),
+    .tv-grid > .tv-project-card:nth-last-child(1):nth-child(5),
+    .tv-grid > .tv-project-card:first-child:nth-last-child(4),
+    .tv-grid > .tv-project-card:first-child:nth-last-child(4) ~ .tv-project-card,
+    .tv-grid > .tv-project-card:first-child:nth-last-child(2),
+    .tv-grid > .tv-project-card:first-child:nth-last-child(2) ~ .tv-project-card,
+    .tv-grid > .tv-project-card:only-child{
+
+        grid-column:
+            auto !important;
+
+    }
+
+}
+
+
 /* RESPONSIVO */
 
 @media(max-width:1000px){
