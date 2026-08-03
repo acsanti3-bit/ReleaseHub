@@ -238,6 +238,19 @@ function TvProjectCard({
         "#8E24AA",
     },
 
+    {
+      nome:
+        "Resolvidas",
+
+      valor:
+        project
+          .situacoes
+          .resolvidas,
+
+      cor:
+        "#2E7D32",
+    },
+
   ];
 
 
@@ -308,6 +321,10 @@ function TvProjectCard({
                 className={`tv-status-card ${
                   zerado
                     ? "tv-status-card-zero"
+                    : ""
+                } ${
+                  item.nome === "Resolvidas"
+                    ? "tv-status-card-resolved"
                     : ""
                 }`}
               >
@@ -390,33 +407,6 @@ function TvProjectCard({
             }
 
           </strong>
-
-        </div>
-
-
-        <div className="tv-card-resolved">
-
-          <small>
-            Resolvidas
-          </small>
-
-          <div>
-
-            <strong>
-
-              {
-                project
-                  .situacoes
-                  .resolvidas
-              }
-
-            </strong>
-
-            <span>
-              tarefas
-            </span>
-
-          </div>
 
         </div>
 

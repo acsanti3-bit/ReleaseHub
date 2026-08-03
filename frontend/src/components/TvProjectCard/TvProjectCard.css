@@ -221,7 +221,7 @@
 
     grid-template-rows:
         repeat(
-            5,
+            4,
             minmax(0,1fr)
         );
 
@@ -329,6 +329,33 @@
 }
 
 
+
+
+
+.tv-status-card-resolved{
+
+    background:#EDF7EE;
+
+    border-color:#CFE7D1;
+
+}
+
+
+.tv-status-card-resolved
+.tv-status-card-top{
+
+    color:#2E7D32;
+
+    font-weight:700;
+
+}
+
+
+.tv-status-card-resolved strong{
+
+    font-weight:800;
+
+}
 
 
 /* STATUS ZERADOS */
@@ -563,7 +590,7 @@
 
         grid-template-rows:
             repeat(
-                5,
+                4,
                 minmax(0,1fr)
             );
 
