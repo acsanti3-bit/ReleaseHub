@@ -457,19 +457,6 @@ function ProjectCard({
         "#8E24AA",
     },
 
-    {
-      label:
-        "Resolvidas",
-
-      value:
-        project
-          .situacoes
-          .resolvidas,
-
-      color:
-        "#2E7D32",
-    },
-
   ].filter(
     status =>
       status.value > 0
@@ -609,6 +596,33 @@ function ProjectCard({
 
         </div>
 
+
+        <div className="release-resolved-info">
+
+          <small>
+            Resolvidas
+          </small>
+
+          <div className="release-resolved-value">
+
+            <strong>
+
+              {
+                project
+                  .situacoes
+                  .resolvidas
+              }
+
+            </strong>
+
+            <span>
+              tarefas
+            </span>
+
+          </div>
+
+        </div>
+
       </div>
 
 
@@ -621,11 +635,7 @@ function ProjectCard({
               key={
                 status.label
               }
-              className={`release-status-item ${
-                status.label === "Resolvidas"
-                  ? "release-status-item-resolved"
-                  : ""
-              }`}
+              className="release-status-item"
             >
 
               <div className="release-status-label">

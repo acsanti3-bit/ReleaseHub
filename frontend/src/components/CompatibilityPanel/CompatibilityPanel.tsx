@@ -7,16 +7,6 @@ import {
 import "./CompatibilityPanel.css";
 
 import {
-  MdApps,
-  MdCloud,
-  MdDns,
-  MdInventory,
-  MdPointOfSale,
-  MdShoppingCart,
-  MdStore,
-} from "react-icons/md";
-
-import {
   buscarAmbientePorIntellicash,
 } from "../../services/ReleaseEnvironmentService";
 
@@ -44,102 +34,6 @@ interface CompatibilityStyle
 
   "--compatibility-columns":
     number;
-
-}
-
-
-function getSystemIcon(
-  chave: string
-) {
-
-  const sistema =
-    chave.toLowerCase();
-
-
-  if (
-    sistema.includes(
-      "intellicash"
-    )
-  ) {
-
-    return (
-      <MdDns />
-    );
-
-  }
-
-
-  if (
-    sistema.includes(
-      "easycash"
-    )
-  ) {
-
-    return (
-      <MdPointOfSale />
-    );
-
-  }
-
-
-  if (
-    sistema.includes(
-      "easycheckout"
-    )
-  ) {
-
-    return (
-      <MdStore />
-    );
-
-  }
-
-
-  if (
-    sistema.includes(
-      "easypdv"
-    )
-  ) {
-
-    return (
-      <MdShoppingCart />
-    );
-
-  }
-
-
-  if (
-    sistema.includes(
-      "intellistock"
-    ) ||
-    sistema.includes(
-      "isa"
-    )
-  ) {
-
-    return (
-      <MdInventory />
-    );
-
-  }
-
-
-  if (
-    sistema.includes(
-      "iwb"
-    )
-  ) {
-
-    return (
-      <MdCloud />
-    );
-
-  }
-
-
-  return (
-    <MdApps />
-  );
 
 }
 
@@ -297,13 +191,13 @@ function obterQuantidadeColunas(
     distribui os itens em linhas
     equilibradas.
 
-    15 sistemas:
-    8 na primeira linha
-    7 na segunda.
+    19 sistemas:
+    10 na primeira linha
+    9 na segunda.
   */
 
   return Math.min(
-    8,
+    10,
     Math.ceil(
       quantidadeSistemas / 2
     )
@@ -646,16 +540,6 @@ function CompatibilityPanel({
                   sistema.versao || "-"
                 }`}
               >
-
-                <div className="compatibility-icon">
-
-                  {getSystemIcon(
-                    sistema.chave
-                  )}
-
-                </div>
-
-
                 <div className="compatibility-system-info">
 
                   <strong>

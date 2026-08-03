@@ -2,23 +2,23 @@
 
     width:100%;
 
-    min-height:66px;
+    min-height:0;
 
     display:grid;
 
     grid-template-columns:
-        135px
+        112px
         minmax(0,1fr);
 
     align-items:stretch;
 
     background:#FFF;
 
-    border-radius:14px;
+    border-radius:12px;
 
     box-shadow:
-        0 4px 12px
-        rgba(0,0,0,.06);
+        0 3px 10px
+        rgba(0,0,0,.05);
 
     box-sizing:border-box;
 
@@ -41,11 +41,11 @@
 
     justify-content:center;
 
-    gap:5px;
+    gap:3px;
 
     padding:
-        12px
-        10px;
+        8px
+        7px;
 
     box-sizing:border-box;
 
@@ -62,11 +62,11 @@
 
     color:#005AA9;
 
-    font-size:15px;
+    font-size:13px;
 
     line-height:1.1;
 
-    font-weight:600;
+    font-weight:700;
 
     white-space:nowrap;
 
@@ -77,32 +77,34 @@
 
     color:#8C969F;
 
-    font-size:11px;
+    font-size:9px;
 
     line-height:1.1;
 
-    font-weight:400;
+    font-weight:500;
 
     white-space:nowrap;
 
 }
 
 
-/* LISTA DINÂMICA */
+/* LISTA COMPACTA */
 
 .compatibility-line{
 
-    --compatibility-columns:8;
+    --compatibility-columns:10;
 
     min-width:0;
 
-    display:flex;
+    display:grid;
 
-    flex-wrap:wrap;
+    grid-template-columns:
+        repeat(
+            var(--compatibility-columns),
+            minmax(0,1fr)
+        );
 
-    align-content:center;
-
-    justify-content:center;
+    align-items:stretch;
 
 }
 
@@ -111,33 +113,21 @@
 
     min-width:0;
 
-    min-height:63px;
-
-    flex:
-        0
-        0
-        calc(
-            100% /
-            var(--compatibility-columns)
-        );
-
-    max-width:
-        calc(
-            100% /
-            var(--compatibility-columns)
-        );
+    min-height:38px;
 
     display:flex;
+
+    flex-direction:column;
 
     align-items:center;
 
     justify-content:center;
 
-    gap:9px;
+    gap:2px;
 
     padding:
-        9px
-        10px;
+        4px
+        6px;
 
     box-sizing:border-box;
 
@@ -149,8 +139,6 @@
         1px solid
         #E7EBEF;
 
-    color:#005AA9;
-
     background:#FFF;
 
     text-align:center;
@@ -158,39 +146,11 @@
 }
 
 
-/* ÍCONE */
-
-.compatibility-icon{
-
-    width:21px;
-
-    height:21px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    flex-shrink:0;
-
-    color:#005AA9;
-
-}
-
-
-.compatibility-icon svg{
-
-    width:20px;
-
-    height:20px;
-
-}
-
-
 /* INFORMAÇÕES */
 
 .compatibility-system-info{
+
+    width:100%;
 
     min-width:0;
 
@@ -202,9 +162,7 @@
 
     justify-content:center;
 
-    gap:4px;
-
-    text-align:center;
+    gap:2px;
 
 }
 
@@ -213,23 +171,19 @@
 
     width:100%;
 
-    max-width:100%;
-
     color:#005AA9;
 
-    font-size:12px;
+    font-size:10px;
 
-    line-height:1.2;
+    line-height:1.08;
 
-    font-weight:600;
+    font-weight:700;
 
-    white-space:normal;
+    white-space:nowrap;
 
-    overflow-wrap:anywhere;
+    overflow:hidden;
 
-    word-break:normal;
-
-    text-align:center;
+    text-overflow:ellipsis;
 
 }
 
@@ -238,23 +192,19 @@
 
     width:100%;
 
-    max-width:100%;
-
     color:#45515C;
 
-    font-size:11px;
+    font-size:9px;
 
-    line-height:1.15;
+    line-height:1;
 
-    font-weight:400;
+    font-weight:500;
 
-    white-space:normal;
+    white-space:nowrap;
 
-    overflow-wrap:anywhere;
+    overflow:hidden;
 
-    word-break:normal;
-
-    text-align:center;
+    text-overflow:ellipsis;
 
 }
 
@@ -263,15 +213,7 @@
 
 .compatibility-version-empty{
 
-    background:#FCFDFE;
-
-}
-
-
-.compatibility-version-empty
-.compatibility-icon{
-
-    color:#8FA2B2;
+    background:#FAFCFD;
 
 }
 
@@ -279,7 +221,7 @@
 .compatibility-version-empty
 .compatibility-system-info strong{
 
-    color:#005AA9;
+    color:#78909C;
 
 }
 
@@ -287,7 +229,7 @@
 .compatibility-version-empty
 .compatibility-system-info small{
 
-    color:#A2ABB3;
+    color:#B0B8BF;
 
 }
 
@@ -298,7 +240,7 @@
 
     min-width:0;
 
-    min-height:66px;
+    min-height:76px;
 
     display:flex;
 
@@ -308,15 +250,15 @@
 
     padding:
         0
-        20px;
+        18px;
 
     box-sizing:border-box;
 
     color:#7D8790;
 
-    font-size:13px;
+    font-size:12px;
 
-    font-weight:400;
+    font-weight:500;
 
     text-align:center;
 
@@ -329,207 +271,14 @@
 
     color:#005AA9;
 
-    font-weight:600;
+    font-weight:700;
 
 }
 
 
 /* TELAS INTERMEDIÁRIAS */
 
-@media(max-width:1600px){
-
-    .compatibility-line{
-
-        --compatibility-columns:
-            6 !important;
-
-    }
-
-
-    .compatibility-panel{
-
-        grid-template-columns:
-            125px
-            minmax(0,1fr);
-
-    }
-
-
-    .compatibility-version{
-
-        min-height:61px;
-
-        gap:8px;
-
-        padding:
-            8px
-            9px;
-
-    }
-
-
-    .compatibility-icon{
-
-        width:20px;
-
-        height:20px;
-
-    }
-
-
-    .compatibility-icon svg{
-
-        width:19px;
-
-        height:19px;
-
-    }
-
-
-    .compatibility-system-info strong{
-
-        font-size:11.5px;
-
-    }
-
-
-    .compatibility-system-info small{
-
-        font-size:10.5px;
-
-    }
-
-
-    .compatibility-title small{
-
-        font-size:10.5px;
-
-    }
-
-}
-
-
-/* MONITORES MENORES */
-
-@media(max-width:1300px){
-
-    .compatibility-line{
-
-        --compatibility-columns:
-            5 !important;
-
-    }
-
-
-    .compatibility-panel{
-
-        grid-template-columns:
-            120px
-            minmax(0,1fr);
-
-    }
-
-
-    .compatibility-version{
-
-        min-height:60px;
-
-    }
-
-
-    .compatibility-icon{
-
-        width:19px;
-
-        height:19px;
-
-    }
-
-
-    .compatibility-icon svg{
-
-        width:18px;
-
-        height:18px;
-
-    }
-
-
-    .compatibility-system-info strong{
-
-        font-size:11px;
-
-    }
-
-
-    .compatibility-system-info small{
-
-        font-size:10px;
-
-    }
-
-
-    .compatibility-title small{
-
-        font-size:10px;
-
-    }
-
-}
-
-
-/*
-    TELAS MUITO LARGAS E BAIXAS
-
-    A compatibilidade continua
-    mostrando os 15 sistemas,
-    mas ocupa menos altura.
-*/
-
-@media(max-height:700px) and (min-width:1500px){
-
-    .compatibility-panel{
-
-        min-height:0;
-
-        grid-template-columns:
-            112px
-            minmax(0,1fr);
-
-        border-radius:12px;
-
-    }
-
-
-    .compatibility-title{
-
-        gap:2px;
-
-        padding:
-            6px
-            7px;
-
-    }
-
-
-    .compatibility-title strong{
-
-        font-size:14px;
-
-    }
-
-
-    .compatibility-title small{
-
-        font-size:9px;
-
-    }
-
-
-    /*
-        Mantém 8 itens na primeira
-        linha e 7 na segunda.
-    */
+@media(max-width:1700px){
 
     .compatibility-line{
 
@@ -538,68 +287,116 @@
 
     }
 
+}
 
-    .compatibility-version{
 
-        min-height:42px;
+@media(max-width:1450px){
 
-        gap:5px;
+    .compatibility-line{
+
+        --compatibility-columns:
+            7 !important;
+
+    }
+
+
+    .compatibility-panel{
+
+        grid-template-columns:
+            105px
+            minmax(0,1fr);
+
+    }
+
+}
+
+
+@media(max-width:1200px){
+
+    .compatibility-line{
+
+        --compatibility-columns:
+            6 !important;
+
+    }
+
+}
+
+
+/* TVs LARGAS E BAIXAS */
+
+@media(max-height:700px) and (min-width:1500px){
+
+    .compatibility-panel{
+
+        grid-template-columns:
+            100px
+            minmax(0,1fr);
+
+    }
+
+
+    .compatibility-title{
 
         padding:
-            4px
+            5px
             6px;
 
     }
 
 
-    .compatibility-icon{
+    .compatibility-title strong{
 
-        width:16px;
-
-        height:16px;
+        font-size:12px;
 
     }
 
 
-    .compatibility-icon svg{
+    .compatibility-title small{
 
-        width:15px;
-
-        height:15px;
+        font-size:8px;
 
     }
 
 
-    .compatibility-system-info{
+    .compatibility-line{
 
-        gap:1px;
+        --compatibility-columns:
+            10 !important;
+
+    }
+
+
+    .compatibility-version{
+
+        min-height:34px;
+
+        padding:
+            3px
+            5px;
 
     }
 
 
     .compatibility-system-info strong{
 
-        font-size:10.5px;
-
-        line-height:1.08;
+        font-size:9.5px;
 
     }
 
 
     .compatibility-system-info small{
 
-        font-size:9px;
-
-        line-height:1;
+        font-size:8.5px;
 
     }
 
 
     .compatibility-empty{
 
-        min-height:84px;
+        min-height:68px;
 
-        font-size:11px;
+        font-size:10px;
 
     }
 
@@ -608,15 +405,13 @@
 
 /* RESPONSIVO */
 
-@media(max-width:1000px){
+@media(max-width:900px){
 
     .compatibility-panel{
 
         display:flex;
 
         flex-direction:column;
-
-        align-items:stretch;
 
         overflow:visible;
 
@@ -625,17 +420,11 @@
 
     .compatibility-title{
 
-        min-height:56px;
-
-        align-items:center;
-
-        justify-content:center;
+        min-height:46px;
 
         padding:
-            10px
-            14px;
-
-        text-align:center;
+            8px
+            12px;
 
         border-right:none;
 
@@ -649,36 +438,16 @@
     .compatibility-line{
 
         --compatibility-columns:
-            3 !important;
+            4 !important;
 
         width:100%;
-
-        justify-content:center;
 
     }
 
 
     .compatibility-version{
 
-        min-height:63px;
-
-        padding:
-            10px
-            12px;
-
-    }
-
-
-    .compatibility-system-info strong{
-
-        font-size:12px;
-
-    }
-
-
-    .compatibility-system-info small{
-
-        font-size:11px;
+        min-height:40px;
 
     }
 
@@ -690,19 +459,19 @@
     .compatibility-line{
 
         --compatibility-columns:
-            2 !important;
+            3 !important;
 
     }
 
 }
 
 
-@media(max-width:420px){
+@media(max-width:460px){
 
     .compatibility-line{
 
         --compatibility-columns:
-            1 !important;
+            2 !important;
 
     }
 

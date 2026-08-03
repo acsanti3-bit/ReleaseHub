@@ -215,13 +215,13 @@
 
     grid-template-columns:
         repeat(
-            2,
+            3,
             minmax(0,1fr)
         );
 
     grid-template-rows:
         repeat(
-            6,
+            5,
             minmax(0,1fr)
         );
 
@@ -330,26 +330,6 @@
 
 
 
-.tv-status-card-resolved{
-
-    grid-column:1/-1;
-    background:#EDF7EE;
-    border-color:#CFE7D1;
-
-}
-
-.tv-status-card-resolved .tv-status-card-top{
-
-    color:#2E7D32;
-    font-weight:700;
-
-}
-
-.tv-status-card-resolved strong{
-
-    font-weight:700;
-
-}
 
 /* STATUS ZERADOS */
 
@@ -465,6 +445,83 @@
 }
 
 
+.tv-card-resolved{
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    gap:3px;
+
+    padding:
+        4px
+        8px;
+
+    border-radius:8px;
+
+    background:#EAF5EC;
+
+    border:1px solid #CFE7D1;
+
+}
+
+
+.tv-card-resolved small{
+
+    color:#4F7D52;
+
+    font-size:8px;
+
+    line-height:1;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.3px;
+
+}
+
+
+.tv-card-resolved > div{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:4px;
+
+}
+
+
+.tv-card-resolved strong{
+
+    color:#2E7D32;
+
+    font-size:18px;
+
+    line-height:1;
+
+    font-weight:800;
+
+}
+
+
+.tv-card-resolved span{
+
+    color:#4F7D52;
+
+    font-size:8px;
+
+    font-weight:600;
+
+}
+
+
 /* TVs COM MENOS ALTURA */
 
 @media(max-height:820px){
@@ -506,7 +563,7 @@
 
         grid-template-rows:
             repeat(
-                6,
+                5,
                 minmax(0,1fr)
             );
 

@@ -176,7 +176,8 @@
     grid-template-columns:
         1fr
         1fr
-        1.3fr;
+        1.3fr
+        .9fr;
 
     gap:14px;
 
@@ -224,6 +225,60 @@
     font-size:13px;
 
     line-height:1.2;
+
+}
+
+
+/* RESOLVIDAS */
+
+.release-resolved-info{
+
+    min-width:0;
+
+    padding:
+        7px
+        10px;
+
+    border-radius:9px;
+
+    background:#EDF7EE;
+
+    border:1px solid #CFE7D1;
+
+}
+
+
+.release-resolved-value{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:5px;
+
+}
+
+
+.release-resolved-value strong{
+
+    color:#2E7D32;
+
+    font-size:20px;
+
+    line-height:1;
+
+    font-weight:800;
+
+}
+
+
+.release-resolved-value span{
+
+    color:#4F7D52;
+
+    font-size:10px;
+
+    font-weight:600;
 
 }
 
@@ -383,26 +438,6 @@
 
 
 
-.release-status-item-resolved{
-
-    grid-column:1/-1;
-    background:#EDF7EE;
-    border:1px solid #CFE7D1;
-
-}
-
-.release-status-item-resolved .release-status-label{
-
-    color:#2E7D32;
-    font-weight:700;
-
-}
-
-.release-status-item-resolved > strong{
-
-    font-size:16px;
-
-}
 
 .release-status-empty{
 
@@ -466,13 +501,6 @@
 
         grid-template-columns:
             repeat(2,1fr);
-
-    }
-
-
-    .release-project-info > div:last-child{
-
-        grid-column:1/-1;
 
     }
 
