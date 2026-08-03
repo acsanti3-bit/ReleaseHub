@@ -59,6 +59,11 @@ function transformarProjeto(row) {
           row.reaberta
         ),
 
+      validacaoCliente:
+        numero(
+          row.validacao_cliente
+        ),
+
       resolvidas:
         numero(
           row.resolvidas
@@ -184,6 +189,7 @@ export async function onRequestGet(
               rp.em_progresso,
               rp.nova,
               rp.reaberta,
+              rp.validacao_cliente,
               rp.resolvidas,
               rp.rejeitada,
               rp.interrompida
@@ -302,6 +308,7 @@ export async function onRequestPut(
             em_progresso,
             nova,
             reaberta,
+            validacao_cliente,
             resolvidas,
             rejeitada,
             interrompida
@@ -310,7 +317,7 @@ export async function onRequestPut(
           VALUES (
             ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?
           )
 
           ON CONFLICT(
@@ -349,6 +356,9 @@ export async function onRequestPut(
 
             reaberta =
               excluded.reaberta,
+
+            validacao_cliente =
+              excluded.validacao_cliente,
 
             resolvidas =
               excluded.resolvidas,
@@ -400,6 +410,10 @@ export async function onRequestPut(
 
         numero(
           situacoes.reaberta
+        ),
+
+        numero(
+          situacoes.validacaoCliente
         ),
 
         numero(

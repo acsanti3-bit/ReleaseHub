@@ -229,6 +229,9 @@ function ProjectDrawer({
     reaberta:
       "Reaberta",
 
+    validacaoCliente:
+      "Validação no Cliente",
+
     resolvidas:
       "Resolvidas",
 
@@ -260,11 +263,13 @@ function ProjectDrawer({
 
       "reaberta",
 
-      "resolvidas",
+      "validacaoCliente",
 
       "rejeitada",
 
       "interrompida",
+
+      "resolvidas",
 
     ];
 

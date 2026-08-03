@@ -43,6 +43,8 @@ function TasksChart({
 
     reaberta: 0,
 
+    validacaoCliente: 0,
+
     resolvidas: 0,
 
     rejeitada: 0,
@@ -95,6 +97,12 @@ function TasksChart({
         project
           .situacoes
           .reaberta;
+
+
+      total.validacaoCliente +=
+        project
+          .situacoes
+          .validacaoCliente;
 
 
       total.resolvidas +=
@@ -164,9 +172,9 @@ function TasksChart({
     },
 
     {
-      name: "Resolvidas",
-      value: total.resolvidas,
-      color: "#2E7D32",
+      name: "Validação no Cliente",
+      value: total.validacaoCliente,
+      color: "#5C6BC0",
     },
 
     {
@@ -179,6 +187,12 @@ function TasksChart({
       name: "Interrompida",
       value: total.interrompida,
       color: "#757575",
+    },
+
+    {
+      name: "Resolvidas",
+      value: total.resolvidas,
+      color: "#2E7D32",
     },
 
   ].filter(

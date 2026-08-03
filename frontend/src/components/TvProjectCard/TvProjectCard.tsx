@@ -201,15 +201,15 @@ function TvProjectCard({
 
     {
       nome:
-        "Resolvidas",
+        "Validação no Cliente",
 
       valor:
         project
           .situacoes
-          .resolvidas,
+          .validacaoCliente,
 
       cor:
-        "#2E7D32",
+        "#5C6BC0",
     },
 
     {
@@ -236,6 +236,19 @@ function TvProjectCard({
 
       cor:
         "#8E24AA",
+    },
+
+    {
+      nome:
+        "Resolvidas",
+
+      valor:
+        project
+          .situacoes
+          .resolvidas,
+
+      cor:
+        "#2E7D32",
     },
 
   ];
@@ -308,6 +321,10 @@ function TvProjectCard({
                 className={`tv-status-card ${
                   zerado
                     ? "tv-status-card-zero"
+                    : ""
+                } ${
+                  item.nome === "Resolvidas"
+                    ? "tv-status-card-resolved"
                     : ""
                 }`}
               >

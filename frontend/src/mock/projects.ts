@@ -33,6 +33,8 @@ export const projects: Project[] = [
 
       reaberta: 1,
 
+      validacaoCliente: 0,
+
       resolvidas: 0,
 
       rejeitada: 0,
@@ -72,6 +74,8 @@ export const projects: Project[] = [
 
       reaberta: 0,
 
+      validacaoCliente: 0,
+
       resolvidas: 0,
 
       rejeitada: 0,
@@ -87,7 +91,7 @@ export const projects: Project[] = [
 
     id: 3,
 
-    nome: "EasyCheckout",
+    nome: "EasyCheckOut",
 
     versao: "1.0.6.0",
 
@@ -110,6 +114,8 @@ export const projects: Project[] = [
       nova: 0,
 
       reaberta: 0,
+
+      validacaoCliente: 0,
 
       resolvidas: 0,
 

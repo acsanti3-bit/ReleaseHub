@@ -26,6 +26,8 @@ export interface Project {
 
     reaberta: number;
 
+    validacaoCliente: number;
+
     resolvidas: number;
 
     rejeitada: number;

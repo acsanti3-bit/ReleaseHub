@@ -382,6 +382,28 @@
 }
 
 
+
+.release-status-item-resolved{
+
+    grid-column:1/-1;
+    background:#EDF7EE;
+    border:1px solid #CFE7D1;
+
+}
+
+.release-status-item-resolved .release-status-label{
+
+    color:#2E7D32;
+    font-weight:700;
+
+}
+
+.release-status-item-resolved > strong{
+
+    font-size:16px;
+
+}
+
 .release-status-empty{
 
     grid-column:1/-1;

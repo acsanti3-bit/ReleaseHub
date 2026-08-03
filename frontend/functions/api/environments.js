@@ -1,79 +1,23 @@
 const SISTEMAS_FIXOS = [
-  {
-    chave: "intellicash",
-    nome: "Intellicash",
-    ordem: 1,
-  },
-  {
-    chave: "easycash",
-    nome: "EasyCash",
-    ordem: 2,
-  },
-  {
-    chave: "easycheckout",
-    nome: "EasyCheckout",
-    ordem: 3,
-  },
-  {
-    chave: "easypdv",
-    nome: "EasyPDV",
-    ordem: 4,
-  },
-  {
-    chave: "intellistock",
-    nome: "IntelliStock",
-    ordem: 5,
-  },
-  {
-    chave: "iwbserver",
-    nome: "IWB Server",
-    ordem: 6,
-  },
-  {
-    chave: "enterpriseserver",
-    nome: "Enterprise Server",
-    ordem: 7,
-  },
-  {
-    chave: "nfedestinadas",
-    nome: "NFeDestinadas",
-    ordem: 8,
-  },
-  {
-    chave: "intellifood",
-    nome: "IntelliFood",
-    ordem: 9,
-  },
-  {
-    chave: "pcp",
-    nome: "PCP",
-    ordem: 10,
-  },
-  {
-    chave: "gerenciadordepromocoes",
-    nome: "Gerenciador de promoções",
-    ordem: 11,
-  },
-  {
-    chave: "sincronizadormatrizxfilial",
-    nome: "Sincronizador Matriz X Filial",
-    ordem: 12,
-  },
-  {
-    chave: "sincronizadorlabfiscal",
-    nome: "Sincronizador Lab Fiscal",
-    ordem: 13,
-  },
-  {
-    chave: "sincronizadorecommerce",
-    nome: "Sincronizador E-Commerce",
-    ordem: 14,
-  },
-  {
-    chave: "bi",
-    nome: "BI",
-    ordem: 15,
-  },
+  { chave: "intellicash", nome: "IntelliCash", ordem: 1 },
+  { chave: "easycash", nome: "EasyCash", ordem: 2 },
+  { chave: "easycheckout", nome: "EasyCheckOut", ordem: 3 },
+  { chave: "easypdv", nome: "EasyPDV", ordem: 4 },
+  { chave: "intellistock", nome: "IntelliStock", ordem: 5 },
+  { chave: "iwbserver", nome: "IWB Server", ordem: 6 },
+  { chave: "enterpriseserver", nome: "Enterprise Server", ordem: 7 },
+  { chave: "nfedestinadas", nome: "NF-e Destinadas", ordem: 8 },
+  { chave: "intellifood", nome: "IntelliFood", ordem: 9 },
+  { chave: "pcp", nome: "PCP", ordem: 10 },
+  { chave: "gerenciadordepromocoes", nome: "Gerenciador de Promoções", ordem: 11 },
+  { chave: "sincmatrizxfilial", nome: "Sinc. Matriz X Filial", ordem: 12 },
+  { chave: "sinclabfiscal", nome: "Sinc. Lab. Fiscal", ordem: 13 },
+  { chave: "sincecommerce", nome: "Sinc. E-Commerce", ordem: 14 },
+  { chave: "pesocerto", nome: "Peso Certo", ordem: 15 },
+  { chave: "notify", nome: "Notify", ordem: 16 },
+  { chave: "vendaassistida", nome: "Venda Assistida", ordem: 17 },
+  { chave: "cotacao", nome: "Cotação", ordem: 18 },
+  { chave: "bi", nome: "BI", ordem: 19 },
 ];
 
 
@@ -137,7 +81,7 @@ function obterVersaoLegada(
 
 /*
   Sempre retorna exatamente
-  os 15 sistemas do catálogo.
+  os 19 sistemas do catálogo.
 
   As versões já cadastradas
   são preservadas.
@@ -389,6 +333,8 @@ function obterVersaoProjeto(
     {
       termos: [
         "iwbserver",
+        "iwbserver",
+        "iwb",
         "iwb",
       ],
       chave: "iwbserver",
@@ -610,7 +556,7 @@ export async function onRequestGet(
           /*
             Mesmo que o ambiente antigo
             possua apenas seis registros,
-            a resposta já conterá os 15.
+            a resposta já conterá os 19.
           */
           const sistemas =
             normalizarSistemas(

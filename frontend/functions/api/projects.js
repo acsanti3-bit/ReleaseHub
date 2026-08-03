@@ -37,6 +37,12 @@ function transformarProjeto(row) {
 
       reaberta: row.reaberta,
 
+      validacaoCliente:
+        numero(row.validacao_cliente),
+
+      resolvidas:
+        numero(row.resolvidas),
+
       rejeitada: row.rejeitada,
 
       interrompida: row.interrompida,
@@ -92,6 +98,8 @@ export async function onRequestGet(
               aguardando_compilacao,
               nova,
               reaberta,
+              validacao_cliente,
+              resolvidas,
               rejeitada,
               interrompida
             FROM projects
@@ -170,13 +178,15 @@ export async function onRequestPost(
             aguardando_compilacao,
             nova,
             reaberta,
+            validacao_cliente,
+            resolvidas,
             rejeitada,
             interrompida
           )
           VALUES (
             ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
-            ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?
           )
         `
       )
@@ -218,6 +228,14 @@ export async function onRequestPost(
 
         numero(
           situacoes.reaberta
+        ),
+
+        numero(
+          situacoes.validacaoCliente
+        ),
+
+        numero(
+          situacoes.resolvidas
         ),
 
         numero(
@@ -309,6 +327,8 @@ export async function onRequestPut(
             aguardando_compilacao = ?,
             nova = ?,
             reaberta = ?,
+            validacao_cliente = ?,
+            resolvidas = ?,
             rejeitada = ?,
             interrompida = ?
 
@@ -351,6 +371,14 @@ export async function onRequestPut(
 
         numero(
           situacoes.reaberta
+        ),
+
+        numero(
+          situacoes.validacaoCliente
+        ),
+
+        numero(
+          situacoes.resolvidas
         ),
 
         numero(

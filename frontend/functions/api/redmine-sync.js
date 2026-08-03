@@ -26,6 +26,9 @@ const STATUS_PARA_CAMPO = {
   reaberto:
     "reaberta",
 
+  validacaonocliente:
+    "validacao_cliente",
+
   resolvida:
     "resolvidas",
 
@@ -86,6 +89,8 @@ function criarContagens() {
     nova: 0,
 
     reaberta: 0,
+
+    validacao_cliente: 0,
 
     resolvidas: 0,
 
@@ -869,6 +874,7 @@ export async function onRequestPost(
                     em_progresso = ?,
                     nova = ?,
                     reaberta = ?,
+                    validacao_cliente = ?,
                     resolvidas = ?,
                     rejeitada = ?,
                     interrompida = ?,
@@ -907,6 +913,10 @@ export async function onRequestPost(
                 atualizacao
                   .contagens
                   .reaberta,
+
+                atualizacao
+                  .contagens
+                  .validacao_cliente,
 
                 atualizacao
                   .contagens

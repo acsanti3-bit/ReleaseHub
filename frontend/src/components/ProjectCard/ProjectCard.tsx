@@ -420,15 +420,15 @@ function ProjectCard({
 
     {
       label:
-        "Resolvidas",
+        "Validação no Cliente",
 
       value:
         project
           .situacoes
-          .resolvidas,
+          .validacaoCliente,
 
       color:
-        "#2E7D32",
+        "#5C6BC0",
     },
 
     {
@@ -455,6 +455,19 @@ function ProjectCard({
 
       color:
         "#8E24AA",
+    },
+
+    {
+      label:
+        "Resolvidas",
+
+      value:
+        project
+          .situacoes
+          .resolvidas,
+
+      color:
+        "#2E7D32",
     },
 
   ].filter(
@@ -608,7 +621,11 @@ function ProjectCard({
               key={
                 status.label
               }
-              className="release-status-item"
+              className={`release-status-item ${
+                status.label === "Resolvidas"
+                  ? "release-status-item-resolved"
+                  : ""
+              }`}
             >
 
               <div className="release-status-label">

@@ -27,7 +27,12 @@ async function requisicao<T>(
   const response =
     await fetch(
       url,
-      options
+      {
+        credentials:
+          "include",
+
+        ...options,
+      }
     );
 
 
@@ -35,13 +40,40 @@ async function requisicao<T>(
     !response.ok
   ) {
 
-    const texto =
-      await response.text();
+    let mensagem =
+      "Erro ao comunicar com a API.";
+
+
+    try {
+
+      const data =
+        await response.json();
+
+
+      mensagem =
+        data.erro ??
+        mensagem;
+
+    } catch {
+
+      const texto =
+        await response.text();
+
+
+      if (
+        texto
+      ) {
+
+        mensagem =
+          texto;
+
+      }
+
+    }
 
 
     throw new Error(
-      texto ||
-      "Erro ao comunicar com a API."
+      mensagem
     );
 
   }
@@ -58,9 +90,14 @@ function obterChaveProjeto(
 
   const projeto =
     nome
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
       .toLowerCase()
       .replace(
-        /\s/g,
+        /[^a-z0-9]/g,
         ""
       );
 
@@ -128,6 +165,9 @@ function obterChaveProjeto(
 
   if (
     projeto.includes(
+      "iwbserver"
+    ) ||
+    projeto.includes(
       "iwb"
     )
   ) {
@@ -149,22 +189,18 @@ async function atualizarProjetoNaApi(
   return requisicao<Project>(
     API_URL,
     {
-
       method:
         "PUT",
 
       headers: {
-
         "Content-Type":
           "application/json",
-
       },
 
       body:
         JSON.stringify(
           project
         ),
-
     }
   );
 
@@ -177,7 +213,14 @@ export async function listarProjetos():
   return requisicao<
     Project[]
   >(
-    API_URL
+    API_URL,
+    {
+      method:
+        "GET",
+
+      cache:
+        "no-store",
+    }
   );
 
 }
@@ -200,9 +243,9 @@ export async function editarProjeto(
 
 
   /*
-    Se o Intellicash mudar de versão,
-    atualizamos todo o ambiente
-    automaticamente.
+    Se o IntelliCash mudar de versão,
+    os projetos vinculados ao ambiente
+    são atualizados automaticamente.
   */
 
   if (
@@ -227,9 +270,26 @@ export async function adicionarProjeto(
   project: Project
 ): Promise<Project> {
 
-  let projetoParaSalvar = {
-    ...project,
-  };
+  let projetoParaSalvar:
+    Project = {
+      ...project,
+
+      situacoes: {
+        ...project.situacoes,
+
+        validacaoCliente:
+          project
+            .situacoes
+            .validacaoCliente ??
+          0,
+
+        resolvidas:
+          project
+            .situacoes
+            .resolvidas ??
+          0,
+      },
+    };
 
 
   const chave =
@@ -239,9 +299,9 @@ export async function adicionarProjeto(
 
 
   /*
-    Se estiver adicionando um
-    projeto pertencente ao ambiente,
-    tenta descobrir sua versão
+    Quando o projeto pertence
+    ao ambiente da release,
+    tenta localizar sua versão
     automaticamente.
   */
 
@@ -280,15 +340,15 @@ export async function adicionarProjeto(
       ) {
 
         projetoParaSalvar = {
-
           ...projetoParaSalvar,
 
           versao:
             ambiente
               .versoes[
                 chave
-              ],
-
+              ] ??
+            projetoParaSalvar
+              .versao,
         };
 
       }
@@ -302,22 +362,18 @@ export async function adicionarProjeto(
     await requisicao<Project>(
       API_URL,
       {
-
         method:
           "POST",
 
         headers: {
-
           "Content-Type":
             "application/json",
-
         },
 
         body:
           JSON.stringify(
             projetoParaSalvar
           ),
-
       }
     );
 
@@ -347,10 +403,8 @@ export async function excluirProjeto(
   await requisicao(
     `${API_URL}?id=${id}`,
     {
-
       method:
         "DELETE",
-
     }
   );
 
@@ -372,7 +426,6 @@ export function criarProjeto():
   Project {
 
   return {
-
     id:
       Date.now(),
 
@@ -389,7 +442,6 @@ export function criarProjeto():
       "",
 
     situacoes: {
-
       qualidade:
         0,
 
@@ -411,6 +463,9 @@ export function criarProjeto():
       reaberta:
         0,
 
+      validacaoCliente:
+        0,
+
       resolvidas:
         0,
 
@@ -419,9 +474,7 @@ export function criarProjeto():
 
       interrompida:
         0,
-
     },
-
   };
 
 }
@@ -493,16 +546,28 @@ export async function sincronizarProjetosComAmbienteAtual(
         }
 
 
-        return {
+        const novaVersao =
+          ambiente
+            .versoes[
+              chave
+            ];
 
+
+        if (
+          novaVersao ===
+            undefined
+        ) {
+
+          return project;
+
+        }
+
+
+        return {
           ...project,
 
           versao:
-            ambiente
-              .versoes[
-                chave
-              ],
-
+            novaVersao,
         };
 
       }
@@ -532,14 +597,12 @@ export async function sincronizarProjetosComAmbienteAtual(
 
 
   await Promise.all(
-
     alterados.map(
       project =>
         atualizarProjetoNaApi(
           project
         )
     )
-
   );
 
 
