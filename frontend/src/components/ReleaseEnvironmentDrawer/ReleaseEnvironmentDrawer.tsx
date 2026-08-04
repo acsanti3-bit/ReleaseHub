@@ -82,6 +82,54 @@ function ReleaseEnvironmentDrawer({
   }
 
 
+  function alterarExibicaoNaTv(
+    chave: string,
+    mostrarNaTv: boolean
+  ) {
+    setForm(
+      estadoAtual => ({
+        ...estadoAtual,
+
+        sistemas:
+          (
+            estadoAtual.sistemas ??
+            []
+          ).map(
+            sistema =>
+              sistema.chave === chave
+                ? {
+                    ...sistema,
+                    mostrarNaTv,
+                  }
+                : sistema
+          ),
+      })
+    );
+  }
+
+
+  function alterarTodosNaTv(
+    mostrarNaTv: boolean
+  ) {
+    setForm(
+      estadoAtual => ({
+        ...estadoAtual,
+
+        sistemas:
+          (
+            estadoAtual.sistemas ??
+            []
+          ).map(
+            sistema => ({
+              ...sistema,
+              mostrarNaTv,
+            })
+          ),
+      })
+    );
+  }
+
+
   function salvar() {
     if (!form.nome.trim()) {
       alert(
@@ -232,6 +280,153 @@ function ReleaseEnvironmentDrawer({
           </div>
 
 
+          <div
+            style={{
+              display:
+                "flex",
+
+              alignItems:
+                "center",
+
+              justifyContent:
+                "space-between",
+
+              gap:
+                "12px",
+
+              marginBottom:
+                "10px",
+
+              padding:
+                "10px 12px",
+
+              border:
+                "1px solid #E3E9EF",
+
+              borderRadius:
+                "10px",
+
+              background:
+                "#F8FAFC",
+            }}
+          >
+            <div>
+              <strong
+                style={{
+                  display:
+                    "block",
+
+                  color:
+                    "#005AA9",
+
+                  fontSize:
+                    "13px",
+                }}
+              >
+                Projetos exibidos na TV
+              </strong>
+
+              <span
+                style={{
+                  color:
+                    "#7A838C",
+
+                  fontSize:
+                    "11px",
+                }}
+              >
+                Desmarque os projetos que
+                não devem aparecer no painel.
+              </span>
+            </div>
+
+            <div
+              style={{
+                display:
+                  "flex",
+
+                gap:
+                  "6px",
+
+                flexShrink:
+                  0,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  alterarTodosNaTv(
+                    true
+                  )
+                }
+                style={{
+                  padding:
+                    "6px 9px",
+
+                  border:
+                    "1px solid #C9D8E5",
+
+                  borderRadius:
+                    "7px",
+
+                  background:
+                    "#FFFFFF",
+
+                  color:
+                    "#005AA9",
+
+                  cursor:
+                    "pointer",
+
+                  fontSize:
+                    "10px",
+
+                  fontWeight:
+                    700,
+                }}
+              >
+                Marcar todos
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  alterarTodosNaTv(
+                    false
+                  )
+                }
+                style={{
+                  padding:
+                    "6px 9px",
+
+                  border:
+                    "1px solid #D7DDE3",
+
+                  borderRadius:
+                    "7px",
+
+                  background:
+                    "#FFFFFF",
+
+                  color:
+                    "#66717C",
+
+                  cursor:
+                    "pointer",
+
+                  fontSize:
+                    "10px",
+
+                  fontWeight:
+                    700,
+                }}
+              >
+                Desmarcar
+              </button>
+            </div>
+          </div>
+
+
           <div className="release-system-list">
             {sistemas.map(
               sistema => {
@@ -282,6 +477,71 @@ function ReleaseEnvironmentDrawer({
                           )
                       }
                     />
+
+                    <label
+                      title="Exibir este projeto no Modo TV"
+                      style={{
+                        display:
+                          "flex",
+
+                        alignItems:
+                          "center",
+
+                        justifyContent:
+                          "center",
+
+                        gap:
+                          "6px",
+
+                        minWidth:
+                          "92px",
+
+                        cursor:
+                          "pointer",
+
+                        color:
+                          sistema.mostrarNaTv
+                            ? "#2E7D32"
+                            : "#8A939D",
+
+                        fontSize:
+                          "10px",
+
+                        fontWeight:
+                          700,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={
+                          sistema.mostrarNaTv
+                        }
+                        onChange={
+                          event =>
+                            alterarExibicaoNaTv(
+                              sistema.chave,
+                              event
+                                .target
+                                .checked
+                            )
+                        }
+                        style={{
+                          width:
+                            "16px",
+
+                          height:
+                            "16px",
+
+                          accentColor:
+                            "#005AA9",
+
+                          cursor:
+                            "pointer",
+                        }}
+                      />
+
+                      Exibir na TV
+                    </label>
                   </div>
                 );
               }

@@ -35,6 +35,123 @@ const STORAGE_KEY =
   "releasehub_tv_environment";
 
 
+function normalizarNome(
+  valor: string
+) {
+  return valor
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]/g,
+      ""
+    );
+}
+
+
+function projetoVisivelNaTv(
+  project: Project,
+  ambiente:
+    ReleaseEnvironment | undefined
+) {
+  const sistemas =
+    ambiente?.sistemas ?? [];
+
+  if (
+    sistemas.length === 0
+  ) {
+    return true;
+  }
+
+  const nomeProjeto =
+    normalizarNome(
+      project.nome
+    );
+
+  const sistema =
+    sistemas.find(
+      item => {
+        const chave =
+          normalizarNome(
+            item.chave
+          );
+
+        const nome =
+          normalizarNome(
+            item.nome
+          );
+
+        if (
+          nomeProjeto === chave ||
+          nomeProjeto === nome
+        ) {
+          return true;
+        }
+
+        if (
+          nomeProjeto.includes(
+            "isa"
+          ) &&
+          chave ===
+            "intellistock"
+        ) {
+          return true;
+        }
+
+        if (
+          nomeProjeto.includes(
+            "sincronizadormatrizxfilial"
+          ) &&
+          chave ===
+            "sincmatrizxfilial"
+        ) {
+          return true;
+        }
+
+        if (
+          nomeProjeto.includes(
+            "sincronizadorlabfiscal"
+          ) &&
+          chave ===
+            "sinclabfiscal"
+        ) {
+          return true;
+        }
+
+        if (
+          nomeProjeto.includes(
+            "sincronizadorecommerce"
+          ) &&
+          chave ===
+            "sincecommerce"
+        ) {
+          return true;
+        }
+
+        return (
+          chave.length > 3 &&
+          (
+            nomeProjeto.includes(
+              chave
+            ) ||
+            nomeProjeto.includes(
+              nome
+            )
+          )
+        );
+      }
+    );
+
+  return (
+    sistema?.mostrarNaTv ??
+    true
+  );
+}
+
+
 function TvDashboard() {
 
   const [
@@ -497,12 +614,17 @@ function TvDashboard() {
           project =>
             possuiTarefas(
               project
+            ) &&
+            projetoVisivelNaTv(
+              project,
+              ambienteSelecionado
             )
         );
 
       },
       [
         projects,
+        ambienteSelecionado,
       ]
     );
 

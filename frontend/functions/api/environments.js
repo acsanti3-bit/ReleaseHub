@@ -147,6 +147,10 @@ function normalizarSistemas(
             ) ??
             ""
           ).trim(),
+
+        mostrarNaTv:
+          encontrado?.mostrarNaTv ??
+          true,
       };
     }
   );
@@ -212,7 +216,8 @@ async function listarSistemas(
             chave,
             nome,
             versao,
-            ordem
+            ordem,
+            mostrar_na_tv
 
           FROM release_environment_versions
 
@@ -248,6 +253,11 @@ async function listarSistemas(
           row.versao ?? "",
         ordem:
           Number(row.ordem) || 0,
+
+        mostrarNaTv:
+          Number(
+            row.mostrar_na_tv
+          ) !== 0,
       });
   }
 
@@ -279,9 +289,10 @@ async function salvarSistemas(
             chave,
             nome,
             versao,
-            ordem
+            ordem,
+            mostrar_na_tv
           )
-          VALUES (?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -289,7 +300,10 @@ async function salvarSistemas(
         sistema.chave,
         sistema.nome,
         sistema.versao,
-        sistema.ordem
+        sistema.ordem,
+        sistema.mostrarNaTv
+          ? 1
+          : 0
       )
       .run();
   }
