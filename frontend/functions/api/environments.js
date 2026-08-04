@@ -333,8 +333,6 @@ function obterVersaoProjeto(
     {
       termos: [
         "iwbserver",
-        "iwbserver",
-        "iwb",
         "iwb",
       ],
       chave: "iwbserver",

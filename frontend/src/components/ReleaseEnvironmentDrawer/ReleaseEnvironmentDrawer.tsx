@@ -104,7 +104,7 @@ function ReleaseEnvironmentDrawer({
         .trim()
     ) {
       alert(
-        "Informe a versão do Intellicash."
+        "Informe a versão do IntelliCash."
       );
 
       return;
@@ -221,7 +221,7 @@ function ReleaseEnvironmentDrawer({
 
             <span>
               Todos os ambientes possuem
-              os mesmos 15 sistemas. Informe
+              os mesmos 19 sistemas. Informe
               somente as versões disponíveis.
             </span>
           </div>
