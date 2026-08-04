@@ -17,7 +17,7 @@
     top: 0;
     right: 0;
 
-    width: 520px;
+    width: 690px;
     max-width: 100%;
     height: 100vh;
 
@@ -37,7 +37,7 @@
 /* CABEÇALHO */
 
 .release-drawer-header {
-    padding: 22px 24px;
+    padding: 18px 24px;
 
     display: flex;
     align-items: center;
@@ -94,14 +94,14 @@
 .release-drawer-body {
     flex: 1;
 
-    padding: 20px 24px 24px;
+    padding: 18px 24px 22px;
 
     overflow-y: auto;
 }
 
 
 .release-field {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 
@@ -119,7 +119,7 @@
 
 .release-field input {
     width: 100%;
-    height: 42px;
+    height: 40px;
 
     padding: 0 12px;
 
@@ -151,9 +151,9 @@
 /* AVISO */
 
 .release-reference {
-    margin: 20px 0;
+    margin: 14px 0;
 
-    padding: 12px 14px;
+    padding: 10px 13px;
 
     background: #eef6fd;
 
@@ -170,26 +170,26 @@
 
     color: #005aa9;
 
-    font-size: 13px;
+    font-size: 12px;
 }
 
 
 .release-reference span {
     display: block;
 
-    margin-top: 3px;
+    margin-top: 2px;
 
     color: #65717c;
 
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.35;
 }
 
 
 .release-divider {
-    margin: 22px 0 12px;
+    margin: 16px 0 9px;
 
-    padding-bottom: 8px;
+    padding-bottom: 7px;
 
     border-bottom:
         1px solid
@@ -205,30 +205,122 @@
 }
 
 
-/* LISTA FIXA */
+/* CONTROLES DA TV */
+
+.release-tv-controls {
+    margin-bottom: 9px;
+
+    padding: 9px 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    box-sizing: border-box;
+
+    background: #f7fafe;
+
+    border:
+        1px solid
+        #dbe7f1;
+
+    border-radius: 9px;
+}
+
+
+.release-tv-controls-text {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.release-tv-controls-text strong {
+    color: #005aa9;
+
+    font-size: 12px;
+}
+
+
+.release-tv-controls-text span {
+    color: #7a838c;
+
+    font-size: 10px;
+}
+
+
+.release-tv-actions {
+    display: flex;
+
+    gap: 6px;
+
+    flex-shrink: 0;
+}
+
+
+.release-tv-actions button {
+    height: 29px;
+
+    padding: 0 10px;
+
+    border:
+        1px solid
+        #cbd9e5;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #005aa9;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.release-tv-actions button:last-child {
+    color: #64707b;
+}
+
+
+.release-tv-actions button:hover {
+    border-color: #005aa9;
+
+    background: #eef6fd;
+}
+
+
+/* LISTA COMPACTA */
 
 .release-system-list {
     display: flex;
     flex-direction: column;
 
-    gap: 8px;
+    gap: 6px;
 }
 
 
 .release-system-row {
-    min-height: 56px;
+    min-height: 48px;
 
-    padding: 8px 10px 8px 12px;
+    padding: 6px 9px 6px 12px;
 
     display: grid;
 
     grid-template-columns:
-        minmax(170px, 1fr)
-        minmax(140px, 0.85fr);
+        minmax(150px, 1fr)
+        minmax(175px, 0.95fr)
+        112px;
 
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 
     box-sizing: border-box;
 
@@ -242,13 +334,13 @@
 }
 
 
-.release-system-row label {
+.release-system-name {
     min-width: 0;
 
     display: flex;
-    flex-direction: column;
+    align-items: center;
 
-    gap: 3px;
+    gap: 7px;
 
     color: #44515c;
 
@@ -257,24 +349,37 @@
 }
 
 
-.release-system-row label span {
-    overflow-wrap: anywhere;
+.release-system-name > span {
+    min-width: 0;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 
-.release-system-row label small {
+.release-system-name small {
+    padding: 3px 5px;
+
+    border-radius: 5px;
+
+    background: #e4f1fb;
     color: #005aa9;
 
-    font-size: 9px;
-    font-weight: 500;
+    font-size: 8px;
+    font-weight: 700;
 
     text-transform: uppercase;
+
+    white-space: nowrap;
 }
 
 
-.release-system-row input {
+.release-system-version {
     width: 100%;
-    height: 36px;
+    height: 34px;
 
     padding: 0 10px;
 
@@ -294,12 +399,51 @@
 }
 
 
-.release-system-row input:focus {
+.release-system-version:focus {
     border-color: #005aa9;
 
     box-shadow:
         0 0 0 3px
         rgba(0, 90, 169, 0.07);
+}
+
+
+.release-tv-toggle {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 7px;
+
+    color: #8a939d;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+
+.release-tv-toggle input {
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+
+    flex-shrink: 0;
+
+    accent-color: #005aa9;
+
+    cursor: pointer;
+}
+
+
+.release-tv-toggle-active {
+    color: #2e7d32;
 }
 
 
@@ -310,12 +454,14 @@
 }
 
 
-.release-system-row-reference label {
+.release-system-row-reference
+.release-system-name {
     color: #005aa9;
 }
 
 
-.release-system-row-reference input {
+.release-system-row-reference
+.release-system-version {
     border-color: #9fc6e5;
 
     color: #005aa9;
@@ -328,9 +474,9 @@
 
 .release-save {
     width: 100%;
-    height: 44px;
+    height: 42px;
 
-    margin-top: 18px;
+    margin-top: 14px;
 
     border: none;
     border-radius: 9px;
@@ -338,7 +484,7 @@
     background: #005aa9;
     color: #ffffff;
 
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
 
     cursor: pointer;
@@ -350,16 +496,57 @@
 }
 
 
-@media (max-width: 520px) {
-    .release-drawer-body {
-        padding:
-            18px
-            16px
-            22px;
+@media (max-width: 720px) {
+    .release-drawer {
+        width: 100%;
     }
 
+
+    .release-drawer-body {
+        padding:
+            16px
+            14px
+            20px;
+    }
+
+
+    .release-tv-controls {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
     .release-system-row {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            minmax(125px, 1fr)
+            minmax(135px, 0.9fr)
+            102px;
+
         gap: 7px;
+
+        padding:
+            6px
+            7px
+            6px
+            9px;
+    }
+}
+
+
+@media (max-width: 520px) {
+    .release-system-row {
+        grid-template-columns:
+            1fr
+            1fr;
+
+        gap: 7px;
+    }
+
+
+    .release-tv-toggle {
+        grid-column: 1 / -1;
+
+        justify-content: flex-end;
     }
 }
