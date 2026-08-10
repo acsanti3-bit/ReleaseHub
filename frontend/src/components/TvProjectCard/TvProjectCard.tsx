@@ -90,12 +90,167 @@ function getProjectColor(
 }
 
 
+function converterDataBrasileira(
+  valor: string
+) {
+  const partes =
+    valor.match(
+      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    );
+
+  if (!partes) {
+    const data =
+      new Date(valor);
+
+    return Number.isNaN(
+      data.getTime()
+    )
+      ? null
+      : data;
+  }
+
+  const dia =
+    Number(partes[1]);
+  const mes =
+    Number(partes[2]);
+  const ano =
+    Number(partes[3]);
+
+  const data =
+    new Date(
+      ano,
+      mes - 1,
+      dia
+    );
+
+  if (
+    data.getFullYear() !== ano ||
+    data.getMonth() !== mes - 1 ||
+    data.getDate() !== dia
+  ) {
+    return null;
+  }
+
+  return data;
+}
+
+
+function obterSituacaoPrazo(
+  prazoTexto: string
+) {
+  if (!prazoTexto) {
+    return {
+      texto: "Sem prazo",
+      detalhe: "Prazo não informado",
+      classe: "neutral",
+    };
+  }
+
+  const prazo =
+    converterDataBrasileira(
+      prazoTexto
+    );
+
+  if (!prazo) {
+    return {
+      texto: "Prazo inválido",
+      detalhe: prazoTexto,
+      classe: "invalid",
+    };
+  }
+
+  const hoje =
+    new Date();
+
+  hoje.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  prazo.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  const diferenca =
+    Math.round(
+      (
+        prazo.getTime() -
+        hoje.getTime()
+      ) /
+      86400000
+    );
+
+  if (diferenca < 0) {
+    const dias =
+      Math.abs(diferenca);
+
+    return {
+      texto: "Atrasado",
+      detalhe:
+        dias === 1
+          ? "1 dia em atraso"
+          : `${dias} dias em atraso`,
+      classe: "late",
+    };
+  }
+
+  if (diferenca === 0) {
+    return {
+      texto: "Vence hoje",
+      detalhe: "Prazo final hoje",
+      classe: "warning",
+    };
+  }
+
+  if (diferenca === 1) {
+    return {
+      texto: "Vence amanhã",
+      detalhe: "1 dia restante",
+      classe: "warning",
+    };
+  }
+
+  if (diferenca <= 3) {
+    return {
+      texto: "Prazo próximo",
+      detalhe: `${diferenca} dias restantes`,
+      classe: "warning",
+    };
+  }
+
+  return {
+    texto: "Em dia",
+    detalhe: `${diferenca} dias restantes`,
+    classe: "ok",
+  };
+}
+
+
 function TvProjectCard({
   project,
 }: Props) {
   const projectColor =
     getProjectColor(
       project.nome
+    );
+
+  const total =
+    Object.values(
+      project.situacoes
+    ).reduce(
+      (acumulado, valor) =>
+        acumulado + valor,
+      0
+    );
+
+  const situacaoPrazo =
+    obterSituacaoPrazo(
+      project.prazo
     );
 
   const status = [
@@ -467,6 +622,25 @@ function TvProjectCard({
             );
           }
         )}
+
+        <div
+          className="tv-status-card tv-status-card-total"
+          title="Total de tarefas do projeto"
+        >
+          <div className="tv-status-card-top">
+            <span
+              className="tv-status-indicator"
+            />
+
+            <span>
+              Total
+            </span>
+          </div>
+
+          <strong>
+            {total}
+          </strong>
+        </div>
       </div>
 
 
@@ -496,6 +670,25 @@ function TvProjectCard({
               "-"
             }
           </strong>
+        </div>
+
+
+        <div className="tv-card-date tv-card-situation">
+          <small>
+            Situação
+          </small>
+
+          <div
+            className={`tv-deadline-status tv-deadline-${situacaoPrazo.classe}`}
+          >
+            <strong>
+              {situacaoPrazo.texto}
+            </strong>
+
+            <span>
+              {situacaoPrazo.detalhe}
+            </span>
+          </div>
         </div>
       </footer>
     </article>
