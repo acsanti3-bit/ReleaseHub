@@ -300,10 +300,14 @@ function TvProjectCard({
 
     const novaAba =
       window.open(
-        "",
-        "_blank",
-        "noopener,noreferrer"
+        "about:blank",
+        "_blank"
       );
+
+    if (novaAba) {
+      novaAba.opener =
+        null;
+    }
 
     try {
       const url =
@@ -317,11 +321,10 @@ function TvProjectCard({
           statusId,
         });
 
-      if (
-        novaAba
-      ) {
-        novaAba.location.href =
-          url;
+      if (novaAba) {
+        novaAba.location.replace(
+          url
+        );
 
         return;
       }
@@ -333,9 +336,7 @@ function TvProjectCard({
       );
 
     } catch (erro) {
-      if (
-        novaAba
-      ) {
+      if (novaAba) {
         novaAba.close();
       }
 
