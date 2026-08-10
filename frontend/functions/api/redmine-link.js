@@ -1,1 +1,500 @@
-function normalizarTexto(valor) {\n  return String(valor ?? "")\n    .normalize("NFD")\n    .replace(/[\\u0300-\\u036f]/g, "")\n    .toLowerCase()\n    .replace(/[^a-z0-9]/g, "");\n}\n\nfunction codificarBase64(valor) {\n  const bytes = new TextEncoder().encode(valor);\n  let binario = "";\n  for (const byte of bytes) {\n    binario += String.fromCharCode(byte);\n  }\n  return btoa(binario);\n}\n\nfunction obterConfiguracao(context) {\n  const url = String(context.env.REDMINE_URL ?? "").trim().replace(/\\/+$/, "");\n  const usuario = String(context.env.REDMINE_USERNAME ?? "").trim();\n  const senha = String(context.env.REDMINE_PASSWORD ?? "");\n  if (!url || !usuario || !senha) {\n    throw new Error("As credenciais do Redmine não estão configuradas na Cloudflare.");\n  }\n  return { url, usuario, senha };\n}\n\nfunction respostaErro(mensagem, status = 500) {\n  return Response.json({ erro: mensagem }, { status });\n}\n\nasync function buscarJsonRedmine(context, caminho, parametros = {}) {\n  const config = obterConfiguracao(context);\n  const url = new URL(`${config.url}${caminho}`);\n  for (const [chave, valor] of Object.entries(parametros)) {\n    if (valor !== undefined && valor !== null && valor !== "") {\n      url.searchParams.set(chave, String(valor));\n    }\n  }\n  const token = codificarBase64(`${config.usuario}:${config.senha}`);\n  const response = await fetch(url.toString(), {\n    method: "GET",\n    headers: { Accept: "application/json", Authorization: `Basic ${token}` },\n    redirect: "manual",\n  });\n  const texto = await response.text();\n  if (!response.ok) {\n    throw new Error(`O Redmine retornou o erro ${response.status} ao consultar ${caminho}.`);\n  }\n  return JSON.parse(texto);\n}\n\nasync function listarProjetosRedmine(context) {\n  const projetos = [];\n  let offset = 0;\n  let total = null;\n  const limite = 100;\n  while (total === null || projetos.length < total) {\n    const resultado = await buscarJsonRedmine(context, "/projects.json", { limit: limite, offset });\n    const itens = Array.isArray(resultado.projects) ? resultado.projects : [];\n    projetos.push(...itens);\n    const totalRetornado = Number(resultado.total_count);\n    total = Number.isFinite(totalRetornado) ? totalRetornado : projetos.length;\n    if (itens.length === 0 || itens.length < limite) break;\n    offset += itens.length;\n  }\n  return projetos;\n}\n\nfunction encontrarProjetoRedmine(nomeReleaseHub, projetosRedmine) {\n  const nome = normalizarTexto(nomeReleaseHub);\n  const exatos = projetosRedmine.filter(p => normalizarTexto(p.name) === nome);\n  if (exatos.length === 1) return exatos[0];\n  if (exatos.length > 1) return exatos.find(p => Number(p.status) === 1) ?? exatos[0];\n  const aproximados = projetosRedmine.filter(p => {\n    const redmine = normalizarTexto(p.name);\n    return redmine.includes(nome) || nome.includes(redmine);\n  });\n  return aproximados.length === 1 ? aproximados[0] : null;\n}\n\nasync function listarVersoesProjeto(context, projectId) {\n  const resultado = await buscarJsonRedmine(context, `/projects/${projectId}/versions.json`);\n  return Array.isArray(resultado.versions) ? resultado.versions : [];\n}\n\nfunction encontrarVersaoRedmine(versaoReleaseHub, versoesRedmine) {\n  const versao = normalizarTexto(versaoReleaseHub);\n  return versoesRedmine.find(v => normalizarTexto(v.name) === versao) ?? null;\n}\n\nfunction montarUrl(config, projeto, versaoId, statusId) {\n  const identifier = String(projeto.identifier ?? projeto.id);\n  const url = new URL(`${config.url}/projects/${encodeURIComponent(identifier)}/issues`);\n  url.searchParams.append("utf8", "✓");\n  url.searchParams.append("set_filter", "1");\n  url.searchParams.append("f[]", "status_id");\n  url.searchParams.append("op[status_id]", "=");\n  url.searchParams.append("v[status_id][]", String(statusId));\n  url.searchParams.append("f[]", "fixed_version_id");\n  url.searchParams.append("op[fixed_version_id]", "=");\n  url.searchParams.append("v[fixed_version_id][]", String(versaoId));\n  url.searchParams.append("f[]", "");\n  for (const c of ["tracker","status","priority","subject","assigned_to","created_on","updated_on","parent","due_date","estimated_hours"]) {\n    url.searchParams.append("c[]", c);\n  }\n  url.searchParams.append("group_by", "");\n  url.searchParams.append("t[]", "");\n  return url.toString();\n}\n\nexport async function onRequestGet(context) {\n  try {\n    const req = new URL(context.request.url);\n    const projetoNome = String(req.searchParams.get("projeto") ?? "").trim();\n    const versaoNome = String(req.searchParams.get("versao") ?? "").trim();\n    const statusId = Number(req.searchParams.get("statusId"));\n    if (!projetoNome) return respostaErro("O projeto é obrigatório.", 400);\n    if (!versaoNome || versaoNome === "-") return respostaErro("A versão do projeto é obrigatória.", 400);\n    if (!Number.isInteger(statusId) || statusId <= 0) return respostaErro("O status do Redmine é inválido.", 400);\n\n    const projetos = await listarProjetosRedmine(context);\n    const projeto = encontrarProjetoRedmine(projetoNome, projetos);\n    if (!projeto) return respostaErro(`Não foi localizado no Redmine um projeto correspondente a ${projetoNome}.`, 404);\n\n    const versoes = await listarVersoesProjeto(context, projeto.id);\n    const versao = encontrarVersaoRedmine(versaoNome, versoes);\n    if (!versao) return respostaErro(`A versão ${versaoNome} não foi localizada no projeto ${projeto.name} do Redmine.`, 404);\n\n    const config = obterConfiguracao(context);\n    return Response.json({\n      url: montarUrl(config, projeto, versao.id, statusId),\n      projeto: { id: projeto.id, identifier: projeto.identifier, nome: projeto.name },\n      versao: { id: versao.id, nome: versao.name },\n      statusId,\n    });\n  } catch (erro) {\n    console.error("Erro ao montar link do Redmine:", erro);\n    return respostaErro(erro instanceof Error ? erro.message : "Não foi possível montar o link do Redmine.");\n  }\n}\n
+function normalizarTexto(valor) {
+  return String(valor ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function codificarBase64(valor) {
+  const bytes = new TextEncoder().encode(valor);
+
+  let binario = "";
+
+  for (const byte of bytes) {
+    binario += String.fromCharCode(byte);
+  }
+
+  return btoa(binario);
+}
+
+function respostaErro(mensagem, status = 500) {
+  return Response.json(
+    {
+      erro: mensagem,
+    },
+    {
+      status,
+    }
+  );
+}
+
+function obterConfiguracao(context) {
+  const url = String(
+    context.env.REDMINE_URL ?? ""
+  )
+    .trim()
+    .replace(/\/+$/, "");
+
+  const usuario = String(
+    context.env.REDMINE_USERNAME ?? ""
+  ).trim();
+
+  const senha = String(
+    context.env.REDMINE_PASSWORD ?? ""
+  );
+
+  if (!url || !usuario || !senha) {
+    throw new Error(
+      "As credenciais do Redmine não estão configuradas na Cloudflare."
+    );
+  }
+
+  return {
+    url,
+    usuario,
+    senha,
+  };
+}
+
+async function buscarJsonRedmine(
+  context,
+  caminho,
+  parametros = {}
+) {
+  const configuracao = obterConfiguracao(
+    context
+  );
+
+  const url = new URL(
+    `${configuracao.url}${caminho}`
+  );
+
+  Object.entries(parametros).forEach(
+    ([chave, valor]) => {
+      if (
+        valor === undefined ||
+        valor === null ||
+        valor === ""
+      ) {
+        return;
+      }
+
+      url.searchParams.set(
+        chave,
+        String(valor)
+      );
+    }
+  );
+
+  const token = codificarBase64(
+    `${configuracao.usuario}:${configuracao.senha}`
+  );
+
+  const response = await fetch(
+    url.toString(),
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Basic ${token}`,
+      },
+      redirect: "manual",
+    }
+  );
+
+  const texto = await response.text();
+
+  if (
+    response.status >= 300 &&
+    response.status < 400
+  ) {
+    throw new Error(
+      `O Redmine redirecionou a chamada da rota ${caminho} para uma tela de login.`
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `O Redmine retornou o erro ${response.status} ao consultar ${caminho}.`
+    );
+  }
+
+  try {
+    return JSON.parse(texto);
+  } catch {
+    throw new Error(
+      `A rota ${caminho} não retornou um JSON válido.`
+    );
+  }
+}
+
+async function listarProjetosRedmine(
+  context
+) {
+  const projetos = [];
+  const limite = 100;
+
+  let offset = 0;
+  let total = null;
+
+  while (
+    total === null ||
+    projetos.length < total
+  ) {
+    const resultado =
+      await buscarJsonRedmine(
+        context,
+        "/projects.json",
+        {
+          limit: limite,
+          offset,
+        }
+      );
+
+    const itens = Array.isArray(
+      resultado.projects
+    )
+      ? resultado.projects
+      : [];
+
+    projetos.push(...itens);
+
+    const totalRetornado = Number(
+      resultado.total_count
+    );
+
+    total = Number.isFinite(
+      totalRetornado
+    )
+      ? totalRetornado
+      : projetos.length;
+
+    if (
+      itens.length === 0 ||
+      itens.length < limite
+    ) {
+      break;
+    }
+
+    offset += itens.length;
+  }
+
+  return projetos;
+}
+
+async function listarVersoesProjeto(
+  context,
+  projectId
+) {
+  const resultado =
+    await buscarJsonRedmine(
+      context,
+      `/projects/${projectId}/versions.json`
+    );
+
+  return Array.isArray(
+    resultado.versions
+  )
+    ? resultado.versions
+    : [];
+}
+
+function encontrarProjetoRedmine(
+  nomeReleaseHub,
+  projetosRedmine
+) {
+  const nomeNormalizado =
+    normalizarTexto(
+      nomeReleaseHub
+    );
+
+  const exatos =
+    projetosRedmine.filter(
+      projeto =>
+        normalizarTexto(
+          projeto.name
+        ) === nomeNormalizado
+    );
+
+  if (exatos.length === 1) {
+    return exatos[0];
+  }
+
+  if (exatos.length > 1) {
+    return (
+      exatos.find(
+        projeto =>
+          Number(
+            projeto.status
+          ) === 1
+      ) ?? exatos[0]
+    );
+  }
+
+  const aproximados =
+    projetosRedmine.filter(
+      projeto => {
+        const redmine =
+          normalizarTexto(
+            projeto.name
+          );
+
+        return (
+          redmine.includes(
+            nomeNormalizado
+          ) ||
+          nomeNormalizado.includes(
+            redmine
+          )
+        );
+      }
+    );
+
+  if (aproximados.length === 1) {
+    return aproximados[0];
+  }
+
+  return null;
+}
+
+function encontrarVersaoRedmine(
+  versaoReleaseHub,
+  versoesRedmine
+) {
+  const versaoNormalizada =
+    normalizarTexto(
+      versaoReleaseHub
+    );
+
+  return (
+    versoesRedmine.find(
+      versao =>
+        normalizarTexto(
+          versao.name
+        ) === versaoNormalizada
+    ) ?? null
+  );
+}
+
+function montarUrlIssues(
+  configuracao,
+  projeto,
+  versaoId,
+  statusId
+) {
+  const identifier = String(
+    projeto.identifier ??
+    projeto.id
+  );
+
+  const url = new URL(
+    `${configuracao.url}/projects/${encodeURIComponent(identifier)}/issues`
+  );
+
+  url.searchParams.append("utf8", "✓");
+  url.searchParams.append(
+    "set_filter",
+    "1"
+  );
+
+  url.searchParams.append(
+    "f[]",
+    "status_id"
+  );
+
+  url.searchParams.append(
+    "op[status_id]",
+    "="
+  );
+
+  url.searchParams.append(
+    "v[status_id][]",
+    String(statusId)
+  );
+
+  url.searchParams.append(
+    "f[]",
+    "fixed_version_id"
+  );
+
+  url.searchParams.append(
+    "op[fixed_version_id]",
+    "="
+  );
+
+  url.searchParams.append(
+    "v[fixed_version_id][]",
+    String(versaoId)
+  );
+
+  url.searchParams.append(
+    "f[]",
+    ""
+  );
+
+  [
+    "tracker",
+    "status",
+    "priority",
+    "subject",
+    "assigned_to",
+    "created_on",
+    "updated_on",
+    "parent",
+    "due_date",
+    "estimated_hours",
+  ].forEach(coluna => {
+    url.searchParams.append(
+      "c[]",
+      coluna
+    );
+  });
+
+  url.searchParams.append(
+    "group_by",
+    ""
+  );
+
+  url.searchParams.append(
+    "t[]",
+    ""
+  );
+
+  return url.toString();
+}
+
+export async function onRequestGet(
+  context
+) {
+  try {
+    const requestUrl =
+      new URL(
+        context.request.url
+      );
+
+    const nomeProjeto = String(
+      requestUrl.searchParams.get(
+        "projeto"
+      ) ?? ""
+    ).trim();
+
+    const versaoProjeto = String(
+      requestUrl.searchParams.get(
+        "versao"
+      ) ?? ""
+    ).trim();
+
+    const statusId = Number(
+      requestUrl.searchParams.get(
+        "statusId"
+      )
+    );
+
+    if (!nomeProjeto) {
+      return respostaErro(
+        "O projeto é obrigatório.",
+        400
+      );
+    }
+
+    if (
+      !versaoProjeto ||
+      versaoProjeto === "-"
+    ) {
+      return respostaErro(
+        "A versão do projeto é obrigatória.",
+        400
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        statusId
+      ) ||
+      statusId <= 0
+    ) {
+      return respostaErro(
+        "O status do Redmine é inválido.",
+        400
+      );
+    }
+
+    const configuracao =
+      obterConfiguracao(
+        context
+      );
+
+    const projetosRedmine =
+      await listarProjetosRedmine(
+        context
+      );
+
+    const projetoRedmine =
+      encontrarProjetoRedmine(
+        nomeProjeto,
+        projetosRedmine
+      );
+
+    if (!projetoRedmine) {
+      return respostaErro(
+        `Não foi localizado no Redmine um projeto correspondente a ${nomeProjeto}.`,
+        404
+      );
+    }
+
+    const versoesRedmine =
+      await listarVersoesProjeto(
+        context,
+        projetoRedmine.id
+      );
+
+    const versaoRedmine =
+      encontrarVersaoRedmine(
+        versaoProjeto,
+        versoesRedmine
+      );
+
+    if (!versaoRedmine) {
+      return respostaErro(
+        `A versão ${versaoProjeto} não foi localizada no projeto ${projetoRedmine.name} do Redmine.`,
+        404
+      );
+    }
+
+    return Response.json({
+      url: montarUrlIssues(
+        configuracao,
+        projetoRedmine,
+        versaoRedmine.id,
+        statusId
+      ),
+
+      projeto: {
+        id: projetoRedmine.id,
+        identifier:
+          projetoRedmine.identifier,
+        nome:
+          projetoRedmine.name,
+      },
+
+      versao: {
+        id: versaoRedmine.id,
+        nome: versaoRedmine.name,
+      },
+
+      statusId,
+    });
+  } catch (erro) {
+    console.error(
+      "Erro ao montar link do Redmine:",
+      erro
+    );
+
+    return respostaErro(
+      erro instanceof Error
+        ? erro.message
+        : "Não foi possível montar o link do Redmine."
+    );
+  }
+}
