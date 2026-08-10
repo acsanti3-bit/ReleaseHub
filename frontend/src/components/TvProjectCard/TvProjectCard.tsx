@@ -10,63 +10,62 @@ import type {
 
 
 interface Props {
-
   project: Project;
-
 }
+
+
+const REDMINE_STATUS_IDS = {
+  qualidade: 9,
+  testes: 7,
+  desenvolvido: 11,
+  aguardandoCompilacao: 14,
+  emProgresso: 2,
+  nova: 1,
+  reaberta: 8,
+  validacaoCliente: 12,
+  rejeitada: 6,
+  interrompida: 13,
+  resolvidas: 3,
+} as const;
 
 
 function getProjectColor(
   nome: string
 ) {
-
   const projeto =
     nome.toLowerCase();
-
 
   if (
     projeto.includes(
       "intellicash"
     )
   ) {
-
     return "#005AA9";
-
   }
-
 
   if (
     projeto.includes(
       "easycash"
     )
   ) {
-
     return "#F58220";
-
   }
-
 
   if (
     projeto.includes(
       "easycheckout"
     )
   ) {
-
     return "#43A047";
-
   }
-
 
   if (
     projeto.includes(
       "easypdv"
     )
   ) {
-
     return "#8E24AA";
-
   }
-
 
   if (
     projeto.includes(
@@ -76,42 +75,30 @@ function getProjectColor(
       "isa"
     )
   ) {
-
     return "#E53935";
-
   }
-
 
   if (
     projeto.includes(
       "iwb"
     )
   ) {
-
     return "#546E7A";
-
   }
 
-
   return "#005AA9";
-
 }
 
 
 function TvProjectCard({
-
   project,
-
 }: Props) {
-
   const projectColor =
     getProjectColor(
       project.nome
     );
 
-
   const status = [
-
     {
       nome:
         "Qualidade",
@@ -124,7 +111,9 @@ function TvProjectCard({
       cor:
         "#F58220",
 
-      statusId: 7,
+      statusId:
+        REDMINE_STATUS_IDS
+          .qualidade,
     },
 
     {
@@ -139,7 +128,9 @@ function TvProjectCard({
       cor:
         "#1976D2",
 
-      statusId: 9,
+      statusId:
+        REDMINE_STATUS_IDS
+          .testes,
     },
 
     {
@@ -154,7 +145,9 @@ function TvProjectCard({
       cor:
         "#43A047",
 
-      statusId: 11,
+      statusId:
+        REDMINE_STATUS_IDS
+          .desenvolvido,
     },
 
     {
@@ -169,7 +162,9 @@ function TvProjectCard({
       cor:
         "#78909C",
 
-      statusId: 14,
+      statusId:
+        REDMINE_STATUS_IDS
+          .aguardandoCompilacao,
     },
 
     {
@@ -184,7 +179,9 @@ function TvProjectCard({
       cor:
         "#F9A825",
 
-      statusId: 2,
+      statusId:
+        REDMINE_STATUS_IDS
+          .emProgresso,
     },
 
     {
@@ -199,7 +196,9 @@ function TvProjectCard({
       cor:
         "#26A69A",
 
-      statusId: 1,
+      statusId:
+        REDMINE_STATUS_IDS
+          .nova,
     },
 
     {
@@ -214,7 +213,9 @@ function TvProjectCard({
       cor:
         "#E53935",
 
-      statusId: 8,
+      statusId:
+        REDMINE_STATUS_IDS
+          .reaberta,
     },
 
     {
@@ -229,7 +230,9 @@ function TvProjectCard({
       cor:
         "#5C6BC0",
 
-      statusId: 12,
+      statusId:
+        REDMINE_STATUS_IDS
+          .validacaoCliente,
     },
 
     {
@@ -244,7 +247,9 @@ function TvProjectCard({
       cor:
         "#616161",
 
-      statusId: 6,
+      statusId:
+        REDMINE_STATUS_IDS
+          .rejeitada,
     },
 
     {
@@ -259,7 +264,9 @@ function TvProjectCard({
       cor:
         "#8E24AA",
 
-      statusId: 13,
+      statusId:
+        REDMINE_STATUS_IDS
+          .interrompida,
     },
 
     {
@@ -274,9 +281,10 @@ function TvProjectCard({
       cor:
         "#2E7D32",
 
-      statusId: 3,
+      statusId:
+        REDMINE_STATUS_IDS
+          .resolvidas,
     },
-
   ];
 
 
@@ -290,20 +298,31 @@ function TvProjectCard({
       return;
     }
 
-    const novaAba = window.open(
-      "",
-      "_blank"
-    );
+    const novaAba =
+      window.open(
+        "",
+        "_blank",
+        "noopener,noreferrer"
+      );
 
     try {
-      const url = await obterLinkRedmine({
-        projeto: project.nome,
-        versao: project.versao,
-        statusId,
-      });
+      const url =
+        await obterLinkRedmine({
+          projeto:
+            project.nome,
 
-      if (novaAba) {
-        novaAba.location.href = url;
+          versao:
+            project.versao,
+
+          statusId,
+        });
+
+      if (
+        novaAba
+      ) {
+        novaAba.location.href =
+          url;
+
         return;
       }
 
@@ -312,8 +331,11 @@ function TvProjectCard({
         "_blank",
         "noopener,noreferrer"
       );
+
     } catch (erro) {
-      if (novaAba) {
+      if (
+        novaAba
+      ) {
         novaAba.close();
       }
 
@@ -332,7 +354,6 @@ function TvProjectCard({
 
 
   return (
-
     <article
       className="tv-project-card"
       style={{
@@ -340,90 +361,81 @@ function TvProjectCard({
           projectColor,
       } as React.CSSProperties}
     >
-
       <header className="tv-card-header">
-
         <div className="tv-card-heading">
-
           <span className="tv-card-project-label">
-
             Projeto
-
           </span>
 
           <h3>
-
             {project.nome}
-
           </h3>
-
         </div>
 
 
         <div className="tv-card-version">
-
           <small>
             Versão
           </small>
 
           <strong>
-
             {
               project.versao ||
               "-"
             }
-
           </strong>
-
         </div>
-
       </header>
 
 
       <div className="tv-status-grid">
-
         {status.map(
           item => {
-
             const zerado =
               item.valor === 0;
 
+            const clicavel =
+              !zerado &&
+              Boolean(
+                project.versao &&
+                project.versao !== "-"
+              );
 
             return (
-
               <button
                 type="button"
                 key={
                   item.nome
                 }
                 disabled={
-                  zerado ||
-                  !project.versao ||
-                  project.versao === "-"
+                  !clicavel
                 }
                 title={
-                  zerado
-                    ? undefined
-                    : `Abrir ${project.nome} - ${item.nome} no Redmine`
+                  clicavel
+                    ? `Abrir ${project.nome} - ${item.nome} no Redmine`
+                    : undefined
                 }
                 className={`tv-status-card ${
                   zerado
                     ? "tv-status-card-zero"
-                    : "tv-status-card-clickable"
+                    : ""
                 } ${
                   item.nome === "Resolvidas"
                     ? "tv-status-card-resolved"
                     : ""
+                } ${
+                  clicavel
+                    ? "tv-status-card-clickable"
+                    : ""
                 }`}
                 onClick={() =>
+                  clicavel &&
                   void abrirRedmine(
                     item.statusId
                   )
                 }
               >
-
                 <div className="tv-status-card-top">
-
                   <span
                     className="tv-status-indicator"
                     style={{
@@ -435,11 +447,8 @@ function TvProjectCard({
                   />
 
                   <span>
-
                     {item.nome}
-
                   </span>
-
                 </div>
 
 
@@ -451,64 +460,45 @@ function TvProjectCard({
                         : item.cor,
                   }}
                 >
-
                   {item.valor}
-
                 </strong>
-
               </button>
-
             );
-
           }
         )}
-
       </div>
 
 
       <footer className="tv-card-footer">
-
         <div className="tv-card-date">
-
           <small>
             Executável
           </small>
 
           <strong>
-
             {
               project.executavel ||
               "-"
             }
-
           </strong>
-
         </div>
 
 
         <div className="tv-card-date">
-
           <small>
             Prazo
           </small>
 
           <strong>
-
             {
               project.prazo ||
               "-"
             }
-
           </strong>
-
         </div>
-
       </footer>
-
     </article>
-
   );
-
 }
 
 
