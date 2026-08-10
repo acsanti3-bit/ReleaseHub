@@ -259,7 +259,37 @@
     border-radius:10px;
 
     background:#FAFBFC;
+    color:inherit;
+    font:inherit;
+    text-align:inherit;
+    appearance:none;
+    -webkit-appearance:none;
 
+}
+
+.tv-status-card:disabled{
+    opacity:1;
+}
+
+.tv-status-card-clickable{
+    cursor:pointer;
+    transition:
+        transform .12s ease,
+        border-color .12s ease,
+        background .12s ease,
+        box-shadow .12s ease;
+}
+
+.tv-status-card-clickable:hover{
+    transform:translateY(-1px);
+    border-color:#BFCBD5;
+    background:#FFF;
+    box-shadow:0 3px 8px rgba(35,55,75,.08);
+}
+
+.tv-status-card-clickable:focus-visible{
+    outline:2px solid #005AA9;
+    outline-offset:1px;
 }
 
 

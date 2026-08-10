@@ -1,5 +1,9 @@
 import "./TvProjectCard.css";
 
+import {
+  obterLinkRedmine,
+} from "../../services/RedmineService";
+
 import type {
   Project,
 } from "../../types/project";
@@ -119,6 +123,8 @@ function TvProjectCard({
 
       cor:
         "#F58220",
+
+      statusId: 7,
     },
 
     {
@@ -132,6 +138,8 @@ function TvProjectCard({
 
       cor:
         "#1976D2",
+
+      statusId: 9,
     },
 
     {
@@ -145,6 +153,8 @@ function TvProjectCard({
 
       cor:
         "#43A047",
+
+      statusId: 11,
     },
 
     {
@@ -158,6 +168,8 @@ function TvProjectCard({
 
       cor:
         "#78909C",
+
+      statusId: 14,
     },
 
     {
@@ -171,6 +183,8 @@ function TvProjectCard({
 
       cor:
         "#F9A825",
+
+      statusId: 2,
     },
 
     {
@@ -184,6 +198,8 @@ function TvProjectCard({
 
       cor:
         "#26A69A",
+
+      statusId: 1,
     },
 
     {
@@ -197,6 +213,8 @@ function TvProjectCard({
 
       cor:
         "#E53935",
+
+      statusId: 8,
     },
 
     {
@@ -210,6 +228,8 @@ function TvProjectCard({
 
       cor:
         "#5C6BC0",
+
+      statusId: 12,
     },
 
     {
@@ -223,6 +243,8 @@ function TvProjectCard({
 
       cor:
         "#616161",
+
+      statusId: 6,
     },
 
     {
@@ -236,6 +258,8 @@ function TvProjectCard({
 
       cor:
         "#8E24AA",
+
+      statusId: 13,
     },
 
     {
@@ -249,9 +273,62 @@ function TvProjectCard({
 
       cor:
         "#2E7D32",
+
+      statusId: 3,
     },
 
   ];
+
+
+  async function abrirRedmine(
+    statusId: number
+  ) {
+    if (
+      !project.versao ||
+      project.versao === "-"
+    ) {
+      return;
+    }
+
+    const novaAba = window.open(
+      "",
+      "_blank"
+    );
+
+    try {
+      const url = await obterLinkRedmine({
+        projeto: project.nome,
+        versao: project.versao,
+        statusId,
+      });
+
+      if (novaAba) {
+        novaAba.location.href = url;
+        return;
+      }
+
+      window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } catch (erro) {
+      if (novaAba) {
+        novaAba.close();
+      }
+
+      console.error(
+        "Erro ao abrir filtro do Redmine:",
+        erro
+      );
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível abrir o filtro no Redmine."
+      );
+    }
+  }
 
 
   return (
@@ -314,19 +391,35 @@ function TvProjectCard({
 
             return (
 
-              <div
+              <button
+                type="button"
                 key={
                   item.nome
+                }
+                disabled={
+                  zerado ||
+                  !project.versao ||
+                  project.versao === "-"
+                }
+                title={
+                  zerado
+                    ? undefined
+                    : `Abrir ${project.nome} - ${item.nome} no Redmine`
                 }
                 className={`tv-status-card ${
                   zerado
                     ? "tv-status-card-zero"
-                    : ""
+                    : "tv-status-card-clickable"
                 } ${
                   item.nome === "Resolvidas"
                     ? "tv-status-card-resolved"
                     : ""
                 }`}
+                onClick={() =>
+                  void abrirRedmine(
+                    item.statusId
+                  )
+                }
               >
 
                 <div className="tv-status-card-top">
@@ -363,7 +456,7 @@ function TvProjectCard({
 
                 </strong>
 
-              </div>
+              </button>
 
             );
 

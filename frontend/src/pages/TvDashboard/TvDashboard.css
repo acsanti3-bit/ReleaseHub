@@ -67,6 +67,23 @@
 }
 
 
+.tv-logo-button{
+    margin:0;
+    padding:0;
+    display:flex;
+    align-items:center;
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    border-radius:10px;
+    flex-shrink:0;
+}
+
+.tv-logo-button:focus-visible{
+    outline:2px solid #005AA9;
+    outline-offset:4px;
+}
+
 .tv-logo{
 
     width:auto;

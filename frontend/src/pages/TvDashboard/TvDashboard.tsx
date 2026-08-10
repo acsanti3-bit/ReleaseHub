@@ -789,11 +789,21 @@ function TvDashboard() {
 
         <div className="tv-brand">
 
-          <img
-            src={logo}
-            alt="IWS"
-            className="tv-logo"
-          />
+          <button
+            type="button"
+            className="tv-logo-button"
+            onClick={() => {
+              window.location.href = "/";
+            }}
+            title="Voltar ao Dashboard"
+            aria-label="Voltar ao Dashboard"
+          >
+            <img
+              src={logo}
+              alt="IWS"
+              className="tv-logo"
+            />
+          </button>
 
 
           <div className="tv-brand-text">
