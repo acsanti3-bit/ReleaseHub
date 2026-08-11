@@ -16,3 +16,7 @@ backend/.env.local
 # Sistema
 .DS_Store
 Thumbs.db
+
+scheduler/node_modules/
+scheduler/.wrangler/
+.wrangler/
