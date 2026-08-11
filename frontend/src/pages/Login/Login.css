@@ -468,12 +468,6 @@
 
 .login-footer{
 
-    display:flex;
-
-    justify-content:space-between;
-
-    gap:15px;
-
     margin-top:25px;
 
     padding-top:17px;
@@ -483,6 +477,36 @@
     color:#9AA3AB;
 
     font-size:10px;
+
+}
+
+
+.login-footer-main{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:15px;
+
+}
+
+
+.login-credit{
+
+    display:block;
+
+    margin-top:10px;
+
+    text-align:center;
+
+    color:#9AA3AB;
+
+    font-size:10px;
+
+    opacity:.6;
+
+    letter-spacing:.1px;
 
 }
 
@@ -512,7 +536,7 @@
     }
 
 
-    .login-footer{
+    .login-footer-main{
 
         flex-direction:column;
 

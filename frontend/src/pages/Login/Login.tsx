@@ -211,7 +211,7 @@ function Login() {
         <div className="login-heading">
 
           <h2>
-            Bem-vinda
+            Bem-vindo(a)
           </h2>
 
           <p>
@@ -351,12 +351,20 @@ function Login() {
 
         <footer className="login-footer">
 
-          <span>
-            IWS Intelliware Solutions
-          </span>
+          <div className="login-footer-main">
 
-          <span>
-            ReleaseHub v1.0.0
+            <span>
+              IWS Intelliware Solutions
+            </span>
+
+            <span>
+              ReleaseHub v1.0.0
+            </span>
+
+          </div>
+
+          <span className="login-credit">
+            Desenvolvido por Ana Carolina Santi Teixeira
           </span>
 
         </footer>
