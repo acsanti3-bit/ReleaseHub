@@ -1,3 +1,7 @@
+import {
+  useState,
+} from "react";
+
 import "./TvProjectCard.css";
 
 import {
@@ -234,6 +238,11 @@ function obterSituacaoPrazo(
 function TvProjectCard({
   project,
 }: Props) {
+  const [
+    mostrarLoginModal,
+    setMostrarLoginModal,
+  ] = useState(false);
+
   const projectColor =
     getProjectColor(
       project.nome
@@ -500,10 +509,40 @@ function TvProjectCard({
         erro
       );
 
-      alert(
+      const mensagem =
         erro instanceof Error
           ? erro.message
-          : "Não foi possível abrir o filtro no Redmine."
+          : "Não foi possível abrir o filtro no Redmine.";
+
+      const mensagemNormalizada =
+        mensagem
+          .normalize("NFD")
+          .replace(
+            /[\u0300-\u036f]/g,
+            ""
+          )
+          .toLowerCase();
+
+      if (
+        mensagemNormalizada.includes(
+          "sessao invalida"
+        ) ||
+        mensagemNormalizada.includes(
+          "sessao expirada"
+        ) ||
+        mensagemNormalizada.includes(
+          "sessao invalida ou expirada"
+        )
+      ) {
+        setMostrarLoginModal(
+          true
+        );
+
+        return;
+      }
+
+      alert(
+        mensagem
       );
     }
   }
@@ -691,6 +730,86 @@ function TvProjectCard({
           </div>
         </div>
       </footer>
+
+
+      {mostrarLoginModal && (
+        <div
+          className="tv-redmine-login-overlay"
+          role="presentation"
+          onClick={() =>
+            setMostrarLoginModal(
+              false
+            )
+          }
+        >
+          <div
+            className="tv-redmine-login-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tv-redmine-login-title"
+            onClick={event =>
+              event.stopPropagation()
+            }
+          >
+            <button
+              type="button"
+              className="tv-redmine-login-close"
+              aria-label="Fechar"
+              title="Fechar"
+              onClick={() =>
+                setMostrarLoginModal(
+                  false
+                )
+              }
+            >
+              ×
+            </button>
+
+
+            <div className="tv-redmine-login-badge">
+              Acesso protegido
+            </div>
+
+
+            <h2 id="tv-redmine-login-title">
+              Acesso ao Redmine
+            </h2>
+
+
+            <p>
+              Para acessar as tarefas no Redmine,
+              faça login no ReleaseHub.
+            </p>
+
+
+            <div className="tv-redmine-login-actions">
+              <button
+                type="button"
+                className="tv-redmine-login-cancel"
+                onClick={() =>
+                  setMostrarLoginModal(
+                    false
+                  )
+                }
+              >
+                Agora não
+              </button>
+
+
+              <button
+                type="button"
+                className="tv-redmine-login-primary"
+                onClick={() => {
+                  window.location.href =
+                    "/";
+                }}
+              >
+                Ir para o login
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

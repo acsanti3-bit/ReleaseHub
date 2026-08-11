@@ -909,3 +909,162 @@
     }
 
 }
+
+/* MODAL DE LOGIN DO REDMINE */
+
+.tv-redmine-login-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    padding:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    background:rgba(20,33,46,.54);
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+}
+
+.tv-redmine-login-modal{
+    position:relative;
+    width:min(430px,100%);
+    padding:30px 30px 26px;
+    box-sizing:border-box;
+    background:#FFF;
+    border:1px solid #DDE5EC;
+    border-radius:18px;
+    box-shadow:0 24px 65px rgba(24,42,60,.25);
+    text-align:left;
+}
+
+.tv-redmine-login-close{
+    position:absolute;
+    top:12px;
+    right:14px;
+    width:34px;
+    height:34px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    border-radius:9px;
+    background:transparent;
+    color:#7C8791;
+    font:inherit;
+    font-size:25px;
+    line-height:1;
+    cursor:pointer;
+}
+
+.tv-redmine-login-close:hover{
+    background:#F2F5F7;
+    color:#36414B;
+}
+
+.tv-redmine-login-close:focus-visible{
+    outline:2px solid #005AA9;
+    outline-offset:2px;
+}
+
+.tv-redmine-login-badge{
+    width:max-content;
+    margin-bottom:14px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#EEF5FF;
+    color:#005AA9;
+    font-size:10px;
+    line-height:1;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.tv-redmine-login-modal h2{
+    margin:0 42px 9px 0;
+    color:#263238;
+    font-size:22px;
+    line-height:1.15;
+    font-weight:750;
+}
+
+.tv-redmine-login-modal p{
+    margin:0;
+    max-width:340px;
+    color:#66727D;
+    font-size:14px;
+    line-height:1.5;
+    font-weight:450;
+}
+
+.tv-redmine-login-actions{
+    margin-top:24px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.tv-redmine-login-actions button{
+    min-height:40px;
+    padding:0 16px;
+    border-radius:10px;
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    font-weight:650;
+    cursor:pointer;
+    transition:
+        background .12s ease,
+        border-color .12s ease,
+        transform .12s ease,
+        box-shadow .12s ease;
+}
+
+.tv-redmine-login-cancel{
+    border:1px solid #D7E0E7;
+    background:#FFF;
+    color:#596571;
+}
+
+.tv-redmine-login-cancel:hover{
+    background:#F7F9FB;
+    border-color:#C6D0D9;
+}
+
+.tv-redmine-login-primary{
+    border:1px solid #005AA9;
+    background:#005AA9;
+    color:#FFF;
+    box-shadow:0 5px 14px rgba(0,90,169,.18);
+}
+
+.tv-redmine-login-primary:hover{
+    transform:translateY(-1px);
+    background:#004C90;
+    border-color:#004C90;
+}
+
+.tv-redmine-login-actions button:focus-visible{
+    outline:2px solid #005AA9;
+    outline-offset:2px;
+}
+
+@media(max-width:560px){
+    .tv-redmine-login-overlay{
+        padding:16px;
+    }
+
+    .tv-redmine-login-modal{
+        padding:26px 20px 20px;
+    }
+
+    .tv-redmine-login-actions{
+        flex-direction:column-reverse;
+    }
+
+    .tv-redmine-login-actions button{
+        width:100%;
+    }
+}
