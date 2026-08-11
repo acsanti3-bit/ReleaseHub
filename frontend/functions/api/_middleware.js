@@ -6,13 +6,16 @@ import {
 export async function onRequest(
   context
 ) {
+
   const url =
     new URL(
       context.request.url
     );
 
+
   const caminho =
     url.pathname;
+
 
   const metodo =
     context.request.method
@@ -28,33 +31,82 @@ export async function onRequest(
       "/api/auth/"
     )
   ) {
+
     return context.next();
+
   }
 
 
   /*
     Leituras necessárias para
     o Modo TV continuam públicas.
+
+    A TV precisa consultar:
+    - projetos
+    - ambientes
+    - projetos vinculados a uma release
   */
 
   const leituraPublica =
     metodo === "GET" &&
     (
-      caminho ===
-        "/api/projects" ||
-
-      caminho ===
-        "/api/environments" ||
-
-      caminho ===
-        "/api/release-projects"
+      caminho === "/api/projects" ||
+      caminho === "/api/environments" ||
+      caminho === "/api/release-projects"
     );
 
 
-  if (
-    leituraPublica
-  ) {
+  if (leituraPublica) {
+
     return context.next();
+
+  }
+
+
+  /*
+    Sincronização automática
+    executada pelo Worker Scheduler.
+
+    A rota continua protegida para
+    requisições normais.
+
+    Somente o Worker que possuir
+    o mesmo SCHEDULER_SECRET
+    configurado na Cloudflare
+    consegue executar a sincronização.
+  */
+
+  const sincronizacaoAutomatica =
+    metodo === "POST" &&
+    caminho === "/api/redmine-sync";
+
+
+  if (
+    sincronizacaoAutomatica
+  ) {
+
+    const segredoRecebido =
+      context.request.headers.get(
+        "X-Scheduler-Secret"
+      );
+
+
+    const segredoConfigurado =
+      context.env
+        .SCHEDULER_SECRET;
+
+
+    if (
+      segredoConfigurado &&
+      segredoRecebido &&
+      segredoRecebido ===
+        segredoConfigurado
+    ) {
+
+      return context.next();
+
+    }
+
   }
 
 
@@ -68,19 +120,18 @@ export async function onRequest(
     );
 
 
-  if (
-    !usuario
-  ) {
+  if (!usuario) {
+
     return Response.json(
       {
         erro:
           "Sessão inválida ou expirada.",
       },
       {
-        status:
-          401,
+        status: 401,
       }
     );
+
   }
 
 
@@ -97,47 +148,19 @@ export async function onRequest(
     caminho.startsWith(
       "/api/users"
     ) &&
-    usuario.role !==
-      "admin"
+    usuario.role !== "admin"
   ) {
+
     return Response.json(
       {
         erro:
           "Você não possui permissão para gerenciar usuários.",
       },
       {
-        status:
-          403,
+        status: 403,
       }
     );
-  }
 
-
-  /*
-    Sincronização com o Redmine:
-
-    Somente administrador
-    ou usuário da Qualidade.
-  */
-
-  if (
-    caminho ===
-      "/api/redmine-sync" &&
-    usuario.role !==
-      "admin" &&
-    usuario.role !==
-      "qualidade"
-  ) {
-    return Response.json(
-      {
-        erro:
-          "Você não possui permissão para sincronizar os dados com o Redmine.",
-      },
-      {
-        status:
-          403,
-      }
-    );
   }
 
 
@@ -147,17 +170,9 @@ export async function onRequest(
   */
 
   const rotaOperacional =
-    caminho ===
-      "/api/projects" ||
-
-    caminho ===
-      "/api/environments" ||
-
-    caminho ===
-      "/api/release-projects" ||
-
-    caminho ===
-      "/api/redmine-sync";
+    caminho === "/api/projects" ||
+    caminho === "/api/environments" ||
+    caminho === "/api/release-projects";
 
 
   const metodoAlteracao =
@@ -174,26 +189,30 @@ export async function onRequest(
   /*
     Visualizador possui
     acesso somente leitura.
+
+    Mesmo tentando alterar pela API,
+    a requisição será bloqueada.
   */
 
   if (
-    usuario.role ===
-      "visualizador" &&
+    usuario.role === "visualizador" &&
     rotaOperacional &&
     metodoAlteracao
   ) {
+
     return Response.json(
       {
         erro:
           "Seu perfil possui acesso somente para visualização.",
       },
       {
-        status:
-          403,
+        status: 403,
       }
     );
+
   }
 
 
   return context.next();
+
 }
