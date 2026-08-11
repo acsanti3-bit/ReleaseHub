@@ -2,6 +2,7 @@ export interface ReleaseSystemVersion {
   chave: string;
   nome: string;
   versao: string;
+  executavel?: string;
   ordem: number;
 
   /*
@@ -18,6 +19,7 @@ export interface ReleaseSystemVersion {
 export interface ReleaseEnvironment {
   id: number;
   nome: string;
+  prazo?: string;
 
   /*
     Estrutura antiga mantida
@@ -477,6 +479,11 @@ export function criarSistemasFixos(
           versoesLegadas[
             sistemaCatalogo.chave
           ] ??
+          "",
+
+        executavel:
+          sistemaSalvo
+            ?.executavel ??
           "",
 
         mostrarNaTv:

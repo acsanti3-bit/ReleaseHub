@@ -82,6 +82,32 @@ function ReleaseEnvironmentDrawer({
   }
 
 
+  function alterarExecutavel(
+    chave: string,
+    valor: string
+  ) {
+    setForm(
+      estadoAtual => ({
+        ...estadoAtual,
+
+        sistemas:
+          (
+            estadoAtual.sistemas ??
+            []
+          ).map(
+            sistema =>
+              sistema.chave === chave
+                ? {
+                    ...sistema,
+                    executavel: valor,
+                  }
+                : sistema
+          ),
+      })
+    );
+  }
+
+
   function alterarExibicaoNaTv(
     chave: string,
     mostrarNaTv: boolean
@@ -203,6 +229,9 @@ function ReleaseEnvironmentDrawer({
       nome:
         form.nome.trim(),
 
+      prazo:
+        form.prazo?.trim() ?? "",
+
       versoes,
 
       sistemas:
@@ -214,6 +243,12 @@ function ReleaseEnvironmentDrawer({
               sistema
                 .versao
                 .trim(),
+
+            executavel:
+              sistema
+                .executavel
+                ?.trim() ??
+              "",
 
             mostrarNaTv:
               sistema
@@ -240,8 +275,8 @@ function ReleaseEnvironmentDrawer({
             </h2>
 
             <span>
-              Informe as versões dos
-              sistemas deste ambiente
+              Defina o prazo da release, versões
+              e executáveis dos sistemas
             </span>
           </div>
 
@@ -281,6 +316,33 @@ function ReleaseEnvironmentDrawer({
           </div>
 
 
+          <div className="release-field">
+            <label>
+              Prazo da Release
+            </label>
+
+            <input
+              placeholder="dd/mm/aaaa"
+              value={
+                form.prazo ?? ""
+              }
+              onChange={
+                event =>
+                  setForm(
+                    estadoAtual => ({
+                      ...estadoAtual,
+
+                      prazo:
+                        event
+                          .target
+                          .value,
+                    })
+                  )
+              }
+            />
+          </div>
+
+
           <div className="release-reference">
             <strong>
               Catálogo fixo
@@ -288,8 +350,9 @@ function ReleaseEnvironmentDrawer({
 
             <span>
               Todos os ambientes possuem
-              os mesmos 19 sistemas. Informe
-              somente as versões disponíveis.
+              os mesmos 19 sistemas. O prazo é
+              único para toda a release; versão
+              e executável são definidos por sistema.
             </span>
           </div>
 
@@ -393,6 +456,25 @@ function ReleaseEnvironmentDrawer({
                               .value
                           )
                       }
+                    />
+
+                    <input
+                      className="release-system-executable"
+                      placeholder="Executável"
+                      value={
+                        sistema.executavel ??
+                        ""
+                      }
+                      onChange={
+                        event =>
+                          alterarExecutavel(
+                            sistema.chave,
+                            event
+                              .target
+                              .value
+                          )
+                      }
+                      title="Data do executável deste sistema"
                     />
 
                     <label

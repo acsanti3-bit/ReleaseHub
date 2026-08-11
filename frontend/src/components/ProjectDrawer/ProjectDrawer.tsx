@@ -550,6 +550,9 @@ function ProjectDrawer({
               form.executavel
             }
             placeholder="dd/mm/aaaa"
+            readOnly={
+              modoRelease
+            }
             onChange={
               event =>
                 alterarCampo(
@@ -557,11 +560,16 @@ function ProjectDrawer({
                   event.target.value
                 )
             }
+            title={
+              modoRelease
+                ? "Executável definido pelo Ambiente da Release."
+                : ""
+            }
           />
 
 
           <label>
-            Prazo
+            Prazo da Release
           </label>
 
 
@@ -570,6 +578,9 @@ function ProjectDrawer({
               form.prazo
             }
             placeholder="dd/mm/aaaa"
+            readOnly={
+              modoRelease
+            }
             onChange={
               event =>
                 alterarCampo(
@@ -577,7 +588,28 @@ function ProjectDrawer({
                   event.target.value
                 )
             }
+            title={
+              modoRelease
+                ? "Prazo definido pelo Ambiente da Release."
+                : ""
+            }
           />
+
+
+          {modoRelease && (
+            <div
+              style={{
+                marginTop: "-4px",
+                marginBottom: "8px",
+                color: "#7A838C",
+                fontSize: "11px",
+                lineHeight: 1.4,
+              }}
+            >
+              Executável e prazo são mantidos no
+              Ambiente da Release.
+            </div>
+          )}
 
 
           <h3>

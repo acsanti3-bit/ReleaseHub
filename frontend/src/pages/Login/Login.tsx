@@ -364,7 +364,7 @@ function Login() {
           </div>
 
           <span className="login-credit">
-            Desenvolvido por Ana Carolina Santi Teixeira
+            Desenvolvido por Ana Carolina Santi Teixeira • QA
           </span>
 
         </footer>

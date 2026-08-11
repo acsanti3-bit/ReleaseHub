@@ -217,6 +217,7 @@ export function criarAmbiente():
   return {
     id: Date.now(),
     nome: "",
+    prazo: "",
     versoes,
     sistemas:
       criarSistemasFixos(

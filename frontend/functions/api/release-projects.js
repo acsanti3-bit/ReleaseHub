@@ -292,6 +292,25 @@ export async function onRequestPut(
       project.situacoes ?? {};
 
 
+    const ambiente =
+      await context.env.DB
+        .prepare(
+          `
+            SELECT prazo
+            FROM release_environments
+            WHERE id = ?
+            LIMIT 1
+          `
+        )
+        .bind(
+          environmentId
+        )
+        .first();
+
+    const prazoDaRelease =
+      ambiente?.prazo ?? "";
+
+
     await context.env.DB
       .prepare(
         `
@@ -382,7 +401,7 @@ export async function onRequestPut(
 
         project.executavel ?? "",
 
-        project.prazo ?? "",
+        prazoDaRelease,
 
         numero(
           situacoes.qualidade
