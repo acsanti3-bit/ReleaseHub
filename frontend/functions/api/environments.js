@@ -303,7 +303,7 @@ async function salvarSistemas(
             ordem,
             mostrar_na_tv
           )
-          VALUES (?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
