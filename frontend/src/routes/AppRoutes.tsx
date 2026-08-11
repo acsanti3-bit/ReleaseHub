@@ -8,8 +8,6 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 
 import TvDashboard from "../pages/TvDashboard/TvDashboard";
 
-import Projects from "../pages/Projects/Projects";
-
 import Settings from "../pages/Settings/Settings";
 
 import ReleaseEnvironments from "../pages/ReleaseEnvironments/ReleaseEnvironments";
@@ -47,19 +45,6 @@ function AppRoutes() {
             <ProtectedRoute>
 
               <Dashboard />
-
-            </ProtectedRoute>
-
-          }
-        />
-
-        <Route
-          path="/projects"
-          element={
-
-            <ProtectedRoute>
-
-              <Projects />
 
             </ProtectedRoute>
 

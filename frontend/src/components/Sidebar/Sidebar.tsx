@@ -177,10 +177,6 @@ function Sidebar() {
           Dashboard
         </NavLink>
 
-        <NavLink to="/projects">
-          Projetos
-        </NavLink>
-
         <NavLink to="/environments">
           Ambientes da Release
         </NavLink>
