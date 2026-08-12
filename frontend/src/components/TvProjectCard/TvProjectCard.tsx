@@ -2,6 +2,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useNavigate,
+} from "react-router-dom";
+
 import "./TvProjectCard.css";
 
 import {
@@ -238,6 +242,9 @@ function obterSituacaoPrazo(
 function TvProjectCard({
   project,
 }: Props) {
+  const navigate =
+    useNavigate();
+
   const [
     mostrarLoginModal,
     setMostrarLoginModal,
@@ -800,8 +807,18 @@ function TvProjectCard({
                 type="button"
                 className="tv-redmine-login-primary"
                 onClick={() => {
-                  window.location.href =
-                    "/";
+                  setMostrarLoginModal(
+                    false
+                  );
+
+                  navigate(
+                    "/login",
+                    {
+                      state: {
+                        from: "/tv",
+                      },
+                    }
+                  );
                 }}
               >
                 Ir para o login

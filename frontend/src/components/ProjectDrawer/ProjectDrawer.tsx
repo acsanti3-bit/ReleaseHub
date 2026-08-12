@@ -333,48 +333,28 @@ function ProjectDrawer({
 
           {environment && (
 
-            <div
-              style={{
-                marginBottom: "20px",
-                padding: "12px 14px",
-                background: "#EEF6FD",
-                borderLeft: "4px solid #005AA9",
-                borderRadius: "8px",
-              }}
-            >
+            <div className="drawer-release-summary">
 
-              <strong
-                style={{
-                  display: "block",
-                  color: "#005AA9",
-                  fontSize: "13px",
-                }}
-              >
+              <div>
 
-                Release em acompanhamento
+                <strong>
+                  Release em acompanhamento
+                </strong>
 
-              </strong>
+                <span>
+                  {environment.nome}
+                  {" • IntelliCash "}
+                  {
+                    environment
+                      .versoes
+                      .intellicash
+                  }
+                </span>
 
+              </div>
 
-              <span
-                style={{
-                  display: "block",
-                  marginTop: "4px",
-                  color: "#65717C",
-                  fontSize: "12px",
-                }}
-              >
-
-                {environment.nome}
-
-                {" • Intellicash "}
-
-                {
-                  environment
-                    .versoes
-                    .intellicash
-                }
-
+              <span className="drawer-release-badge">
+                Ambiente vinculado
               </span>
 
             </div>
@@ -382,291 +362,353 @@ function ProjectDrawer({
           )}
 
 
-          <label>
-            Nome
-          </label>
-
-
-          <input
-            value={
-              form.nome
-            }
-            readOnly={
+          <section
+            className={`drawer-section ${
               modoRelease
-            }
-            onChange={
-              event =>
-                alterarCampo(
-                  "nome",
-                  event.target.value
-                )
-            }
-            title={
-              modoRelease
-                ? "O projeto é definido pelo cadastro geral."
+                ? "drawer-section-readonly"
                 : ""
-            }
-          />
+            }`}
+          >
 
+            <div className="drawer-section-heading">
 
-          {modoRelease && (
+              <div>
 
-            <div
-              style={{
-                marginTop: "6px",
-                marginBottom: "12px",
-                color: "#7A838C",
-                fontSize: "11px",
-              }}
-            >
-
-              O nome pertence ao cadastro geral do projeto.
-
-            </div>
-
-          )}
-
-
-          <label>
-            Versão
-          </label>
-
-
-          {modoRelease ? (
-
-            <input
-              value={
-                form.versao
-              }
-              readOnly
-              title="Versão definida pelo Ambiente da Release."
-            />
-
-          ) : isIntellicash ? (
-
-            <select
-              value={
-                form.versao
-              }
-              onChange={
-                event =>
-                  alterarCampo(
-                    "versao",
-                    event.target.value
-                  )
-              }
-            >
-
-              <option value="">
-
-                Selecione o Ambiente da Release
-
-              </option>
-
-
-              {ambientes.map(
-                ambiente => (
-
-                  <option
-                    key={
-                      ambiente.id
-                    }
-                    value={
-                      ambiente
-                        .versoes
-                        .intellicash
-                    }
-                  >
-
-                    {
-                      ambiente
-                        .versoes
-                        .intellicash
-                    }
-
-                    {" — "}
-
-                    {ambiente.nome}
-
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-          ) : (
-
-            <input
-              value={
-                form.versao
-              }
-              readOnly={
-                isProjetoVinculado
-              }
-              onChange={
-                event =>
-                  alterarCampo(
-                    "versao",
-                    event.target.value
-                  )
-              }
-              title={
-                isProjetoVinculado
-                  ? "Versão definida pelo Ambiente da Release."
-                  : ""
-              }
-            />
-
-          )}
-
-
-          {modoRelease && (
-
-            <div
-              style={{
-                marginTop: "6px",
-                marginBottom: "12px",
-                color: "#005AA9",
-                fontSize: "12px",
-              }}
-            >
-
-              Versão vinculada automaticamente
-              ao ambiente selecionado.
-
-            </div>
-
-          )}
-
-
-          <label>
-            Executável
-          </label>
-
-
-          <input
-            value={
-              form.executavel
-            }
-            placeholder="dd/mm/aaaa"
-            readOnly={
-              modoRelease
-            }
-            onChange={
-              event =>
-                alterarCampo(
-                  "executavel",
-                  event.target.value
-                )
-            }
-            title={
-              modoRelease
-                ? "Executável definido pelo Ambiente da Release."
-                : ""
-            }
-          />
-
-
-          <label>
-            Prazo da Release
-          </label>
-
-
-          <input
-            value={
-              form.prazo
-            }
-            placeholder="dd/mm/aaaa"
-            readOnly={
-              modoRelease
-            }
-            onChange={
-              event =>
-                alterarCampo(
-                  "prazo",
-                  event.target.value
-                )
-            }
-            title={
-              modoRelease
-                ? "Prazo definido pelo Ambiente da Release."
-                : ""
-            }
-          />
-
-
-          {modoRelease && (
-            <div
-              style={{
-                marginTop: "-4px",
-                marginBottom: "8px",
-                color: "#7A838C",
-                fontSize: "11px",
-                lineHeight: 1.4,
-              }}
-            >
-              Executável e prazo são mantidos no
-              Ambiente da Release.
-            </div>
-          )}
-
-
-          <h3>
-            Situações
-          </h3>
-
-
-          {ordemSituacoes.map(
-            campo => (
-
-              <div
-                key={
-                  campo
-                }
-                className="drawer-row"
-              >
-
-                <span>
-
-                  {
-                    nomesSituacoes[
-                      campo
-                    ]
-                  }
-
+                <span className="drawer-section-kicker">
+                  Dados da Release
                 </span>
 
+                <h3>
+                  Informações do projeto
+                </h3>
+
+              </div>
+
+
+              {modoRelease && (
+
+                <span className="drawer-managed-badge">
+                  Gerenciado em Ambientes da Release
+                </span>
+
+              )}
+
+            </div>
+
+
+            <div className="drawer-fields-grid">
+
+              <div className="drawer-field drawer-field-full">
+
+                <label>
+                  Nome
+                </label>
 
                 <input
-                  type="number"
-                  min={0}
+                  className={
+                    modoRelease
+                      ? "drawer-input-readonly"
+                      : ""
+                  }
                   value={
-                    form
-                      .situacoes[
-                        campo
-                      ] ?? 0
+                    form.nome
+                  }
+                  readOnly={
+                    modoRelease
                   }
                   onChange={
                     event =>
-                      alterarSituacao(
-                        campo,
-                        Math.max(
-                          0,
-                          Number(
-                            event
-                              .target
-                              .value
-                          )
-                        )
+                      alterarCampo(
+                        "nome",
+                        event.target.value
                       )
+                  }
+                  title={
+                    modoRelease
+                      ? "O projeto é definido pelo cadastro geral."
+                      : ""
                   }
                 />
 
               </div>
 
-            )
-          )}
+
+              <div className="drawer-field drawer-field-full">
+
+                <label>
+                  Versão
+                </label>
+
+                {modoRelease ? (
+
+                  <input
+                    className="drawer-input-readonly"
+                    value={
+                      form.versao
+                    }
+                    readOnly
+                    title="Versão definida pelo Ambiente da Release."
+                  />
+
+                ) : isIntellicash ? (
+
+                  <select
+                    value={
+                      form.versao
+                    }
+                    onChange={
+                      event =>
+                        alterarCampo(
+                          "versao",
+                          event.target.value
+                        )
+                    }
+                  >
+
+                    <option value="">
+                      Selecione o Ambiente da Release
+                    </option>
+
+                    {ambientes.map(
+                      ambiente => (
+
+                        <option
+                          key={
+                            ambiente.id
+                          }
+                          value={
+                            ambiente
+                              .versoes
+                              .intellicash
+                          }
+                        >
+                          {
+                            ambiente
+                              .versoes
+                              .intellicash
+                          }
+                          {" — "}
+                          {ambiente.nome}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                ) : (
+
+                  <input
+                    className={
+                      isProjetoVinculado
+                        ? "drawer-input-readonly"
+                        : ""
+                    }
+                    value={
+                      form.versao
+                    }
+                    readOnly={
+                      isProjetoVinculado
+                    }
+                    onChange={
+                      event =>
+                        alterarCampo(
+                          "versao",
+                          event.target.value
+                        )
+                    }
+                    title={
+                      isProjetoVinculado
+                        ? "Versão definida pelo Ambiente da Release."
+                        : ""
+                    }
+                  />
+
+                )}
+
+              </div>
+
+
+              <div className="drawer-field">
+
+                <label>
+                  Executável
+                </label>
+
+                <input
+                  className={
+                    modoRelease
+                      ? "drawer-input-readonly"
+                      : ""
+                  }
+                  value={
+                    form.executavel
+                  }
+                  placeholder="dd/mm/aaaa"
+                  readOnly={
+                    modoRelease
+                  }
+                  onChange={
+                    event =>
+                      alterarCampo(
+                        "executavel",
+                        event.target.value
+                      )
+                  }
+                  title={
+                    modoRelease
+                      ? "Executável definido pelo Ambiente da Release."
+                      : ""
+                  }
+                />
+
+              </div>
+
+
+              <div className="drawer-field">
+
+                <label>
+                  Prazo da Release
+                </label>
+
+                <input
+                  className={
+                    modoRelease
+                      ? "drawer-input-readonly"
+                      : ""
+                  }
+                  value={
+                    form.prazo
+                  }
+                  placeholder="dd/mm/aaaa"
+                  readOnly={
+                    modoRelease
+                  }
+                  onChange={
+                    event =>
+                      alterarCampo(
+                        "prazo",
+                        event.target.value
+                      )
+                  }
+                  title={
+                    modoRelease
+                      ? "Prazo definido pelo Ambiente da Release."
+                      : ""
+                  }
+                />
+
+              </div>
+
+            </div>
+
+
+            {modoRelease && (
+
+              <div className="drawer-managed-note">
+
+                <strong>
+                  Dados informativos
+                </strong>
+
+                <span>
+                  Nome, versão, executável e prazo são
+                  definidos fora deste projeto. Para alterá-los,
+                  utilize a tela Ambientes da Release.
+                </span>
+
+              </div>
+
+            )}
+
+          </section>
+
+
+          <section className="drawer-section drawer-section-status">
+
+            <div className="drawer-section-heading">
+
+              <div>
+
+                <span className="drawer-section-kicker">
+                  Acompanhamento
+                </span>
+
+                <h3>
+                  Situações
+                </h3>
+
+              </div>
+
+              <span className="drawer-editable-badge">
+                Editável
+              </span>
+
+            </div>
+
+
+            <p className="drawer-section-description">
+              Ajuste somente quando for necessário corrigir
+              manualmente os totais deste projeto na release.
+            </p>
+
+
+            <div className="drawer-status-list">
+
+              {ordemSituacoes.map(
+                campo => (
+
+                  <div
+                    key={
+                      campo
+                    }
+                    className="drawer-row"
+                  >
+
+                    <span>
+
+                      {
+                        nomesSituacoes[
+                          campo
+                        ]
+                      }
+
+                    </span>
+
+
+                    <input
+                      type="number"
+                      min={0}
+                      value={
+                        form
+                          .situacoes[
+                            campo
+                          ] ?? 0
+                      }
+                      onChange={
+                        event =>
+                          alterarSituacao(
+                            campo,
+                            Math.max(
+                              0,
+                              Number(
+                                event
+                                  .target
+                                  .value
+                              )
+                            )
+                          )
+                      }
+                    />
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </section>
 
 
           <button
@@ -679,7 +721,7 @@ function ProjectDrawer({
             }
           >
 
-            Salvar
+            Salvar alterações
 
           </button>
 

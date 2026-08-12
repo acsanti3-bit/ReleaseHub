@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useEffect,
   useMemo,
   useState,
@@ -8,17 +10,41 @@ import Layout from "../../components/layout";
 
 import ProjectCard from "../../components/ProjectCard/ProjectCard";
 
-import ProjectDrawer from "../../components/ProjectDrawer/ProjectDrawer";
-
 import CompatibilityPanel from "../../components/CompatibilityPanel/CompatibilityPanel";
 
-import TasksChart from "../../components/TasksChart/TasksChart";
-
-import TopProjects from "../../components/TopProjects/TopProjects";
-
-import AttentionProjects from "../../components/AttentionProjects/AttentionProjects";
-
 import "./Dashboard.css";
+
+const ProjectDrawer =
+  lazy(
+    () =>
+      import(
+        "../../components/ProjectDrawer/ProjectDrawer"
+      )
+  );
+
+const TasksChart =
+  lazy(
+    () =>
+      import(
+        "../../components/TasksChart/TasksChart"
+      )
+  );
+
+const TopProjects =
+  lazy(
+    () =>
+      import(
+        "../../components/TopProjects/TopProjects"
+      )
+  );
+
+const AttentionProjects =
+  lazy(
+    () =>
+      import(
+        "../../components/AttentionProjects/AttentionProjects"
+      )
+  );
 
 import type {
   Project,
@@ -1175,29 +1201,41 @@ function Dashboard() {
         />
 
 
-        <div className="dashboard-charts">
-
-          <TasksChart
-            projects={
-              projects
-            }
-          />
-
-
-          <TopProjects
-            projects={
-              projects
-            }
-          />
-
-        </div>
-
-
-        <AttentionProjects
-          projects={
-            projects
+        <Suspense
+          fallback={
+            <div className="dashboard-empty">
+              <h2>
+                Carregando indicadores...
+              </h2>
+            </div>
           }
-        />
+        >
+
+          <div className="dashboard-charts">
+
+            <TasksChart
+              projects={
+                projects
+              }
+            />
+
+
+            <TopProjects
+              projects={
+                projects
+              }
+            />
+
+          </div>
+
+
+          <AttentionProjects
+            projects={
+              projects
+            }
+          />
+
+        </Suspense>
 
 
         <div className="dashboard-filters">
@@ -1427,20 +1465,26 @@ function Dashboard() {
         projectSelecionado &&
         ambienteSelecionado && (
 
-        <ProjectDrawer
-          project={
-            projectSelecionado
-          }
-          environment={
-            ambienteSelecionado
-          }
-          onSave={
-            salvarProjeto
-          }
-          onClose={
-            fecharDrawer
-          }
-        />
+        <Suspense
+          fallback={null}
+        >
+
+          <ProjectDrawer
+            project={
+              projectSelecionado
+            }
+            environment={
+              ambienteSelecionado
+            }
+            onSave={
+              salvarProjeto
+            }
+            onClose={
+              fecharDrawer
+            }
+          />
+
+        </Suspense>
 
       )}
 

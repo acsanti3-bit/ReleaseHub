@@ -89,7 +89,7 @@ function Login() {
         ) {
 
           navigate(
-            "/",
+            origem,
             {
               replace: true,
             }
@@ -118,6 +118,7 @@ function Login() {
 
   }, [
     navigate,
+    origem,
   ]);
 
   async function handleSubmit(
@@ -354,7 +355,7 @@ function Login() {
           <div className="login-footer-main">
 
             <span>
-              IWS Intelliware Solutions
+              IWS Sistemas
             </span>
 
             <span>
