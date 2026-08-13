@@ -150,6 +150,12 @@ function normalizarSistemas(
             ""
           ).trim(),
 
+        executavel:
+          String(
+            encontrado?.executavel ??
+            ""
+          ).trim(),
+
         mostrarNaTv:
           encontrado?.mostrarNaTv ??
           true,
@@ -180,6 +186,7 @@ function transformarAmbiente(
   return {
     id: row.id,
     nome: row.nome,
+    prazo: row.prazo ?? "",
 
     versoes: {
       intellicash:
@@ -218,6 +225,7 @@ async function listarSistemas(
             chave,
             nome,
             versao,
+            executavel,
             ordem,
             mostrar_na_tv
 
@@ -253,6 +261,8 @@ async function listarSistemas(
         nome: row.nome,
         versao:
           row.versao ?? "",
+        executavel:
+          row.executavel ?? "",
         ordem:
           Number(row.ordem) || 0,
 
@@ -291,6 +301,7 @@ async function salvarSistemas(
             chave,
             nome,
             versao,
+            executavel,
             ordem,
             mostrar_na_tv
           )
@@ -302,6 +313,7 @@ async function salvarSistemas(
         sistema.chave,
         sistema.nome,
         sistema.versao,
+        sistema.executavel ?? "",
         sistema.ordem,
         sistema.mostrarNaTv
           ? 1
@@ -312,7 +324,7 @@ async function salvarSistemas(
 }
 
 
-function obterVersaoProjeto(
+function obterSistemaProjeto(
   nome,
   sistemas
 ) {
@@ -363,62 +375,89 @@ function obterVersaoProjeto(
       );
 
     if (encontrou) {
-      return obterVersaoSistema(
-        sistemas,
-        conhecido.chave
+      return sistemas.find(
+        sistema =>
+          sistema.chave ===
+          conhecido.chave
       );
     }
   }
 
-  const encontrado =
-    sistemas.find(
-      sistema => {
-        const chave =
-          normalizarTexto(
-            sistema.chave
-          );
+  return sistemas.find(
+    sistema => {
+      const chave =
+        normalizarTexto(
+          sistema.chave
+        );
 
-        const nomeSistema =
-          normalizarTexto(
-            sistema.nome
-          );
+      const nomeSistema =
+        normalizarTexto(
+          sistema.nome
+        );
 
-        if (
-          !chave ||
-          !nomeSistema
-        ) {
-          return false;
-        }
+      if (
+        !chave ||
+        !nomeSistema
+      ) {
+        return false;
+      }
 
-        if (
-          chave.length <= 3 ||
-          nomeSistema.length <= 3
-        ) {
-          return (
-            projeto === chave ||
-            projeto === nomeSistema
-          );
-        }
-
+      if (
+        chave.length <= 3 ||
+        nomeSistema.length <= 3
+      ) {
         return (
           projeto === chave ||
-          projeto === nomeSistema ||
-          projeto.includes(chave) ||
-          projeto.includes(
-            nomeSistema
-          )
+          projeto === nomeSistema
         );
       }
-    );
 
-  return encontrado?.versao ?? "";
+      return (
+        projeto === chave ||
+        projeto === nomeSistema ||
+        projeto.includes(chave) ||
+        projeto.includes(
+          nomeSistema
+        )
+      );
+    }
+  );
+}
+
+
+function obterVersaoProjeto(
+  nome,
+  sistemas
+) {
+  return (
+    obterSistemaProjeto(
+      nome,
+      sistemas
+    )?.versao ??
+    ""
+  );
+}
+
+
+function obterExecutavelProjeto(
+  nome,
+  sistemas
+) {
+  return (
+    obterSistemaProjeto(
+      nome,
+      sistemas
+    )?.executavel ??
+    ""
+  );
 }
 
 
 async function sincronizarProjetos(
   context,
   environmentId,
-  sistemas
+  sistemas,
+  prazo
 ) {
   const resultado =
     await context.env.DB
@@ -445,15 +484,23 @@ async function sincronizarProjetos(
         sistemas
       );
 
+    const executavel =
+      obterExecutavelProjeto(
+        projeto.nome,
+        sistemas
+      );
+
     await context.env.DB
       .prepare(
         `
           INSERT INTO release_projects (
             environment_id,
             project_id,
-            versao
+            versao,
+            executavel,
+            prazo
           )
-          VALUES (?, ?, ?)
+          VALUES (?, ?, ?, ?, ?)
 
           ON CONFLICT (
             environment_id,
@@ -461,13 +508,17 @@ async function sincronizarProjetos(
           )
           DO UPDATE SET
             versao = excluded.versao,
+            executavel = excluded.executavel,
+            prazo = excluded.prazo,
             updated_at = CURRENT_TIMESTAMP
         `
       )
       .bind(
         environmentId,
         projeto.id,
-        versao
+        versao,
+        executavel,
+        prazo ?? ""
       )
       .run();
   }
@@ -477,11 +528,13 @@ async function sincronizarProjetos(
 function criarRespostaAmbiente(
   id,
   nome,
-  sistemas
+  sistemas,
+  prazo
 ) {
   return {
     id,
     nome,
+    prazo: prazo ?? "",
 
     versoes: {
       intellicash:
@@ -540,6 +593,7 @@ export async function onRequestGet(
             SELECT
               id,
               nome,
+              prazo,
               intellicash,
               easycash,
               easycheckout,
@@ -646,6 +700,7 @@ export async function onRequestPost(
           INSERT INTO release_environments (
             id,
             nome,
+            prazo,
             intellicash,
             easycash,
             easycheckout,
@@ -653,12 +708,15 @@ export async function onRequestPost(
             intellistock,
             iwbserver
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
         id,
         body.nome.trim(),
+        String(
+          body.prazo ?? ""
+        ).trim(),
         intellicash,
         obterVersaoSistema(
           sistemas,
@@ -692,14 +750,20 @@ export async function onRequestPost(
     await sincronizarProjetos(
       context,
       id,
-      sistemas
+      sistemas,
+      String(
+        body.prazo ?? ""
+      ).trim()
     );
 
     return Response.json(
       criarRespostaAmbiente(
         id,
         body.nome.trim(),
-        sistemas
+        sistemas,
+        String(
+          body.prazo ?? ""
+        ).trim()
       ),
       {
         status: 201,
@@ -767,6 +831,7 @@ export async function onRequestPut(
           UPDATE release_environments
           SET
             nome = ?,
+            prazo = ?,
             intellicash = ?,
             easycash = ?,
             easycheckout = ?,
@@ -778,6 +843,9 @@ export async function onRequestPut(
       )
       .bind(
         body.nome.trim(),
+        String(
+          body.prazo ?? ""
+        ).trim(),
         intellicash,
         obterVersaoSistema(
           sistemas,
@@ -812,14 +880,20 @@ export async function onRequestPut(
     await sincronizarProjetos(
       context,
       body.id,
-      sistemas
+      sistemas,
+      String(
+        body.prazo ?? ""
+      ).trim()
     );
 
     return Response.json(
       criarRespostaAmbiente(
         body.id,
         body.nome.trim(),
-        sistemas
+        sistemas,
+        String(
+          body.prazo ?? ""
+        ).trim()
       )
     );
   } catch (erro) {
