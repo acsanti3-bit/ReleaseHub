@@ -338,18 +338,6 @@ function Login() {
 
         </form>
 
-        <button
-          type="button"
-          className="login-tv-link"
-          onClick={() =>
-            navigate("/tv")
-          }
-        >
-
-          Acessar apenas o Modo TV
-
-        </button>
-
         <footer className="login-footer">
 
           <div className="login-footer-main">

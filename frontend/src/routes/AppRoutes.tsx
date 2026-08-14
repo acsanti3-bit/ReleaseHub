@@ -89,7 +89,13 @@ function AppRoutes() {
           <Route
             path="/tv"
             element={
-              <TvDashboard />
+
+              <ProtectedRoute>
+
+                <TvDashboard />
+
+              </ProtectedRoute>
+
             }
           />
 
