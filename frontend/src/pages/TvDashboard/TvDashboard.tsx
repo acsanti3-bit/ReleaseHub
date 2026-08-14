@@ -226,6 +226,12 @@ function TvDashboard() {
 
   /*
     Ambientes disponíveis.
+
+    Releases concluídas não aparecem
+    no Modo TV. A lista é atualizada
+    periodicamente para refletir
+    conclusões/reaberturas sem precisar
+    recarregar a página.
   */
 
   useEffect(() => {
@@ -249,9 +255,16 @@ function TvDashboard() {
         }
 
 
+        const ativos =
+          lista.filter(
+            ambiente =>
+              !ambiente.concluido
+          );
+
+
         const ordenados =
           ordenarAmbientesPorVersao(
-            lista
+            ativos
           );
 
 
@@ -317,6 +330,16 @@ function TvDashboard() {
             )
           );
 
+        } else {
+
+          setAmbienteSelecionadoId(
+            null
+          );
+
+          localStorage.removeItem(
+            STORAGE_KEY
+          );
+
         }
 
       } catch (erro) {
@@ -344,10 +367,25 @@ function TvDashboard() {
     void carregarAmbientes();
 
 
+    const intervalo =
+      setInterval(
+        () => {
+
+          void carregarAmbientes();
+
+        },
+        10000
+      );
+
+
     return () => {
 
       ativo =
         false;
+
+      clearInterval(
+        intervalo
+      );
 
     };
 

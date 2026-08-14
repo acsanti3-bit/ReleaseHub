@@ -187,6 +187,8 @@ function transformarAmbiente(
     id: row.id,
     nome: row.nome,
     prazo: row.prazo ?? "",
+    concluido:
+      Number(row.concluido) !== 0,
 
     versoes: {
       intellicash:
@@ -529,12 +531,15 @@ function criarRespostaAmbiente(
   id,
   nome,
   sistemas,
-  prazo
+  prazo,
+  concluido = false
 ) {
   return {
     id,
     nome,
     prazo: prazo ?? "",
+    concluido:
+      Boolean(concluido),
 
     versoes: {
       intellicash:
@@ -594,6 +599,7 @@ export async function onRequestGet(
               id,
               nome,
               prazo,
+              concluido,
               intellicash,
               easycash,
               easycheckout,
@@ -701,6 +707,7 @@ export async function onRequestPost(
             id,
             nome,
             prazo,
+            concluido,
             intellicash,
             easycash,
             easycheckout,
@@ -708,7 +715,7 @@ export async function onRequestPost(
             intellistock,
             iwbserver
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `
       )
       .bind(
@@ -717,6 +724,7 @@ export async function onRequestPost(
         String(
           body.prazo ?? ""
         ).trim(),
+        body.concluido ? 1 : 0,
         intellicash,
         obterVersaoSistema(
           sistemas,
@@ -763,7 +771,8 @@ export async function onRequestPost(
         sistemas,
         String(
           body.prazo ?? ""
-        ).trim()
+        ).trim(),
+        Boolean(body.concluido)
       ),
       {
         status: 201,
@@ -832,6 +841,7 @@ export async function onRequestPut(
           SET
             nome = ?,
             prazo = ?,
+            concluido = ?,
             intellicash = ?,
             easycash = ?,
             easycheckout = ?,
@@ -846,6 +856,7 @@ export async function onRequestPut(
         String(
           body.prazo ?? ""
         ).trim(),
+        body.concluido ? 1 : 0,
         intellicash,
         obterVersaoSistema(
           sistemas,
@@ -893,7 +904,8 @@ export async function onRequestPut(
         sistemas,
         String(
           body.prazo ?? ""
-        ).trim()
+        ).trim(),
+        Boolean(body.concluido)
       )
     );
   } catch (erro) {

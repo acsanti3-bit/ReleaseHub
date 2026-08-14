@@ -22,6 +22,13 @@ export interface ReleaseEnvironment {
   prazo?: string;
 
   /*
+    Quando true, a release fica arquivada:
+    não é sincronizada automaticamente
+    e não aparece no Modo TV.
+  */
+  concluido?: boolean;
+
+  /*
     Estrutura antiga mantida
     para compatibilidade.
   */

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   MdAdd,
+  MdCheckCircle,
   MdDeleteOutline,
   MdEdit,
   MdLink,
+  MdReplay,
 } from "react-icons/md";
 
 import "./ReleaseEnvironments.css";
@@ -254,6 +256,61 @@ function ReleaseEnvironments() {
     }
   }
 
+  async function alterarConclusao(
+    ambiente: ReleaseEnvironment
+  ) {
+    if (!podeEditar || salvando) {
+      return;
+    }
+
+    const vaiConcluir =
+      !ambiente.concluido;
+
+    const confirmar =
+      window.confirm(
+        vaiConcluir
+          ? `Concluir o ambiente "${ambiente.nome}"? Ele deixará de ser sincronizado automaticamente e não aparecerá mais no Modo TV.`
+          : `Reabrir o ambiente "${ambiente.nome}"? Ele voltará a ser sincronizado automaticamente e poderá aparecer novamente no Modo TV.`
+      );
+
+    if (!confirmar) {
+      return;
+    }
+
+    try {
+      setSalvando(true);
+
+      const ambienteSalvo =
+        await editarAmbiente({
+          ...ambiente,
+          concluido:
+            vaiConcluir,
+        });
+
+      setAmbientes(
+        listaAtual =>
+          listaAtual.map(
+            item =>
+              item.id ===
+              ambienteSalvo.id
+                ? ambienteSalvo
+                : item
+          )
+      );
+    } catch (erro) {
+      console.error(
+        "Erro ao alterar situação do ambiente:",
+        erro
+      );
+
+      alert(
+        "Não foi possível alterar a situação do ambiente."
+      );
+    } finally {
+      setSalvando(false);
+    }
+  }
+
 
   return (
     <Layout>
@@ -360,9 +417,41 @@ function ReleaseEnvironments() {
                         Ambiente
                       </span>
 
-                      <h2>
-                        {ambiente.nome}
-                      </h2>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <h2>
+                          {ambiente.nome}
+                        </h2>
+
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "4px 9px",
+                            borderRadius: "999px",
+                            fontSize: "11px",
+                            fontWeight: 700,
+                            background:
+                              ambiente.concluido
+                                ? "#E8EDF2"
+                                : "#EAF7EE",
+                            color:
+                              ambiente.concluido
+                                ? "#5F6B76"
+                                : "#2E7D32",
+                          }}
+                        >
+                          {ambiente.concluido
+                            ? "Concluído"
+                            : "Ativo"}
+                        </span>
+                      </div>
 
                       <div className="release-environment-summary">
                         <span className="release-environment-reference">
@@ -400,6 +489,33 @@ function ReleaseEnvironments() {
 
                     {podeEditar && (
                       <div className="release-actions">
+                        <button
+                          type="button"
+                          title={
+                            ambiente.concluido
+                              ? "Reabrir ambiente"
+                              : "Concluir ambiente"
+                          }
+                          onClick={() => {
+                            void alterarConclusao(
+                              ambiente
+                            );
+                          }}
+                          disabled={salvando}
+                          style={{
+                            color:
+                              ambiente.concluido
+                                ? "#005AA9"
+                                : "#2E7D32",
+                          }}
+                        >
+                          {ambiente.concluido ? (
+                            <MdReplay size={19} />
+                          ) : (
+                            <MdCheckCircle size={19} />
+                          )}
+                        </button>
+
                         <button
                           type="button"
                           title="Editar ambiente"
