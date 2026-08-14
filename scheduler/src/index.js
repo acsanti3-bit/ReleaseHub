@@ -114,9 +114,15 @@ async function executarSincronizacao(
   const ambientes =
     await listarAmbientes();
 
+  const ambientesAtivos =
+    ambientes.filter(
+      ambiente =>
+        !ambiente.concluido
+    );
+
 
   console.log(
-    `[ReleaseHub] ${ambientes.length} ambiente(s) encontrado(s).`
+    `[ReleaseHub] ${ambientes.length} ambiente(s) encontrado(s), ${ambientesAtivos.length} ativo(s).`
   );
 
 
@@ -129,7 +135,7 @@ async function executarSincronizacao(
 
   for (
     const ambiente
-    of ambientes
+    of ambientesAtivos
   ) {
     try {
       console.log(
@@ -193,6 +199,13 @@ async function executarSincronizacao(
     {
       ambientes:
         ambientes.length,
+
+      ambientesAtivos:
+        ambientesAtivos.length,
+
+      ignoradosConcluidos:
+        ambientes.length -
+        ambientesAtivos.length,
 
       sincronizados,
 
