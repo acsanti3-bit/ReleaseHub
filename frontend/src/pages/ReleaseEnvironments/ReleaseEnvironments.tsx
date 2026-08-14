@@ -269,8 +269,8 @@ function ReleaseEnvironments() {
     const confirmar =
       window.confirm(
         vaiConcluir
-          ? `Concluir o ambiente "${ambiente.nome}"? Ele deixará de ser sincronizado automaticamente e não aparecerá mais no Modo TV.`
-          : `Reabrir o ambiente "${ambiente.nome}"? Ele voltará a ser sincronizado automaticamente e poderá aparecer novamente no Modo TV.`
+          ? `Concluir a release "${ambiente.nome}"?\n\nEla continuará disponível no ReleaseHub e permanecerá visível no Modo TV, preservando o histórico da versão que foi para produção. A partir deste momento, apenas a sincronização automática com o Redmine será encerrada.`
+          : `Reabrir a release "${ambiente.nome}"?\n\nA sincronização automática com o Redmine será retomada e os dados voltarão a acompanhar as alterações da release.`
       );
 
     if (!confirmar) {

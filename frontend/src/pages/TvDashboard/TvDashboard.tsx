@@ -227,11 +227,11 @@ function TvDashboard() {
   /*
     Ambientes disponíveis.
 
-    Releases concluídas não aparecem
-    no Modo TV. A lista é atualizada
-    periodicamente para refletir
-    conclusões/reaberturas sem precisar
-    recarregar a página.
+    Releases concluídas continuam
+    aparecendo no Modo TV, pois fazem
+    parte do histórico visual da release.
+    Apenas deixam de ser sincronizadas
+    automaticamente pelo scheduler.
   */
 
   useEffect(() => {
@@ -255,16 +255,9 @@ function TvDashboard() {
         }
 
 
-        const ativos =
-          lista.filter(
-            ambiente =>
-              !ambiente.concluido
-          );
-
-
         const ordenados =
           ordenarAmbientesPorVersao(
-            ativos
+            lista
           );
 
 
