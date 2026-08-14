@@ -89,6 +89,9 @@ function ReleaseEnvironments() {
   const [ambienteSelecionado, setAmbienteSelecionado] =
     useState<ReleaseEnvironment | null>(null);
 
+  const [ambienteConfirmacao, setAmbienteConfirmacao] =
+    useState<ReleaseEnvironment | null>(null);
+
 
   async function atualizarLista() {
     try {
@@ -256,33 +259,37 @@ function ReleaseEnvironments() {
     }
   }
 
-  async function alterarConclusao(
+  function alterarConclusao(
     ambiente: ReleaseEnvironment
   ) {
     if (!podeEditar || salvando) {
       return;
     }
 
-    const vaiConcluir =
-      !ambiente.concluido;
+    setAmbienteConfirmacao(
+      ambiente
+    );
+  }
 
-    const confirmar =
-      window.confirm(
-        vaiConcluir
-          ? `Concluir a release "${ambiente.nome}"?\n\nEla continuará disponível no ReleaseHub e permanecerá visível no Modo TV, preservando o histórico da versão que foi para produção. A partir deste momento, apenas a sincronização automática com o Redmine será encerrada.`
-          : `Reabrir a release "${ambiente.nome}"?\n\nA sincronização automática com o Redmine será retomada e os dados voltarão a acompanhar as alterações da release.`
-      );
 
-    if (!confirmar) {
+  async function confirmarAlteracaoConclusao() {
+    if (
+      !ambienteConfirmacao ||
+      !podeEditar ||
+      salvando
+    ) {
       return;
     }
+
+    const vaiConcluir =
+      !ambienteConfirmacao.concluido;
 
     try {
       setSalvando(true);
 
       const ambienteSalvo =
         await editarAmbiente({
-          ...ambiente,
+          ...ambienteConfirmacao,
           concluido:
             vaiConcluir,
         });
@@ -296,6 +303,10 @@ function ReleaseEnvironments() {
                 ? ambienteSalvo
                 : item
           )
+      );
+
+      setAmbienteConfirmacao(
+        null
       );
     } catch (erro) {
       console.error(
@@ -603,6 +614,198 @@ function ReleaseEnvironments() {
           }
           onSave={salvar}
         />
+      )}
+
+
+      {ambienteConfirmacao && (
+        <div
+          role="presentation"
+          onClick={() =>
+            !salvando &&
+            setAmbienteConfirmacao(
+              null
+            )
+          }
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+            background:
+              "rgba(18, 31, 45, 0.48)",
+            backdropFilter:
+              "blur(3px)",
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="release-conclusion-title"
+            onClick={event =>
+              event.stopPropagation()
+            }
+            style={{
+              width: "min(100%, 470px)",
+              borderRadius: "18px",
+              background: "#FFFFFF",
+              boxShadow:
+                "0 24px 70px rgba(0, 0, 0, 0.22)",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "5px",
+                background:
+                  ambienteConfirmacao.concluido
+                    ? "#005AA9"
+                    : "#F58220",
+              }}
+            />
+
+            <div
+              style={{
+                padding:
+                  "26px 28px 28px",
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "5px 10px",
+                  marginBottom: "14px",
+                  borderRadius: "999px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                  background:
+                    ambienteConfirmacao.concluido
+                      ? "#EAF3FB"
+                      : "#FFF1E6",
+                  color:
+                    ambienteConfirmacao.concluido
+                      ? "#005AA9"
+                      : "#C45D00",
+                }}
+              >
+                {ambienteConfirmacao.concluido
+                  ? "Reabrir release"
+                  : "Concluir release"}
+              </div>
+
+              <h2
+                id="release-conclusion-title"
+                style={{
+                  margin:
+                    "0 0 10px",
+                  color: "#17212B",
+                  fontSize: "22px",
+                  lineHeight: 1.25,
+                }}
+              >
+                {ambienteConfirmacao.concluido
+                  ? "Reabrir esta release?"
+                  : "Esta release já foi para produção?"}
+              </h2>
+
+              <p
+                style={{
+                  margin:
+                    "0 0 12px",
+                  color: "#4D5965",
+                  fontSize: "14px",
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong>
+                  {ambienteConfirmacao.nome}
+                </strong>
+              </p>
+
+              <p
+                style={{
+                  margin: 0,
+                  color: "#66727D",
+                  fontSize: "14px",
+                  lineHeight: 1.65,
+                }}
+              >
+                {ambienteConfirmacao.concluido
+                  ? "Ao reabrir, a sincronização automática com o Redmine será retomada e os dados voltarão a acompanhar as alterações da release."
+                  : "Ao concluir, a release continuará disponível no ReleaseHub e permanecerá visível no Modo TV como histórico da versão em produção. Apenas a sincronização automática com o Redmine será encerrada."}
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "flex-end",
+                  gap: "10px",
+                  marginTop: "24px",
+                }}
+              >
+                <button
+                  type="button"
+                  disabled={salvando}
+                  onClick={() =>
+                    setAmbienteConfirmacao(
+                      null
+                    )
+                  }
+                  style={{
+                    minWidth: "100px",
+                    padding: "10px 16px",
+                    border:
+                      "1px solid #D8DEE5",
+                    borderRadius: "9px",
+                    background: "#FFFFFF",
+                    color: "#56616C",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  disabled={salvando}
+                  onClick={() =>
+                    void confirmarAlteracaoConclusao()
+                  }
+                  style={{
+                    minWidth: "132px",
+                    padding: "10px 18px",
+                    border: 0,
+                    borderRadius: "9px",
+                    background:
+                      ambienteConfirmacao.concluido
+                        ? "#005AA9"
+                        : "#F58220",
+                    color: "#FFFFFF",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    opacity:
+                      salvando
+                        ? 0.7
+                        : 1,
+                  }}
+                >
+                  {salvando
+                    ? "Salvando..."
+                    : ambienteConfirmacao.concluido
+                      ? "Reabrir release"
+                      : "Concluir release"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </Layout>
   );
