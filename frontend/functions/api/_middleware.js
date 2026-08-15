@@ -38,29 +38,14 @@ export async function onRequest(
 
 
   /*
-    Leituras necessárias para
-    o Modo TV continuam públicas.
+    Todas as rotas de dados exigem
+    sessão autenticada.
 
-    A TV precisa consultar:
-    - projetos
-    - ambientes
-    - projetos vinculados a uma release
+    A única exceção técnica é a
+    sincronização automática do
+    Worker Scheduler, validada pelo
+    SCHEDULER_SECRET.
   */
-
-  const leituraPublica =
-    metodo === "GET" &&
-    (
-      caminho === "/api/projects" ||
-      caminho === "/api/environments" ||
-      caminho === "/api/release-projects"
-    );
-
-
-  if (leituraPublica) {
-
-    return context.next();
-
-  }
 
 
   /*
@@ -140,6 +125,39 @@ export async function onRequest(
 
 
   /*
+    Sincronização manual com o Redmine:
+    somente Administrador e Qualidade.
+
+    O Worker Scheduler já foi liberado
+    antes desta etapa através do
+    SCHEDULER_SECRET.
+  */
+
+  if (
+    metodo === "POST" &&
+    caminho === "/api/redmine-sync" &&
+    ![
+      "admin",
+      "qualidade",
+    ].includes(
+      usuario.role
+    )
+  ) {
+
+    return Response.json(
+      {
+        erro:
+          "Você não possui permissão para sincronizar dados com o Redmine.",
+      },
+      {
+        status: 403,
+      }
+    );
+
+  }
+
+
+  /*
     Gestão de usuários:
     somente administrador.
   */
@@ -184,6 +202,41 @@ export async function onRequest(
     ].includes(
       metodo
     );
+
+
+  /*
+    Exclusões estruturais:
+    somente administrador.
+
+    Mesmo que um endpoint não possua
+    uma validação própria, o middleware
+    impede a exclusão por outros perfis.
+  */
+
+  const exclusaoEstrutural =
+    metodo === "DELETE" &&
+    (
+      caminho === "/api/projects" ||
+      caminho === "/api/environments"
+    );
+
+
+  if (
+    exclusaoEstrutural &&
+    usuario.role !== "admin"
+  ) {
+
+    return Response.json(
+      {
+        erro:
+          "Somente administradores podem excluir dados estruturais do ReleaseHub.",
+      },
+      {
+        status: 403,
+      }
+    );
+
+  }
 
 
   /*
