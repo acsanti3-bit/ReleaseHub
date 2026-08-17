@@ -41,34 +41,36 @@ export async function onRequest(
     Todas as rotas de dados exigem
     sessão autenticada.
 
-    A única exceção técnica é a
-    sincronização automática do
-    Worker Scheduler, validada pelo
-    SCHEDULER_SECRET.
+    Exceções técnicas do Worker
+    Scheduler são permitidas somente
+    com SCHEDULER_SECRET válido.
   */
 
 
   /*
-    Sincronização automática
-    executada pelo Worker Scheduler.
+    Worker Scheduler.
 
-    A rota continua protegida para
-    requisições normais.
+    O Scheduler precisa:
+    - listar os ambientes;
+    - executar a sincronização do Redmine.
 
-    Somente o Worker que possuir
-    o mesmo SCHEDULER_SECRET
-    configurado na Cloudflare
-    consegue executar a sincronização.
+    Essas chamadas só são liberadas
+    quando X-Scheduler-Secret for igual
+    ao secret configurado na Cloudflare.
   */
 
-  const sincronizacaoAutomatica =
-    metodo === "POST" &&
-    caminho === "/api/redmine-sync";
+  const rotaScheduler =
+    (
+      metodo === "GET" &&
+      caminho === "/api/environments"
+    ) ||
+    (
+      metodo === "POST" &&
+      caminho === "/api/redmine-sync"
+    );
 
 
-  if (
-    sincronizacaoAutomatica
-  ) {
+  if (rotaScheduler) {
 
     const segredoRecebido =
       context.request.headers.get(
@@ -125,39 +127,6 @@ export async function onRequest(
 
 
   /*
-    Sincronização manual com o Redmine:
-    somente Administrador e Qualidade.
-
-    O Worker Scheduler já foi liberado
-    antes desta etapa através do
-    SCHEDULER_SECRET.
-  */
-
-  if (
-    metodo === "POST" &&
-    caminho === "/api/redmine-sync" &&
-    ![
-      "admin",
-      "qualidade",
-    ].includes(
-      usuario.role
-    )
-  ) {
-
-    return Response.json(
-      {
-        erro:
-          "Você não possui permissão para sincronizar dados com o Redmine.",
-      },
-      {
-        status: 403,
-      }
-    );
-
-  }
-
-
-  /*
     Gestão de usuários:
     somente administrador.
   */
@@ -202,41 +171,6 @@ export async function onRequest(
     ].includes(
       metodo
     );
-
-
-  /*
-    Exclusões estruturais:
-    somente administrador.
-
-    Mesmo que um endpoint não possua
-    uma validação própria, o middleware
-    impede a exclusão por outros perfis.
-  */
-
-  const exclusaoEstrutural =
-    metodo === "DELETE" &&
-    (
-      caminho === "/api/projects" ||
-      caminho === "/api/environments"
-    );
-
-
-  if (
-    exclusaoEstrutural &&
-    usuario.role !== "admin"
-  ) {
-
-    return Response.json(
-      {
-        erro:
-          "Somente administradores podem excluir dados estruturais do ReleaseHub.",
-      },
-      {
-        status: 403,
-      }
-    );
-
-  }
 
 
   /*

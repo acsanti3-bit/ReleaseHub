@@ -2,7 +2,9 @@ const RELEASEHUB_URL =
   "https://releasehub.pages.dev";
 
 
-async function listarAmbientes() {
+async function listarAmbientes(
+  secret
+) {
   const response =
     await fetch(
       `${RELEASEHUB_URL}/api/environments`,
@@ -10,6 +12,9 @@ async function listarAmbientes() {
         headers: {
           Accept:
             "application/json",
+
+          "X-Scheduler-Secret":
+            secret,
         },
       }
     );
@@ -112,7 +117,9 @@ async function executarSincronizacao(
 
 
   const ambientes =
-    await listarAmbientes();
+    await listarAmbientes(
+      secret
+    );
 
   const ambientesAtivos =
     ambientes.filter(
