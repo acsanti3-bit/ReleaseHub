@@ -14,6 +14,78 @@ const FAKE_HASH =
   "0000000000000000000000000000000000000000000000000000000000000000";
 
 
+async function validarTurnstile(
+  context,
+  token
+) {
+
+  const secret =
+    context.env
+      .TURNSTILE_SECRET;
+
+  if (!secret) {
+
+    throw new Error(
+      "TURNSTILE_SECRET não configurado."
+    );
+
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "secret",
+    secret
+  );
+
+  formData.append(
+    "response",
+    token
+  );
+
+  const ip =
+    context.request.headers.get(
+      "CF-Connecting-IP"
+    );
+
+  if (ip) {
+
+    formData.append(
+      "remoteip",
+      ip
+    );
+
+  }
+
+  const response =
+    await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+  if (!response.ok) {
+
+    throw new Error(
+      `Falha ao consultar o Turnstile: HTTP ${response.status}.`
+    );
+
+  }
+
+  const resultado =
+    await response.json();
+
+  return (
+    resultado?.success === true &&
+    resultado?.action === "login"
+  );
+
+}
+
+
 export async function onRequestPost(
   context
 ) {
@@ -51,6 +123,11 @@ export async function onRequestPost(
         body.senha || ""
       );
 
+    const turnstileToken =
+      String(
+        body.turnstileToken || ""
+      );
+
     if (
       !email ||
       !senha
@@ -63,6 +140,42 @@ export async function onRequestPost(
         },
         {
           status: 400,
+        }
+      );
+
+    }
+
+    if (
+      !turnstileToken
+    ) {
+
+      return Response.json(
+        {
+          erro:
+            "Conclua a verificação de segurança.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+    const turnstileValido =
+      await validarTurnstile(
+        context,
+        turnstileToken
+      );
+
+    if (!turnstileValido) {
+
+      return Response.json(
+        {
+          erro:
+            "Não foi possível validar a verificação de segurança. Tente novamente.",
+        },
+        {
+          status: 403,
         }
       );
 

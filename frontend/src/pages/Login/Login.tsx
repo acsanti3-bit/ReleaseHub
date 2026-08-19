@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
   type SyntheticEvent,
 } from "react";
@@ -24,6 +25,41 @@ import {
 } from "../../services/AuthService";
 
 import "./Login.css";
+
+
+const TURNSTILE_SITE_KEY =
+  "0x4AAAAAAETHPPp2o-cUo82B";
+
+type TurnstileWidgetId =
+  string | number;
+
+interface TurnstileOptions {
+  sitekey: string;
+  action?: string;
+  theme?: "light" | "dark" | "auto";
+  callback?: (
+    token: string
+  ) => void;
+  "expired-callback"?: () => void;
+  "error-callback"?: () => void;
+}
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: TurnstileOptions
+      ) => TurnstileWidgetId;
+      reset: (
+        widgetId?: TurnstileWidgetId
+      ) => void;
+      remove: (
+        widgetId: TurnstileWidgetId
+      ) => void;
+    };
+  }
+}
 
 function Login() {
 
@@ -63,6 +99,23 @@ function Login() {
   ] =
     useState("");
 
+
+  const [
+    turnstileToken,
+    setTurnstileToken,
+  ] =
+    useState("");
+
+  const turnstileContainerRef =
+    useRef<HTMLDivElement | null>(
+      null
+    );
+
+  const turnstileWidgetRef =
+    useRef<TurnstileWidgetId | null>(
+      null
+    );
+
   const origem =
     (
       location.state as
@@ -71,6 +124,190 @@ function Login() {
           }
         | null
     )?.from || "/";
+
+
+  useEffect(() => {
+
+    let ativo = true;
+
+    function renderizarTurnstile() {
+
+      if (
+        !ativo ||
+        !turnstileContainerRef.current ||
+        !window.turnstile ||
+        turnstileWidgetRef.current !== null
+      ) {
+
+        return;
+
+      }
+
+      turnstileWidgetRef.current =
+        window.turnstile.render(
+          turnstileContainerRef.current,
+          {
+            sitekey:
+              TURNSTILE_SITE_KEY,
+
+            action:
+              "login",
+
+            theme:
+              "light",
+
+            callback:
+              token => {
+
+                if (ativo) {
+
+                  setTurnstileToken(
+                    token
+                  );
+
+                }
+
+              },
+
+            "expired-callback":
+              () => {
+
+                if (ativo) {
+
+                  setTurnstileToken(
+                    ""
+                  );
+
+                }
+
+              },
+
+            "error-callback":
+              () => {
+
+                if (ativo) {
+
+                  setTurnstileToken(
+                    ""
+                  );
+
+                  setErro(
+                    "Não foi possível concluir a verificação de segurança. Tente novamente."
+                  );
+
+                }
+
+              },
+          }
+        );
+
+    }
+
+    const scriptId =
+      "cloudflare-turnstile-script";
+
+    let script =
+      document.getElementById(
+        scriptId
+      ) as HTMLScriptElement | null;
+
+    const handleLoad =
+      () => {
+
+        renderizarTurnstile();
+
+      };
+
+    const handleError =
+      () => {
+
+        if (ativo) {
+
+          setErro(
+            "Não foi possível carregar a verificação de segurança. Atualize a página e tente novamente."
+          );
+
+        }
+
+      };
+
+    if (
+      window.turnstile
+    ) {
+
+      renderizarTurnstile();
+
+    } else {
+
+      if (!script) {
+
+        script =
+          document.createElement(
+            "script"
+          );
+
+        script.id =
+          scriptId;
+
+        script.src =
+          "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+
+        script.async = true;
+        script.defer = true;
+
+        document.head.appendChild(
+          script
+        );
+
+      }
+
+      script.addEventListener(
+        "load",
+        handleLoad
+      );
+
+      script.addEventListener(
+        "error",
+        handleError
+      );
+
+    }
+
+    return () => {
+
+      ativo = false;
+
+      if (script) {
+
+        script.removeEventListener(
+          "load",
+          handleLoad
+        );
+
+        script.removeEventListener(
+          "error",
+          handleError
+        );
+
+      }
+
+      if (
+        window.turnstile &&
+        turnstileWidgetRef.current !== null
+      ) {
+
+        window.turnstile.remove(
+          turnstileWidgetRef.current
+        );
+
+        turnstileWidgetRef.current =
+          null;
+
+      }
+
+    };
+
+  }, []);
 
   useEffect(() => {
 
@@ -140,6 +377,19 @@ function Login() {
 
     }
 
+
+    if (
+      !turnstileToken
+    ) {
+
+      setErro(
+        "Conclua a verificação de segurança para entrar."
+      );
+
+      return;
+
+    }
+
     setCarregando(true);
 
     setErro("");
@@ -148,7 +398,8 @@ function Login() {
 
       await login(
         email.trim(),
-        senha
+        senha,
+        turnstileToken
       );
 
       navigate(
@@ -165,6 +416,21 @@ function Login() {
           ? error.message
           : "Não foi possível entrar."
       );
+
+      setTurnstileToken(
+        ""
+      );
+
+      if (
+        window.turnstile &&
+        turnstileWidgetRef.current !== null
+      ) {
+
+        window.turnstile.reset(
+          turnstileWidgetRef.current
+        );
+
+      }
 
     } finally {
 
@@ -312,6 +578,17 @@ function Login() {
 
           </div>
 
+          <div
+            ref={
+              turnstileContainerRef
+            }
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              minHeight: "65px",
+            }}
+          />
+
           {erro && (
 
             <div className="login-error">
@@ -326,7 +603,8 @@ function Login() {
             type="submit"
             className="login-submit"
             disabled={
-              carregando
+              carregando ||
+              !turnstileToken
             }
           >
 

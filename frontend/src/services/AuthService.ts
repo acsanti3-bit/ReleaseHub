@@ -41,7 +41,8 @@ async function obterMensagemErro(
 
 export async function login(
   email: string,
-  senha: string
+  senha: string,
+  turnstileToken: string
 ): Promise<AuthUser> {
 
   const response =
@@ -62,6 +63,7 @@ export async function login(
           JSON.stringify({
             email,
             senha,
+            turnstileToken,
           }),
       }
     );
