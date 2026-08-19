@@ -606,12 +606,15 @@ function somarContagens(
 
 
 
-async function contarIssuesStatus(
+async function buscarPaginaIssues(
   context,
   projectId,
   versionId,
-  statusId
+  issueOffset
 ) {
+  const limite =
+    100;
+
   const resultado =
     await buscarJsonRedmine(
       context,
@@ -627,51 +630,44 @@ async function contarIssuesStatus(
           versionId,
 
         status_id:
-          statusId,
+          "*",
 
         limit:
-          1,
+          limite,
 
         offset:
-          0,
+          issueOffset,
+
+        sort:
+          "id:asc",
       }
     );
 
-  const total =
+  const issues =
+    Array.isArray(
+      resultado.issues
+    )
+      ? resultado.issues
+      : [];
+
+  const totalRetornado =
     Number(
       resultado.total_count
     );
 
-  if (
+  const total =
     Number.isFinite(
-      total
+      totalRetornado
     )
-  ) {
-    return total;
-  }
+      ? totalRetornado
+      : issueOffset +
+        issues.length;
 
-  return Array.isArray(
-    resultado.issues
-  )
-    ? resultado.issues.length
-    : 0;
-}
-
-
-async function listarStatusRedmine(
-  context
-) {
-  const resultado =
-    await buscarJsonRedmine(
-      context,
-      "/issue_statuses.json"
-    );
-
-  return Array.isArray(
-    resultado.issue_statuses
-  )
-    ? resultado.issue_statuses
-    : [];
+  return {
+    issues,
+    total,
+    limite,
+  };
 }
 
 
@@ -679,7 +675,8 @@ async function sincronizarProjetoScheduler(
   context,
   ambiente,
   environmentId,
-  projectOffset
+  projectOffset,
+  issueOffset
 ) {
   const totalRow =
     await context.env.DB
@@ -735,7 +732,7 @@ async function sincronizarProjetoScheduler(
   const nextProjectOffset =
     projectOffset + 1;
 
-  const hasMore =
+  const hasMoreProjects =
     nextProjectOffset <
     totalProjetos;
 
@@ -778,9 +775,17 @@ async function sincronizarProjetoScheduler(
 
       projectOffset,
 
+      issueOffset,
+
       nextProjectOffset,
 
+      nextIssueOffset:
+        0,
+
       totalProjetos,
+
+      projectDone:
+        true,
 
       hasMore:
         false,
@@ -796,22 +801,21 @@ async function sincronizarProjetoScheduler(
       ""
     ).trim();
 
-  const projetosIgnorados =
-    [];
+  const projetoInfo = {
+    projectId:
+      projetoRelease.project_id,
 
-  if (
-    !versaoProjeto ||
-    versaoProjeto === "-"
-  ) {
-    projetosIgnorados.push({
-      projeto:
-        projetoRelease.nome,
+    nome:
+      projetoRelease.nome,
 
-      motivo:
-        "O projeto não possui versão informada neste ambiente.",
-    });
+    versao:
+      versaoProjeto,
+  };
 
-    return Response.json({
+  const respostaIgnorado = (
+    motivo
+  ) =>
+    Response.json({
       sucesso:
         true,
 
@@ -832,7 +836,14 @@ async function sincronizarProjetoScheduler(
       tarefasSincronizadas:
         0,
 
-      projetosIgnorados,
+      projetosIgnorados: [
+        {
+          projeto:
+            projetoRelease.nome,
+
+          motivo,
+        },
+      ],
 
       statusIgnorados:
         [],
@@ -844,25 +855,34 @@ async function sincronizarProjetoScheduler(
       schedulerMode:
         true,
 
-      projeto: {
-        projectId:
-          projetoRelease.project_id,
-
-        nome:
-          projetoRelease.nome,
-
-        versao:
-          versaoProjeto,
-      },
+      projeto:
+        projetoInfo,
 
       projectOffset,
 
+      issueOffset,
+
       nextProjectOffset,
+
+      nextIssueOffset:
+        0,
 
       totalProjetos,
 
-      hasMore,
+      projectDone:
+        true,
+
+      hasMore:
+        hasMoreProjects,
     });
+
+  if (
+    !versaoProjeto ||
+    versaoProjeto === "-"
+  ) {
+    return respostaIgnorado(
+      "O projeto não possui versão informada neste ambiente."
+    );
   }
 
   const projetosRedmine =
@@ -879,66 +899,9 @@ async function sincronizarProjetoScheduler(
   if (
     !projetoRedmine
   ) {
-    projetosIgnorados.push({
-      projeto:
-        projetoRelease.nome,
-
-      motivo:
-        "Não foi localizado um projeto correspondente no Redmine.",
-    });
-
-    return Response.json({
-      sucesso:
-        true,
-
-      ambiente: {
-        id:
-          ambiente.id,
-
-        nome:
-          ambiente.nome,
-      },
-
-      projetosAtualizados:
-        0,
-
-      tarefasEncontradas:
-        0,
-
-      tarefasSincronizadas:
-        0,
-
-      projetosIgnorados,
-
-      statusIgnorados:
-        [],
-
-      sincronizadoEm:
-        new Date()
-          .toISOString(),
-
-      schedulerMode:
-        true,
-
-      projeto: {
-        projectId:
-          projetoRelease.project_id,
-
-        nome:
-          projetoRelease.nome,
-
-        versao:
-          versaoProjeto,
-      },
-
-      projectOffset,
-
-      nextProjectOffset,
-
-      totalProjetos,
-
-      hasMore,
-    });
+    return respostaIgnorado(
+      "Não foi localizado um projeto correspondente no Redmine."
+    );
   }
 
   const versoesRedmine =
@@ -956,109 +919,35 @@ async function sincronizarProjetoScheduler(
   if (
     !versaoRedmine
   ) {
-    projetosIgnorados.push({
-      projeto:
-        projetoRelease.nome,
-
-      motivo:
-        `A versão ${versaoProjeto} não foi localizada no Redmine.`,
-    });
-
-    return Response.json({
-      sucesso:
-        true,
-
-      ambiente: {
-        id:
-          ambiente.id,
-
-        nome:
-          ambiente.nome,
-      },
-
-      projetosAtualizados:
-        0,
-
-      tarefasEncontradas:
-        0,
-
-      tarefasSincronizadas:
-        0,
-
-      projetosIgnorados,
-
-      statusIgnorados:
-        [],
-
-      sincronizadoEm:
-        new Date()
-          .toISOString(),
-
-      schedulerMode:
-        true,
-
-      projeto: {
-        projectId:
-          projetoRelease.project_id,
-
-        nome:
-          projetoRelease.nome,
-
-        versao:
-          versaoProjeto,
-      },
-
-      projectOffset,
-
-      nextProjectOffset,
-
-      totalProjetos,
-
-      hasMore,
-    });
+    return respostaIgnorado(
+      `A versão ${versaoProjeto} não foi localizada no Redmine.`
+    );
   }
 
-  const statusRedmine =
-    await listarStatusRedmine(
-      context
+  const pagina =
+    await buscarPaginaIssues(
+      context,
+      projetoRedmine.id,
+      versaoRedmine.id,
+      issueOffset
     );
 
   const contagens =
     criarContagens();
 
-  const statusIgnorados =
-    [];
-
-  let tarefasEncontradas =
-    0;
+  const statusIgnoradosMap =
+    new Map();
 
   let tarefasSincronizadas =
     0;
 
   for (
-    const status
-    of statusRedmine
+    const issue
+    of pagina.issues
   ) {
-    const quantidade =
-      await contarIssuesStatus(
-        context,
-        projetoRedmine.id,
-        versaoRedmine.id,
-        status.id
-      );
-
-    if (
-      quantidade <= 0
-    ) {
-      continue;
-    }
-
-    tarefasEncontradas +=
-      quantidade;
-
     const nomeStatus =
       String(
-        status.name ??
+        issue.status?.name ??
         ""
       );
 
@@ -1075,13 +964,20 @@ async function sincronizarProjetoScheduler(
     if (
       !campo
     ) {
-      statusIgnorados.push({
-        status:
-          nomeStatus ||
-          "Sem situação",
+      const chave =
+        nomeStatus ||
+        "Sem situação";
 
-        quantidade,
-      });
+      statusIgnoradosMap.set(
+        chave,
+        (
+          statusIgnoradosMap.get(
+            chave
+          ) ??
+          0
+        ) +
+        1
+      );
 
       continue;
     }
@@ -1089,52 +985,122 @@ async function sincronizarProjetoScheduler(
     contagens[
       campo
     ] +=
-      quantidade;
+      1;
 
     tarefasSincronizadas +=
-      quantidade;
+      1;
   }
 
-  await context.env.DB
-    .prepare(
-      `
-        UPDATE release_projects
+  const statusIgnorados =
+    Array.from(
+      statusIgnoradosMap.entries()
+    ).map(
+      (
+        [
+          status,
+          quantidade,
+        ]
+      ) => ({
+        status,
+        quantidade,
+      })
+    );
 
-        SET
-          qualidade = ?,
-          testes = ?,
-          desenvolvido = ?,
-          aguardando_compilacao = ?,
-          em_progresso = ?,
-          nova = ?,
-          reaberta = ?,
-          validacao_cliente = ?,
-          resolvidas = ?,
-          rejeitada = ?,
-          interrompida = ?,
-          updated_at = CURRENT_TIMESTAMP
+  if (
+    issueOffset === 0
+  ) {
+    await context.env.DB
+      .prepare(
+        `
+          UPDATE release_projects
 
-        WHERE
-          environment_id = ?
-          AND project_id = ?
-      `
-    )
-    .bind(
-      contagens.qualidade,
-      contagens.testes,
-      contagens.desenvolvido,
-      contagens.aguardando_compilacao,
-      contagens.em_progresso,
-      contagens.nova,
-      contagens.reaberta,
-      contagens.validacao_cliente,
-      contagens.resolvidas,
-      contagens.rejeitada,
-      contagens.interrompida,
-      environmentId,
-      projetoRelease.project_id
-    )
-    .run();
+          SET
+            qualidade = ?,
+            testes = ?,
+            desenvolvido = ?,
+            aguardando_compilacao = ?,
+            em_progresso = ?,
+            nova = ?,
+            reaberta = ?,
+            validacao_cliente = ?,
+            resolvidas = ?,
+            rejeitada = ?,
+            interrompida = ?,
+            updated_at = CURRENT_TIMESTAMP
+
+          WHERE
+            environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        contagens.qualidade,
+        contagens.testes,
+        contagens.desenvolvido,
+        contagens.aguardando_compilacao,
+        contagens.em_progresso,
+        contagens.nova,
+        contagens.reaberta,
+        contagens.validacao_cliente,
+        contagens.resolvidas,
+        contagens.rejeitada,
+        contagens.interrompida,
+        environmentId,
+        projetoRelease.project_id
+      )
+      .run();
+  } else {
+    await context.env.DB
+      .prepare(
+        `
+          UPDATE release_projects
+
+          SET
+            qualidade = qualidade + ?,
+            testes = testes + ?,
+            desenvolvido = desenvolvido + ?,
+            aguardando_compilacao = aguardando_compilacao + ?,
+            em_progresso = em_progresso + ?,
+            nova = nova + ?,
+            reaberta = reaberta + ?,
+            validacao_cliente = validacao_cliente + ?,
+            resolvidas = resolvidas + ?,
+            rejeitada = rejeitada + ?,
+            interrompida = interrompida + ?,
+            updated_at = CURRENT_TIMESTAMP
+
+          WHERE
+            environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        contagens.qualidade,
+        contagens.testes,
+        contagens.desenvolvido,
+        contagens.aguardando_compilacao,
+        contagens.em_progresso,
+        contagens.nova,
+        contagens.reaberta,
+        contagens.validacao_cliente,
+        contagens.resolvidas,
+        contagens.rejeitada,
+        contagens.interrompida,
+        environmentId,
+        projetoRelease.project_id
+      )
+      .run();
+  }
+
+  const nextIssueOffset =
+    issueOffset +
+    pagina.issues.length;
+
+  const projectDone =
+    nextIssueOffset >=
+      pagina.total ||
+    pagina.issues.length ===
+      0;
 
   return Response.json({
     sucesso:
@@ -1149,13 +1115,17 @@ async function sincronizarProjetoScheduler(
     },
 
     projetosAtualizados:
-      1,
+      projectDone
+        ? 1
+        : 0,
 
-    tarefasEncontradas,
+    tarefasEncontradas:
+      pagina.issues.length,
 
     tarefasSincronizadas,
 
-    projetosIgnorados,
+    projetosIgnorados:
+      [],
 
     statusIgnorados,
 
@@ -1166,24 +1136,31 @@ async function sincronizarProjetoScheduler(
     schedulerMode:
       true,
 
-    projeto: {
-      projectId:
-        projetoRelease.project_id,
-
-      nome:
-        projetoRelease.nome,
-
-      versao:
-        versaoProjeto,
-    },
+    projeto:
+      projetoInfo,
 
     projectOffset,
 
+    issueOffset,
+
     nextProjectOffset,
+
+    nextIssueOffset:
+      projectDone
+        ? 0
+        : nextIssueOffset,
 
     totalProjetos,
 
-    hasMore,
+    totalIssuesProjeto:
+      pagina.total,
+
+    projectDone,
+
+    hasMore:
+      projectDone
+        ? hasMoreProjects
+        : true,
   });
 }
 
@@ -1216,6 +1193,20 @@ export async function onRequestPost(
       ) &&
       projectOffsetValor >= 0
         ? projectOffsetValor
+        : 0;
+
+    const issueOffsetValor =
+      Number(
+        body.issueOffset ??
+        0
+      );
+
+    const issueOffset =
+      Number.isInteger(
+        issueOffsetValor
+      ) &&
+      issueOffsetValor >= 0
+        ? issueOffsetValor
         : 0;
 
     if (
@@ -1263,7 +1254,8 @@ export async function onRequestPost(
         context,
         ambiente,
         environmentId,
-        projectOffset
+        projectOffset,
+        issueOffset
       );
     }
 

@@ -47,7 +47,8 @@ async function listarAmbientes(
 async function sincronizarProjeto(
   ambiente,
   secret,
-  projectOffset
+  projectOffset,
+  issueOffset
 ) {
   const response =
     await fetch(
@@ -76,6 +77,8 @@ async function sincronizarProjeto(
               true,
 
             projectOffset,
+
+            issueOffset,
           }),
       }
     );
@@ -121,6 +124,9 @@ async function sincronizarAmbiente(
   let totalProjetos =
     null;
 
+  let issueOffset =
+    0;
+
   let projetosAtualizados =
     0;
 
@@ -160,7 +166,8 @@ async function sincronizarAmbiente(
         await sincronizarProjeto(
           ambiente,
           secret,
-          projectOffset
+          projectOffset,
+          issueOffset
         );
 
       totalProjetos =
@@ -213,6 +220,15 @@ async function sincronizarAmbiente(
               ?.nome ??
             null,
 
+          paginaOffset:
+            issueOffset,
+
+          projetoConcluido:
+            Boolean(
+              resultado
+                ?.projectDone
+            ),
+
           atualizados:
             resultado
               ?.projetosAtualizados ??
@@ -229,6 +245,32 @@ async function sincronizarAmbiente(
             0,
         }
       );
+
+      if (
+        !resultado?.projectDone
+      ) {
+        issueOffset =
+          Number(
+            resultado
+              ?.nextIssueOffset
+          );
+
+        if (
+          !Number.isInteger(
+            issueOffset
+          ) ||
+          issueOffset < 0
+        ) {
+          throw new Error(
+            "A API retornou um deslocamento de tarefas inválido."
+          );
+        }
+
+        continue;
+      }
+
+      issueOffset =
+        0;
 
       if (
         !resultado?.hasMore
@@ -269,6 +311,9 @@ async function sincronizarAmbiente(
 
       projectOffset +=
         1;
+
+      issueOffset =
+        0;
     }
   }
 
