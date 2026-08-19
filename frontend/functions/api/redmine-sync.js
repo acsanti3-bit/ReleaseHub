@@ -26,9 +26,6 @@ const STATUS_PARA_CAMPO = {
   reaberto:
     "reaberta",
 
-  validacaonocliente:
-    "validacao_cliente",
-
   resolvida:
     "resolvidas",
 
@@ -89,8 +86,6 @@ function criarContagens() {
     nova: 0,
 
     reaberta: 0,
-
-    validacao_cliente: 0,
 
     resolvidas: 0,
 
@@ -610,6 +605,589 @@ function somarContagens(
 }
 
 
+
+async function contarIssuesStatus(
+  context,
+  projectId,
+  versionId,
+  statusId
+) {
+  const resultado =
+    await buscarJsonRedmine(
+      context,
+      "/issues.json",
+      {
+        project_id:
+          projectId,
+
+        subproject_id:
+          "!*",
+
+        fixed_version_id:
+          versionId,
+
+        status_id:
+          statusId,
+
+        limit:
+          1,
+
+        offset:
+          0,
+      }
+    );
+
+  const total =
+    Number(
+      resultado.total_count
+    );
+
+  if (
+    Number.isFinite(
+      total
+    )
+  ) {
+    return total;
+  }
+
+  return Array.isArray(
+    resultado.issues
+  )
+    ? resultado.issues.length
+    : 0;
+}
+
+
+async function listarStatusRedmine(
+  context
+) {
+  const resultado =
+    await buscarJsonRedmine(
+      context,
+      "/issue_statuses.json"
+    );
+
+  return Array.isArray(
+    resultado.issue_statuses
+  )
+    ? resultado.issue_statuses
+    : [];
+}
+
+
+async function sincronizarProjetoScheduler(
+  context,
+  ambiente,
+  environmentId,
+  projectOffset
+) {
+  const totalRow =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            COUNT(*) AS total
+
+          FROM release_projects
+
+          WHERE environment_id = ?
+        `
+      )
+      .bind(
+        environmentId
+      )
+      .first();
+
+  const totalProjetos =
+    Number(
+      totalRow?.total ??
+      0
+    );
+
+  const resultadoProjeto =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            rp.project_id,
+            p.nome,
+            rp.versao
+
+          FROM release_projects rp
+
+          INNER JOIN projects p
+            ON p.id = rp.project_id
+
+          WHERE rp.environment_id = ?
+
+          ORDER BY p.id
+
+          LIMIT 1
+          OFFSET ?
+        `
+      )
+      .bind(
+        environmentId,
+        projectOffset
+      )
+      .first();
+
+  const nextProjectOffset =
+    projectOffset + 1;
+
+  const hasMore =
+    nextProjectOffset <
+    totalProjetos;
+
+  if (
+    !resultadoProjeto
+  ) {
+    return Response.json({
+      sucesso:
+        true,
+
+      ambiente: {
+        id:
+          ambiente.id,
+
+        nome:
+          ambiente.nome,
+      },
+
+      projetosAtualizados:
+        0,
+
+      tarefasEncontradas:
+        0,
+
+      tarefasSincronizadas:
+        0,
+
+      projetosIgnorados:
+        [],
+
+      statusIgnorados:
+        [],
+
+      sincronizadoEm:
+        new Date()
+          .toISOString(),
+
+      schedulerMode:
+        true,
+
+      projectOffset,
+
+      nextProjectOffset,
+
+      totalProjetos,
+
+      hasMore:
+        false,
+    });
+  }
+
+  const projetoRelease =
+    resultadoProjeto;
+
+  const versaoProjeto =
+    String(
+      projetoRelease.versao ??
+      ""
+    ).trim();
+
+  const projetosIgnorados =
+    [];
+
+  if (
+    !versaoProjeto ||
+    versaoProjeto === "-"
+  ) {
+    projetosIgnorados.push({
+      projeto:
+        projetoRelease.nome,
+
+      motivo:
+        "O projeto não possui versão informada neste ambiente.",
+    });
+
+    return Response.json({
+      sucesso:
+        true,
+
+      ambiente: {
+        id:
+          ambiente.id,
+
+        nome:
+          ambiente.nome,
+      },
+
+      projetosAtualizados:
+        0,
+
+      tarefasEncontradas:
+        0,
+
+      tarefasSincronizadas:
+        0,
+
+      projetosIgnorados,
+
+      statusIgnorados:
+        [],
+
+      sincronizadoEm:
+        new Date()
+          .toISOString(),
+
+      schedulerMode:
+        true,
+
+      projeto: {
+        projectId:
+          projetoRelease.project_id,
+
+        nome:
+          projetoRelease.nome,
+
+        versao:
+          versaoProjeto,
+      },
+
+      projectOffset,
+
+      nextProjectOffset,
+
+      totalProjetos,
+
+      hasMore,
+    });
+  }
+
+  const projetosRedmine =
+    await listarProjetosRedmine(
+      context
+    );
+
+  const projetoRedmine =
+    encontrarProjetoRedmine(
+      projetoRelease.nome,
+      projetosRedmine
+    );
+
+  if (
+    !projetoRedmine
+  ) {
+    projetosIgnorados.push({
+      projeto:
+        projetoRelease.nome,
+
+      motivo:
+        "Não foi localizado um projeto correspondente no Redmine.",
+    });
+
+    return Response.json({
+      sucesso:
+        true,
+
+      ambiente: {
+        id:
+          ambiente.id,
+
+        nome:
+          ambiente.nome,
+      },
+
+      projetosAtualizados:
+        0,
+
+      tarefasEncontradas:
+        0,
+
+      tarefasSincronizadas:
+        0,
+
+      projetosIgnorados,
+
+      statusIgnorados:
+        [],
+
+      sincronizadoEm:
+        new Date()
+          .toISOString(),
+
+      schedulerMode:
+        true,
+
+      projeto: {
+        projectId:
+          projetoRelease.project_id,
+
+        nome:
+          projetoRelease.nome,
+
+        versao:
+          versaoProjeto,
+      },
+
+      projectOffset,
+
+      nextProjectOffset,
+
+      totalProjetos,
+
+      hasMore,
+    });
+  }
+
+  const versoesRedmine =
+    await listarVersoesProjeto(
+      context,
+      projetoRedmine.id
+    );
+
+  const versaoRedmine =
+    encontrarVersaoRedmine(
+      versaoProjeto,
+      versoesRedmine
+    );
+
+  if (
+    !versaoRedmine
+  ) {
+    projetosIgnorados.push({
+      projeto:
+        projetoRelease.nome,
+
+      motivo:
+        `A versão ${versaoProjeto} não foi localizada no Redmine.`,
+    });
+
+    return Response.json({
+      sucesso:
+        true,
+
+      ambiente: {
+        id:
+          ambiente.id,
+
+        nome:
+          ambiente.nome,
+      },
+
+      projetosAtualizados:
+        0,
+
+      tarefasEncontradas:
+        0,
+
+      tarefasSincronizadas:
+        0,
+
+      projetosIgnorados,
+
+      statusIgnorados:
+        [],
+
+      sincronizadoEm:
+        new Date()
+          .toISOString(),
+
+      schedulerMode:
+        true,
+
+      projeto: {
+        projectId:
+          projetoRelease.project_id,
+
+        nome:
+          projetoRelease.nome,
+
+        versao:
+          versaoProjeto,
+      },
+
+      projectOffset,
+
+      nextProjectOffset,
+
+      totalProjetos,
+
+      hasMore,
+    });
+  }
+
+  const statusRedmine =
+    await listarStatusRedmine(
+      context
+    );
+
+  const contagens =
+    criarContagens();
+
+  const statusIgnorados =
+    [];
+
+  let tarefasEncontradas =
+    0;
+
+  let tarefasSincronizadas =
+    0;
+
+  for (
+    const status
+    of statusRedmine
+  ) {
+    const quantidade =
+      await contarIssuesStatus(
+        context,
+        projetoRedmine.id,
+        versaoRedmine.id,
+        status.id
+      );
+
+    if (
+      quantidade <= 0
+    ) {
+      continue;
+    }
+
+    tarefasEncontradas +=
+      quantidade;
+
+    const nomeStatus =
+      String(
+        status.name ??
+        ""
+      );
+
+    const chaveStatus =
+      normalizarTexto(
+        nomeStatus
+      );
+
+    const campo =
+      STATUS_PARA_CAMPO[
+        chaveStatus
+      ];
+
+    if (
+      !campo
+    ) {
+      statusIgnorados.push({
+        status:
+          nomeStatus ||
+          "Sem situação",
+
+        quantidade,
+      });
+
+      continue;
+    }
+
+    contagens[
+      campo
+    ] +=
+      quantidade;
+
+    tarefasSincronizadas +=
+      quantidade;
+  }
+
+  await context.env.DB
+    .prepare(
+      `
+        UPDATE release_projects
+
+        SET
+          qualidade = ?,
+          testes = ?,
+          desenvolvido = ?,
+          aguardando_compilacao = ?,
+          em_progresso = ?,
+          nova = ?,
+          reaberta = ?,
+          validacao_cliente = ?,
+          resolvidas = ?,
+          rejeitada = ?,
+          interrompida = ?,
+          updated_at = CURRENT_TIMESTAMP
+
+        WHERE
+          environment_id = ?
+          AND project_id = ?
+      `
+    )
+    .bind(
+      contagens.qualidade,
+      contagens.testes,
+      contagens.desenvolvido,
+      contagens.aguardando_compilacao,
+      contagens.em_progresso,
+      contagens.nova,
+      contagens.reaberta,
+      contagens.validacao_cliente,
+      contagens.resolvidas,
+      contagens.rejeitada,
+      contagens.interrompida,
+      environmentId,
+      projetoRelease.project_id
+    )
+    .run();
+
+  return Response.json({
+    sucesso:
+      true,
+
+    ambiente: {
+      id:
+        ambiente.id,
+
+      nome:
+        ambiente.nome,
+    },
+
+    projetosAtualizados:
+      1,
+
+    tarefasEncontradas,
+
+    tarefasSincronizadas,
+
+    projetosIgnorados,
+
+    statusIgnorados,
+
+    sincronizadoEm:
+      new Date()
+        .toISOString(),
+
+    schedulerMode:
+      true,
+
+    projeto: {
+      projectId:
+        projetoRelease.project_id,
+
+      nome:
+        projetoRelease.nome,
+
+      versao:
+        versaoProjeto,
+    },
+
+    projectOffset,
+
+    nextProjectOffset,
+
+    totalProjetos,
+
+    hasMore,
+  });
+}
+
+
 export async function onRequestPost(
   context
 ) {
@@ -621,6 +1199,24 @@ export async function onRequestPost(
       Number(
         body.environmentId
       );
+
+    const schedulerMode =
+      body.schedulerMode ===
+      true;
+
+    const projectOffsetValor =
+      Number(
+        body.projectOffset ??
+        0
+      );
+
+    const projectOffset =
+      Number.isInteger(
+        projectOffsetValor
+      ) &&
+      projectOffsetValor >= 0
+        ? projectOffsetValor
+        : 0;
 
     if (
       !environmentId
@@ -657,6 +1253,17 @@ export async function onRequestPost(
       return respostaErro(
         "Ambiente da release não encontrado.",
         404
+      );
+    }
+
+    if (
+      schedulerMode
+    ) {
+      return await sincronizarProjetoScheduler(
+        context,
+        ambiente,
+        environmentId,
+        projectOffset
       );
     }
 
@@ -874,7 +1481,6 @@ export async function onRequestPost(
                     em_progresso = ?,
                     nova = ?,
                     reaberta = ?,
-                    validacao_cliente = ?,
                     resolvidas = ?,
                     rejeitada = ?,
                     interrompida = ?,
@@ -913,10 +1519,6 @@ export async function onRequestPost(
                 atualizacao
                   .contagens
                   .reaberta,
-
-                atualizacao
-                  .contagens
-                  .validacao_cliente,
 
                 atualizacao
                   .contagens

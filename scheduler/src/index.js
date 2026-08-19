@@ -19,17 +19,16 @@ async function listarAmbientes(
       }
     );
 
-
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     throw new Error(
       `Erro ${response.status} ao buscar os ambientes do ReleaseHub.`
     );
   }
 
-
   const ambientes =
     await response.json();
-
 
   if (
     !Array.isArray(
@@ -41,14 +40,14 @@ async function listarAmbientes(
     );
   }
 
-
   return ambientes;
 }
 
 
-async function sincronizarAmbiente(
+async function sincronizarProjeto(
   ambiente,
-  secret
+  secret,
+  projectOffset
 ) {
   const response =
     await fetch(
@@ -72,102 +71,149 @@ async function sincronizarAmbiente(
           JSON.stringify({
             environmentId:
               ambiente.id,
+
+            schedulerMode:
+              true,
+
+            projectOffset,
           }),
       }
     );
 
+  const texto =
+    await response.text();
 
-  const resultado =
-    await response
-      .json()
-      .catch(
-        () => null
-      );
+  let resultado =
+    null;
 
-
-  if (!response.ok) {
-    throw new Error(
-      resultado?.erro ??
-      `Erro ${response.status} ao sincronizar o ambiente ${ambiente.id}.`
-    );
+  try {
+    resultado =
+      texto
+        ? JSON.parse(
+            texto
+          )
+        : null;
+  } catch {
+    resultado =
+      null;
   }
 
+  if (
+    !response.ok
+  ) {
+    throw new Error(
+      resultado?.erro ??
+      `Erro ${response.status} ao sincronizar o projeto ${projectOffset} do ambiente ${ambiente.id}.`
+    );
+  }
 
   return resultado;
 }
 
 
-async function executarSincronizacao(
+async function sincronizarAmbiente(
+  ambiente,
   secret
 ) {
-  if (!secret) {
-    throw new Error(
-      "O segredo SCHEDULER_SECRET não está configurado no Worker."
-    );
-  }
-
-
-  const inicio =
-    new Date();
-
-
-  console.log(
-    `[ReleaseHub] Sincronização automática iniciada em ${inicio.toISOString()}.`
-  );
-
-
-  const ambientes =
-    await listarAmbientes(
-      secret
-    );
-
-  const ambientesAtivos =
-    ambientes.filter(
-      ambiente =>
-        !ambiente.concluido
-    );
-
-
-  console.log(
-    `[ReleaseHub] ${ambientes.length} ambiente(s) encontrado(s), ${ambientesAtivos.length} ativo(s).`
-  );
-
-
-  let sincronizados =
+  let projectOffset =
     0;
 
-  let erros =
+  let totalProjetos =
+    null;
+
+  let projetosAtualizados =
     0;
 
+  let tarefasEncontradas =
+    0;
 
-  for (
-    const ambiente
-    of ambientesAtivos
+  let tarefasSincronizadas =
+    0;
+
+  let projetosIgnorados =
+    0;
+
+  let errosProjetos =
+    0;
+
+  let iteracoes =
+    0;
+
+  while (
+    totalProjetos === null ||
+    projectOffset <
+      totalProjetos
   ) {
-    try {
-      console.log(
-        `[ReleaseHub] Sincronizando ambiente ${ambiente.id} - ${ambiente.nome}...`
+    iteracoes +=
+      1;
+
+    if (
+      iteracoes > 200
+    ) {
+      throw new Error(
+        `O ambiente ${ambiente.id} ultrapassou o limite de segurança de projetos.`
       );
+    }
 
-
+    try {
       const resultado =
-        await sincronizarAmbiente(
+        await sincronizarProjeto(
           ambiente,
-          secret
+          secret,
+          projectOffset
         );
 
+      totalProjetos =
+        Number(
+          resultado
+            ?.totalProjetos ??
+          0
+        );
 
-      sincronizados +=
-        1;
+      projetosAtualizados +=
+        Number(
+          resultado
+            ?.projetosAtualizados ??
+          0
+        );
 
+      tarefasEncontradas +=
+        Number(
+          resultado
+            ?.tarefasEncontradas ??
+          0
+        );
+
+      tarefasSincronizadas +=
+        Number(
+          resultado
+            ?.tarefasSincronizadas ??
+          0
+        );
+
+      projetosIgnorados +=
+        Array.isArray(
+          resultado
+            ?.projetosIgnorados
+        )
+          ? resultado
+              .projetosIgnorados
+              .length
+          : 0;
 
       console.log(
-        `[ReleaseHub] Ambiente ${ambiente.id} sincronizado.`,
+        `[ReleaseHub] Projeto ${projectOffset + 1}/${totalProjetos} processado no ambiente ${ambiente.id}.`,
         {
-          nome:
+          ambiente:
             ambiente.nome,
 
-          projetosAtualizados:
+          projeto:
+            resultado
+              ?.projeto
+              ?.nome ??
+            null,
+
+          atualizados:
             resultado
               ?.projetosAtualizados ??
             0,
@@ -184,22 +230,189 @@ async function executarSincronizacao(
         }
       );
 
+      if (
+        !resultado?.hasMore
+      ) {
+        break;
+      }
+
+      projectOffset =
+        Number(
+          resultado
+            ?.nextProjectOffset
+        );
+
+      if (
+        !Number.isInteger(
+          projectOffset
+        ) ||
+        projectOffset < 0
+      ) {
+        throw new Error(
+          "A API retornou um deslocamento de projeto inválido."
+        );
+      }
     } catch (erro) {
-      erros +=
+      errosProjetos +=
         1;
 
-
       console.error(
-        `[ReleaseHub] Erro no ambiente ${ambiente.id} - ${ambiente.nome}:`,
+        `[ReleaseHub] Erro no projeto ${projectOffset + 1} do ambiente ${ambiente.id} - ${ambiente.nome}:`,
         erro
       );
+
+      if (
+        totalProjetos === null
+      ) {
+        throw erro;
+      }
+
+      projectOffset +=
+        1;
     }
   }
 
+  return {
+    totalProjetos:
+      totalProjetos ??
+      0,
+
+    projetosAtualizados,
+
+    tarefasEncontradas,
+
+    tarefasSincronizadas,
+
+    projetosIgnorados,
+
+    errosProjetos,
+  };
+}
+
+
+async function executarSincronizacao(
+  secret
+) {
+  if (
+    !secret
+  ) {
+    throw new Error(
+      "O segredo SCHEDULER_SECRET não está configurado no Worker."
+    );
+  }
+
+  const inicio =
+    new Date();
+
+  console.log(
+    `[ReleaseHub] Sincronização automática iniciada em ${inicio.toISOString()}.`
+  );
+
+  const ambientes =
+    await listarAmbientes(
+      secret
+    );
+
+  const ambientesAtivos =
+    ambientes.filter(
+      ambiente =>
+        !ambiente.concluido
+    );
+
+  console.log(
+    `[ReleaseHub] ${ambientes.length} ambiente(s) encontrado(s), ${ambientesAtivos.length} ativo(s).`
+  );
+
+  if (
+    ambientesAtivos.length === 0
+  ) {
+    console.log(
+      "[ReleaseHub] Nenhum ambiente ativo para sincronizar."
+    );
+
+    return;
+  }
+
+  /*
+   * No plano Free, cada execução do Worker possui limites de CPU
+   * e de subrequisições. Para evitar processar todas as releases
+   * na mesma execução, o scheduler alterna um ambiente ativo por ciclo.
+   */
+  const ciclo =
+    Math.floor(
+      Date.now() /
+      120000
+    );
+
+  const indiceAmbiente =
+    ciclo %
+    ambientesAtivos.length;
+
+  const ambiente =
+    ambientesAtivos[
+      indiceAmbiente
+    ];
+
+  console.log(
+    `[ReleaseHub] Ambiente selecionado neste ciclo: ${ambiente.id} - ${ambiente.nome}.`
+  );
+
+  let resultado =
+    null;
+
+  let erroAmbiente =
+    null;
+
+  try {
+    resultado =
+      await sincronizarAmbiente(
+        ambiente,
+        secret
+      );
+
+    console.log(
+      `[ReleaseHub] Ambiente ${ambiente.id} sincronizado.`,
+      {
+        nome:
+          ambiente.nome,
+
+        totalProjetos:
+          resultado
+            .totalProjetos,
+
+        projetosAtualizados:
+          resultado
+            .projetosAtualizados,
+
+        projetosIgnorados:
+          resultado
+            .projetosIgnorados,
+
+        errosProjetos:
+          resultado
+            .errosProjetos,
+
+        tarefasEncontradas:
+          resultado
+            .tarefasEncontradas,
+
+        tarefasSincronizadas:
+          resultado
+            .tarefasSincronizadas,
+      }
+    );
+  } catch (erro) {
+    erroAmbiente =
+      erro;
+
+    console.error(
+      `[ReleaseHub] Erro no ambiente ${ambiente.id} - ${ambiente.nome}:`,
+      erro
+    );
+  }
 
   const fim =
     new Date();
-
 
   console.log(
     "[ReleaseHub] Sincronização automática finalizada.",
@@ -210,13 +423,11 @@ async function executarSincronizacao(
       ambientesAtivos:
         ambientesAtivos.length,
 
-      ignoradosConcluidos:
-        ambientes.length -
-        ambientesAtivos.length,
+      ambienteProcessado:
+        ambiente.id,
 
-      sincronizados,
-
-      erros,
+      sucesso:
+        !erroAmbiente,
 
       inicio:
         inicio.toISOString(),
@@ -229,7 +440,6 @@ async function executarSincronizacao(
 
 
 export default {
-
   async scheduled(
     controller,
     env,
@@ -260,6 +470,9 @@ export default {
       intervalo:
         "2 minutos",
 
+      estrategia:
+        "1 ambiente ativo por ciclo, projeto a projeto",
+
       releaseHub:
         RELEASEHUB_URL,
 
@@ -269,5 +482,4 @@ export default {
         ),
     });
   },
-
 };
