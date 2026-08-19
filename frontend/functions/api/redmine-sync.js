@@ -26,6 +26,9 @@ const STATUS_PARA_CAMPO = {
   reaberto:
     "reaberta",
 
+  validacaonocliente:
+    "validacao_cliente",
+
   resolvida:
     "resolvidas",
 
@@ -86,6 +89,8 @@ function criarContagens() {
     nova: 0,
 
     reaberta: 0,
+
+    validacao_cliente: 0,
 
     resolvidas: 0,
 
