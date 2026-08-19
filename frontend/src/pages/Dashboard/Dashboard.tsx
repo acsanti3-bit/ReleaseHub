@@ -898,6 +898,13 @@ function Dashboard() {
               project => {
 
                 if (
+                  ambienteSelecionado
+                    ?.concluido
+                ) {
+                  return false;
+                }
+
+                if (
                   !project.prazo
                 ) {
                   return false;
@@ -1011,6 +1018,8 @@ function Dashboard() {
       pesquisa,
       filtro,
       ordenacao,
+      ambienteSelecionado
+        ?.concluido,
     ]);
 
 
@@ -1233,6 +1242,12 @@ function Dashboard() {
             projects={
               projects
             }
+            concluido={
+              Boolean(
+                ambienteSelecionado
+                  ?.concluido
+              )
+            }
           />
 
         </Suspense>
@@ -1418,6 +1433,12 @@ function Dashboard() {
                     canEdit={
                       podeEditar
                     }
+                    concluido={
+                      Boolean(
+                        ambienteSelecionado
+                          ?.concluido
+                      )
+                    }
                     onOpen={
                       setProjectSelecionado
                     }
@@ -1443,6 +1464,12 @@ function Dashboard() {
                     }
                     canEdit={
                       podeEditar
+                    }
+                    concluido={
+                      Boolean(
+                        ambienteSelecionado
+                          ?.concluido
+                      )
                     }
                     onOpen={
                       setProjectSelecionado

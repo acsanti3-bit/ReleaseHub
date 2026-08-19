@@ -4,13 +4,18 @@ import type { Project } from "../../types/project";
 
 interface Props {
   projects: Project[];
+  concluido?: boolean;
 }
 
-function AttentionProjects({ projects }: Props) {
+function AttentionProjects({
+  projects,
+  concluido = false,
+}: Props) {
 
   const lista = projects.filter(project => {
 
     const atrasado =
+      !concluido &&
       project.prazo &&
       new Date(project.prazo) < new Date();
 
@@ -38,6 +43,7 @@ function AttentionProjects({ projects }: Props) {
         const badges = [];
 
         if (
+          !concluido &&
           project.prazo &&
           new Date(project.prazo) < new Date()
         ) {

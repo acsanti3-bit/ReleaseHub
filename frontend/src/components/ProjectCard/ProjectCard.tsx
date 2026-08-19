@@ -18,6 +18,8 @@ interface Props {
 
   canEdit: boolean;
 
+  concluido?: boolean;
+
 }
 
 
@@ -130,8 +132,24 @@ function converterDataBrasileira(
 
 
 function obterSituacaoPrazo(
-  prazoTexto: string
+  prazoTexto: string,
+  concluido = false
 ): PrazoInfo {
+
+  if (concluido) {
+
+    return {
+      texto:
+        "Concluída",
+
+      detalhe:
+        "Prazo não considerado",
+
+      classe:
+        "neutral",
+    };
+
+  }
 
   if (
     !prazoTexto
@@ -303,6 +321,8 @@ function ProjectCard({
 
   canEdit,
 
+  concluido = false,
+
 }: Props) {
 
   const total =
@@ -320,7 +340,8 @@ function ProjectCard({
 
   const situacaoPrazo =
     obterSituacaoPrazo(
-      project.prazo
+      project.prazo,
+      concluido
     );
 
 

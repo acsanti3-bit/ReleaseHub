@@ -19,6 +19,7 @@ import type {
 
 interface Props {
   project: Project;
+  concluido?: boolean;
 }
 
 
@@ -144,8 +145,17 @@ function converterDataBrasileira(
 
 
 function obterSituacaoPrazo(
-  prazoTexto: string
+  prazoTexto: string,
+  concluido = false
 ) {
+  if (concluido) {
+    return {
+      texto: "Concluída",
+      detalhe: "Prazo não considerado",
+      classe: "neutral",
+    };
+  }
+
   if (!prazoTexto) {
     return {
       texto: "Sem prazo",
@@ -241,6 +251,7 @@ function obterSituacaoPrazo(
 
 function TvProjectCard({
   project,
+  concluido = false,
 }: Props) {
   const navigate =
     useNavigate();
@@ -266,7 +277,8 @@ function TvProjectCard({
 
   const situacaoPrazo =
     obterSituacaoPrazo(
-      project.prazo
+      project.prazo,
+      concluido
     );
 
   const status = [

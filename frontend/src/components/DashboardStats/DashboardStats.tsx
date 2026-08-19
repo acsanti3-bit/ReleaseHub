@@ -6,6 +6,8 @@ interface Props {
 
   projects: Project[];
 
+  concluido?: boolean;
+
   onFilter: (filtro: string) => void;
 
 }
@@ -13,6 +15,8 @@ interface Props {
 function DashboardStats({
 
   projects,
+
+  concluido = false,
 
   onFilter,
 
@@ -72,17 +76,20 @@ function DashboardStats({
 
   );
 
-  const atrasados = projects.filter(project => {
+  const atrasados =
+    concluido
+      ? 0
+      : projects.filter(project => {
 
-    if (!project.prazo) {
+          if (!project.prazo) {
 
-      return false;
+            return false;
 
-    }
+          }
 
-    return new Date(project.prazo) < new Date();
+          return new Date(project.prazo) < new Date();
 
-  }).length;
+        }).length;
 
   const cards = [
 

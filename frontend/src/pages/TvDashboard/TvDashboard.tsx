@@ -1023,6 +1023,12 @@ function TvDashboard() {
                 project={
                   project
                 }
+                concluido={
+                  Boolean(
+                    ambienteSelecionado
+                      ?.concluido
+                  )
+                }
               />
 
             )
