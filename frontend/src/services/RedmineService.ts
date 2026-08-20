@@ -1,3 +1,7 @@
+import {
+  apiUrl,
+} from "./ApiConfig";
+
 import axios from "axios";
 
 const api = axios.create({
@@ -34,7 +38,13 @@ export async function obterLinkRedmine({
   });
 
   const response = await fetch(
-    `/api/redmine-link?${parametros.toString()}`
+    apiUrl(
+      `/api/redmine-link?${parametros.toString()}`
+    ),
+    {
+      credentials:
+        "include",
+    }
   );
 
   const data = await response.json() as {

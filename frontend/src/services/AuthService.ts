@@ -1,3 +1,7 @@
+import {
+  apiUrl,
+} from "./ApiConfig";
+
 export interface AuthUser {
   id: number;
   nome: string;
@@ -15,7 +19,7 @@ interface SessionResponse {
 }
 
 const API_URL =
-  "/api/auth";
+  apiUrl("/api/auth");
 
 async function obterMensagemErro(
   response: Response

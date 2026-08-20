@@ -1,4 +1,8 @@
 import {
+  apiUrl,
+} from "./ApiConfig";
+
+import {
   criarSistemasFixos,
 } from "../types/releaseEnvironment";
 
@@ -8,7 +12,7 @@ import type {
 
 
 const API_URL =
-  "/api/environments";
+  apiUrl("/api/environments");
 
 
 async function requisicao<T>(

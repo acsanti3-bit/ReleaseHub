@@ -385,7 +385,8 @@ export function criarCookieSessao(
     `Max-Age=${SESSION_SECONDS}`,
     "HttpOnly",
     "Secure",
-    "SameSite=Strict",
+    "SameSite=None",
+    "Partitioned",
   ].join("; ");
 
 }
@@ -399,7 +400,8 @@ export function removerCookieSessao() {
     "Max-Age=0",
     "HttpOnly",
     "Secure",
-    "SameSite=Strict",
+    "SameSite=None",
+    "Partitioned",
   ].join("; ");
 
 }

@@ -1,3 +1,7 @@
+import {
+  apiUrl,
+} from "./ApiConfig";
+
 export type UserRole =
   | "admin"
   | "qualidade"
@@ -33,7 +37,7 @@ export interface UpdateUserData {
 
 
 const API_URL =
-  "/api/users";
+  apiUrl("/api/users");
 
 
 async function obterErro(

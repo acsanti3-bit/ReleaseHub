@@ -3,6 +3,253 @@ import {
 } from "../../server/auth.js";
 
 
+function normalizarOrigem(
+  valor
+) {
+
+  if (!valor) {
+
+    return null;
+
+  }
+
+  try {
+
+    return new URL(
+      valor
+    ).origin;
+
+  } catch {
+
+    return null;
+
+  }
+
+}
+
+
+function obterOrigemPermitida(
+  context
+) {
+
+  const origemRecebida =
+    normalizarOrigem(
+      context.request.headers.get(
+        "Origin"
+      )
+    );
+
+
+  if (!origemRecebida) {
+
+    return {
+      recebida:
+        null,
+
+      permitida:
+        null,
+    };
+
+  }
+
+
+  const origemApi =
+    new URL(
+      context.request.url
+    ).origin;
+
+
+  const origemFrontend =
+    normalizarOrigem(
+      context.env
+        .FRONTEND_ORIGIN
+    );
+
+
+  const permitidas =
+    new Set(
+      [
+        origemApi,
+        origemFrontend,
+      ].filter(Boolean)
+    );
+
+
+  return {
+    recebida:
+      origemRecebida,
+
+    permitida:
+      permitidas.has(
+        origemRecebida
+      )
+        ? origemRecebida
+        : null,
+  };
+
+}
+
+
+function adicionarVaryOrigin(
+  headers
+) {
+
+  const atual =
+    headers.get(
+      "Vary"
+    );
+
+
+  const valores =
+    atual
+      ? atual
+          .split(",")
+          .map(
+            item =>
+              item.trim()
+          )
+          .filter(Boolean)
+      : [];
+
+
+  if (
+    !valores.some(
+      item =>
+        item.toLowerCase() ===
+        "origin"
+    )
+  ) {
+
+    valores.push(
+      "Origin"
+    );
+
+  }
+
+
+  headers.set(
+    "Vary",
+    valores.join(", ")
+  );
+
+}
+
+
+function aplicarCors(
+  response,
+  origem
+) {
+
+  if (!origem) {
+
+    return response;
+
+  }
+
+
+  const headers =
+    new Headers(
+      response.headers
+    );
+
+
+  headers.set(
+    "Access-Control-Allow-Origin",
+    origem
+  );
+
+  headers.set(
+    "Access-Control-Allow-Credentials",
+    "true"
+  );
+
+  adicionarVaryOrigin(
+    headers
+  );
+
+
+  return new Response(
+    response.body,
+    {
+      status:
+        response.status,
+
+      statusText:
+        response.statusText,
+
+      headers,
+    }
+  );
+
+}
+
+
+function respostaJson(
+  body,
+  init,
+  origem
+) {
+
+  return aplicarCors(
+    Response.json(
+      body,
+      init
+    ),
+    origem
+  );
+
+}
+
+
+function respostaPreflight(
+  origem
+) {
+
+  const headers =
+    new Headers();
+
+
+  headers.set(
+    "Access-Control-Allow-Origin",
+    origem
+  );
+
+  headers.set(
+    "Access-Control-Allow-Credentials",
+    "true"
+  );
+
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+
+  headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, X-Scheduler-Secret, X-Setup-Secret"
+  );
+
+  headers.set(
+    "Access-Control-Max-Age",
+    "86400"
+  );
+
+  adicionarVaryOrigin(
+    headers
+  );
+
+
+  return new Response(
+    null,
+    {
+      status: 204,
+      headers,
+    }
+  );
+
+}
+
+
 export async function onRequest(
   context
 ) {
@@ -22,8 +269,79 @@ export async function onRequest(
       .toUpperCase();
 
 
+  const {
+    recebida:
+      origemRecebida,
+
+    permitida:
+      origemPermitida,
+  } =
+    obterOrigemPermitida(
+      context
+    );
+
+
+  /*
+    Requisições de navegador vindas
+    de outra origem só são aceitas
+    quando a origem estiver explicitamente
+    configurada em FRONTEND_ORIGIN.
+
+    Chamadas servidor-servidor, como
+    o Scheduler, normalmente não possuem
+    o cabeçalho Origin e seguem normalmente.
+  */
+
+  if (
+    origemRecebida &&
+    !origemPermitida
+  ) {
+
+    return Response.json(
+      {
+        erro:
+          "Origem não permitida.",
+      },
+      {
+        status: 403,
+      }
+    );
+
+  }
+
+
+  /*
+    Preflight CORS.
+  */
+
+  if (
+    metodo === "OPTIONS"
+  ) {
+
+    if (!origemPermitida) {
+
+      return new Response(
+        null,
+        {
+          status: 403,
+        }
+      );
+
+    }
+
+
+    return respostaPreflight(
+      origemPermitida
+    );
+
+  }
+
+
   /*
     Rotas de autenticação.
+
+    Continuam públicas quanto à sessão,
+    mas a origem já foi validada acima.
   */
 
   if (
@@ -32,19 +350,12 @@ export async function onRequest(
     )
   ) {
 
-    return context.next();
+    return aplicarCors(
+      await context.next(),
+      origemPermitida
+    );
 
   }
-
-
-  /*
-    Todas as rotas de dados exigem
-    sessão autenticada.
-
-    Exceções técnicas do Worker
-    Scheduler são permitidas somente
-    com SCHEDULER_SECRET válido.
-  */
 
 
   /*
@@ -90,7 +401,10 @@ export async function onRequest(
         segredoConfigurado
     ) {
 
-      return context.next();
+      return aplicarCors(
+        await context.next(),
+        origemPermitida
+      );
 
     }
 
@@ -109,14 +423,15 @@ export async function onRequest(
 
   if (!usuario) {
 
-    return Response.json(
+    return respostaJson(
       {
         erro:
           "Sessão inválida ou expirada.",
       },
       {
         status: 401,
-      }
+      },
+      origemPermitida
     );
 
   }
@@ -138,14 +453,15 @@ export async function onRequest(
     usuario.role !== "admin"
   ) {
 
-    return Response.json(
+    return respostaJson(
       {
         erro:
           "Você não possui permissão para gerenciar usuários.",
       },
       {
         status: 403,
-      }
+      },
+      origemPermitida
     );
 
   }
@@ -176,9 +492,6 @@ export async function onRequest(
   /*
     Visualizador possui
     acesso somente leitura.
-
-    Mesmo tentando alterar pela API,
-    a requisição será bloqueada.
   */
 
   if (
@@ -187,19 +500,23 @@ export async function onRequest(
     metodoAlteracao
   ) {
 
-    return Response.json(
+    return respostaJson(
       {
         erro:
           "Seu perfil possui acesso somente para visualização.",
       },
       {
         status: 403,
-      }
+      },
+      origemPermitida
     );
 
   }
 
 
-  return context.next();
+  return aplicarCors(
+    await context.next(),
+    origemPermitida
+  );
 
 }

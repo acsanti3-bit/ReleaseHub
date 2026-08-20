@@ -1,3 +1,7 @@
+import {
+  apiUrl,
+} from "./ApiConfig";
+
 import type {
   Project,
 } from "../types/project";
@@ -12,7 +16,7 @@ import {
 
 
 const API_URL =
-  "/api/projects";
+  apiUrl("/api/projects");
 
 
 type ChaveVersao =

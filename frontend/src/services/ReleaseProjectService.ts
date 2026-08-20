@@ -1,14 +1,18 @@
+import {
+  apiUrl,
+} from "./ApiConfig";
+
 import type {
   Project,
 } from "../types/project";
 
 
 const API_URL =
-  "/api/release-projects";
+  apiUrl("/api/release-projects");
 
 
 const REDMINE_SYNC_URL =
-  "/api/redmine-sync";
+  apiUrl("/api/redmine-sync");
 
 
 export interface RedmineProjectIgnored {
