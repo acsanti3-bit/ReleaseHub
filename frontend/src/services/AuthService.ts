@@ -2,11 +2,17 @@ import {
   apiUrl,
 } from "./ApiConfig";
 
+export type AuthRole =
+  | "admin"
+  | "qualidade"
+  | "visualizador";
+
+
 export interface AuthUser {
   id: number;
   nome: string;
   email: string;
-  role: string;
+  role: AuthRole;
 }
 
 interface LoginResponse {

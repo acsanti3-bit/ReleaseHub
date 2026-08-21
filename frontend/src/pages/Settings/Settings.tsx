@@ -17,6 +17,15 @@ import {
 } from "react-icons/md";
 
 import Layout from "../../components/layout";
+import AuditHistory from "./AuditHistory";
+
+import {
+  buscarSessao,
+} from "../../services/AuthService";
+
+import type {
+  AuthUser,
+} from "../../services/AuthService";
 
 import {
   adicionarUsuario,
@@ -80,6 +89,12 @@ function nomePerfil(
 function Settings() {
 
   const [
+    usuarioLogado,
+    setUsuarioLogado,
+  ] =
+    useState<AuthUser | null>(null);
+
+  const [
     usuarios,
     setUsuarios,
   ] =
@@ -128,6 +143,34 @@ function Settings() {
       formulario.id
     );
 
+  const administrador =
+    usuarioLogado?.role === "admin";
+
+  const qualidade =
+    usuarioLogado?.role === "qualidade";
+
+
+  async function carregarUsuarioLogado() {
+
+    try {
+
+      setUsuarioLogado(
+        await buscarSessao()
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao carregar usuário logado:",
+        error
+      );
+
+      setUsuarioLogado(null);
+
+    }
+
+  }
+
   async function carregarUsuarios() {
 
     try {
@@ -163,6 +206,7 @@ function Settings() {
   useEffect(() => {
 
     void carregarUsuarios();
+    void carregarUsuarioLogado();
 
   }, []);
 
@@ -214,6 +258,10 @@ function Settings() {
 
     setFormulario({
       ...formularioVazio,
+      role:
+        qualidade
+          ? "qualidade"
+          : formularioVazio.role,
     });
 
     setErro("");
@@ -225,6 +273,19 @@ function Settings() {
   function abrirEdicao(
     usuario: User
   ) {
+
+    if (
+      qualidade &&
+      usuario.role === "admin"
+    ) {
+
+      setErro(
+        "O perfil Qualidade não pode alterar usuários administradores."
+      );
+
+      return;
+
+    }
 
     setFormulario({
 
@@ -317,6 +378,20 @@ function Settings() {
 
       setErro(
         "A nova senha deve possuir pelo menos 12 caracteres."
+      );
+
+      return;
+
+    }
+
+    if (
+      qualidade &&
+      editando &&
+      !formulario.senha
+    ) {
+
+      setErro(
+        "Informe a nova senha do usuário."
       );
 
       return;
@@ -676,7 +751,18 @@ function Settings() {
 
                           <button
                             type="button"
-                            title="Editar usuário"
+                            title={
+                              qualidade &&
+                              usuario.role === "admin"
+                                ? "Somente administradores podem alterar este usuário"
+                                : administrador
+                                  ? "Editar usuário"
+                                  : "Redefinir senha"
+                            }
+                            disabled={
+                              qualidade &&
+                              usuario.role === "admin"
+                            }
                             onClick={() =>
                               abrirEdicao(
                                 usuario
@@ -729,6 +815,8 @@ function Settings() {
 
         </section>
 
+        <AuditHistory />
+
       </div>
 
       {modalAberto && (
@@ -744,7 +832,9 @@ function Settings() {
                 <h2>
 
                   {editando
-                    ? "Editar Usuário"
+                    ? administrador
+                      ? "Editar Usuário"
+                      : "Redefinir Senha"
                     : "Novo Usuário"}
 
                 </h2>
@@ -752,7 +842,9 @@ function Settings() {
                 <p>
 
                   {editando
-                    ? "Atualize os dados e permissões do usuário."
+                    ? administrador
+                      ? "Atualize os dados e permissões do usuário."
+                      : "Defina uma nova senha para o usuário selecionado."
                     : "Cadastre um novo acesso ao ReleaseHub."}
 
                 </p>
@@ -791,6 +883,10 @@ function Settings() {
                   formulario.nome
                 }
                 placeholder="Nome do usuário"
+                disabled={
+                  qualidade &&
+                  editando
+                }
                 onChange={event =>
                   setFormulario(
                     atual => ({
@@ -812,6 +908,10 @@ function Settings() {
                   formulario.email
                 }
                 placeholder="usuario@empresa.com"
+                disabled={
+                  qualidade &&
+                  editando
+                }
                 onChange={event =>
                   setFormulario(
                     atual => ({
@@ -830,6 +930,10 @@ function Settings() {
               <select
                 value={
                   formulario.role
+                }
+                disabled={
+                  qualidade &&
+                  editando
                 }
                 onChange={event =>
                   setFormulario(
@@ -851,13 +955,18 @@ function Settings() {
                   Qualidade
                 </option>
 
-                <option value="admin">
-                  Administrador
-                </option>
+                {administrador && (
+
+                  <option value="admin">
+                    Administrador
+                  </option>
+
+                )}
 
               </select>
 
-              {editando && (
+              {editando &&
+                administrador && (
 
                 <>
 
@@ -918,7 +1027,9 @@ function Settings() {
                   }
                   placeholder={
                     editando
-                      ? "Deixe em branco para manter"
+                      ? qualidade
+                        ? "Mínimo 12 caracteres"
+                        : "Deixe em branco para manter"
                       : "Mínimo 12 caracteres"
                   }
                   onChange={event =>
@@ -938,7 +1049,9 @@ function Settings() {
 
                 <small className="settings-password-help">
 
-                  Preencha somente caso queira redefinir a senha.
+                  {qualidade
+                    ? "Informe a nova senha para concluir a redefinição."
+                    : "Preencha somente caso queira redefinir a senha."}
 
                 </small>
 
@@ -981,7 +1094,9 @@ function Settings() {
 
                   {salvando
                     ? "Salvando..."
-                    : "Salvar"}
+                    : qualidade && editando
+                      ? "Redefinir senha"
+                      : "Salvar"}
 
                 </button>
 

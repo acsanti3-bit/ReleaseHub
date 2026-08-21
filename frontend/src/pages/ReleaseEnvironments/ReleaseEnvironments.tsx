@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import {
   MdAdd,
   MdCheckCircle,
+  MdClose,
   MdDeleteOutline,
   MdEdit,
+  MdErrorOutline,
   MdLink,
   MdReplay,
 } from "react-icons/md";
@@ -27,6 +29,12 @@ import type {
   ReleaseEnvironment,
   ReleaseSystemVersion,
 } from "../../types/releaseEnvironment";
+
+
+type ReleaseFeedback = {
+  tipo: "sucesso" | "erro";
+  texto: string;
+};
 
 
 function obterSistemasDoAmbiente(
@@ -92,6 +100,15 @@ function ReleaseEnvironments() {
   const [ambienteConfirmacao, setAmbienteConfirmacao] =
     useState<ReleaseEnvironment | null>(null);
 
+  const [ambienteExclusao, setAmbienteExclusao] =
+    useState<ReleaseEnvironment | null>(null);
+
+  const [excluindo, setExcluindo] =
+    useState(false);
+
+  const [feedback, setFeedback] =
+    useState<ReleaseFeedback | null>(null);
+
 
   async function atualizarLista() {
     try {
@@ -135,6 +152,50 @@ function ReleaseEnvironments() {
   }, []);
 
 
+  useEffect(() => {
+    if (!feedback) {
+      return;
+    }
+
+    const temporizador = window.setTimeout(
+      () => setFeedback(null),
+      6000
+    );
+
+    return () =>
+      window.clearTimeout(temporizador);
+  }, [feedback]);
+
+
+  useEffect(() => {
+    if (!ambienteExclusao) {
+      return;
+    }
+
+    function fecharComEscape(
+      evento: KeyboardEvent
+    ) {
+      if (
+        evento.key === "Escape" &&
+        !excluindo
+      ) {
+        setAmbienteExclusao(null);
+      }
+    }
+
+    document.addEventListener(
+      "keydown",
+      fecharComEscape
+    );
+
+    return () =>
+      document.removeEventListener(
+        "keydown",
+        fecharComEscape
+      );
+  }, [ambienteExclusao, excluindo]);
+
+
   function novoAmbiente() {
     if (!podeEditar) {
       return;
@@ -168,6 +229,7 @@ function ReleaseEnvironments() {
 
     try {
       setSalvando(true);
+      setFeedback(null);
 
       const ambienteJaExiste = ambientes.some(
         item => item.id === ambiente.id
@@ -207,37 +269,55 @@ function ReleaseEnvironments() {
       setAmbienteSelecionado(null);
 
       await atualizarLista();
+
+      setFeedback({
+        tipo: "sucesso",
+        texto: `Ambiente "${ambienteSalvo.nome}" salvo com sucesso.`,
+      });
     } catch (erro) {
       console.error(
         "Erro ao salvar ambiente:",
         erro
       );
 
-      alert(
-        "Não foi possível salvar o ambiente."
-      );
+      setFeedback({
+        tipo: "erro",
+        texto: "Não foi possível salvar o ambiente. Tente novamente.",
+      });
     } finally {
       setSalvando(false);
     }
   }
 
 
-  async function removerAmbiente(
+  function solicitarExclusao(
     ambiente: ReleaseEnvironment
   ) {
-    if (!podeExcluir) {
+    if (!podeExcluir || excluindo) {
       return;
     }
 
-    const confirmar = window.confirm(
-      `Excluir o ambiente "${ambiente.nome}"?`
+    setFeedback(null);
+    setAmbienteExclusao(
+      ambiente
     );
+  }
 
-    if (!confirmar) {
+
+  async function confirmarExclusao() {
+    if (
+      !ambienteExclusao ||
+      !podeExcluir ||
+      excluindo
+    ) {
       return;
     }
+
+    const ambiente = ambienteExclusao;
 
     try {
+      setExcluindo(true);
+
       await excluirAmbiente(
         ambiente.id
       );
@@ -247,15 +327,25 @@ function ReleaseEnvironments() {
           item => item.id !== ambiente.id
         )
       );
+
+      setAmbienteExclusao(null);
+
+      setFeedback({
+        tipo: "sucesso",
+        texto: `Ambiente "${ambiente.nome}" excluído com sucesso.`,
+      });
     } catch (erro) {
       console.error(
         "Erro ao excluir ambiente:",
         erro
       );
 
-      alert(
-        "Não foi possível excluir o ambiente."
-      );
+      setFeedback({
+        tipo: "erro",
+        texto: `Não foi possível excluir o ambiente "${ambiente.nome}". Tente novamente.`,
+      });
+    } finally {
+      setExcluindo(false);
     }
   }
 
@@ -286,6 +376,7 @@ function ReleaseEnvironments() {
 
     try {
       setSalvando(true);
+      setFeedback(null);
 
       const ambienteSalvo =
         await editarAmbiente({
@@ -308,15 +399,23 @@ function ReleaseEnvironments() {
       setAmbienteConfirmacao(
         null
       );
+
+      setFeedback({
+        tipo: "sucesso",
+        texto: vaiConcluir
+          ? `Ambiente "${ambienteSalvo.nome}" concluído com sucesso.`
+          : `Ambiente "${ambienteSalvo.nome}" reaberto com sucesso.`,
+      });
     } catch (erro) {
       console.error(
         "Erro ao alterar situação do ambiente:",
         erro
       );
 
-      alert(
-        "Não foi possível alterar a situação do ambiente."
-      );
+      setFeedback({
+        tipo: "erro",
+        texto: "Não foi possível alterar a situação do ambiente. Tente novamente.",
+      });
     } finally {
       setSalvando(false);
     }
@@ -326,6 +425,38 @@ function ReleaseEnvironments() {
   return (
     <Layout>
       <div className="release-page">
+        {feedback && (
+          <div
+            className={`release-feedback release-feedback-${feedback.tipo}`}
+            role={
+              feedback.tipo === "erro"
+                ? "alert"
+                : "status"
+            }
+            aria-live="polite"
+          >
+            <div className="release-feedback-content">
+              {feedback.tipo === "sucesso" ? (
+                <MdCheckCircle size={21} />
+              ) : (
+                <MdErrorOutline size={21} />
+              )}
+
+              <span>
+                {feedback.texto}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              aria-label="Fechar mensagem"
+              onClick={() => setFeedback(null)}
+            >
+              <MdClose size={18} />
+            </button>
+          </div>
+        )}
+
         <div className="release-page-header">
           <div>
             <h1>
@@ -544,11 +675,12 @@ function ReleaseEnvironments() {
                             type="button"
                             title="Excluir ambiente"
                             className="delete-environment"
-                            onClick={() => {
-                              void removerAmbiente(
+                            disabled={excluindo}
+                            onClick={() =>
+                              solicitarExclusao(
                                 ambiente
-                              );
-                            }}
+                              )
+                            }
                           >
                             <MdDeleteOutline size={19} />
                           </button>
@@ -614,6 +746,92 @@ function ReleaseEnvironments() {
           }
           onSave={salvar}
         />
+      )}
+
+
+      {ambienteExclusao && (
+        <div
+          className="release-modal-overlay"
+          role="presentation"
+          onClick={() =>
+            !excluindo &&
+            setAmbienteExclusao(null)
+          }
+        >
+          <div
+            className="release-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="release-delete-title"
+            aria-describedby="release-delete-description"
+            onClick={evento =>
+              evento.stopPropagation()
+            }
+          >
+            <div className="release-delete-modal-accent" />
+
+            <div className="release-delete-modal-body">
+              <div className="release-delete-badge">
+                <MdDeleteOutline size={16} />
+
+                Exclusão permanente
+              </div>
+
+              <h2 id="release-delete-title">
+                Excluir Ambiente da Release
+              </h2>
+
+              <p
+                id="release-delete-description"
+                className="release-delete-question"
+              >
+                Tem certeza de que deseja excluir o ambiente
+                {" "}
+                <strong>
+                  “{ambienteExclusao.nome}”
+                </strong>
+                ?
+              </p>
+
+              <div className="release-delete-warning">
+                <MdErrorOutline size={21} />
+
+                <span>
+                  Esta ação removerá permanentemente o ambiente e não poderá ser desfeita.
+                </span>
+              </div>
+
+              <div className="release-modal-actions">
+                <button
+                  type="button"
+                  className="release-modal-cancel-button"
+                  disabled={excluindo}
+                  autoFocus
+                  onClick={() =>
+                    setAmbienteExclusao(null)
+                  }
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  className="release-modal-delete-button"
+                  disabled={excluindo}
+                  onClick={() =>
+                    void confirmarExclusao()
+                  }
+                >
+                  <MdDeleteOutline size={18} />
+
+                  {excluindo
+                    ? "Excluindo..."
+                    : "Excluir ambiente"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
 

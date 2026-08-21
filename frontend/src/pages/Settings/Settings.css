@@ -589,6 +589,20 @@
 }
 
 
+.settings-actions button:disabled,
+.settings-actions button:disabled:hover{
+
+    border-color:#E4E8EC;
+
+    background:#F4F6F8;
+
+    color:#A5ADB3;
+
+    cursor:not-allowed;
+
+}
+
+
 .settings-empty{
 
     padding:35px;
@@ -794,6 +808,18 @@
     border-color:#005AA9;
 
     box-shadow:0 0 0 3px rgba(0,90,169,.07);
+
+}
+
+
+.settings-form > input:disabled,
+.settings-form > select:disabled{
+
+    background:#F4F6F8;
+
+    color:#7F8992;
+
+    cursor:not-allowed;
 
 }
 

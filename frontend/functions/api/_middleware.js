@@ -443,14 +443,23 @@ export async function onRequest(
 
   /*
     Gestão de usuários:
-    somente administrador.
+    administrador e Qualidade.
+
+    As limitações específicas das
+    alterações são validadas também
+    pelo próprio endpoint de usuários.
   */
 
   if (
     caminho.startsWith(
       "/api/users"
     ) &&
-    usuario.role !== "admin"
+    ![
+      "admin",
+      "qualidade",
+    ].includes(
+      usuario.role
+    )
   ) {
 
     return respostaJson(
@@ -464,6 +473,55 @@ export async function onRequest(
       origemPermitida
     );
 
+  }
+
+
+  if (
+    caminho.startsWith(
+      "/api/users"
+    ) &&
+    usuario.role === "qualidade" &&
+    metodo === "DELETE"
+  ) {
+    return respostaJson(
+      {
+        erro:
+          "O perfil Qualidade não possui permissão para excluir usuários.",
+      },
+      {
+        status: 403,
+      },
+      origemPermitida
+    );
+  }
+
+
+  /*
+    Histórico de alterações:
+    administrador e Qualidade.
+  */
+
+  if (
+    caminho.startsWith(
+      "/api/audit-logs"
+    ) &&
+    ![
+      "admin",
+      "qualidade",
+    ].includes(
+      usuario.role
+    )
+  ) {
+    return respostaJson(
+      {
+        erro:
+          "Você não possui permissão para consultar o histórico de alterações.",
+      },
+      {
+        status: 403,
+      },
+      origemPermitida
+    );
   }
 
 

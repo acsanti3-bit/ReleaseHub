@@ -1,3 +1,8 @@
+import {
+  registrarAuditoria,
+} from "../../server/audit.js";
+
+
 function numero(valor) {
   const convertido = Number(valor);
 
@@ -66,6 +71,47 @@ function respostaErro(
       status,
     }
   );
+
+}
+
+
+async function buscarProjetoPorId(
+  context,
+  id
+) {
+
+  const projeto =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            nome,
+            versao,
+            executavel,
+            prazo,
+            qualidade,
+            testes,
+            desenvolvido,
+            em_progresso,
+            aguardando_compilacao,
+            nova,
+            reaberta,
+            validacao_cliente,
+            resolvidas,
+            rejeitada,
+            interrompida
+          FROM projects
+          WHERE id = ?
+          LIMIT 1
+        `
+      )
+      .bind(id)
+      .first();
+
+  return projeto
+    ? transformarProjeto(projeto)
+    : null;
 
 }
 
@@ -249,11 +295,30 @@ export async function onRequestPost(
       )
       .run();
 
-    return Response.json(
+    const projetoCriado = {
+      ...body,
+      id,
+      nome:
+        body.nome.trim(),
+    };
+
+
+    await registrarAuditoria(
+      context,
       {
-        ...body,
-        id,
-      },
+        acao: "CRIAR",
+        entidade: "projeto",
+        entidadeId: id,
+        entidadeNome:
+          projetoCriado.nome,
+        dadosNovos:
+          projetoCriado,
+      }
+    );
+
+
+    return Response.json(
+      projetoCriado,
       {
         status: 201,
       }
@@ -309,6 +374,23 @@ export async function onRequestPut(
 
     const situacoes =
       body.situacoes ?? {};
+
+
+    const projetoAnterior =
+      await buscarProjetoPorId(
+        context,
+        body.id
+      );
+
+
+    if (!projetoAnterior) {
+
+      return respostaErro(
+        "Projeto não encontrado.",
+        404
+      );
+
+    }
 
     await context.env.DB
       .prepare(
@@ -394,8 +476,32 @@ export async function onRequestPut(
       )
       .run();
 
+    const projetoAtualizado = {
+      ...body,
+      nome:
+        body.nome.trim(),
+    };
+
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "EDITAR",
+        entidade: "projeto",
+        entidadeId:
+          projetoAtualizado.id,
+        entidadeNome:
+          projetoAtualizado.nome,
+        dadosAnteriores:
+          projetoAnterior,
+        dadosNovos:
+          projetoAtualizado,
+      }
+    );
+
+
     return Response.json(
-      body
+      projetoAtualizado
     );
 
   } catch (erro) {
@@ -444,6 +550,23 @@ export async function onRequestDelete(
 
     }
 
+
+    const projetoExcluido =
+      await buscarProjetoPorId(
+        context,
+        id
+      );
+
+
+    if (!projetoExcluido) {
+
+      return respostaErro(
+        "Projeto não encontrado.",
+        404
+      );
+
+    }
+
     await context.env.DB
       .prepare(
         `
@@ -453,6 +576,20 @@ export async function onRequestDelete(
       )
       .bind(id)
       .run();
+
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "EXCLUIR",
+        entidade: "projeto",
+        entidadeId: id,
+        entidadeNome:
+          projetoExcluido.nome,
+        dadosAnteriores:
+          projetoExcluido,
+      }
+    );
 
     return Response.json(
       {

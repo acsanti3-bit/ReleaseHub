@@ -130,7 +130,10 @@ function AppRoutes() {
             element={
 
               <ProtectedRoute
-                requiredRole="admin"
+                requiredRoles={[
+                  "admin",
+                  "qualidade",
+                ]}
               >
 
                 <Settings />

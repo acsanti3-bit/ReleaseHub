@@ -21,12 +21,14 @@ import "./ProtectedRoute.css";
 
 interface Props {
   children: ReactNode;
-  requiredRole?: "admin";
+  requiredRoles?: Array<
+    AuthUser["role"]
+  >;
 }
 
 function ProtectedRoute({
   children,
-  requiredRole,
+  requiredRoles,
 }: Props) {
 
   const location =
@@ -144,8 +146,10 @@ function ProtectedRoute({
   }
 
   if (
-    requiredRole &&
-    usuario.role !== requiredRole
+    requiredRoles &&
+    !requiredRoles.includes(
+      usuario.role
+    )
   ) {
 
     return (

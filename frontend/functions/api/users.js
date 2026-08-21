@@ -2,6 +2,10 @@ import {
   criarHashSenha,
 } from "../../server/auth.js";
 
+import {
+  registrarAuditoria,
+} from "../../server/audit.js";
+
 
 function respostaErro(
   mensagem,
@@ -186,6 +190,24 @@ export async function onRequestPost(
       );
 
 
+    const usuarioResponsavel =
+      context.data.usuario;
+
+
+    if (
+      usuarioResponsavel.role ===
+        "qualidade" &&
+      role === "admin"
+    ) {
+
+      return respostaErro(
+        "O perfil Qualidade não pode cadastrar administradores.",
+        403
+      );
+
+    }
+
+
     if (
       !nome ||
       !email ||
@@ -264,17 +286,34 @@ export async function onRequestPost(
         .run();
 
 
-    return Response.json(
-      {
-        id:
-          resultado.meta
-            ?.last_row_id,
+    const usuarioCriado = {
+      id:
+        resultado.meta
+          ?.last_row_id,
+      nome,
+      email,
+      role,
+      ativo: 1,
+    };
 
-        nome,
-        email,
-        role,
-        ativo: 1,
-      },
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "CRIAR",
+        entidade: "usuario",
+        entidadeId:
+          usuarioCriado.id,
+        entidadeNome:
+          usuarioCriado.nome,
+        dadosNovos:
+          usuarioCriado,
+      }
+    );
+
+
+    return Response.json(
+      usuarioCriado,
       {
         status: 201,
       }
@@ -377,12 +416,81 @@ export async function onRequestPut(
       context.data.usuario;
 
 
+    const usuarioAnterior =
+      await buscarUsuarioPorId(
+        context,
+        id
+      );
+
+
+    if (!usuarioAnterior) {
+
+      return respostaErro(
+        "Usuário não encontrado.",
+        404
+      );
+
+    }
+
+
+    const solicitanteQualidade =
+      usuarioAtual.role ===
+        "qualidade";
+
+
+    if (
+      solicitanteQualidade &&
+      usuarioAnterior.role ===
+        "admin"
+    ) {
+
+      return respostaErro(
+        "O perfil Qualidade não pode alterar usuários administradores.",
+        403
+      );
+
+    }
+
+
+    if (
+      solicitanteQualidade &&
+      (
+        nome !== usuarioAnterior.nome ||
+        email !== usuarioAnterior.email ||
+        role !== usuarioAnterior.role ||
+        ativo !==
+          Number(usuarioAnterior.ativo)
+      )
+    ) {
+
+      return respostaErro(
+        "O perfil Qualidade pode apenas redefinir a senha do usuário.",
+        403
+      );
+
+    }
+
+
+    if (
+      solicitanteQualidade &&
+      !novaSenha
+    ) {
+
+      return respostaErro(
+        "Informe a nova senha do usuário.",
+        400
+      );
+
+    }
+
+
     /*
       Impede o administrador de
       desativar o próprio acesso.
     */
 
     if (
+      usuarioAtual.role === "admin" &&
       Number(
         usuarioAtual.id
       ) === id &&
@@ -403,6 +511,7 @@ export async function onRequestPut(
     */
 
     if (
+      usuarioAtual.role === "admin" &&
       Number(
         usuarioAtual.id
       ) === id &&
@@ -446,28 +555,32 @@ export async function onRequestPut(
     }
 
 
-    await context.env.DB
-      .prepare(
-        `
-          UPDATE users
+    if (!solicitanteQualidade) {
 
-          SET
-            nome = ?,
-            email = ?,
-            role = ?,
-            ativo = ?
+      await context.env.DB
+        .prepare(
+          `
+            UPDATE users
 
-          WHERE id = ?
-        `
-      )
-      .bind(
-        nome,
-        email,
-        role,
-        ativo,
-        id
-      )
-      .run();
+            SET
+              nome = ?,
+              email = ?,
+              role = ?,
+              ativo = ?
+
+            WHERE id = ?
+          `
+        )
+        .bind(
+          nome,
+          email,
+          role,
+          ativo,
+          id
+        )
+        .run();
+
+    }
 
 
     if (
@@ -524,14 +637,78 @@ export async function onRequestPut(
     }
 
 
-    return Response.json(
+    const usuarioAtualizado = {
+      id,
+
+      nome:
+        solicitanteQualidade
+          ? usuarioAnterior.nome
+          : nome,
+
+      email:
+        solicitanteQualidade
+          ? usuarioAnterior.email
+          : email,
+
+      role:
+        solicitanteQualidade
+          ? usuarioAnterior.role
+          : role,
+
+      ativo:
+        solicitanteQualidade
+          ? Number(
+              usuarioAnterior.ativo
+            )
+          : ativo,
+
+      senhaRedefinida:
+        Boolean(novaSenha),
+    };
+
+
+    const alterouSomenteSenha =
+      Boolean(novaSenha) &&
+      nome === usuarioAnterior.nome &&
+      email === usuarioAnterior.email &&
+      role === usuarioAnterior.role &&
+      ativo ===
+        Number(usuarioAnterior.ativo);
+
+
+    await registrarAuditoria(
+      context,
       {
-        id,
-        nome,
-        email,
-        role,
-        ativo,
+        acao:
+          alterouSomenteSenha
+            ? "REDEFINIR_SENHA"
+            : "EDITAR",
+        entidade: "usuario",
+        entidadeId: id,
+        entidadeNome:
+          usuarioAtualizado.nome,
+        dadosAnteriores: {
+          id:
+            usuarioAnterior.id,
+          nome:
+            usuarioAnterior.nome,
+          email:
+            usuarioAnterior.email,
+          role:
+            usuarioAnterior.role,
+          ativo:
+            Number(
+              usuarioAnterior.ativo
+            ),
+        },
+        dadosNovos:
+          usuarioAtualizado,
       }
+    );
+
+
+    return Response.json(
+      usuarioAtualizado
     );
 
   } catch (erro) {
@@ -547,5 +724,31 @@ export async function onRequestPut(
     );
 
   }
+
+}
+
+
+async function buscarUsuarioPorId(
+  context,
+  id
+) {
+
+  return context.env.DB
+    .prepare(
+      `
+        SELECT
+          id,
+          nome,
+          email,
+          role,
+          ativo,
+          created_at
+        FROM users
+        WHERE id = ?
+        LIMIT 1
+      `
+    )
+    .bind(id)
+    .first();
 
 }

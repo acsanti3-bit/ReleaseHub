@@ -1,3 +1,8 @@
+import {
+  registrarAuditoria,
+} from "../../server/audit.js";
+
+
 function numero(valor) {
   const convertido = Number(valor);
 
@@ -97,6 +102,66 @@ function respostaErro(
       status,
     }
   );
+
+}
+
+
+async function buscarProjetoDaRelease(
+  context,
+  environmentId,
+  projectId
+) {
+
+  const row =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            rp.project_id,
+            p.nome,
+            e.nome AS environment_name,
+            rp.versao,
+            rp.executavel,
+            rp.prazo,
+            rp.qualidade,
+            rp.testes,
+            rp.desenvolvido,
+            rp.aguardando_compilacao,
+            rp.em_progresso,
+            rp.nova,
+            rp.reaberta,
+            rp.validacao_cliente,
+            rp.resolvidas,
+            rp.rejeitada,
+            rp.interrompida
+          FROM release_projects rp
+          INNER JOIN projects p
+            ON p.id = rp.project_id
+          INNER JOIN release_environments e
+            ON e.id = rp.environment_id
+          WHERE
+            rp.environment_id = ? AND
+            rp.project_id = ?
+          LIMIT 1
+        `
+      )
+      .bind(
+        environmentId,
+        projectId
+      )
+      .first();
+
+  if (!row) {
+    return null;
+  }
+
+  return {
+    environmentId,
+    environmentName:
+      row.environment_name,
+    project:
+      transformarProjeto(row),
+  };
 
 }
 
@@ -292,11 +357,19 @@ export async function onRequestPut(
       project.situacoes ?? {};
 
 
+    const projetoAnterior =
+      await buscarProjetoDaRelease(
+        context,
+        environmentId,
+        project.id
+      );
+
+
     const ambiente =
       await context.env.DB
         .prepare(
           `
-            SELECT prazo
+            SELECT nome, prazo
             FROM release_environments
             WHERE id = ?
             LIMIT 1
@@ -309,6 +382,11 @@ export async function onRequestPut(
 
     const prazoDaRelease =
       ambiente?.prazo ?? "";
+
+
+    const nomeDaRelease =
+      ambiente?.nome ??
+      `Ambiente #${environmentId}`;
 
 
     await context.env.DB
@@ -448,6 +526,36 @@ export async function onRequestPut(
         )
       )
       .run();
+
+
+    const projetoAtualizado = {
+      environmentId,
+      environmentName:
+        nomeDaRelease,
+      project: {
+        ...project,
+        prazo:
+          prazoDaRelease,
+      },
+    };
+
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "EDITAR",
+        entidade:
+          "projeto_release",
+        entidadeId:
+          `${environmentId}:${project.id}`,
+        entidadeNome:
+          `${project.nome} — ${nomeDaRelease}`,
+        dadosAnteriores:
+          projetoAnterior,
+        dadosNovos:
+          projetoAtualizado,
+      }
+    );
 
 
     return Response.json(

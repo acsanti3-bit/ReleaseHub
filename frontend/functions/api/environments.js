@@ -1,5 +1,9 @@
 import { buscarUsuarioLogado } from "../../server/auth.js";
 
+import {
+  registrarAuditoria,
+} from "../../server/audit.js";
+
 const SISTEMAS_FIXOS = [
   { chave: "intellicash", nome: "IntelliCash", ordem: 1 },
   { chave: "easycash", nome: "EasyCash", ordem: 2 },
@@ -584,6 +588,84 @@ function criarRespostaAmbiente(
 }
 
 
+async function buscarAmbientePorId(
+  context,
+  id
+) {
+  const row =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            nome,
+            prazo,
+            concluido,
+            intellicash,
+            easycash,
+            easycheckout,
+            easypdv,
+            intellistock,
+            iwbserver
+          FROM release_environments
+          WHERE id = ?
+          LIMIT 1
+        `
+      )
+      .bind(id)
+      .first();
+
+  if (!row) {
+    return null;
+  }
+
+  const resultadoSistemas =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            chave,
+            nome,
+            versao,
+            executavel,
+            ordem,
+            mostrar_na_tv
+          FROM release_environment_versions
+          WHERE environment_id = ?
+          ORDER BY ordem, nome
+        `
+      )
+      .bind(id)
+      .all();
+
+  const sistemasSalvos =
+    resultadoSistemas.results.map(
+      sistema => ({
+        chave: sistema.chave,
+        nome: sistema.nome,
+        versao:
+          sistema.versao ?? "",
+        executavel:
+          sistema.executavel ?? "",
+        ordem:
+          Number(sistema.ordem) || 0,
+        mostrarNaTv:
+          Number(
+            sistema.mostrar_na_tv
+          ) !== 0,
+      })
+    );
+
+  return transformarAmbiente(
+    row,
+    normalizarSistemas(
+      sistemasSalvos,
+      row
+    )
+  );
+}
+
+
 /*
   GET /api/environments
 */
@@ -764,7 +846,7 @@ export async function onRequestPost(
       ).trim()
     );
 
-    return Response.json(
+    const ambienteCriado =
       criarRespostaAmbiente(
         id,
         body.nome.trim(),
@@ -773,7 +855,23 @@ export async function onRequestPost(
           body.prazo ?? ""
         ).trim(),
         Boolean(body.concluido)
-      ),
+      );
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "CRIAR",
+        entidade: "ambiente",
+        entidadeId: id,
+        entidadeNome:
+          ambienteCriado.nome,
+        dadosNovos:
+          ambienteCriado,
+      }
+    );
+
+    return Response.json(
+      ambienteCriado,
       {
         status: 201,
       }
@@ -831,6 +929,19 @@ export async function onRequestPut(
       return respostaErro(
         "A versão do Intellicash é obrigatória.",
         400
+      );
+    }
+
+    const ambienteAnterior =
+      await buscarAmbientePorId(
+        context,
+        body.id
+      );
+
+    if (!ambienteAnterior) {
+      return respostaErro(
+        "Ambiente da release não encontrado.",
+        404
       );
     }
 
@@ -897,7 +1008,7 @@ export async function onRequestPut(
       ).trim()
     );
 
-    return Response.json(
+    const ambienteAtualizado =
       criarRespostaAmbiente(
         body.id,
         body.nome.trim(),
@@ -906,7 +1017,38 @@ export async function onRequestPut(
           body.prazo ?? ""
         ).trim(),
         Boolean(body.concluido)
-      )
+      );
+
+    let acao = "EDITAR";
+
+    if (
+      ambienteAnterior.concluido !==
+      ambienteAtualizado.concluido
+    ) {
+      acao =
+        ambienteAtualizado.concluido
+          ? "CONCLUIR"
+          : "REABRIR";
+    }
+
+    await registrarAuditoria(
+      context,
+      {
+        acao,
+        entidade: "ambiente",
+        entidadeId:
+          ambienteAtualizado.id,
+        entidadeNome:
+          ambienteAtualizado.nome,
+        dadosAnteriores:
+          ambienteAnterior,
+        dadosNovos:
+          ambienteAtualizado,
+      }
+    );
+
+    return Response.json(
+      ambienteAtualizado
     );
   } catch (erro) {
     console.error(
@@ -966,6 +1108,19 @@ export async function onRequestDelete(
       );
     }
 
+    const ambienteExcluido =
+      await buscarAmbientePorId(
+        context,
+        id
+      );
+
+    if (!ambienteExcluido) {
+      return respostaErro(
+        "Ambiente da release não encontrado.",
+        404
+      );
+    }
+
     await context.env.DB
       .prepare(
         `
@@ -995,6 +1150,19 @@ export async function onRequestDelete(
       )
       .bind(id)
       .run();
+
+    await registrarAuditoria(
+      context,
+      {
+        acao: "EXCLUIR",
+        entidade: "ambiente",
+        entidadeId: id,
+        entidadeNome:
+          ambienteExcluido.nome,
+        dadosAnteriores:
+          ambienteExcluido,
+      }
+    );
 
     return Response.json({
       sucesso: true,
