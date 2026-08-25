@@ -103,7 +103,12 @@ function AppRoutes() {
             path="/"
             element={
 
-              <ProtectedRoute>
+              <ProtectedRoute
+                requiredRoles={[
+                  "admin",
+                  "qualidade",
+                ]}
+              >
 
                 <Dashboard />
 

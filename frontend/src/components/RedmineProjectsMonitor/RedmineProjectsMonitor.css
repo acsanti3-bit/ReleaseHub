@@ -1,0 +1,443 @@
+.redmine-monitor{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    padding:24px;
+    background:#FFF;
+    border:1px solid #DCE6EF;
+    border-top:4px solid #F58220;
+    border-radius:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.redmine-monitor-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+}
+
+.redmine-monitor-eyebrow{
+    display:block;
+    margin-bottom:6px;
+    color:#F58220;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.55px;
+    text-transform:uppercase;
+}
+
+.redmine-monitor-header h2{
+    margin:0;
+    color:#005AA9;
+    font-size:25px;
+    line-height:1.15;
+}
+
+.redmine-monitor-header p{
+    max-width:720px;
+    margin:7px 0 0;
+    color:#68747E;
+    font-size:13px;
+    line-height:1.45;
+}
+
+.redmine-monitor-refresh{
+    min-height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex-shrink:0;
+    padding:0 15px;
+    border:1px solid #BFD3E3;
+    border-radius:9px;
+    background:#FFF;
+    color:#005AA9;
+    font-size:12px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.redmine-monitor-refresh:hover:not(:disabled){
+    background:#EEF6FC;
+    border-color:#005AA9;
+}
+
+.redmine-monitor-refresh:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.redmine-monitor-refresh .is-spinning{
+    animation:redmine-monitor-spin .8s linear infinite;
+}
+
+.redmine-monitor-summary{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+}
+
+.redmine-monitor-summary > div{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:13px 15px;
+    background:#F6F9FC;
+    border:1px solid #E2EAF1;
+    border-radius:11px;
+}
+
+.redmine-monitor-summary span{
+    color:#667581;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.redmine-monitor-summary strong{
+    color:#005AA9;
+    font-size:23px;
+    line-height:1;
+}
+
+.redmine-monitor-summary .is-highlighted{
+    background:#FFF5EC;
+    border-color:#F7D0AD;
+}
+
+.redmine-monitor-summary .is-highlighted strong{
+    color:#D96C10;
+}
+
+.redmine-monitor-controls{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.redmine-monitor-search{
+    height:42px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    flex:1;
+    padding:0 13px;
+    border:1px solid #D6E0E8;
+    border-radius:9px;
+    color:#7B8791;
+    background:#FFF;
+    transition:.2s;
+}
+
+.redmine-monitor-search:focus-within{
+    border-color:#005AA9;
+    box-shadow:0 0 0 3px rgba(0,90,169,.07);
+}
+
+.redmine-monitor-search input{
+    width:100%;
+    min-width:0;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:#263238;
+    font-size:13px;
+}
+
+.redmine-monitor-filter{
+    min-height:42px;
+    padding:0 14px;
+    border:1px solid #D6E0E8;
+    border-radius:9px;
+    background:#FFF;
+    color:#52616D;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.redmine-monitor-filter:hover,
+.redmine-monitor-filter.is-active{
+    border-color:#F58220;
+    background:#FFF5EC;
+    color:#C6600D;
+}
+
+.redmine-monitor-error{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:12px 14px;
+    border:1px solid #F1CCCC;
+    border-radius:10px;
+    background:#FFF1F1;
+    color:#9F2525;
+    font-size:12px;
+}
+
+.redmine-monitor-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.redmine-monitor-project{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+    padding:16px;
+    border:1px solid #E1E8EE;
+    border-left:4px solid #005AA9;
+    border-radius:12px;
+    background:#FFF;
+    box-shadow:0 3px 10px rgba(0,0,0,.045);
+    transition:.2s;
+}
+
+.redmine-monitor-project:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 15px rgba(0,0,0,.075);
+}
+
+.redmine-monitor-project.has-no-open-tasks{
+    border-left-color:#B0BEC5;
+    background:#FAFBFC;
+}
+
+.redmine-monitor-project-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.redmine-monitor-project-header > div{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.redmine-monitor-project-header > div > a{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:#005AA9;
+    font-size:16px;
+    line-height:1.2;
+    font-weight:800;
+    text-decoration:none;
+}
+
+.redmine-monitor-project-header > div > a:hover{
+    color:#F58220;
+    text-decoration:underline;
+}
+
+.redmine-monitor-project-header > div > a svg{
+    flex-shrink:0;
+}
+
+.redmine-monitor-project-header > div > span{
+    color:#89949D;
+    font-size:10px;
+    font-weight:600;
+    text-transform:uppercase;
+}
+
+.redmine-monitor-total{
+    min-width:66px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    flex-shrink:0;
+    padding:7px 10px;
+    border-radius:20px;
+    background:#FFF0E3;
+    color:#C85C08;
+    text-decoration:none;
+    transition:.2s;
+}
+
+a.redmine-monitor-total:hover{
+    background:#F58220;
+    color:#FFF;
+}
+
+.redmine-monitor-total strong{
+    font-size:16px;
+    line-height:1;
+}
+
+.redmine-monitor-total span{
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.redmine-monitor-total.is-zero{
+    background:#EDF1F4;
+    color:#7A8791;
+}
+
+.redmine-monitor-statuses{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+}
+
+.redmine-monitor-statuses a{
+    min-width:0;
+    min-height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:6px 9px;
+    border:1px solid #E5EBF0;
+    border-radius:8px;
+    background:#F8FAFC;
+    color:#46545F;
+    font-size:11px;
+    font-weight:650;
+    text-decoration:none;
+    transition:.2s;
+}
+
+.redmine-monitor-statuses a:hover{
+    border-color:#B8CEDF;
+    background:#EEF6FC;
+    color:#005AA9;
+}
+
+.redmine-monitor-statuses a > span{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.redmine-monitor-statuses i{
+    width:8px;
+    height:8px;
+    flex-shrink:0;
+    border-radius:50%;
+}
+
+.redmine-monitor-statuses strong{
+    min-width:22px;
+    color:#263238;
+    font-size:13px;
+    text-align:right;
+}
+
+.redmine-monitor-no-tasks{
+    padding:11px;
+    border:1px dashed #D8E0E6;
+    border-radius:8px;
+    color:#7B8791;
+    font-size:11px;
+    text-align:center;
+}
+
+.redmine-monitor-empty{
+    min-height:120px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:24px;
+    border:2px dashed #D9E2E9;
+    border-radius:12px;
+    color:#78858F;
+    font-size:12px;
+    text-align:center;
+}
+
+.redmine-monitor-empty strong{
+    color:#005AA9;
+    font-size:14px;
+}
+
+.redmine-monitor-loader{
+    width:28px;
+    height:28px;
+    margin-bottom:3px;
+    border:3px solid #DCE8F1;
+    border-top-color:#F58220;
+    border-radius:50%;
+    animation:redmine-monitor-spin .8s linear infinite;
+}
+
+.redmine-monitor-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    padding-top:13px;
+    border-top:1px solid #E6ECF1;
+    color:#78858F;
+    font-size:10px;
+    font-weight:600;
+}
+
+.redmine-monitor-footer strong{
+    color:#005AA9;
+}
+
+@keyframes redmine-monitor-spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@media(max-width:1150px){
+    .redmine-monitor-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:800px){
+    .redmine-monitor{
+        padding:19px;
+    }
+
+    .redmine-monitor-header,
+    .redmine-monitor-controls{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .redmine-monitor-refresh,
+    .redmine-monitor-filter{
+        width:100%;
+    }
+
+    .redmine-monitor-summary{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:520px){
+    .redmine-monitor-statuses{
+        grid-template-columns:1fr;
+    }
+
+    .redmine-monitor-project-header{
+        flex-direction:column;
+    }
+}

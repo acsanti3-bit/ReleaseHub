@@ -152,10 +152,18 @@ function ProtectedRoute({
     )
   ) {
 
+    const destinoSemPermissao =
+      usuario.role ===
+        "visualizador"
+        ? "/environments"
+        : "/";
+
     return (
 
       <Navigate
-        to="/"
+        to={
+          destinoSemPermissao
+        }
         replace
       />
 

@@ -156,6 +156,10 @@ function Sidebar() {
     usuario?.role === "admin" ||
     usuario?.role === "qualidade";
 
+  const podeAcessarDashboard =
+    usuario?.role === "admin" ||
+    usuario?.role === "qualidade";
+
   return (
 
     <aside className="sidebar">
@@ -174,9 +178,13 @@ function Sidebar() {
 
       <nav>
 
-        <NavLink to="/">
-          Dashboard
-        </NavLink>
+        {podeAcessarDashboard && (
+
+          <NavLink to="/">
+            Dashboard
+          </NavLink>
+
+        )}
 
         <NavLink to="/environments">
           Ambientes da Release

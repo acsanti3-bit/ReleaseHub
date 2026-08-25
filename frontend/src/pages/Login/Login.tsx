@@ -24,6 +24,10 @@ import {
   login,
 } from "../../services/AuthService";
 
+import type {
+  AuthUser,
+} from "../../services/AuthService";
+
 import "./Login.css";
 
 
@@ -42,6 +46,30 @@ interface TurnstileOptions {
   ) => void;
   "expired-callback"?: () => void;
   "error-callback"?: () => void;
+}
+
+
+function obterDestinoAposLogin(
+  usuario: AuthUser,
+  origem: string
+): string {
+  if (
+    usuario.role !==
+      "visualizador"
+  ) {
+    return origem;
+  }
+
+  if (
+    origem === "/" ||
+    origem.startsWith(
+      "/settings"
+    )
+  ) {
+    return "/environments";
+  }
+
+  return origem;
 }
 
 declare global {
@@ -326,7 +354,10 @@ function Login() {
         ) {
 
           navigate(
-            origem,
+            obterDestinoAposLogin(
+              usuario,
+              origem
+            ),
             {
               replace: true,
             }
@@ -396,14 +427,18 @@ function Login() {
 
     try {
 
-      await login(
-        email.trim(),
-        senha,
-        turnstileToken
-      );
+      const usuario =
+        await login(
+          email.trim(),
+          senha,
+          turnstileToken
+        );
 
       navigate(
-        origem,
+        obterDestinoAposLogin(
+          usuario,
+          origem
+        ),
         {
           replace: true,
         }

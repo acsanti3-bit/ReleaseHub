@@ -46,6 +46,14 @@ const AttentionProjects =
       )
   );
 
+const RedmineProjectsMonitor =
+  lazy(
+    () =>
+      import(
+        "../../components/RedmineProjectsMonitor/RedmineProjectsMonitor"
+      )
+  );
+
 import type {
   Project,
 } from "../../types/project";
@@ -1197,6 +1205,21 @@ function Dashboard() {
           </div>
 
         </div>
+
+
+        <Suspense
+          fallback={
+            <div className="dashboard-empty">
+              <h2>
+                Carregando monitoramento do Redmine...
+              </h2>
+            </div>
+          }
+        >
+
+          <RedmineProjectsMonitor />
+
+        </Suspense>
 
 
         <CompatibilityPanel
