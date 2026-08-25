@@ -206,6 +206,12 @@ function RedmineProjectsMonitor() {
   ] =
     useState(true);
 
+  const [
+    somenteForaReleaseHub,
+    setSomenteForaReleaseHub,
+  ] =
+    useState(false);
+
   const requisicaoEmAndamento =
     useRef(false);
 
@@ -327,6 +333,13 @@ function RedmineProjectsMonitor() {
               return false;
             }
 
+            if (
+              somenteForaReleaseHub &&
+              projeto.cadastradoNoReleaseHub !== false
+            ) {
+              return false;
+            }
+
             return (
               !termo ||
               normalizarTexto(
@@ -347,6 +360,7 @@ function RedmineProjectsMonitor() {
         pesquisa,
         resumo,
         somenteComTarefas,
+        somenteForaReleaseHub,
       ]
     );
 
@@ -420,6 +434,16 @@ function RedmineProjectsMonitor() {
             </strong>
           </div>
 
+          <div className="is-outside-releasehub">
+            <span>
+              Fora do ReleaseHub
+            </span>
+
+            <strong>
+              {resumo.totalProjetosForaReleaseHub ?? 0}
+            </strong>
+          </div>
+
           <div className="is-highlighted">
             <span>
               Total de tarefas abertas
@@ -453,23 +477,43 @@ function RedmineProjectsMonitor() {
             />
           </label>
 
-          <button
-            type="button"
-            className={`redmine-monitor-filter ${somenteComTarefas ? "is-active" : ""}`}
-            aria-pressed={
-              somenteComTarefas
-            }
-            onClick={() =>
-              setSomenteComTarefas(
-                valor =>
-                  !valor
-              )
-            }
-          >
-            {somenteComTarefas
-              ? "Mostrando somente com tarefas"
-              : "Mostrar somente com tarefas abertas"}
-          </button>
+          <div className="redmine-monitor-filters">
+            <button
+              type="button"
+              className={`redmine-monitor-filter ${somenteComTarefas ? "is-active" : ""}`}
+              aria-pressed={
+                somenteComTarefas
+              }
+              onClick={() =>
+                setSomenteComTarefas(
+                  valor =>
+                    !valor
+                )
+              }
+            >
+              {somenteComTarefas
+                ? "Mostrando somente com tarefas"
+                : "Mostrar somente com tarefas abertas"}
+            </button>
+
+            <button
+              type="button"
+              className={`redmine-monitor-filter ${somenteForaReleaseHub ? "is-active" : ""}`}
+              aria-pressed={
+                somenteForaReleaseHub
+              }
+              onClick={() =>
+                setSomenteForaReleaseHub(
+                  valor =>
+                    !valor
+                )
+              }
+            >
+              {somenteForaReleaseHub
+                ? "Mostrando fora do ReleaseHub"
+                : "Mostrar fora do ReleaseHub"}
+            </button>
+          </div>
         </div>
       )}
 
@@ -514,7 +558,17 @@ function RedmineProjectsMonitor() {
                 key={
                   projeto.id
                 }
-                className={`redmine-monitor-project ${projeto.totalAbertas === 0 ? "has-no-open-tasks" : ""}`}
+                className={[
+                  "redmine-monitor-project",
+                  projeto.totalAbertas === 0
+                    ? "has-no-open-tasks"
+                    : "",
+                  projeto.cadastradoNoReleaseHub === false
+                    ? "is-outside-releasehub"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 <div className="redmine-monitor-project-header">
                   <div>
@@ -534,9 +588,17 @@ function RedmineProjectsMonitor() {
                       />
                     </a>
 
-                    <span>
-                      Projeto do Redmine
-                    </span>
+                    <div className="redmine-monitor-project-meta">
+                      <span>
+                        Projeto do Redmine
+                      </span>
+
+                      {projeto.cadastradoNoReleaseHub === false && (
+                        <strong>
+                          Fora do ReleaseHub
+                        </strong>
+                      )}
+                    </div>
                   </div>
 
                   {projeto.totalAbertas > 0 ? (

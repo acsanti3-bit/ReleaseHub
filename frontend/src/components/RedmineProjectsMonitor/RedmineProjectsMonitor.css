@@ -76,7 +76,7 @@
 
 .redmine-monitor-summary{
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     gap:12px;
 }
 
@@ -114,10 +114,26 @@
     color:#D96C10;
 }
 
+.redmine-monitor-summary .is-outside-releasehub{
+    background:#FFF8F1;
+    border-color:#F2C99F;
+}
+
+.redmine-monitor-summary .is-outside-releasehub strong{
+    color:#D96C10;
+}
+
 .redmine-monitor-controls{
     display:flex;
     align-items:center;
     gap:12px;
+}
+
+.redmine-monitor-filters{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
 }
 
 .redmine-monitor-search{
@@ -211,6 +227,10 @@
     background:#FAFBFC;
 }
 
+.redmine-monitor-project.is-outside-releasehub{
+    border-left-color:#F58220;
+}
+
 .redmine-monitor-project-header{
     display:flex;
     align-items:flex-start;
@@ -246,10 +266,30 @@
     flex-shrink:0;
 }
 
-.redmine-monitor-project-header > div > span{
+.redmine-monitor-project-meta{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    flex-wrap:wrap;
+}
+
+.redmine-monitor-project-meta > span{
     color:#89949D;
     font-size:10px;
     font-weight:600;
+    text-transform:uppercase;
+}
+
+.redmine-monitor-project-meta > strong{
+    padding:3px 7px;
+    border:1px solid #F2C99F;
+    border-radius:999px;
+    background:#FFF5EC;
+    color:#C6600D;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.2px;
+    line-height:1.2;
     text-transform:uppercase;
 }
 
@@ -418,6 +458,12 @@ a.redmine-monitor-total:hover{
 
     .redmine-monitor-header,
     .redmine-monitor-controls{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .redmine-monitor-filters{
+        width:100%;
         flex-direction:column;
         align-items:stretch;
     }

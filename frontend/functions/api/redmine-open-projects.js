@@ -6,6 +6,25 @@ let cacheAtual =
   null;
 
 
+function normalizarTexto(
+  valor
+) {
+  return String(
+    valor ?? ""
+  )
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]/g,
+      ""
+    );
+}
+
+
 function codificarBase64(
   valor
 ) {
@@ -297,6 +316,93 @@ async function listarColecao(
 }
 
 
+async function listarProjetosReleaseHub(
+  context
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            nome
+          FROM projects
+          ORDER BY id
+        `
+      )
+      .all();
+
+  return Array.isArray(
+    resultado.results
+  )
+    ? resultado.results
+    : [];
+}
+
+
+function encontrarProjetoRedmine(
+  nomeReleaseHub,
+  projetosRedmine
+) {
+  const nomeNormalizado =
+    normalizarTexto(
+      nomeReleaseHub
+    );
+
+  if (!nomeNormalizado) {
+    return null;
+  }
+
+  const exatos =
+    projetosRedmine.filter(
+      projeto =>
+        normalizarTexto(
+          projeto.name
+        ) ===
+        nomeNormalizado
+    );
+
+  if (exatos.length === 1) {
+    return exatos[0];
+  }
+
+  if (exatos.length > 1) {
+    return (
+      exatos.find(
+        projeto =>
+          Number(
+            projeto.status
+          ) === 1
+      ) ??
+      exatos[0]
+    );
+  }
+
+  const aproximados =
+    projetosRedmine.filter(
+      projeto => {
+        const nomeRedmine =
+          normalizarTexto(
+            projeto.name
+          );
+
+        return (
+          nomeRedmine.includes(
+            nomeNormalizado
+          ) ||
+          nomeNormalizado.includes(
+            nomeRedmine
+          )
+        );
+      }
+    );
+
+  return aproximados.length === 1
+    ? aproximados[0]
+    : null;
+}
+
+
 function adicionarColunasPadrao(
   url
 ) {
@@ -472,6 +578,7 @@ async function montarMonitoramento(
   const [
     projetosRecebidos,
     tarefasAbertas,
+    projetosReleaseHub,
   ] =
     await Promise.all([
       listarColecao(
@@ -492,6 +599,10 @@ async function montarMonitoramento(
             "id:asc",
         }
       ),
+
+      listarProjetosReleaseHub(
+        context
+      ),
     ]);
 
   const projetosAtivos =
@@ -502,6 +613,27 @@ async function montarMonitoramento(
           projeto.status
         ) === 1
     );
+
+  const idsCadastradosNoReleaseHub =
+    new Set();
+
+  projetosReleaseHub.forEach(
+    projetoReleaseHub => {
+      const projetoRedmine =
+        encontrarProjetoRedmine(
+          projetoReleaseHub.nome,
+          projetosAtivos
+        );
+
+      if (projetoRedmine) {
+        idsCadastradosNoReleaseHub.add(
+          Number(
+            projetoRedmine.id
+          )
+        );
+      }
+    }
+  );
 
   const porId =
     new Map();
@@ -634,6 +766,13 @@ async function montarMonitoramento(
         projeto => ({
           ...projeto,
 
+          cadastradoNoReleaseHub:
+            idsCadastradosNoReleaseHub.has(
+              Number(
+                projeto.id
+              )
+            ),
+
           situacoes:
             Array.from(
               projeto.situacoes.values()
@@ -691,6 +830,12 @@ async function montarMonitoramento(
       projetos.filter(
         projeto =>
           projeto.totalAbertas > 0
+      ).length,
+
+    totalProjetosForaReleaseHub:
+      projetos.filter(
+        projeto =>
+          !projeto.cadastradoNoReleaseHub
       ).length,
 
     totalTarefasAbertas:

@@ -16,6 +16,7 @@ export interface RedmineOpenProject {
   identifier: string;
   nome: string;
   totalAbertas: number;
+  cadastradoNoReleaseHub: boolean;
   urlProjeto: string;
   urlTarefasAbertas: string;
   situacoes: RedmineOpenStatus[];
@@ -26,6 +27,7 @@ export interface RedmineOpenProjectsSummary {
   atualizadoEm: string;
   totalProjetos: number;
   totalProjetosComTarefas: number;
+  totalProjetosForaReleaseHub: number;
   totalTarefasAbertas: number;
   projetos: RedmineOpenProject[];
 }
