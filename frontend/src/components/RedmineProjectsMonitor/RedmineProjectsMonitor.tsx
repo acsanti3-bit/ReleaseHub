@@ -27,6 +27,19 @@ const INTERVALO_ATUALIZACAO =
   2 * 60 * 1000;
 
 
+const compararNomesProjetos =
+  new Intl.Collator(
+    "pt-BR",
+    {
+      sensitivity:
+        "base",
+
+      numeric:
+        true,
+    }
+  ).compare;
+
+
 function normalizarTexto(
   valor: string
 ): string {
@@ -210,7 +223,7 @@ function RedmineProjectsMonitor() {
     somenteForaReleaseHub,
     setSomenteForaReleaseHub,
   ] =
-    useState(false);
+    useState(true);
 
   const requisicaoEmAndamento =
     useRef(false);
@@ -324,37 +337,48 @@ function RedmineProjectsMonitor() {
         return (
           resumo?.projetos ??
           []
-        ).filter(
-          projeto => {
-            if (
-              somenteComTarefas &&
-              projeto.totalAbertas === 0
-            ) {
-              return false;
-            }
+        )
+          .filter(
+            projeto => {
+              if (
+                somenteComTarefas &&
+                projeto.totalAbertas === 0
+              ) {
+                return false;
+              }
 
-            if (
-              somenteForaReleaseHub &&
-              projeto.cadastradoNoReleaseHub !== false
-            ) {
-              return false;
-            }
+              if (
+                somenteForaReleaseHub &&
+                projeto.cadastradoNoReleaseHub !== false
+              ) {
+                return false;
+              }
 
-            return (
-              !termo ||
-              normalizarTexto(
-                projeto.nome
-              ).includes(
-                termo
-              ) ||
-              normalizarTexto(
-                projeto.identifier
-              ).includes(
-                termo
+              return (
+                !termo ||
+                normalizarTexto(
+                  projeto.nome
+                ).includes(
+                  termo
+                ) ||
+                normalizarTexto(
+                  projeto.identifier
+                ).includes(
+                  termo
+                )
+              );
+            }
+          )
+          .sort(
+            (
+              projetoA,
+              projetoB
+            ) =>
+              compararNomesProjetos(
+                projetoA.nome,
+                projetoB.nome
               )
-            );
-          }
-        );
+          );
       },
       [
         pesquisa,
@@ -436,7 +460,7 @@ function RedmineProjectsMonitor() {
 
           <div className="is-outside-releasehub">
             <span>
-              Fora do ReleaseHub
+              Projetos fora do ReleaseHub
             </span>
 
             <strong>
@@ -510,8 +534,8 @@ function RedmineProjectsMonitor() {
               }
             >
               {somenteForaReleaseHub
-                ? "Mostrando fora do ReleaseHub"
-                : "Mostrar fora do ReleaseHub"}
+                ? "Mostrando somente fora do ReleaseHub"
+                : "Mostrar somente fora do ReleaseHub"}
             </button>
           </div>
         </div>
