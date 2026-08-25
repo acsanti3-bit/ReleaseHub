@@ -204,7 +204,7 @@ function RedmineProjectsMonitor() {
     somenteComTarefas,
     setSomenteComTarefas,
   ] =
-    useState(false);
+    useState(true);
 
   const requisicaoEmAndamento =
     useRef(false);
