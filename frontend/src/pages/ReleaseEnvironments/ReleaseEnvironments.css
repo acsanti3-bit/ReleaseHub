@@ -149,6 +149,12 @@
 }
 
 
+.release-environment-card-collapsed
+.release-environment-card-header {
+    border-bottom: 0;
+}
+
+
 /* AÇÕES */
 
 .release-actions {
@@ -174,6 +180,16 @@
 
 .release-actions button:hover {
     background: #ddebf5;
+}
+
+.release-actions .release-collapse-button {
+    background: #f6f8fa;
+    color: #596773;
+}
+
+.release-actions .release-collapse-button:hover {
+    background: #e9eef2;
+    color: #263238;
 }
 
 .release-actions button:disabled {
@@ -585,14 +601,4 @@
     .release-systems-grid {
         grid-template-columns: 1fr;
     }
-}
-
-.release-actions .info-environment {
-    background: #f3f6f8;
-    color: #687682;
-}
-
-.release-actions .info-environment:hover {
-    background: #e8eef2;
-    color: #005aa9;
 }

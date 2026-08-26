@@ -8,6 +8,8 @@ import {
   MdEdit,
   MdErrorOutline,
   MdInfoOutline,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
   MdLink,
   MdReplay,
 } from "react-icons/md";
@@ -94,6 +96,99 @@ function obterSistemasDoAmbiente(
 }
 
 
+
+function obterVersaoIntellicashDoAmbiente(
+  ambiente: ReleaseEnvironment
+): string {
+  const sistemaIntellicash =
+    obterSistemasDoAmbiente(
+      ambiente
+    ).find(sistema =>
+      sistema.chave
+        .toLowerCase()
+        .includes("intellicash")
+    );
+
+  return (
+    sistemaIntellicash?.versao ||
+    ambiente.versoes.intellicash ||
+    ambiente.nome ||
+    ""
+  );
+}
+
+
+function obterPartesNumericas(
+  valor: string
+): number[] {
+  return (
+    valor
+      .match(/\d+/g)
+      ?.map(parte =>
+        Number(parte)
+      ) ??
+    []
+  );
+}
+
+
+function compararAmbientesPorVersao(
+  ambienteA: ReleaseEnvironment,
+  ambienteB: ReleaseEnvironment
+): number {
+  const versaoA =
+    obterVersaoIntellicashDoAmbiente(
+      ambienteA
+    );
+
+  const versaoB =
+    obterVersaoIntellicashDoAmbiente(
+      ambienteB
+    );
+
+  const partesA =
+    obterPartesNumericas(
+      versaoA
+    );
+
+  const partesB =
+    obterPartesNumericas(
+      versaoB
+    );
+
+  const maiorQuantidade =
+    Math.max(
+      partesA.length,
+      partesB.length
+    );
+
+  for (
+    let indice = 0;
+    indice < maiorQuantidade;
+    indice += 1
+  ) {
+    const parteA =
+      partesA[indice] ?? 0;
+
+    const parteB =
+      partesB[indice] ?? 0;
+
+    if (parteA !== parteB) {
+      return parteA - parteB;
+    }
+  }
+
+  return ambienteA.nome.localeCompare(
+    ambienteB.nome,
+    "pt-BR",
+    {
+      numeric: true,
+      sensitivity: "base",
+    }
+  );
+}
+
+
 function ReleaseEnvironments() {
   const navigate =
     useNavigate();
@@ -121,6 +216,41 @@ function ReleaseEnvironments() {
 
   const [feedback, setFeedback] =
     useState<ReleaseFeedback | null>(null);
+
+  const [
+    ambientesRecolhidos,
+    setAmbientesRecolhidos,
+  ] = useState<Set<number>>(
+    () => new Set()
+  );
+
+
+  function alternarAmbienteRecolhido(
+    ambienteId: number
+  ) {
+    setAmbientesRecolhidos(
+      atuais => {
+        const proximos =
+          new Set(atuais);
+
+        if (
+          proximos.has(
+            ambienteId
+          )
+        ) {
+          proximos.delete(
+            ambienteId
+          );
+        } else {
+          proximos.add(
+            ambienteId
+          );
+        }
+
+        return proximos;
+      }
+    );
+  }
 
 
   async function atualizarLista() {
@@ -435,6 +565,12 @@ function ReleaseEnvironments() {
   }
 
 
+  const ambientesOrdenados =
+    [...ambientes].sort(
+      compararAmbientesPorVersao
+    );
+
+
   return (
     <Layout>
       <div className="release-page">
@@ -522,7 +658,12 @@ function ReleaseEnvironments() {
           </div>
         ) : (
           <div className="release-environments-list">
-            {ambientes.map(ambiente => {
+            {ambientesOrdenados.map(ambiente => {
+              const recolhido =
+                ambientesRecolhidos.has(
+                  ambiente.id
+                );
+
               const sistemas =
                 obterSistemasDoAmbiente(
                   ambiente
@@ -564,7 +705,11 @@ function ReleaseEnvironments() {
               return (
                 <article
                   key={ambiente.id}
-                  className="release-environment-card"
+                  className={`release-environment-card ${
+                    recolhido
+                      ? "release-environment-card-collapsed"
+                      : ""
+                  }`}
                 >
                   <header className="release-environment-card-header">
                     <div className="release-environment-heading">
@@ -643,6 +788,39 @@ function ReleaseEnvironments() {
 
 
                     <div className="release-actions">
+                      <button
+                        type="button"
+                        className="release-collapse-button"
+                        title={
+                          recolhido
+                            ? "Expandir ambiente"
+                            : "Recolher ambiente"
+                        }
+                        aria-label={
+                          recolhido
+                            ? `Expandir ${ambiente.nome}`
+                            : `Recolher ${ambiente.nome}`
+                        }
+                        aria-expanded={
+                          !recolhido
+                        }
+                        onClick={() =>
+                          alternarAmbienteRecolhido(
+                            ambiente.id
+                          )
+                        }
+                      >
+                        {recolhido ? (
+                          <MdKeyboardArrowDown
+                            size={22}
+                          />
+                        ) : (
+                          <MdKeyboardArrowUp
+                            size={22}
+                          />
+                        )}
+                      </button>
+
                       <button
                         type="button"
                         title="Ver compatibilidade"
@@ -732,8 +910,9 @@ function ReleaseEnvironments() {
                   </header>
 
 
-                  <div className="release-systems-grid">
-                    {sistemas.map(sistema => {
+                  {!recolhido && (
+                    <div className="release-systems-grid">
+                      {sistemas.map(sistema => {
                       const possuiVersao =
                         Boolean(
                           sistema.versao?.trim()
@@ -770,8 +949,9 @@ function ReleaseEnvironments() {
                           </strong>
                         </div>
                       );
-                    })}
-                  </div>
+                      })}
+                    </div>
+                  )}
                 </article>
               );
             })}
