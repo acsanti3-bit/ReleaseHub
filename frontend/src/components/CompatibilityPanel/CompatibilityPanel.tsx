@@ -279,9 +279,16 @@ function CompatibilityPanel({
     </div>
   );
 
+  /*
+    No primeiro carregamento, exibe a mensagem normalmente.
+    Nas atualizações automáticas do Dashboard/Modo TV, mantém
+    a compatibilidade atual na tela enquanto os novos dados
+    são consultados em segundo plano, evitando o efeito de piscar.
+  */
   if (
-    carregando ||
-    carregandoAmbiente
+    (carregando || carregandoAmbiente) &&
+    !ambiente &&
+    sistemas.length === 0
   ) {
     return (
       <section className="compatibility-panel">
