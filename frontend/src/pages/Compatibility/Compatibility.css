@@ -838,3 +838,193 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Modelo novo: cadastro geral dos sistemas + versão específica por release. */
+.compatibility-global-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 17px 18px;
+  border: 1px solid #dbe4ec;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.compatibility-global-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef6fd;
+  color: #005aa9;
+}
+
+.compatibility-global-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.compatibility-global-content > strong {
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.compatibility-global-content > span {
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.compatibility-global-content > small {
+  margin-top: 2px;
+  color: #005aa9;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.compatibility-global-action {
+  min-height: 38px;
+  border: 1px solid #c8dced;
+  border-radius: 8px;
+  background: #f7fbff;
+  color: #005aa9;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.compatibility-global-action:hover:not(:disabled) {
+  border-color: #005aa9;
+  background: #eef6fd;
+}
+
+.compatibility-global-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.compatibility-view-heading-row {
+  min-height: 64px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #eef0f3;
+  background: #fbfcfd;
+}
+
+.compatibility-view-heading-row .compatibility-view-title {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.compatibility-view-title p {
+  margin: 4px 0 0;
+  color: #7b8794;
+  font-size: 11px;
+}
+
+.compatibility-release-modal {
+  width: min(920px, 96vw);
+}
+
+.compatibility-release-editor-list {
+  gap: 10px;
+}
+
+.compatibility-release-item {
+  padding: 13px 14px;
+}
+
+.compatibility-release-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 11px;
+}
+
+.compatibility-project-reference {
+  display: block;
+  margin-top: 5px;
+  color: #7b8794;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.compatibility-release-visibility {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.compatibility-release-version-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compatibility-release-version-field > span {
+  color: #475467;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.compatibility-release-version-field > select,
+.compatibility-release-version-field .compatibility-new-version input {
+  width: 100%;
+  min-height: 39px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #1f2937;
+  padding: 0 10px;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.compatibility-release-version-field > select:focus,
+.compatibility-release-version-field .compatibility-new-version input:focus {
+  border-color: #005aa9;
+  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.09);
+}
+
+.compatibility-release-version-field small {
+  color: #7b8794;
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .compatibility-global-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .compatibility-global-action {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .compatibility-view-heading-row,
+  .compatibility-release-item-top {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compatibility-view-heading-row .compatibility-edit-button,
+  .compatibility-release-visibility {
+    width: 100%;
+  }
+}

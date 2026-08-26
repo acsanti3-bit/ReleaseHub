@@ -43,6 +43,8 @@ const NOMES_ENTIDADE:
     usuario: "Usuário",
     compatibilidade:
       "Compatibilidade",
+    catalogo_compatibilidade:
+      "Sistemas da compatibilidade",
     versao_compatibilidade:
       "Versão da compatibilidade",
 };

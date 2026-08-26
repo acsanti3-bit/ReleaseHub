@@ -2,39 +2,18 @@ import {
   registrarAuditoria,
 } from "../../server/audit.js";
 
-const SISTEMAS_FIXOS = [
-  { chave: "intellicash", nome: "IntelliCash", ordem: 1 },
-  { chave: "easycash", nome: "EasyCash", ordem: 2 },
-  { chave: "easycheckout", nome: "EasyCheckOut", ordem: 3 },
-  { chave: "easypdv", nome: "EasyPDV", ordem: 4 },
-  { chave: "intellistock", nome: "IntelliStock", ordem: 5 },
-  { chave: "iwbserver", nome: "IWB Server", ordem: 6 },
-  { chave: "enterpriseserver", nome: "Enterprise Server", ordem: 7 },
-  { chave: "nfedestinadas", nome: "NF-e Destinadas", ordem: 8 },
-  { chave: "intellifood", nome: "IntelliFood", ordem: 9 },
-  { chave: "pcp", nome: "PCP", ordem: 10 },
-  { chave: "gerenciadordepromocoes", nome: "Gerenciador de Promoções", ordem: 11 },
-  { chave: "sincmatrizxfilial", nome: "Sinc. Matriz X Filial", ordem: 12 },
-  { chave: "sinclabfiscal", nome: "Sinc. Lab. Fiscal", ordem: 13 },
-  { chave: "sincecommerce", nome: "Sinc. E-Commerce", ordem: 14 },
-  { chave: "pesocerto", nome: "Peso Certo", ordem: 15 },
-  { chave: "notify", nome: "Notify", ordem: 16 },
-  { chave: "vendaassistida", nome: "Venda Assistida", ordem: 17 },
-  { chave: "cotacao", nome: "Cotação", ordem: 18 },
-  { chave: "bi", nome: "BI", ordem: 19 },
-];
+import {
+  garantirCatalogoGlobal,
+  listarCatalogoGlobal,
+} from "./compatibility-systems.js";
 
 function respostaErro(
   mensagem,
   status = 500
 ) {
   return Response.json(
-    {
-      erro: mensagem,
-    },
-    {
-      status,
-    }
+    { erro: mensagem },
+    { status }
   );
 }
 
@@ -47,13 +26,11 @@ function normalizarTexto(valor) {
 }
 
 function normalizarChave(valor) {
-  const chave = String(valor ?? "")
+  return String(valor ?? "")
     .trim()
     .replace(/[^a-zA-Z0-9:_-]/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 160);
-
-  return chave;
 }
 
 async function garantirEstrutura(
@@ -84,6 +61,10 @@ async function garantirEstrutura(
       `
     )
     .run();
+
+  await garantirCatalogoGlobal(
+    context
+  );
 }
 
 async function buscarAmbiente(
@@ -137,7 +118,7 @@ function obterVersaoLegada(
   ).trim();
 }
 
-async function listarSistemasAmbiente(
+async function listarVersoesAmbiente(
   context,
   ambiente
 ) {
@@ -158,69 +139,83 @@ async function listarSistemasAmbiente(
       .bind(ambiente.id)
       .all();
 
-  const mapa =
-    new Map();
+  const mapa = new Map();
 
   for (
     const sistema of
     resultado.results ?? []
   ) {
-    const chave =
+    const porChave =
       normalizarTexto(
         sistema.chave
       );
 
-    const nome =
+    const porNome =
       normalizarTexto(
         sistema.nome
       );
 
-    if (chave) {
-      mapa.set(chave, sistema);
+    if (porChave) {
+      mapa.set(
+        porChave,
+        sistema
+      );
     }
 
-    if (nome) {
-      mapa.set(nome, sistema);
+    if (porNome) {
+      mapa.set(
+        porNome,
+        sistema
+      );
     }
   }
 
-  return SISTEMAS_FIXOS.map(
-    sistemaCatalogo => {
-      const encontrado =
-        mapa.get(
-          normalizarTexto(
-            sistemaCatalogo.chave
-          )
-        ) ??
-        mapa.get(
-          normalizarTexto(
-            sistemaCatalogo.nome
-          )
-        );
+  return mapa;
+}
 
-      return {
-        chave:
-          sistemaCatalogo.chave,
-        nome:
-          String(
-            encontrado?.nome ??
-            sistemaCatalogo.nome
-          ).trim(),
-        versao:
-          String(
-            encontrado?.versao ??
-            obterVersaoLegada(
-              ambiente,
-              sistemaCatalogo.chave
-            )
-          ).trim(),
-        ordem:
-          Number(
-            encontrado?.ordem
-          ) ||
-          sistemaCatalogo.ordem,
-      };
+function obterVersaoDoAmbiente(
+  definicao,
+  mapaAmbiente,
+  ambiente
+) {
+  if (
+    definicao.source !==
+    "environment"
+  ) {
+    return "";
+  }
+
+  const chaveSemPrefixo =
+    definicao.key.startsWith(
+      "env:"
+    )
+      ? definicao.key.slice(4)
+      : definicao.key;
+
+  const candidatos = [
+    chaveSemPrefixo,
+    definicao.originalName,
+    definicao.displayName,
+  ]
+    .map(normalizarTexto)
+    .filter(Boolean);
+
+  for (const candidato of candidatos) {
+    const sistema =
+      mapaAmbiente.get(
+        candidato
+      );
+
+    if (sistema) {
+      return String(
+        sistema.versao ?? ""
+      ).trim();
     }
+  }
+
+  return obterVersaoLegada(
+    ambiente,
+    chaveSemPrefixo
   );
 }
 
@@ -241,28 +236,9 @@ function parseItens(valor) {
   }
 }
 
-function sanitizarItem(
-  item,
-  indice
+function sanitizarOverride(
+  item
 ) {
-  const source = [
-    "environment",
-    "redmine",
-    "manual",
-  ].includes(item?.source)
-    ? item.source
-    : "manual";
-
-  const versionSource = [
-    "environment",
-    "redmine",
-    "manual",
-  ].includes(item?.versionSource)
-    ? item.versionSource
-    : source === "environment"
-      ? "environment"
-      : source;
-
   const key =
     normalizarChave(
       item?.key
@@ -272,38 +248,16 @@ function sanitizarItem(
     return null;
   }
 
-  const displayName =
-    String(
-      item?.displayName ?? ""
-    )
-      .trim()
-      .slice(0, 120);
-
-  if (!displayName) {
-    return null;
-  }
-
-  const redmineProjectId =
-    Number(
-      item?.redmineProjectId
-    );
+  const versionSource = [
+    "environment",
+    "redmine",
+    "manual",
+  ].includes(item?.versionSource)
+    ? item.versionSource
+    : "manual";
 
   return {
     key,
-    source,
-    originalName:
-      String(
-        item?.originalName ?? ""
-      )
-        .trim()
-        .slice(0, 120),
-    displayName,
-    environmentVersion:
-      String(
-        item?.environmentVersion ?? ""
-      )
-        .trim()
-        .slice(0, 120),
     selectedVersion:
       String(
         item?.selectedVersion ?? ""
@@ -311,59 +265,33 @@ function sanitizarItem(
         .trim()
         .slice(0, 120),
     versionSource,
-    redmineProjectId:
-      Number.isInteger(
-        redmineProjectId
-      ) &&
-      redmineProjectId > 0
-        ? redmineProjectId
-        : null,
-    redmineProjectName:
-      String(
-        item?.redmineProjectName ?? ""
-      )
-        .trim()
-        .slice(0, 160),
     visible:
       item?.visible !== false,
-    order:
-      Number.isFinite(
-        Number(item?.order)
-      )
-        ? Number(item.order)
-        : indice + 1,
-    relatedTo:
-      Array.isArray(
-        item?.relatedTo
-      )
-        ? item.relatedTo
-            .map(normalizarChave)
-            .filter(Boolean)
-            .slice(0, 50)
-        : [],
   };
 }
 
-function sanitizarItens(
-  itens
+function sanitizarOverrides(
+  itens,
+  chavesPermitidas = null
 ) {
   const resultado = [];
   const chaves = new Set();
 
-  for (
-    let indice = 0;
-    indice < itens.length;
-    indice++
-  ) {
+  for (const recebido of itens) {
     const item =
-      sanitizarItem(
-        itens[indice],
-        indice
+      sanitizarOverride(
+        recebido
       );
 
     if (
       !item ||
-      chaves.has(item.key)
+      chaves.has(item.key) ||
+      (
+        chavesPermitidas &&
+        !chavesPermitidas.has(
+          item.key
+        )
+      )
     ) {
       continue;
     }
@@ -372,17 +300,7 @@ function sanitizarItens(
     resultado.push(item);
   }
 
-  return resultado.map(
-    item => ({
-      ...item,
-      relatedTo:
-        item.relatedTo.filter(
-          key =>
-            key !== item.key &&
-            chaves.has(key)
-        ),
-    })
-  );
+  return resultado;
 }
 
 async function buscarConfiguracaoSalva(
@@ -401,135 +319,17 @@ async function buscarConfiguracaoSalva(
       .bind(environmentId)
       .first();
 
+  const itens =
+    sanitizarOverrides(
+      parseItens(
+        row?.items_json
+      )
+    );
+
   return {
     configured: Boolean(row),
-    items:
-      sanitizarItens(
-        parseItens(
-          row?.items_json
-        )
-      ),
+    items: itens,
   };
-}
-
-function criarItensPadrao(
-  sistemas
-) {
-  return sistemas.map(
-    sistema => ({
-      key:
-        `env:${sistema.chave}`,
-      source:
-        "environment",
-      originalName:
-        sistema.nome,
-      displayName:
-        sistema.nome,
-      environmentVersion:
-        sistema.versao,
-      selectedVersion:
-        sistema.versao,
-      versionSource:
-        "environment",
-      redmineProjectId:
-        null,
-      redmineProjectName:
-        "",
-      visible:
-        true,
-      order:
-        sistema.ordem,
-      relatedTo: [],
-    })
-  );
-}
-
-function mesclarItens(
-  sistemas,
-  itensSalvos
-) {
-  const padrao =
-    criarItensPadrao(
-      sistemas
-    );
-
-  const salvosPorChave =
-    new Map(
-      itensSalvos.map(
-        item => [
-          item.key,
-          item,
-        ]
-      )
-    );
-
-  const chavesBase =
-    new Set(
-      padrao.map(
-        item => item.key
-      )
-    );
-
-  const itensBase =
-    padrao.map(
-      item => {
-        const salvo =
-          salvosPorChave.get(
-            item.key
-          );
-
-        if (!salvo) {
-          return item;
-        }
-
-        const usaAmbiente =
-          salvo.versionSource ===
-          "environment";
-
-        return {
-          ...salvo,
-          source:
-            "environment",
-          originalName:
-            item.originalName,
-          environmentVersion:
-            item.environmentVersion,
-          selectedVersion:
-            usaAmbiente
-              ? item.environmentVersion
-              : salvo.selectedVersion,
-          order:
-            Number.isFinite(
-              Number(salvo.order)
-            )
-              ? Number(salvo.order)
-              : item.order,
-        };
-      }
-    );
-
-  const extras =
-    itensSalvos.filter(
-      item =>
-        !chavesBase.has(
-          item.key
-        )
-    );
-
-  return [
-    ...itensBase,
-    ...extras,
-  ].sort(
-    (a, b) =>
-      a.order - b.order ||
-      a.displayName.localeCompare(
-        b.displayName,
-        "pt-BR",
-        {
-          sensitivity: "base",
-        }
-      )
-  );
 }
 
 async function listarVersoesManuais(
@@ -601,34 +401,116 @@ async function montarResposta(
     return null;
   }
 
-  const sistemas =
-    await listarSistemasAmbiente(
+  const [
+    catalogo,
+    mapaAmbiente,
+    configuracao,
+    manualVersions,
+  ] = await Promise.all([
+    listarCatalogoGlobal(
+      context
+    ),
+    listarVersoesAmbiente(
       context,
       ambiente
-    );
-
-  const configuracao =
-    await buscarConfiguracaoSalva(
+    ),
+    buscarConfiguracaoSalva(
       context,
       environmentId
+    ),
+    listarVersoesManuais(
+      context
+    ),
+  ]);
+
+  const overrides =
+    new Map(
+      configuracao.items.map(
+        item => [
+          item.key,
+          item,
+        ]
+      )
     );
 
   const items =
-    mesclarItens(
-      sistemas,
-      configuracao.items
-    );
+    catalogo
+      .map(definicao => {
+        const ambienteVersao =
+          obterVersaoDoAmbiente(
+            definicao,
+            mapaAmbiente,
+            ambiente
+          );
 
-  const manualVersions =
-    await listarVersoesManuais(
-      context
-    );
+        const override =
+          overrides.get(
+            definicao.key
+          );
+
+        const versionSource =
+          override?.versionSource ??
+          (
+            definicao.source ===
+              "environment"
+              ? "environment"
+              : definicao.source
+          );
+
+        const selectedVersion =
+          versionSource ===
+            "environment"
+            ? ambienteVersao
+            : String(
+                override?.selectedVersion ??
+                ""
+              ).trim();
+
+        return {
+          key:
+            definicao.key,
+          source:
+            definicao.source,
+          originalName:
+            definicao.originalName,
+          displayName:
+            definicao.displayName,
+          environmentVersion:
+            ambienteVersao,
+          selectedVersion,
+          versionSource,
+          redmineProjectId:
+            definicao.redmineProjectId,
+          redmineProjectName:
+            definicao.redmineProjectName,
+          visible:
+            override
+              ? override.visible
+              : definicao.defaultVisible,
+          order:
+            definicao.order,
+          relatedTo: [
+            ...definicao.relatedTo,
+          ],
+        };
+      })
+      .sort(
+        (a, b) =>
+          a.order - b.order ||
+          a.displayName.localeCompare(
+            b.displayName,
+            "pt-BR",
+            { sensitivity: "base" }
+          )
+      );
 
   return {
     environmentId:
       Number(ambiente.id),
     environmentName:
-      String(ambiente.nome ?? ""),
+      String(
+        ambiente.nome ?? ""
+      ),
     configured:
       configuracao.configured,
     items,
@@ -758,9 +640,22 @@ export async function onRequestPut(
         environmentId
       );
 
-    const items =
-      sanitizarItens(
-        body.items
+    const catalogo =
+      await listarCatalogoGlobal(
+        context
+      );
+
+    const chavesPermitidas =
+      new Set(
+        catalogo.map(
+          item => item.key
+        )
+      );
+
+    const overrides =
+      sanitizarOverrides(
+        body.items,
+        chavesPermitidas
       );
 
     await context.env.DB
@@ -780,7 +675,7 @@ export async function onRequestPut(
       )
       .bind(
         environmentId,
-        JSON.stringify(items)
+        JSON.stringify(overrides)
       )
       .run();
 
@@ -879,6 +774,23 @@ export async function onRequestPost(
       return respostaErro(
         "Sistema e versão são obrigatórios.",
         400
+      );
+    }
+
+    const catalogo =
+      await listarCatalogoGlobal(
+        context
+      );
+
+    if (
+      !catalogo.some(
+        item =>
+          item.key === systemKey
+      )
+    ) {
+      return respostaErro(
+        "O sistema não está no cadastro geral da compatibilidade.",
+        404
       );
     }
 

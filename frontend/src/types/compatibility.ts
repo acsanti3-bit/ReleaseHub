@@ -8,6 +8,22 @@ export type CompatibilityVersionSource =
   | "redmine"
   | "manual";
 
+export interface CompatibilitySystemDefinition {
+  key: string;
+  source: CompatibilityItemSource;
+  originalName?: string;
+  displayName: string;
+  redmineProjectId?: number | null;
+  redmineProjectName?: string;
+  defaultVisible: boolean;
+  order: number;
+  relatedTo: string[];
+}
+
+export interface CompatibilitySystemCatalog {
+  items: CompatibilitySystemDefinition[];
+}
+
 export interface CompatibilityItem {
   key: string;
   source: CompatibilityItemSource;
