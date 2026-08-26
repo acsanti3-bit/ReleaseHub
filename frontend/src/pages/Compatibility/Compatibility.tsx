@@ -14,6 +14,8 @@ import {
   MdClose,
   MdDeleteOutline,
   MdErrorOutline,
+  MdEdit,
+  MdInfoOutline,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdLink,
@@ -159,6 +161,9 @@ function Compatibility() {
     useState<Record<string, string[]>>({});
 
   const [adicionandoVersaoPara, setAdicionandoVersaoPara] =
+    useState<string | null>(null);
+
+  const [editandoNomePara, setEditandoNomePara] =
     useState<string | null>(null);
 
   const [novaVersao, setNovaVersao] =
@@ -473,6 +478,7 @@ function Compatibility() {
       compatibilidade.manualVersions ?? {}
     );
     setAdicionandoVersaoPara(null);
+    setEditandoNomePara(null);
     setNovaVersao("");
     setNovoProjetoRedmineId("");
     setNovoSistemaManual("");
@@ -1330,6 +1336,13 @@ function Compatibility() {
               </button>
             </header>
 
+            <div className="compatibility-modal-guidance">
+              <MdInfoOutline size={18} />
+              <span>
+                Os projetos são vinculados pelo ID do Redmine. Alterar o nome exibido não modifica esse vínculo.
+              </span>
+            </div>
+
             {erroRedmine && (
               <div className="compatibility-redmine-warning">
                 <MdErrorOutline size={19} />
@@ -1377,32 +1390,40 @@ function Compatibility() {
                       }
                     >
                       <div className="compatibility-editor-item-top">
-                        <label className="compatibility-visibility-toggle">
-                          <input
-                            type="checkbox"
-                            checked={item.visible}
-                            onChange={evento =>
-                              atualizarItem(
-                                item.key,
-                                {
-                                  visible:
-                                    evento.target.checked,
-                                }
-                              )
-                            }
-                          />
-                          <span>
-                            Exibir
-                          </span>
-                        </label>
+                        <div className="compatibility-editor-heading">
+                          <div className="compatibility-editor-title-line">
+                            <strong className="compatibility-editor-title">
+                              {item.displayName || item.originalName || "Sem nome"}
+                            </strong>
 
-                        <span className="compatibility-source-badge">
-                          {item.source === "environment"
-                            ? "Ambiente"
-                            : item.source === "redmine"
-                              ? "Redmine"
-                              : "Manual"}
-                        </span>
+                            <span className="compatibility-source-badge">
+                              {item.source === "environment"
+                                ? "Ambiente"
+                                : item.source === "redmine"
+                                  ? "Redmine"
+                                  : "Manual"}
+                            </span>
+                          </div>
+
+                          <label className="compatibility-visibility-toggle">
+                            <input
+                              type="checkbox"
+                              checked={item.visible}
+                              onChange={evento =>
+                                atualizarItem(
+                                  item.key,
+                                  {
+                                    visible:
+                                      evento.target.checked,
+                                  }
+                                )
+                              }
+                            />
+                            <span>
+                              Exibir no Dashboard e Modo TV
+                            </span>
+                          </label>
+                        </div>
 
                         <div className="compatibility-order-actions">
                           <button
@@ -1434,48 +1455,23 @@ function Compatibility() {
                           >
                             <MdKeyboardArrowDown size={20} />
                           </button>
-                        </div>
 
-                        {item.source !== "environment" && (
-                          <button
-                            type="button"
-                            className="compatibility-remove-item"
-                            title="Remover da compatibilidade"
-                            onClick={() =>
-                              removerItem(item)
-                            }
-                          >
-                            <MdDeleteOutline size={19} />
-                          </button>
-                        )}
+                          {item.source !== "environment" && (
+                            <button
+                              type="button"
+                              className="compatibility-remove-item"
+                              title="Remover da compatibilidade"
+                              onClick={() =>
+                                removerItem(item)
+                              }
+                            >
+                              <MdDeleteOutline size={19} />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       <div className="compatibility-editor-fields">
-                        <label>
-                          <span>
-                            Nome exibido
-                          </span>
-                          <input
-                            value={item.displayName}
-                            onChange={evento =>
-                              atualizarItem(
-                                item.key,
-                                {
-                                  displayName:
-                                    evento.target.value,
-                                }
-                              )
-                            }
-                          />
-                          {item.source === "environment" &&
-                            item.originalName &&
-                            item.originalName !== item.displayName && (
-                              <small>
-                                Cadastro original: {item.originalName}
-                              </small>
-                            )}
-                        </label>
-
                         <label>
                           <span>
                             Projeto no Redmine
@@ -1506,11 +1502,6 @@ function Compatibility() {
                               )
                             )}
                           </select>
-                          {item.redmineProjectId && (
-                            <small>
-                              O vínculo usa o ID do projeto, mesmo que o nome exibido seja diferente.
-                            </small>
-                          )}
                         </label>
 
                         <label>
@@ -1608,6 +1599,71 @@ function Compatibility() {
                             </div>
                           )}
                         </label>
+                      </div>
+
+                      <div className="compatibility-display-name-row">
+                        {editandoNomePara === item.key ? (
+                          <label className="compatibility-display-name-editor">
+                            <span>
+                              Nome exibido
+                            </span>
+                            <div>
+                              <input
+                                autoFocus
+                                value={item.displayName}
+                                onChange={evento =>
+                                  atualizarItem(
+                                    item.key,
+                                    {
+                                      displayName:
+                                        evento.target.value,
+                                    }
+                                  )
+                                }
+                                onKeyDown={evento => {
+                                  if (evento.key === "Enter") {
+                                    evento.preventDefault();
+                                    setEditandoNomePara(null);
+                                  }
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditandoNomePara(null)
+                                }
+                              >
+                                Concluir
+                              </button>
+                            </div>
+                            {item.source === "environment" &&
+                              item.originalName &&
+                              item.originalName !== item.displayName && (
+                                <small>
+                                  Cadastro original: {item.originalName}
+                                </small>
+                              )}
+                          </label>
+                        ) : (
+                          <>
+                            <span className="compatibility-display-name-label">
+                              Nome exibido
+                            </span>
+                            <strong>
+                              {item.displayName || "Sem nome"}
+                            </strong>
+                            <button
+                              type="button"
+                              className="compatibility-display-name-edit"
+                              onClick={() =>
+                                setEditandoNomePara(item.key)
+                              }
+                            >
+                              <MdEdit size={16} />
+                              Alterar
+                            </button>
+                          </>
+                        )}
                       </div>
 
                       <details className="compatibility-relations">
