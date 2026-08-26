@@ -6,6 +6,7 @@ import {
   MdDeleteOutline,
   MdEdit,
   MdErrorOutline,
+  MdInfoOutline,
   MdLink,
   MdReplay,
 } from "react-icons/md";
@@ -14,6 +15,7 @@ import "./ReleaseEnvironments.css";
 
 import Layout from "../../components/layout/Layout";
 import ReleaseEnvironmentDrawer from "../../components/ReleaseEnvironmentDrawer/ReleaseEnvironmentDrawer";
+import EnvironmentDetailsModal from "../../components/EnvironmentDetailsModal/EnvironmentDetailsModal";
 
 import {
   adicionarAmbiente,
@@ -95,6 +97,9 @@ function ReleaseEnvironments() {
   const [podeExcluir, setPodeExcluir] = useState(false);
 
   const [ambienteSelecionado, setAmbienteSelecionado] =
+    useState<ReleaseEnvironment | null>(null);
+
+  const [ambienteDetalhes, setAmbienteDetalhes] =
     useState<ReleaseEnvironment | null>(null);
 
   const [ambienteConfirmacao, setAmbienteConfirmacao] =
@@ -629,64 +634,80 @@ function ReleaseEnvironments() {
                     </div>
 
 
-                    {podeEditar && (
-                      <div className="release-actions">
-                        <button
-                          type="button"
-                          title={
-                            ambiente.concluido
-                              ? "Reabrir ambiente"
-                              : "Concluir ambiente"
-                          }
-                          onClick={() => {
-                            void alterarConclusao(
-                              ambiente
-                            );
-                          }}
-                          disabled={salvando}
-                          style={{
-                            color:
-                              ambiente.concluido
-                                ? "#005AA9"
-                                : "#2E7D32",
-                          }}
-                        >
-                          {ambiente.concluido ? (
-                            <MdReplay size={19} />
-                          ) : (
-                            <MdCheckCircle size={19} />
-                          )}
-                        </button>
+                    <div className="release-actions">
+                      <button
+                        type="button"
+                        title="Detalhes do ambiente"
+                        className="info-environment"
+                        aria-label={`Ver detalhes de ${ambiente.nome}`}
+                        onClick={() =>
+                          setAmbienteDetalhes(
+                            ambiente
+                          )
+                        }
+                      >
+                        <MdInfoOutline size={19} />
+                      </button>
 
-                        <button
-                          type="button"
-                          title="Editar ambiente"
-                          onClick={() =>
-                            abrirEdicao(
-                              ambiente
-                            )
-                          }
-                        >
-                          <MdEdit size={18} />
-                        </button>
-
-                        {podeExcluir && (
+                      {podeEditar && (
+                        <>
                           <button
                             type="button"
-                            title="Excluir ambiente"
-                            className="delete-environment"
-                            disabled={excluindo}
+                            title={
+                              ambiente.concluido
+                                ? "Reabrir ambiente"
+                                : "Concluir ambiente"
+                            }
+                            onClick={() => {
+                              void alterarConclusao(
+                                ambiente
+                              );
+                            }}
+                            disabled={salvando}
+                            style={{
+                              color:
+                                ambiente.concluido
+                                  ? "#005AA9"
+                                  : "#2E7D32",
+                            }}
+                          >
+                            {ambiente.concluido ? (
+                              <MdReplay size={19} />
+                            ) : (
+                              <MdCheckCircle size={19} />
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            title="Editar ambiente"
                             onClick={() =>
-                              solicitarExclusao(
+                              abrirEdicao(
                                 ambiente
                               )
                             }
                           >
-                            <MdDeleteOutline size={19} />
+                            <MdEdit size={18} />
                           </button>
-                        )}
-                      </div>
-                    )}
+
+                          {podeExcluir && (
+                            <button
+                              type="button"
+                              title="Excluir ambiente"
+                              className="delete-environment"
+                              disabled={excluindo}
+                              onClick={() =>
+                                solicitarExclusao(
+                                  ambiente
+                                )
+                              }
+                            >
+                              <MdDeleteOutline size={19} />
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </header>
 
 
@@ -736,6 +757,17 @@ function ReleaseEnvironments() {
           </div>
         )}
       </div>
+
+
+      {ambienteDetalhes && (
+        <EnvironmentDetailsModal
+          environment={ambienteDetalhes}
+          canAddObservation={podeEditar}
+          onClose={() =>
+            setAmbienteDetalhes(null)
+          }
+        />
+      )}
 
 
       {podeEditar && ambienteSelecionado && (

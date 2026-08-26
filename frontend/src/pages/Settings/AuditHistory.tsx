@@ -28,6 +28,7 @@ const NOMES_ACAO:
     EXCLUIR: "Exclusão",
     CONCLUIR: "Conclusão",
     REABRIR: "Reabertura",
+    OBSERVACAO: "Observação",
     REDEFINIR_SENHA:
       "Redefinição de senha",
 };

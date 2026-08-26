@@ -586,3 +586,13 @@
         grid-template-columns: 1fr;
     }
 }
+
+.release-actions .info-environment {
+    background: #f3f6f8;
+    color: #687682;
+}
+
+.release-actions .info-environment:hover {
+    background: #e8eef2;
+    color: #005aa9;
+}
