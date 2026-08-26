@@ -1,501 +1,380 @@
-.release-project-card{
-
-    background:#FFF;
-
-    border-radius:15px;
-
-    border-left:5px solid #005AA9;
-
-    padding:17px 18px;
-
-    box-shadow:0 5px 16px rgba(0,0,0,.07);
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:13px;
-
-    min-width:0;
-
-    transition:.2s;
-
+.release-project-card {
+    background: #FFF;
+    border-radius: 15px;
+    border: 1px solid #E4E9EE;
+    border-left: 5px solid #005AA9;
+    padding: 17px 18px;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, .07);
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    min-width: 0;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
 }
 
-
-.release-project-card:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 9px 22px rgba(0,0,0,.10);
-
+.release-project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 22px rgba(0, 0, 0, .10);
 }
 
-
-/* HEADER */
-
-.release-project-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:flex-start;
-
-    gap:15px;
-
+.release-project-card-observation {
+    border-left-color: #F58220;
 }
 
-
-.release-project-title{
-
-    min-width:0;
-
+.release-project-card-collapsed {
+    gap: 0;
 }
 
-
-.release-project-title h2{
-
-    margin:0;
-
-    color:#005AA9;
-
-    font-size:22px;
-
-    line-height:1.15;
-
-    font-weight:700;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
+.release-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
 }
 
-
-.release-project-subtitle{
-
-    display:flex;
-
-    align-items:center;
-
-    flex-wrap:wrap;
-
-    gap:9px;
-
-    margin-top:6px;
-
+.release-project-title {
+    min-width: 0;
+    flex: 1;
 }
 
-
-.release-project-subtitle > span:first-child{
-
-    color:#777;
-
-    font-size:12px;
-
+.release-project-title-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
 }
 
-
-.release-project-subtitle > span:first-child strong{
-
-    color:#4B5563;
-
-    font-weight:600;
-
+.release-project-title h2 {
+    margin: 0;
+    min-width: 0;
+    color: #005AA9;
+    font-size: 22px;
+    line-height: 1.15;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-
-.release-task-total{
-
-    background:#EEF5FF;
-
-    color:#005AA9;
-
-    padding:4px 9px;
-
-    border-radius:20px;
-
-    font-size:11px;
-
-    font-weight:700;
-
+.release-observation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #FFF3E8;
+    color: #C65D08;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 800;
+    white-space: nowrap;
 }
 
-
-/* EDITAR */
-
-.release-edit-button{
-
-    width:34px;
-
-    height:34px;
-
-    border:1px solid #D5E2EE;
-
-    border-radius:9px;
-
-    background:#FFF;
-
-    color:#005AA9;
-
-    cursor:pointer;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    flex-shrink:0;
-
-    transition:.2s;
-
+.release-project-subtitle {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 6px;
 }
 
-
-.release-edit-button:hover{
-
-    background:#005AA9;
-
-    border-color:#005AA9;
-
-    color:#FFF;
-
+.release-project-subtitle > span:first-child {
+    color: #777;
+    font-size: 12px;
 }
 
-
-/* INFORMAÇÕES */
-
-.release-project-info{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr
-        1fr
-        1.3fr;
-
-    gap:14px;
-
-    padding:11px 0;
-
-    border-top:1px solid #E8EDF2;
-
-    border-bottom:1px solid #E8EDF2;
-
+.release-project-subtitle > span:first-child strong {
+    color: #4B5563;
+    font-weight: 600;
 }
 
-
-.release-project-info > div{
-
-    min-width:0;
-
-    display:flex;
-
-    flex-direction:column;
-
+.release-task-total {
+    background: #EEF5FF;
+    color: #005AA9;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
-
-.release-project-info small{
-
-    margin-bottom:4px;
-
-    color:#8A939D;
-
-    font-size:9px;
-
-    line-height:1;
-
-    font-weight:600;
-
-    text-transform:uppercase;
-
+.release-collapsed-movement {
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
 }
 
-
-.release-project-info > div > strong{
-
-    color:#263238;
-
-    font-size:13px;
-
-    line-height:1.2;
-
+.release-collapsed-movement.fresh {
+    background: #EDF7EE;
+    color: #2E7D32;
 }
 
-
-/* SITUAÇÃO */
-
-.release-deadline-status{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:2px;
-
+.release-collapsed-movement.warning {
+    background: #FFF6E8;
+    color: #D96C10;
 }
 
-
-.release-deadline-status strong{
-
-    font-size:12px;
-
-    line-height:1.1;
-
+.release-collapsed-movement.late {
+    background: #FFF0F0;
+    color: #C62828;
 }
 
-
-.release-deadline-status span{
-
-    color:#7A838C;
-
-    font-size:10px;
-
-    line-height:1.1;
-
+.release-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
 }
 
-
-.release-deadline-status.ok strong{
-
-    color:#2E7D32;
-
+.release-edit-button,
+.release-collapse-button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #D5E2EE;
+    border-radius: 9px;
+    background: #FFF;
+    color: #005AA9;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: .2s;
 }
 
-
-.release-deadline-status.warning strong{
-
-    color:#F57C00;
-
+.release-collapse-button {
+    color: #68747E;
 }
 
-
-.release-deadline-status.late strong{
-
-    color:#D32F2F;
-
+.release-edit-button:hover,
+.release-collapse-button:hover {
+    background: #005AA9;
+    border-color: #005AA9;
+    color: #FFF;
 }
 
-
-.release-deadline-status.invalid strong{
-
-    color:#D32F2F;
-
+.release-edit-button:focus-visible,
+.release-collapse-button:focus-visible,
+.release-status-item:focus-visible {
+    outline: 3px solid rgba(0, 90, 169, .18);
+    outline-offset: 2px;
 }
 
-
-.release-deadline-status.neutral strong{
-
-    color:#607D8B;
-
+.release-project-info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    padding: 11px 0;
+    border-top: 1px solid #E8EDF2;
+    border-bottom: 1px solid #E8EDF2;
 }
 
-
-/* STATUS - SEM BARRAS */
-
-.release-status-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(3,minmax(0,1fr));
-
-    gap:6px 14px;
-
+.release-project-info > div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-
-.release-status-item{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:12px;
-
-    min-width:0;
-
-    min-height:30px;
-
-    padding:6px 9px;
-
-    background:#F8FAFC;
-
-    border-radius:8px;
-
+.release-project-info small {
+    margin-bottom: 4px;
+    color: #8A939D;
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
-
-.release-status-label{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-    min-width:0;
-
-    color:#4B5563;
-
-    font-size:12px;
-
-    font-weight:500;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
+.release-project-info > div > strong {
+    color: #263238;
+    font-size: 13px;
+    line-height: 1.2;
 }
 
-
-.release-status-dot{
-
-    width:7px;
-
-    height:7px;
-
-    border-radius:50%;
-
-    flex-shrink:0;
-
+.release-deadline-status,
+.release-movement-status {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-
-.release-status-item > strong{
-
-    min-width:25px;
-
-    text-align:right;
-
-    font-size:14px;
-
-    font-weight:700;
-
+.release-deadline-status strong,
+.release-movement-status strong {
+    font-size: 12px;
+    line-height: 1.1;
 }
 
-
-
-
-
-.release-status-item-resolved{
-
-    background:#EDF7EE;
-
-    border:
-        1px solid
-        #CFE7D1;
-
+.release-deadline-status span,
+.release-movement-status span {
+    color: #7A838C;
+    font-size: 10px;
+    line-height: 1.2;
 }
 
-
-.release-status-item-resolved
-.release-status-label{
-
-    color:#2E7D32;
-
-    font-weight:700;
-
+.release-deadline-status.ok strong,
+.release-movement-status.fresh strong {
+    color: #2E7D32;
 }
 
-
-.release-status-item-resolved > strong{
-
-    font-weight:800;
-
+.release-deadline-status.warning strong,
+.release-movement-status.warning strong {
+    color: #F57C00;
 }
 
-
-.release-status-empty{
-
-    grid-column:1/-1;
-
-    padding:10px;
-
-    color:#8A939D;
-
-    font-size:12px;
-
-    text-align:center;
-
+.release-deadline-status.late strong,
+.release-deadline-status.invalid strong,
+.release-movement-status.late strong {
+    color: #D32F2F;
 }
 
+.release-deadline-status.neutral strong,
+.release-movement-status.neutral strong {
+    color: #607D8B;
+}
 
-/* TELAS MENORES */
+.release-observation-reasons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: -2px;
+}
 
-@media(max-width:1350px){
+.release-observation-reasons span {
+    padding: 5px 8px;
+    border: 1px solid #F4D3B8;
+    border-radius: 999px;
+    background: #FFF9F3;
+    color: #A94E09;
+    font-size: 10px;
+    font-weight: 700;
+}
 
-    .release-project-title h2{
+.release-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 14px;
+}
 
-        font-size:19px;
+.release-status-item {
+    appearance: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    min-height: 30px;
+    padding: 6px 9px;
+    border: 1px solid transparent;
+    background: #F8FAFC;
+    border-radius: 8px;
+    text-align: left;
+    font: inherit;
+}
 
+.release-status-item:disabled {
+    opacity: 1;
+}
+
+.release-status-item-clickable {
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .2s;
+}
+
+.release-status-item-clickable:hover {
+    background: #F1F6FA;
+    border-color: #D5E2EE;
+    transform: translateY(-1px);
+}
+
+.release-status-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    color: #4B5563;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.release-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.release-status-item > strong {
+    min-width: 25px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.release-status-item-resolved {
+    background: #EDF7EE;
+    border-color: #CFE7D1;
+}
+
+.release-status-item-resolved .release-status-label {
+    color: #2E7D32;
+    font-weight: 700;
+}
+
+.release-status-item-resolved > strong {
+    font-weight: 800;
+}
+
+.release-status-empty {
+    grid-column: 1 / -1;
+    padding: 10px;
+    color: #8A939D;
+    font-size: 12px;
+    text-align: center;
+}
+
+@media (max-width: 1350px) {
+    .release-project-title h2 {
+        font-size: 19px;
     }
 
-
-    .release-status-grid{
-
-        gap:5px 10px;
-
+    .release-project-info {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-
-    .release-status-item{
-
-        padding:5px 7px;
-
+    .release-status-grid {
+        gap: 5px 10px;
     }
 
-
-    .release-status-label{
-
-        font-size:11px;
-
+    .release-status-item {
+        padding: 5px 7px;
     }
 
+    .release-status-label {
+        font-size: 11px;
+    }
 }
 
-
-
-@media(max-width:1150px){
-
-    .release-status-grid{
-
-        grid-template-columns:
-            repeat(2,minmax(0,1fr));
-
+@media (max-width: 1150px) {
+    .release-status-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
 }
 
-
-@media(max-width:900px){
-
-    .release-project-card{
-
-        padding:15px;
-
+@media (max-width: 900px) {
+    .release-project-card {
+        padding: 15px;
     }
 
-
-    .release-project-info{
-
-        grid-template-columns:
-            repeat(2,1fr);
-
+    .release-project-title-line {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
-
-    .release-status-grid{
-
-        grid-template-columns:1fr;
-
+    .release-project-info,
+    .release-status-grid {
+        grid-template-columns: 1fr;
     }
-
 }

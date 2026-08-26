@@ -27,6 +27,9 @@ function transformarProjeto(row) {
     prazo:
       row.prazo ?? "",
 
+    ultimaMovimentacao:
+      row.updated_at ?? undefined,
+
     situacoes: {
 
       qualidade:
@@ -123,6 +126,7 @@ async function buscarProjetoDaRelease(
             rp.versao,
             rp.executavel,
             rp.prazo,
+            rp.updated_at,
             rp.qualidade,
             rp.testes,
             rp.desenvolvido,
@@ -246,6 +250,7 @@ export async function onRequestGet(
               rp.versao,
               rp.executavel,
               rp.prazo,
+              rp.updated_at,
 
               rp.qualidade,
               rp.testes,
@@ -464,10 +469,7 @@ export async function onRequestPut(
               excluded.rejeitada,
 
             interrompida =
-              excluded.interrompida,
-
-            updated_at =
-              CURRENT_TIMESTAMP
+              excluded.interrompida
         `
       )
       .bind(

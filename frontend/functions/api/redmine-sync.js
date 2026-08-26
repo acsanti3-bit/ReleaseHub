@@ -610,6 +610,49 @@ function somarContagens(
 }
 
 
+function obterUltimaMovimentacao(
+  issues
+) {
+  let ultima = null;
+  let ultimoTimestamp = -1;
+
+  for (
+    const issue
+    of issues
+  ) {
+    const valor =
+      issue.updated_on ??
+      issue.created_on ??
+      null;
+
+    if (!valor) {
+      continue;
+    }
+
+    const timestamp =
+      Date.parse(
+        String(valor)
+      );
+
+    if (
+      Number.isNaN(timestamp) ||
+      timestamp <= ultimoTimestamp
+    ) {
+      continue;
+    }
+
+    ultimoTimestamp =
+      timestamp;
+
+    ultima =
+      new Date(timestamp)
+        .toISOString();
+  }
+
+  return ultima;
+}
+
+
 
 async function buscarPaginaIssues(
   context,
@@ -1011,6 +1054,11 @@ async function sincronizarProjetoScheduler(
       })
     );
 
+  const ultimaMovimentacaoPagina =
+    obterUltimaMovimentacao(
+      pagina.issues
+    );
+
   if (
     issueOffset === 0
   ) {
@@ -1031,7 +1079,10 @@ async function sincronizarProjetoScheduler(
             resolvidas = ?,
             rejeitada = ?,
             interrompida = ?,
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = CASE
+              WHEN ? IS NULL THEN updated_at
+              ELSE ?
+            END
 
           WHERE
             environment_id = ?
@@ -1050,6 +1101,8 @@ async function sincronizarProjetoScheduler(
         contagens.resolvidas,
         contagens.rejeitada,
         contagens.interrompida,
+        ultimaMovimentacaoPagina,
+        ultimaMovimentacaoPagina,
         environmentId,
         projetoRelease.project_id
       )
@@ -1072,7 +1125,12 @@ async function sincronizarProjetoScheduler(
             resolvidas = resolvidas + ?,
             rejeitada = rejeitada + ?,
             interrompida = interrompida + ?,
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = CASE
+              WHEN ? IS NULL THEN updated_at
+              WHEN updated_at IS NULL THEN ?
+              WHEN datetime(?) > datetime(updated_at) THEN ?
+              ELSE updated_at
+            END
 
           WHERE
             environment_id = ?
@@ -1091,6 +1149,10 @@ async function sincronizarProjetoScheduler(
         contagens.resolvidas,
         contagens.rejeitada,
         contagens.interrompida,
+        ultimaMovimentacaoPagina,
+        ultimaMovimentacaoPagina,
+        ultimaMovimentacaoPagina,
+        ultimaMovimentacaoPagina,
         environmentId,
         projetoRelease.project_id
       )
@@ -1445,6 +1507,11 @@ export async function onRequestPost(
           contagens
         );
 
+      const ultimaMovimentacao =
+        obterUltimaMovimentacao(
+          issues
+        );
+
       atualizacoes.push({
         projectId:
           projetoRelease.project_id,
@@ -1456,6 +1523,8 @@ export async function onRequestPost(
           versaoProjeto,
 
         contagens,
+
+        ultimaMovimentacao,
       });
     }
 
@@ -1478,10 +1547,14 @@ export async function onRequestPost(
                     em_progresso = ?,
                     nova = ?,
                     reaberta = ?,
+                    validacao_cliente = ?,
                     resolvidas = ?,
                     rejeitada = ?,
                     interrompida = ?,
-                    updated_at = CURRENT_TIMESTAMP
+                    updated_at = CASE
+                      WHEN ? IS NULL THEN updated_at
+                      ELSE ?
+                    END
 
                   WHERE
                     environment_id = ?
@@ -1519,6 +1592,10 @@ export async function onRequestPost(
 
                 atualizacao
                   .contagens
+                  .validacao_cliente,
+
+                atualizacao
+                  .contagens
                   .resolvidas,
 
                 atualizacao
@@ -1528,6 +1605,12 @@ export async function onRequestPost(
                 atualizacao
                   .contagens
                   .interrompida,
+
+                atualizacao
+                  .ultimaMovimentacao,
+
+                atualizacao
+                  .ultimaMovimentacao,
 
                 environmentId,
 

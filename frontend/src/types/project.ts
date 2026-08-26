@@ -10,6 +10,8 @@ export interface Project {
 
   prazo: string;
 
+  ultimaMovimentacao?: string;
+
   situacoes: {
 
     qualidade: number;

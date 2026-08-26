@@ -1,220 +1,143 @@
 import "./DashboardStats.css";
 
 import type { Project } from "../../types/project";
+import {
+  isProjectInactive,
+  isProjectOverdue,
+  isProjectUnderObservation,
+} from "../../utils/projectMonitoring";
 
 interface Props {
-
   projects: Project[];
-
   concluido?: boolean;
-
+  filtroAtivo: string;
   onFilter: (filtro: string) => void;
+}
 
+interface StatCard {
+  titulo: string;
+  valor: number;
+  cor: string;
+  filtro: string;
+  detalhe: string;
 }
 
 function DashboardStats({
-
   projects,
-
   concluido = false,
-
+  filtroAtivo,
   onFilter,
-
 }: Props) {
-
-  const totalProjetos = projects.length;
-
   const totalTarefas = projects.reduce(
-
     (acc, project) =>
-
-      acc +
-
-      Object.values(project.situacoes).reduce(
-
-        (a, b) => a + b,
-
-        0
-
-      ),
-
+      acc + Object.values(project.situacoes).reduce((a, b) => a + b, 0),
     0
-
   );
 
-  const qualidade = projects.reduce(
+  const somar = (campo: keyof Project["situacoes"]) =>
+    projects.reduce((acc, project) => acc + project.situacoes[campo], 0);
 
-    (acc, project) =>
+  const observacao = projects.filter(project =>
+    isProjectUnderObservation(project, concluido)
+  ).length;
 
-      acc + project.situacoes.qualidade,
+  const semMovimentacao = projects.filter(isProjectInactive).length;
 
-    0
+  const atrasados = projects.filter(project =>
+    isProjectOverdue(project, concluido)
+  ).length;
 
-  );
-
-  const testes = projects.reduce(
-
-    (acc, project) =>
-
-      acc + project.situacoes.testes,
-
-    0
-
-  );
-
-  const desenvolvido = projects.reduce(
-
-    (acc, project) =>
-
-      acc +
-
-      project.situacoes.desenvolvido +
-
-      project.situacoes.aguardandoCompilacao,
-
-    0
-
-  );
-
-  const atrasados =
-    concluido
-      ? 0
-      : projects.filter(project => {
-
-          if (!project.prazo) {
-
-            return false;
-
-          }
-
-          return new Date(project.prazo) < new Date();
-
-        }).length;
-
-  const cards = [
-
+  const cards: StatCard[] = [
     {
-
       titulo: "Projetos",
-
-      valor: totalProjetos,
-
+      valor: projects.length,
       cor: "#005AA9",
-
       filtro: "Todos",
-
+      detalhe: "Todos da release",
     },
-
     {
-
       titulo: "Tarefas",
-
       valor: totalTarefas,
-
       cor: "#F58220",
-
       filtro: "Todos",
-
+      detalhe: "Total sincronizado",
     },
-
     {
-
-      titulo: "Desenvolvido",
-
-      valor: desenvolvido,
-
-      cor: "#43A047",
-
-      filtro: "Desenvolvido",
-
-    },
-
-    {
-
       titulo: "Qualidade",
-
-      valor: qualidade,
-
+      valor: somar("qualidade"),
       cor: "#F58220",
-
       filtro: "Qualidade",
-
+      detalhe: "Clique para filtrar",
     },
-
     {
-
       titulo: "Testes",
-
-      valor: testes,
-
-      cor: "#005AA9",
-
+      valor: somar("testes"),
+      cor: "#1976D2",
       filtro: "Testes",
-
+      detalhe: "Clique para filtrar",
     },
-
     {
-
-      titulo: "Atrasados",
-
-      valor: atrasados,
-
-      cor: "#E53935",
-
-      filtro: "Atrasados",
-
+      titulo: "Aguard. Comp.",
+      valor: somar("aguardandoCompilacao"),
+      cor: "#78909C",
+      filtro: "Aguard. Comp.",
+      detalhe: "Aguardando compilação",
     },
-
+    {
+      titulo: "Reabertas",
+      valor: somar("reaberta"),
+      cor: "#EF5350",
+      filtro: "Reaberta",
+      detalhe: "Tarefas reabertas",
+    },
+    {
+      titulo: "Em observação",
+      valor: observacao,
+      cor: "#D96C10",
+      filtro: "Em observação",
+      detalhe: "Projetos com atenção",
+    },
+    {
+      titulo: "Sem movimentação",
+      valor: semMovimentacao,
+      cor: "#8E24AA",
+      filtro: "Sem movimentação",
+      detalhe: "3 dias ou mais",
+    },
+    {
+      titulo: "Atrasados",
+      valor: atrasados,
+      cor: "#D32F2F",
+      filtro: "Atrasados",
+      detalhe: concluido ? "Release concluída" : "Prazo vencido",
+    },
   ];
 
   return (
+    <div className="stats-grid" aria-label="Indicadores da release">
+      {cards.map(card => {
+        const ativo =
+          card.titulo !== "Tarefas" &&
+          filtroAtivo === card.filtro;
 
-    <div className="stats-grid">
-
-      {cards.map(card => (
-
-        <div
-
-          key={card.titulo}
-
-          className="stats-card"
-
-          onClick={() =>
-
-            onFilter(card.filtro)
-
-          }
-
-        >
-
-          <small>
-
-            {card.titulo}
-
-          </small>
-
-          <strong
-
-            style={{
-
-              color: card.cor,
-
-            }}
-
+        return (
+          <button
+            type="button"
+            key={card.titulo}
+            className={`stats-card ${ativo ? "stats-card-active" : ""}`}
+            style={{ borderTopColor: card.cor }}
+            onClick={() => onFilter(card.filtro)}
+            aria-pressed={ativo}
+            title={`${card.titulo}: ${card.valor}. ${card.detalhe}`}
           >
-
-            {card.valor}
-
-          </strong>
-
-        </div>
-
-      ))}
-
+            <small>{card.titulo}</small>
+            <strong style={{ color: card.cor }}>{card.valor}</strong>
+            <span>{card.detalhe}</span>
+          </button>
+        );
+      })}
     </div>
-
   );
-
 }
 
 export default DashboardStats;
