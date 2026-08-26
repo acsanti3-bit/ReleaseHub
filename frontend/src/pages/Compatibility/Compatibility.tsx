@@ -14,6 +14,8 @@ import {
   MdClose,
   MdDeleteOutline,
   MdErrorOutline,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
   MdLink,
   MdRefresh,
   MdSave,
@@ -920,6 +922,59 @@ function Compatibility() {
   }
 
 
+  function moverItem(
+    itemKey: string,
+    direcao: "up" | "down"
+  ) {
+    setItensEdicao(atual => {
+      const ordenados =
+        atual
+          .slice()
+          .sort(
+            (a, b) =>
+              a.order - b.order
+          );
+
+      const indiceAtual =
+        ordenados.findIndex(
+          item =>
+            item.key === itemKey
+        );
+
+      if (indiceAtual < 0) {
+        return atual;
+      }
+
+      const indiceDestino =
+        direcao === "up"
+          ? indiceAtual - 1
+          : indiceAtual + 1;
+
+      if (
+        indiceDestino < 0 ||
+        indiceDestino >= ordenados.length
+      ) {
+        return atual;
+      }
+
+      [
+        ordenados[indiceAtual],
+        ordenados[indiceDestino],
+      ] = [
+        ordenados[indiceDestino],
+        ordenados[indiceAtual],
+      ];
+
+      return ordenados.map(
+        (item, indice) => ({
+          ...item,
+          order: indice + 1,
+        })
+      );
+    });
+  }
+
+
   function alternarRelacionamento(
     itemKey: string,
     relacionadoKey: string
@@ -1291,7 +1346,7 @@ function Compatibility() {
                   (a, b) =>
                     a.order - b.order
                 )
-                .map(item => {
+                .map((item, indice, itensOrdenados) => {
                   const projetoCarregando =
                     item.redmineProjectId
                       ? carregandoVersoes[
@@ -1304,6 +1359,13 @@ function Compatibility() {
                       outro =>
                         outro.key !== item.key
                     );
+
+                  const podeSubir =
+                    indice > 0;
+
+                  const podeDescer =
+                    indice <
+                    itensOrdenados.length - 1;
 
                   return (
                     <article
@@ -1341,6 +1403,38 @@ function Compatibility() {
                               ? "Redmine"
                               : "Manual"}
                         </span>
+
+                        <div className="compatibility-order-actions">
+                          <button
+                            type="button"
+                            title="Subir na ordem"
+                            aria-label={`Subir ${item.displayName} na ordem`}
+                            disabled={!podeSubir}
+                            onClick={() =>
+                              moverItem(
+                                item.key,
+                                "up"
+                              )
+                            }
+                          >
+                            <MdKeyboardArrowUp size={20} />
+                          </button>
+
+                          <button
+                            type="button"
+                            title="Descer na ordem"
+                            aria-label={`Descer ${item.displayName} na ordem`}
+                            disabled={!podeDescer}
+                            onClick={() =>
+                              moverItem(
+                                item.key,
+                                "down"
+                              )
+                            }
+                          >
+                            <MdKeyboardArrowDown size={20} />
+                          </button>
+                        </div>
 
                         {item.source !== "environment" && (
                           <button
@@ -1518,13 +1612,13 @@ function Compatibility() {
 
                       <details className="compatibility-relations">
                         <summary>
-                          Amarrações com outros sistemas
+                          Utilizado em conjunto com
                           {item.relatedTo.length > 0 &&
                             ` (${item.relatedTo.length})`}
                         </summary>
 
                         <p>
-                          Marque os sistemas que dependem ou trabalham em conjunto com este item nesta release.
+                          Selecione os sistemas utilizados em conjunto com este item nesta release.
                         </p>
 
                         <div className="compatibility-relations-grid">
