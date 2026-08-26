@@ -260,6 +260,13 @@ function ReleaseEnvironments() {
       const lista = await listarAmbientes();
 
       setAmbientes(lista);
+      setAmbientesRecolhidos(
+        new Set(
+          lista.map(ambiente =>
+            ambiente.id
+          )
+        )
+      );
     } catch (erro) {
       console.error("Erro ao carregar ambientes:", erro);
     } finally {
@@ -712,7 +719,28 @@ function ReleaseEnvironments() {
                   }`}
                 >
                   <header className="release-environment-card-header">
-                    <div className="release-environment-heading">
+                    <div
+                      className="release-environment-heading release-environment-heading-toggle"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={!recolhido}
+                      onClick={() =>
+                        alternarAmbienteRecolhido(
+                          ambiente.id
+                        )
+                      }
+                      onKeyDown={evento => {
+                        if (
+                          evento.key === "Enter" ||
+                          evento.key === " "
+                        ) {
+                          evento.preventDefault();
+                          alternarAmbienteRecolhido(
+                            ambiente.id
+                          );
+                        }
+                      }}
+                    >
                       <span className="release-environment-label">
                         Ambiente
                       </span>

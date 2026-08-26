@@ -135,8 +135,8 @@ export function ordenarAmbientesPorVersao(
   return [...ambientes].sort(
     (a, b) =>
       compararVersoes(
-        b.versoes.intellicash,
-        a.versoes.intellicash
+        a.versoes.intellicash,
+        b.versoes.intellicash
       )
   );
 }
@@ -145,9 +145,14 @@ export function ordenarAmbientesPorVersao(
 export function obterAmbienteMaisRecente(
   ambientes: ReleaseEnvironment[]
 ): ReleaseEnvironment | undefined {
-  return ordenarAmbientesPorVersao(
-    ambientes
-  )[0];
+  const ordenados =
+    ordenarAmbientesPorVersao(
+      ambientes
+    );
+
+  return ordenados[
+    ordenados.length - 1
+  ];
 }
 
 
