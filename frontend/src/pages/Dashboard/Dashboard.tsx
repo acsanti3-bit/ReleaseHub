@@ -4,22 +4,16 @@ import {
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
-import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 import Layout from "../../components/layout";
 import ProjectCard from "../../components/ProjectCard/ProjectCard";
 import CompatibilityPanel from "../../components/CompatibilityPanel/CompatibilityPanel";
-import DashboardStats from "../../components/DashboardStats/DashboardStats";
 import "./Dashboard.css";
 
 const ProjectDrawer = lazy(() => import("../../components/ProjectDrawer/ProjectDrawer"));
 const TasksChart = lazy(() => import("../../components/TasksChart/TasksChart"));
 const TopProjects = lazy(() => import("../../components/TopProjects/TopProjects"));
-const AttentionProjects = lazy(
-  () => import("../../components/AttentionProjects/AttentionProjects")
-);
 const RedmineProjectsMonitor = lazy(
   () => import("../../components/RedmineProjectsMonitor/RedmineProjectsMonitor")
 );
@@ -39,11 +33,7 @@ import {
 } from "../../services/ReleaseProjectService";
 import { buscarSessao } from "../../services/AuthService";
 import {
-  daysWithoutMovement,
-  INACTIVITY_WARNING_DAYS,
-  isProjectInactive,
   isProjectOverdue,
-  isProjectUnderObservation,
   parseBrazilianDate,
   parseProjectTimestamp,
 } from "../../utils/projectMonitoring";
@@ -61,42 +51,6 @@ interface FilterDefinition {
   label: string;
   count: number;
   matches: (project: Project) => boolean;
-}
-
-interface CollapsibleSectionProps {
-  title: string;
-  subtitle?: string;
-  open: boolean;
-  onToggle: () => void;
-  children: ReactNode;
-}
-
-function CollapsibleSection({
-  title,
-  subtitle,
-  open,
-  onToggle,
-  children,
-}: CollapsibleSectionProps) {
-  return (
-    <section className={`dashboard-section ${open ? "" : "dashboard-section-closed"}`}>
-      <button
-        type="button"
-        className="dashboard-section-toggle"
-        onClick={onToggle}
-        aria-expanded={open}
-      >
-        <span>
-          <strong>{title}</strong>
-          {subtitle && <small>{subtitle}</small>}
-        </span>
-
-        {open ? <MdExpandLess size={22} /> : <MdExpandMore size={22} />}
-      </button>
-
-      {open && <div className="dashboard-section-content">{children}</div>}
-    </section>
-  );
 }
 
 function totalTasks(project: Project): number {
@@ -124,11 +78,6 @@ function Dashboard() {
   const [ordenacao, setOrdenacao] = useState("Nome");
   const [sincronizandoRedmine, setSincronizandoRedmine] = useState(false);
   const [mensagemRedmine, setMensagemRedmine] = useState<MensagemRedmine | null>(null);
-  const [paineis, setPaineis] = useState({
-    compatibilidade: true,
-    analises: true,
-    observacao: true,
-  });
 
   useEffect(() => {
     let ativo = true;
@@ -321,35 +270,18 @@ function Dashboard() {
       matches: project => project.situacoes[item.field] > 0,
     }));
 
-    definitions.push(
-      {
-        value: "Em observação",
-        label: "Em observação",
-        count: projects.filter(project => isProjectUnderObservation(project, concluido)).length,
-        matches: project => isProjectUnderObservation(project, concluido),
-      },
-      {
-        value: "Sem movimentação",
-        label: `Sem movimentação (${INACTIVITY_WARNING_DAYS}+ dias)`,
-        count: projects.filter(isProjectInactive).length,
-        matches: isProjectInactive,
-      },
-      {
-        value: "Atrasados",
-        label: "Atrasados",
-        count: projects.filter(project => isProjectOverdue(project, concluido)).length,
-        matches: project => isProjectOverdue(project, concluido),
-      }
-    );
+    definitions.push({
+      value: "Atrasados",
+      label: "Atrasados",
+      count: projects.filter(project => isProjectOverdue(project, concluido)).length,
+      matches: project => isProjectOverdue(project, concluido),
+    });
 
     return definitions;
   }, [projects, concluido]);
 
   const opcoesFiltro = useMemo(
-    () =>
-      filtrosDinamicos.filter(
-        item => item.count > 0 || item.value === filtro
-      ),
+    () => filtrosDinamicos.filter(item => item.count > 0 || item.value === filtro),
     [filtrosDinamicos, filtro]
   );
 
@@ -398,19 +330,6 @@ function Dashboard() {
 
   const colunaEsquerda = projetos.filter((_, index) => index % 2 === 0);
   const colunaDireita = projetos.filter((_, index) => index % 2 !== 0);
-
-  const semDadosMovimentacao = projects.filter(
-    project => daysWithoutMovement(project.ultimaMovimentacao) === null
-  ).length;
-
-  function localizarProjeto(project: Project) {
-    setFiltro("Todos");
-    setPesquisa(project.nome);
-  }
-
-  function alternarPainel(painel: keyof typeof paineis) {
-    setPaineis(atual => ({ ...atual, [painel]: !atual[painel] }));
-  }
 
   return (
     <Layout>
@@ -490,32 +409,10 @@ function Dashboard() {
           <RedmineProjectsMonitor />
         </Suspense>
 
-        <DashboardStats
+        <CompatibilityPanel
           projects={projects}
-          concluido={concluido}
-          filtroAtivo={filtro}
-          onFilter={setFiltro}
+          carregando={carregando || carregandoAmbientes}
         />
-
-        {semDadosMovimentacao > 0 && !carregando && (
-          <div className="dashboard-activity-hint">
-            {semDadosMovimentacao === projects.length
-              ? "A informação de movimentação aparecerá após a próxima sincronização com o Redmine."
-              : `${semDadosMovimentacao} projeto${semDadosMovimentacao === 1 ? " ainda não possui" : "s ainda não possuem"} histórico de movimentação sincronizado.`}
-          </div>
-        )}
-
-        <CollapsibleSection
-          title="Compatibilidade"
-          subtitle="Versões relacionadas à release"
-          open={paineis.compatibilidade}
-          onToggle={() => alternarPainel("compatibilidade")}
-        >
-          <CompatibilityPanel
-            projects={projects}
-            carregando={carregando || carregandoAmbientes}
-          />
-        </CollapsibleSection>
 
         <Suspense
           fallback={
@@ -524,30 +421,10 @@ function Dashboard() {
             </div>
           }
         >
-          <CollapsibleSection
-            title="Análises"
-            subtitle="Distribuição e projetos com maior volume de tarefas"
-            open={paineis.analises}
-            onToggle={() => alternarPainel("analises")}
-          >
-            <div className="dashboard-charts">
-              <TasksChart projects={projects} />
-              <TopProjects projects={projects} />
-            </div>
-          </CollapsibleSection>
-
-          <CollapsibleSection
-            title="Observação"
-            subtitle="Projetos que merecem acompanhamento mais próximo"
-            open={paineis.observacao}
-            onToggle={() => alternarPainel("observacao")}
-          >
-            <AttentionProjects
-              projects={projects}
-              concluido={concluido}
-              onProjectClick={localizarProjeto}
-            />
-          </CollapsibleSection>
+          <div className="dashboard-charts">
+            <TasksChart projects={projects} />
+            <TopProjects projects={projects} />
+          </div>
         </Suspense>
 
         <div className="dashboard-filters">
@@ -634,7 +511,6 @@ function Dashboard() {
                   canEdit={podeEditar}
                   concluido={concluido}
                   onOpen={setProjectSelecionado}
-                  onFilterStatus={setFiltro}
                 />
               ))}
             </div>
@@ -647,7 +523,6 @@ function Dashboard() {
                   canEdit={podeEditar}
                   concluido={concluido}
                   onOpen={setProjectSelecionado}
-                  onFilterStatus={setFiltro}
                 />
               ))}
             </div>

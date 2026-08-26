@@ -9,20 +9,12 @@
     flex-direction: column;
     gap: 13px;
     min-width: 0;
-    transition: transform .2s, box-shadow .2s, border-color .2s;
+    transition: transform .2s, box-shadow .2s;
 }
 
 .release-project-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 9px 22px rgba(0, 0, 0, .10);
-}
-
-.release-project-card-observation {
-    border-left-color: #F58220;
-}
-
-.release-project-card-collapsed {
-    gap: 0;
 }
 
 .release-project-header {
@@ -37,14 +29,6 @@
     flex: 1;
 }
 
-.release-project-title-line {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-width: 0;
-}
-
 .release-project-title h2 {
     margin: 0;
     min-width: 0;
@@ -55,20 +39,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.release-observation-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 999px;
-    background: #FFF3E8;
-    color: #C65D08;
-    font-size: 10px;
-    line-height: 1;
-    font-weight: 800;
-    white-space: nowrap;
 }
 
 .release-project-subtitle {
@@ -98,37 +68,7 @@
     font-weight: 700;
 }
 
-.release-collapsed-movement {
-    padding: 4px 9px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.release-collapsed-movement.fresh {
-    background: #EDF7EE;
-    color: #2E7D32;
-}
-
-.release-collapsed-movement.warning {
-    background: #FFF6E8;
-    color: #D96C10;
-}
-
-.release-collapsed-movement.late {
-    background: #FFF0F0;
-    color: #C62828;
-}
-
-.release-project-actions {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-shrink: 0;
-}
-
-.release-edit-button,
-.release-collapse-button {
+.release-edit-button {
     width: 34px;
     height: 34px;
     border: 1px solid #D5E2EE;
@@ -143,20 +83,13 @@
     transition: .2s;
 }
 
-.release-collapse-button {
-    color: #68747E;
-}
-
-.release-edit-button:hover,
-.release-collapse-button:hover {
+.release-edit-button:hover {
     background: #005AA9;
     border-color: #005AA9;
     color: #FFF;
 }
 
-.release-edit-button:focus-visible,
-.release-collapse-button:focus-visible,
-.release-status-item:focus-visible {
+.release-edit-button:focus-visible {
     outline: 3px solid rgba(0, 90, 169, .18);
     outline-offset: 2px;
 }
@@ -232,23 +165,6 @@
     color: #607D8B;
 }
 
-.release-observation-reasons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: -2px;
-}
-
-.release-observation-reasons span {
-    padding: 5px 8px;
-    border: 1px solid #F4D3B8;
-    border-radius: 999px;
-    background: #FFF9F3;
-    color: #A94E09;
-    font-size: 10px;
-    font-weight: 700;
-}
-
 .release-status-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -256,7 +172,6 @@
 }
 
 .release-status-item {
-    appearance: none;
     width: 100%;
     display: flex;
     align-items: center;
@@ -269,22 +184,6 @@
     background: #F8FAFC;
     border-radius: 8px;
     text-align: left;
-    font: inherit;
-}
-
-.release-status-item:disabled {
-    opacity: 1;
-}
-
-.release-status-item-clickable {
-    cursor: pointer;
-    transition: background .2s, border-color .2s, transform .2s;
-}
-
-.release-status-item-clickable:hover {
-    background: #F1F6FA;
-    border-color: #D5E2EE;
-    transform: translateY(-1px);
 }
 
 .release-status-label {
@@ -366,11 +265,6 @@
 @media (max-width: 900px) {
     .release-project-card {
         padding: 15px;
-    }
-
-    .release-project-title-line {
-        align-items: flex-start;
-        flex-direction: column;
     }
 
     .release-project-info,
