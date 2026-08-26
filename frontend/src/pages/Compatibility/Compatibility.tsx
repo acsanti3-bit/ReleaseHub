@@ -166,6 +166,9 @@ function Compatibility() {
   const [editandoNomePara, setEditandoNomePara] =
     useState<string | null>(null);
 
+  const [nomeEmEdicao, setNomeEmEdicao] =
+    useState("");
+
   const [novaVersao, setNovaVersao] =
     useState("");
 
@@ -479,6 +482,7 @@ function Compatibility() {
     );
     setAdicionandoVersaoPara(null);
     setEditandoNomePara(null);
+    setNomeEmEdicao("");
     setNovaVersao("");
     setNovoProjetoRedmineId("");
     setNovoSistemaManual("");
@@ -1392,9 +1396,99 @@ function Compatibility() {
                       <div className="compatibility-editor-item-top">
                         <div className="compatibility-editor-heading">
                           <div className="compatibility-editor-title-line">
-                            <strong className="compatibility-editor-title">
-                              {item.displayName || item.originalName || "Sem nome"}
-                            </strong>
+                            {editandoNomePara === item.key ? (
+                              <div className="compatibility-title-editor">
+                                <input
+                                  autoFocus
+                                  value={nomeEmEdicao}
+                                  aria-label={`Nome exibido de ${item.displayName || item.originalName || "sistema"}`}
+                                  onChange={evento =>
+                                    setNomeEmEdicao(
+                                      evento.target.value
+                                    )
+                                  }
+                                  onKeyDown={evento => {
+                                    if (evento.key === "Enter") {
+                                      evento.preventDefault();
+                                      const nome = nomeEmEdicao.trim();
+                                      if (nome) {
+                                        atualizarItem(
+                                          item.key,
+                                          {
+                                            displayName: nome,
+                                          }
+                                        );
+                                      }
+                                      setEditandoNomePara(null);
+                                      setNomeEmEdicao("");
+                                    }
+
+                                    if (evento.key === "Escape") {
+                                      setEditandoNomePara(null);
+                                      setNomeEmEdicao("");
+                                    }
+                                  }}
+                                />
+
+                                <button
+                                  type="button"
+                                  className="compatibility-title-editor-confirm"
+                                  title="Confirmar nome"
+                                  aria-label="Confirmar nome exibido"
+                                  onClick={() => {
+                                    const nome = nomeEmEdicao.trim();
+                                    if (nome) {
+                                      atualizarItem(
+                                        item.key,
+                                        {
+                                          displayName: nome,
+                                        }
+                                      );
+                                    }
+                                    setEditandoNomePara(null);
+                                    setNomeEmEdicao("");
+                                  }}
+                                >
+                                  <MdCheckCircle size={18} />
+                                </button>
+
+                                <button
+                                  type="button"
+                                  className="compatibility-title-editor-cancel"
+                                  title="Cancelar alteração"
+                                  aria-label="Cancelar alteração do nome exibido"
+                                  onClick={() => {
+                                    setEditandoNomePara(null);
+                                    setNomeEmEdicao("");
+                                  }}
+                                >
+                                  <MdClose size={18} />
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <strong className="compatibility-editor-title">
+                                  {item.displayName || item.originalName || "Sem nome"}
+                                </strong>
+
+                                <button
+                                  type="button"
+                                  className="compatibility-title-edit"
+                                  title="Alterar nome exibido"
+                                  aria-label={`Alterar nome exibido de ${item.displayName || item.originalName || "sistema"}`}
+                                  onClick={() => {
+                                    setEditandoNomePara(item.key);
+                                    setNomeEmEdicao(
+                                      item.displayName ||
+                                      item.originalName ||
+                                      ""
+                                    );
+                                  }}
+                                >
+                                  <MdEdit size={15} />
+                                </button>
+                              </>
+                            )}
 
                             <span className="compatibility-source-badge">
                               {item.source === "environment"
@@ -1601,70 +1695,6 @@ function Compatibility() {
                         </label>
                       </div>
 
-                      <div className="compatibility-display-name-row">
-                        {editandoNomePara === item.key ? (
-                          <label className="compatibility-display-name-editor">
-                            <span>
-                              Nome exibido
-                            </span>
-                            <div>
-                              <input
-                                autoFocus
-                                value={item.displayName}
-                                onChange={evento =>
-                                  atualizarItem(
-                                    item.key,
-                                    {
-                                      displayName:
-                                        evento.target.value,
-                                    }
-                                  )
-                                }
-                                onKeyDown={evento => {
-                                  if (evento.key === "Enter") {
-                                    evento.preventDefault();
-                                    setEditandoNomePara(null);
-                                  }
-                                }}
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEditandoNomePara(null)
-                                }
-                              >
-                                Concluir
-                              </button>
-                            </div>
-                            {item.source === "environment" &&
-                              item.originalName &&
-                              item.originalName !== item.displayName && (
-                                <small>
-                                  Cadastro original: {item.originalName}
-                                </small>
-                              )}
-                          </label>
-                        ) : (
-                          <>
-                            <span className="compatibility-display-name-label">
-                              Nome exibido
-                            </span>
-                            <strong>
-                              {item.displayName || "Sem nome"}
-                            </strong>
-                            <button
-                              type="button"
-                              className="compatibility-display-name-edit"
-                              onClick={() =>
-                                setEditandoNomePara(item.key)
-                              }
-                            >
-                              <MdEdit size={16} />
-                              Alterar
-                            </button>
-                          </>
-                        )}
-                      </div>
 
                       <details className="compatibility-relations">
                         <summary>
