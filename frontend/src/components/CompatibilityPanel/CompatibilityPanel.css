@@ -7,7 +7,7 @@
     display:grid;
 
     grid-template-columns:
-        120px
+        185px
         minmax(0,1fr);
 
     align-items:stretch;
@@ -68,7 +68,7 @@
 
     font-weight:700;
 
-    white-space:nowrap;
+    white-space:normal;
 
 }
 
@@ -319,7 +319,7 @@
     .compatibility-panel{
 
         grid-template-columns:
-            105px
+            165px
             minmax(0,1fr);
 
     }
@@ -346,7 +346,7 @@
     .compatibility-panel{
 
         grid-template-columns:
-            112px
+            175px
             minmax(0,1fr);
 
     }

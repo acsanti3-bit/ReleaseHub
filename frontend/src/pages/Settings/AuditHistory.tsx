@@ -41,6 +41,10 @@ const NOMES_ENTIDADE:
     projeto_release:
       "Projeto da release",
     usuario: "Usuário",
+    compatibilidade:
+      "Compatibilidade",
+    versao_compatibilidade:
+      "Versão da compatibilidade",
 };
 
 

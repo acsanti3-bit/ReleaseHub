@@ -3,6 +3,7 @@ import {
   MdAdd,
   MdCheckCircle,
   MdClose,
+  MdCompareArrows,
   MdDeleteOutline,
   MdEdit,
   MdErrorOutline,
@@ -10,6 +11,10 @@ import {
   MdLink,
   MdReplay,
 } from "react-icons/md";
+
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import "./ReleaseEnvironments.css";
 
@@ -90,6 +95,9 @@ function obterSistemasDoAmbiente(
 
 
 function ReleaseEnvironments() {
+  const navigate =
+    useNavigate();
+
   const [ambientes, setAmbientes] = useState<ReleaseEnvironment[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -469,7 +477,7 @@ function ReleaseEnvironments() {
             </h1>
 
             <p>
-              Configure a relação entre as versões dos projetos.
+              Cadastre os ambientes e as versões dos sistemas que compõem cada release.
               {!podeEditar && " • Somente leitura"}
             </p>
           </div>
@@ -635,6 +643,19 @@ function ReleaseEnvironments() {
 
 
                     <div className="release-actions">
+                      <button
+                        type="button"
+                        title="Ver compatibilidade"
+                        aria-label={`Ver compatibilidade de ${ambiente.nome}`}
+                        onClick={() =>
+                          navigate(
+                            `/compatibility?environment=${ambiente.id}`
+                          )
+                        }
+                      >
+                        <MdCompareArrows size={19} />
+                      </button>
+
                       <button
                         type="button"
                         title="Detalhes do ambiente"

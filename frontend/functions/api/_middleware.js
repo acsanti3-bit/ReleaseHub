@@ -526,36 +526,6 @@ export async function onRequest(
 
 
   /*
-    Monitoramento geral do Redmine:
-    informação exclusiva dos perfis
-    Administrador e Qualidade.
-  */
-
-  if (
-    caminho.startsWith(
-      "/api/redmine-open-projects"
-    ) &&
-    ![
-      "admin",
-      "qualidade",
-    ].includes(
-      usuario.role
-    )
-  ) {
-    return respostaJson(
-      {
-        erro:
-          "Você não possui permissão para consultar o monitoramento geral do Redmine.",
-      },
-      {
-        status: 403,
-      },
-      origemPermitida
-    );
-  }
-
-
-  /*
     Rotas que alteram dados
     operacionais do ReleaseHub.
   */
@@ -563,7 +533,8 @@ export async function onRequest(
   const rotaOperacional =
     caminho === "/api/projects" ||
     caminho === "/api/environments" ||
-    caminho === "/api/release-projects";
+    caminho === "/api/release-projects" ||
+    caminho === "/api/compatibility";
 
 
   const metodoAlteracao =

@@ -152,13 +152,12 @@ function Sidebar() {
 
   }
 
-  const podeAcessarConfiguracoes =
+  const podeAcessarAmbientes =
     usuario?.role === "admin" ||
     usuario?.role === "qualidade";
 
-  const podeAcessarDashboard =
-    usuario?.role === "admin" ||
-    usuario?.role === "qualidade";
+  const podeAcessarConfiguracoes =
+    podeAcessarAmbientes;
 
   return (
 
@@ -178,16 +177,20 @@ function Sidebar() {
 
       <nav>
 
-        {podeAcessarDashboard && (
+        <NavLink to="/">
+          Dashboard
+        </NavLink>
 
-          <NavLink to="/">
-            Dashboard
+        {podeAcessarAmbientes && (
+
+          <NavLink to="/environments">
+            Ambientes da Release
           </NavLink>
 
         )}
 
-        <NavLink to="/environments">
-          Ambientes da Release
+        <NavLink to="/compatibility">
+          Compatibilidade
         </NavLink>
 
         <NavLink to="/tv">

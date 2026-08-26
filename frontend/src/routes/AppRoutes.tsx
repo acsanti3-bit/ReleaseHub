@@ -35,6 +35,15 @@ const Settings =
       )
   );
 
+
+const Compatibility =
+  lazy(
+    () =>
+      import(
+        "../pages/Compatibility/Compatibility"
+      )
+  );
+
 const ReleaseEnvironments =
   lazy(
     () =>
@@ -103,14 +112,23 @@ function AppRoutes() {
             path="/"
             element={
 
-              <ProtectedRoute
-                requiredRoles={[
-                  "admin",
-                  "qualidade",
-                ]}
-              >
+              <ProtectedRoute>
 
                 <Dashboard />
+
+              </ProtectedRoute>
+
+            }
+          />
+
+
+          <Route
+            path="/compatibility"
+            element={
+
+              <ProtectedRoute>
+
+                <Compatibility />
 
               </ProtectedRoute>
 
@@ -121,7 +139,12 @@ function AppRoutes() {
             path="/environments"
             element={
 
-              <ProtectedRoute>
+              <ProtectedRoute
+                requiredRoles={[
+                  "admin",
+                  "qualidade",
+                ]}
+              >
 
                 <ReleaseEnvironments />
 
