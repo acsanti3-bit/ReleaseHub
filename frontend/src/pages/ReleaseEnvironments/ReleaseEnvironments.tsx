@@ -8,6 +8,8 @@ import {
   MdEdit,
   MdErrorOutline,
   MdInfoOutline,
+  MdContentCopy,
+  MdMenuBook,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdLink,
@@ -207,6 +209,12 @@ function ReleaseEnvironments() {
 
   const [ambienteConfirmacao, setAmbienteConfirmacao] =
     useState<ReleaseEnvironment | null>(null);
+
+  const [ambienteWiki, setAmbienteWiki] =
+    useState<ReleaseEnvironment | null>(null);
+
+  const [copiadoWiki, setCopiadoWiki] =
+    useState(false);
 
   const [ambienteExclusao, setAmbienteExclusao] =
     useState<ReleaseEnvironment | null>(null);
@@ -499,6 +507,64 @@ function ReleaseEnvironments() {
     }
   }
 
+  function montarLinhaWiki(
+    ambiente: ReleaseEnvironment
+  ) {
+    const versao =
+      obterVersaoIntellicashDoAmbiente(
+        ambiente
+      ).trim();
+
+    if (!versao) {
+      return "";
+    }
+
+    return `[[intellicash:atualizacoes:${versao}|${versao}]]\\\\`;
+  }
+
+
+  async function copiarLinhaWiki() {
+    if (!ambienteWiki) {
+      return;
+    }
+
+    const linha =
+      montarLinhaWiki(
+        ambienteWiki
+      );
+
+    if (!linha) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        linha
+      );
+      setCopiadoWiki(true);
+
+      window.setTimeout(
+        () => setCopiadoWiki(false),
+        1800
+      );
+    } catch (erro) {
+      console.error(
+        "Não foi possível copiar a linha da Wiki:",
+        erro
+      );
+    }
+  }
+
+
+  function abrirWikiParaEdicao() {
+    window.open(
+      "https://wiki.iws.com.br/doku.php?id=intellicash:atualizacoes&do=edit",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
+
+
   function alterarConclusao(
     ambiente: ReleaseEnvironment
   ) {
@@ -549,6 +615,13 @@ function ReleaseEnvironments() {
       setAmbienteConfirmacao(
         null
       );
+
+      if (vaiConcluir) {
+        setAmbienteWiki(
+          ambienteSalvo
+        );
+        setCopiadoWiki(false);
+      }
 
       setFeedback({
         tipo: "sucesso",
@@ -1286,7 +1359,107 @@ function ReleaseEnvironments() {
             </div>
           </div>
         </div>
+
       )}
+
+      {ambienteWiki && (
+        <div
+          className="release-modal-overlay"
+          role="presentation"
+          onClick={() => {
+            setAmbienteWiki(null);
+            setCopiadoWiki(false);
+          }}
+        >
+          <div
+            className="release-wiki-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="release-wiki-title"
+            onClick={evento =>
+              evento.stopPropagation()
+            }
+          >
+            <div className="release-wiki-modal-accent" />
+
+            <div className="release-wiki-modal-body">
+              <div className="release-wiki-badge">
+                <MdMenuBook size={16} />
+                Wiki do IntelliCash
+              </div>
+
+              <h2 id="release-wiki-title">
+                Atualizar a página de versões?
+              </h2>
+
+              <p className="release-wiki-question">
+                A release <strong>{ambienteWiki.nome}</strong> foi concluída.
+                Copie a linha abaixo e adicione-a na página geral de atualizações da Wiki.
+              </p>
+
+              <div className="release-wiki-version">
+                IntelliCash{" "}
+                <strong>
+                  {obterVersaoIntellicashDoAmbiente(
+                    ambienteWiki
+                  )}
+                </strong>
+              </div>
+
+              <div className="release-wiki-code-row">
+                <code>
+                  {montarLinhaWiki(
+                    ambienteWiki
+                  )}
+                </code>
+
+                <button
+                  type="button"
+                  className="release-wiki-copy-button"
+                  onClick={() =>
+                    void copiarLinhaWiki()
+                  }
+                >
+                  <MdContentCopy size={18} />
+                  {copiadoWiki
+                    ? "Copiado!"
+                    : "Copiar linha"}
+                </button>
+              </div>
+
+              <div className="release-wiki-help">
+                <span>
+                  Depois, abra a página de Atualizações, cole a linha no ano correspondente e salve.
+                </span>
+              </div>
+
+              <div className="release-wiki-actions">
+                <button
+                  type="button"
+                  className="release-wiki-later-button"
+                  onClick={() => {
+                    setAmbienteWiki(null);
+                    setCopiadoWiki(false);
+                  }}
+                >
+                  Agora não
+                </button>
+
+                <button
+                  type="button"
+                  className="release-wiki-open-button"
+                  onClick={abrirWikiParaEdicao}
+                >
+                  <MdMenuBook size={18} />
+                  Abrir Wiki para editar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      )
     </Layout>
   );
 }

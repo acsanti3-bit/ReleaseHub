@@ -537,6 +537,163 @@
 }
 
 
+
+/* MODAL DE ATUALIZAÇÃO DA WIKI */
+
+.release-wiki-modal {
+    width: min(100%, 620px);
+    overflow: hidden;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+    animation: release-modal-in 180ms ease-out;
+}
+
+.release-wiki-modal-accent {
+    height: 5px;
+    background: #005AA9;
+}
+
+.release-wiki-modal-body {
+    padding: 26px 28px 28px;
+}
+
+.release-wiki-badge {
+    width: fit-content;
+    margin-bottom: 14px;
+    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    background: #EAF3FB;
+    color: #005AA9;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.release-wiki-modal h2 {
+    margin: 0 0 12px;
+    color: #17212B;
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+.release-wiki-question {
+    margin: 0;
+    color: #4D5965;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.release-wiki-question strong {
+    color: #17212B;
+}
+
+.release-wiki-version {
+    margin-top: 16px;
+    color: #66727D;
+    font-size: 13px;
+}
+
+.release-wiki-version strong {
+    color: #005AA9;
+}
+
+.release-wiki-code-row {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.release-wiki-code-row code {
+    min-width: 0;
+    min-height: 42px;
+    padding: 11px 12px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #D7E3ED;
+    border-radius: 9px;
+    background: #F7FAFC;
+    color: #344054;
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.release-wiki-copy-button,
+.release-wiki-open-button,
+.release-wiki-later-button {
+    min-height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.release-wiki-copy-button {
+    border: 1px solid #C8DCED;
+    background: #F7FBFF;
+    color: #005AA9;
+}
+
+.release-wiki-copy-button:hover {
+    border-color: #005AA9;
+    background: #EEF6FD;
+}
+
+.release-wiki-help {
+    margin-top: 12px;
+    padding: 11px 13px;
+    border: 1px solid #D7EAF9;
+    border-radius: 9px;
+    background: #F4F9FE;
+    color: #526579;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.release-wiki-actions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.release-wiki-later-button {
+    min-width: 100px;
+    border: 1px solid #D8DEE5;
+    background: #FFFFFF;
+    color: #56616C;
+}
+
+.release-wiki-later-button:hover {
+    background: #F6F8FA;
+}
+
+.release-wiki-open-button {
+    min-width: 190px;
+    border: 1px solid #005AA9;
+    background: #005AA9;
+    color: #FFFFFF;
+}
+
+.release-wiki-open-button:hover {
+    background: #004B8C;
+    border-color: #004B8C;
+}
+
+
 /* RESPONSIVO */
 
 @media (max-width: 1300px) {
@@ -575,6 +732,24 @@
 }
 
 @media (max-width: 520px) {
+    .release-wiki-modal-body {
+        padding: 22px 20px 20px;
+    }
+
+    .release-wiki-code-row {
+        grid-template-columns: 1fr;
+    }
+
+    .release-wiki-actions {
+        flex-direction: column-reverse;
+    }
+
+    .release-wiki-copy-button,
+    .release-wiki-later-button,
+    .release-wiki-open-button {
+        width: 100%;
+    }
+
     .release-feedback {
         top: 12px;
         right: 12px;
