@@ -34,6 +34,7 @@
 }
 
 .compatibility-refresh-button,
+.compatibility-wiki-button,
 .compatibility-edit-button,
 .compatibility-save-button,
 .compatibility-cancel-button {
@@ -47,6 +48,18 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
+}
+
+.compatibility-wiki-button {
+  border: 1px solid #c8dced;
+  background: #f7fbff;
+  color: #005aa9;
+  text-decoration: none;
+}
+
+.compatibility-wiki-button:hover {
+  border-color: #005aa9;
+  background: #eef6fd;
 }
 
 .compatibility-refresh-button {
@@ -786,7 +799,8 @@
     justify-content: stretch;
   }
 
-  .compatibility-header-actions button {
+  .compatibility-header-actions button,
+  .compatibility-header-actions a {
     flex: 1;
   }
 

@@ -18,6 +18,7 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdLink,
+  MdMenuBook,
   MdRefresh,
   MdSave,
   MdSettings,
@@ -217,6 +218,14 @@ function Compatibility() {
         ) ?? null,
       [ambientes, environmentId]
     );
+
+
+  const wikiIntellicashUrl =
+    ambienteSelecionado?.versoes.intellicash
+      ? `https://wiki.iws.com.br/doku.php?id=intellicash:atualizacoes:${encodeURIComponent(
+          ambienteSelecionado.versoes.intellicash
+        )}`
+      : "https://wiki.iws.com.br/doku.php?id=intellicash:atualizacoes";
 
 
   const itensVisiveis =
@@ -1261,6 +1270,21 @@ function Compatibility() {
           </div>
 
           <div className="compatibility-header-actions">
+            <a
+              className="compatibility-wiki-button"
+              href={wikiIntellicashUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={
+                ambienteSelecionado?.versoes.intellicash
+                  ? `Abrir Wiki do IntelliCash ${ambienteSelecionado.versoes.intellicash}`
+                  : "Abrir Wiki do IntelliCash"
+              }
+            >
+              <MdMenuBook size={19} />
+              Abrir Wiki do IntelliCash
+            </a>
+
             <button
               type="button"
               className="compatibility-refresh-button"
