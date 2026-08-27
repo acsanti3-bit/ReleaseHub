@@ -336,8 +336,8 @@ function Dashboard() {
       <div className="dashboard">
         <div className="dashboard-header">
           <div className="dashboard-title">
-            <h1>IWS ReleaseHub</h1>
-            <span>{projects.length} Projetos</span>
+            <h1>Painel da Qualidade</h1>
+            <span>Acompanhe releases, projetos e tarefas em um só lugar</span>
           </div>
 
           <div className="dashboard-release-control">
