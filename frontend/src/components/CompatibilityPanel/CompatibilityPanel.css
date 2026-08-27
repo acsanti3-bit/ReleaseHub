@@ -157,6 +157,70 @@
 
     text-align:center;
 
+    position:relative;
+
+}
+
+
+/* LINK DO MANUAL DO INTELLICASH */
+
+.compatibility-wiki-link{
+
+    position:absolute;
+
+    top:5px;
+
+    right:5px;
+
+    width:24px;
+
+    height:24px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:1px solid #D7E2EC;
+
+    border-radius:7px;
+
+    background:#F7FAFC;
+
+    color:#005AA9;
+
+    text-decoration:none;
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .15s ease;
+
+}
+
+
+.compatibility-wiki-link:hover{
+
+    background:#EAF3FB;
+
+    border-color:#B8D2E7;
+
+    transform:translateY(-1px);
+
+}
+
+
+.compatibility-wiki-link:focus-visible{
+
+    outline:2px solid #005AA9;
+
+    outline-offset:2px;
+
 }
 
 
@@ -470,6 +534,19 @@
     .compatibility-version{
 
         min-height:40px;
+
+    }
+
+
+    .compatibility-wiki-link{
+
+        width:22px;
+
+        height:22px;
+
+        top:4px;
+
+        right:4px;
 
     }
 

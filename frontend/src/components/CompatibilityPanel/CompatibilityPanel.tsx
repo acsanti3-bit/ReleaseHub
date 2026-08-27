@@ -7,6 +7,10 @@ import {
 import "./CompatibilityPanel.css";
 
 import {
+  MdMenuBook,
+} from "react-icons/md";
+
+import {
   buscarCompatibilidade,
 } from "../../services/CompatibilityService";
 
@@ -149,6 +153,37 @@ function obterQuantidadeColunas(
     Math.ceil(
       quantidadeSistemas / 2
     )
+  );
+}
+
+
+function ehIntellicash(
+  sistema: SistemaExibicao
+) {
+  const chave =
+    sistema.key.toLowerCase();
+
+  const nome =
+    sistema.nome.toLowerCase();
+
+  return (
+    chave === "intellicash" ||
+    chave === "intelicash" ||
+    nome.includes("intellicash") ||
+    nome.includes("intelicash")
+  );
+}
+
+
+function obterUrlManualIntellicash(
+  versao: string
+) {
+  const versaoNormalizada =
+    versao.trim();
+
+  return (
+    "https://wiki.iws.com.br/doku.php?id=" +
+    `intellicash:atualizacoes:${encodeURIComponent(versaoNormalizada)}`
   );
 }
 
@@ -361,6 +396,10 @@ function CompatibilityPanel({
               sistema.versao?.trim()
             );
 
+          const mostrarManual =
+            possuiVersao &&
+            ehIntellicash(sistema);
+
           return (
             <div
               key={sistema.key}
@@ -381,6 +420,21 @@ function CompatibilityPanel({
                   {sistema.versao || "-"}
                 </small>
               </div>
+
+              {mostrarManual && (
+                <a
+                  className="compatibility-wiki-link"
+                  href={obterUrlManualIntellicash(
+                    sistema.versao
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Abrir manual do IntelliCash ${sistema.versao} na Wiki`}
+                  aria-label={`Abrir manual do IntelliCash ${sistema.versao} na Wiki`}
+                >
+                  <MdMenuBook size={15} />
+                </a>
+              )}
             </div>
           );
         })}
