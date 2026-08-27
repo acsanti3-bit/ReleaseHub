@@ -518,6 +518,238 @@ async function montarResposta(
   };
 }
 
+const COLUNAS_LEGADAS_AMBIENTE = {
+  intellicash: "intellicash",
+  easycash: "easycash",
+  easycheckout: "easycheckout",
+  easypdv: "easypdv",
+  intellistock: "intellistock",
+  iwbserver: "iwbserver",
+};
+
+
+function chaveAmbienteDaDefinicao(
+  definicao
+) {
+  if (
+    definicao?.source !==
+    "environment"
+  ) {
+    return null;
+  }
+
+  return definicao.key.startsWith(
+    "env:"
+  )
+    ? definicao.key.slice(4)
+    : definicao.key;
+}
+
+
+function termosProjetoPorChave(
+  chave
+) {
+  const conhecidos = {
+    intellicash: [
+      "intellicash",
+      "intelicash",
+    ],
+    easycash: ["easycash"],
+    easycheckout: [
+      "easycheckout",
+    ],
+    easypdv: ["easypdv"],
+    intellistock: [
+      "intellistock",
+      "isa",
+    ],
+    iwbserver: [
+      "iwbserver",
+      "iwb",
+    ],
+  };
+
+  return conhecidos[chave] ?? [
+    normalizarTexto(chave),
+  ];
+}
+
+
+async function atualizarVersaoNoAmbiente(
+  context,
+  environmentId,
+  definicao,
+  versao
+) {
+  const chave =
+    chaveAmbienteDaDefinicao(
+      definicao
+    );
+
+  if (!chave) {
+    return;
+  }
+
+  const versaoNormalizada =
+    String(versao ?? "")
+      .trim()
+      .slice(0, 120);
+
+  await context.env.DB
+    .prepare(
+      `
+        UPDATE release_environment_versions
+        SET versao = ?
+        WHERE environment_id = ?
+          AND chave = ?
+      `
+    )
+    .bind(
+      versaoNormalizada,
+      environmentId,
+      chave
+    )
+    .run();
+
+  const colunaLegada =
+    COLUNAS_LEGADAS_AMBIENTE[
+      chave
+    ];
+
+  if (colunaLegada) {
+    await context.env.DB
+      .prepare(
+        `
+          UPDATE release_environments
+          SET ${colunaLegada} = ?
+          WHERE id = ?
+        `
+      )
+      .bind(
+        versaoNormalizada,
+        environmentId
+      )
+      .run();
+  }
+
+  const projetos =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT id, nome
+          FROM projects
+        `
+      )
+      .all();
+
+  const termos =
+    termosProjetoPorChave(
+      chave
+    );
+
+  for (
+    const projeto of
+    projetos.results ?? []
+  ) {
+    const nomeProjeto =
+      normalizarTexto(
+        projeto.nome
+      );
+
+    const corresponde =
+      termos.some(termo => {
+        const normalizado =
+          normalizarTexto(termo);
+
+        if (
+          !normalizado ||
+          !nomeProjeto
+        ) {
+          return false;
+        }
+
+        if (
+          normalizado.length <= 3
+        ) {
+          return (
+            nomeProjeto ===
+            normalizado
+          );
+        }
+
+        return (
+          nomeProjeto ===
+            normalizado ||
+          nomeProjeto.includes(
+            normalizado
+          )
+        );
+      });
+
+    if (!corresponde) {
+      continue;
+    }
+
+    await context.env.DB
+      .prepare(
+        `
+          UPDATE release_projects
+          SET
+            versao = ?,
+            updated_at = CURRENT_TIMESTAMP
+          WHERE environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        versaoNormalizada,
+        environmentId,
+        projeto.id
+      )
+      .run();
+  }
+}
+
+
+async function aplicarVersoesDaCompatibilidade(
+  context,
+  environmentId,
+  catalogo,
+  overrides
+) {
+  const porChave =
+    new Map(
+      catalogo.map(
+        item => [
+          item.key,
+          item,
+        ]
+      )
+    );
+
+  for (const override of overrides) {
+    const definicao =
+      porChave.get(
+        override.key
+      );
+
+    if (
+      definicao?.source !==
+      "environment"
+    ) {
+      continue;
+    }
+
+    await atualizarVersaoNoAmbiente(
+      context,
+      environmentId,
+      definicao,
+      override.selectedVersion
+    );
+  }
+}
+
+
 function usuarioPodeEditar(
   context
 ) {
@@ -657,6 +889,13 @@ export async function onRequestPut(
         body.items,
         chavesPermitidas
       );
+
+    await aplicarVersoesDaCompatibilidade(
+      context,
+      environmentId,
+      catalogo,
+      overrides
+    );
 
     await context.env.DB
       .prepare(

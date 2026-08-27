@@ -26,6 +26,14 @@ const SISTEMAS_FIXOS = [
   { chave: "bi", nome: "BI", ordem: 19 },
 ];
 
+const SISTEMAS_PRINCIPAIS = new Set([
+  "intellicash",
+  "easycash",
+  "easycheckout",
+  "easypdv",
+  "intellistock",
+]);
+
 
 function respostaErro(
   mensagem,
@@ -53,6 +61,71 @@ function normalizarTexto(valor) {
     .replace(
       /[^a-z0-9]/g,
       ""
+    );
+}
+
+
+function obterPartesVersao(valor) {
+  return (
+    String(valor ?? "")
+      .match(/\d+/g)
+      ?.map(Number) ??
+    []
+  );
+}
+
+
+function compararVersoes(
+  versaoA,
+  versaoB
+) {
+  const partesA =
+    obterPartesVersao(versaoA);
+
+  const partesB =
+    obterPartesVersao(versaoB);
+
+  const tamanho =
+    Math.max(
+      partesA.length,
+      partesB.length
+    );
+
+  for (
+    let indice = 0;
+    indice < tamanho;
+    indice += 1
+  ) {
+    const parteA =
+      partesA[indice] ?? 0;
+
+    const parteB =
+      partesB[indice] ?? 0;
+
+    if (parteA !== parteB) {
+      return parteA - parteB;
+    }
+  }
+
+  return 0;
+}
+
+
+function validarVersoesPrincipais(
+  sistemas
+) {
+  return sistemas
+    .filter(
+      sistema =>
+        SISTEMAS_PRINCIPAIS.has(
+          sistema.chave
+        ) &&
+        !String(
+          sistema.versao ?? ""
+        ).trim()
+    )
+    .map(
+      sistema => sistema.nome
     );
 }
 
@@ -666,6 +739,170 @@ async function buscarAmbientePorId(
 }
 
 
+async function buscarAmbienteAnterior(
+  context,
+  versaoIntellicash,
+  excluirId = null
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT id, intellicash
+          FROM release_environments
+        `
+      )
+      .all();
+
+  const candidatos =
+    (resultado.results ?? [])
+      .filter(row => {
+        if (
+          excluirId !== null &&
+          Number(row.id) ===
+            Number(excluirId)
+        ) {
+          return false;
+        }
+
+        const versao =
+          String(
+            row.intellicash ?? ""
+          ).trim();
+
+        return (
+          Boolean(versao) &&
+          compararVersoes(
+            versao,
+            versaoIntellicash
+          ) < 0
+        );
+      })
+      .sort(
+        (a, b) =>
+          compararVersoes(
+            String(
+              b.intellicash ?? ""
+            ),
+            String(
+              a.intellicash ?? ""
+            )
+          )
+      );
+
+  if (candidatos.length) {
+    return buscarAmbientePorId(
+      context,
+      candidatos[0].id
+    );
+  }
+
+  const posteriores =
+    (resultado.results ?? [])
+      .filter(row => {
+        if (
+          excluirId !== null &&
+          Number(row.id) ===
+            Number(excluirId)
+        ) {
+          return false;
+        }
+
+        const versao =
+          String(
+            row.intellicash ?? ""
+          ).trim();
+
+        return (
+          Boolean(versao) &&
+          compararVersoes(
+            versao,
+            versaoIntellicash
+          ) > 0
+        );
+      })
+      .sort(
+        (a, b) =>
+          compararVersoes(
+            String(
+              a.intellicash ?? ""
+            ),
+            String(
+              b.intellicash ?? ""
+            )
+          )
+      );
+
+  if (!posteriores.length) {
+    return null;
+  }
+
+  return buscarAmbientePorId(
+    context,
+    posteriores[0].id
+  );
+}
+
+
+function herdarSistemasSecundarios(
+  sistemas,
+  ambienteAnterior
+) {
+  if (!ambienteAnterior) {
+    return sistemas;
+  }
+
+  const anteriores =
+    new Map(
+      (
+        ambienteAnterior.sistemas ??
+        []
+      ).map(
+        sistema => [
+          sistema.chave,
+          sistema,
+        ]
+      )
+    );
+
+  return sistemas.map(
+    sistema => {
+      if (
+        SISTEMAS_PRINCIPAIS.has(
+          sistema.chave
+        )
+      ) {
+        return sistema;
+      }
+
+      const anterior =
+        anteriores.get(
+          sistema.chave
+        );
+
+      if (!anterior) {
+        return sistema;
+      }
+
+      return {
+        ...sistema,
+        versao:
+          String(
+            anterior.versao ?? ""
+          ).trim(),
+        executavel:
+          String(
+            anterior.executavel ?? ""
+          ).trim(),
+        mostrarNaTv:
+          anterior.mostrarNaTv ??
+          true,
+      };
+    }
+  );
+}
+
+
 /*
   GET /api/environments
 */
@@ -760,11 +997,23 @@ export async function onRequestPost(
       );
     }
 
-    const sistemas =
+    let sistemas =
       normalizarSistemas(
         body.sistemas,
         body.versoes
       );
+
+    const faltantes =
+      validarVersoesPrincipais(
+        sistemas
+      );
+
+    if (faltantes.length) {
+      return respostaErro(
+        `Informe a versão de: ${faltantes.join(", ")}.`,
+        400
+      );
+    }
 
     const intellicash =
       obterVersaoSistema(
@@ -772,12 +1021,17 @@ export async function onRequestPost(
         "intellicash"
       );
 
-    if (!intellicash) {
-      return respostaErro(
-        "A versão do Intellicash é obrigatória.",
-        400
+    const ambienteAnterior =
+      await buscarAmbienteAnterior(
+        context,
+        intellicash
       );
-    }
+
+    sistemas =
+      herdarSistemasSecundarios(
+        sistemas,
+        ambienteAnterior
+      );
 
     const id =
       body.id ?? Date.now();
@@ -919,18 +1173,23 @@ export async function onRequestPut(
         body.versoes
       );
 
+    const faltantes =
+      validarVersoesPrincipais(
+        sistemas
+      );
+
+    if (faltantes.length) {
+      return respostaErro(
+        `Informe a versão de: ${faltantes.join(", ")}.`,
+        400
+      );
+    }
+
     const intellicash =
       obterVersaoSistema(
         sistemas,
         "intellicash"
       );
-
-    if (!intellicash) {
-      return respostaErro(
-        "A versão do Intellicash é obrigatória.",
-        400
-      );
-    }
 
     const ambienteAnterior =
       await buscarAmbientePorId(

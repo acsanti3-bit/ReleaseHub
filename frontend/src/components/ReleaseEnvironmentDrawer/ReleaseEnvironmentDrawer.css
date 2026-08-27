@@ -559,3 +559,58 @@
         justify-content: flex-end;
     }
 }
+
+
+/* HERANÇA DE VERSÕES */
+.release-inheritance-note {
+    margin: -4px 0 14px;
+    padding: 10px 13px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.release-inheritance-note strong {
+    display: block;
+    color: #475467;
+    font-size: 12px;
+}
+
+.release-inheritance-note span {
+    display: block;
+    margin-top: 3px;
+    color: #667085;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.release-system-version-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.release-system-version-wrap .release-system-version {
+    width: 100%;
+}
+
+.release-system-version-inherited {
+    padding-right: 92px !important;
+    background: #f8fafc !important;
+    color: #667085 !important;
+    cursor: default;
+}
+
+.release-inherited-badge {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #eaf2f8;
+    color: #005aa9;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.4;
+    pointer-events: none;
+}

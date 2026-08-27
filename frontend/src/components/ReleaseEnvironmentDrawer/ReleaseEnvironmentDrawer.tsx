@@ -17,6 +17,8 @@ import type {
 interface Props {
   environment: ReleaseEnvironment;
 
+  environments?: ReleaseEnvironment[];
+
   onClose: () => void;
 
   onSave: (
@@ -25,8 +27,81 @@ interface Props {
 }
 
 
+const SISTEMAS_PRINCIPAIS = new Set([
+  "intellicash",
+  "easycash",
+  "easycheckout",
+  "easypdv",
+  "intellistock",
+]);
+
+
+function obterPartesVersao(
+  valor: string
+): number[] {
+  return (
+    valor
+      .match(/\d+/g)
+      ?.map(Number) ??
+    []
+  );
+}
+
+
+function compararVersoes(
+  versaoA: string,
+  versaoB: string
+): number {
+  const partesA =
+    obterPartesVersao(versaoA);
+
+  const partesB =
+    obterPartesVersao(versaoB);
+
+  const tamanho =
+    Math.max(
+      partesA.length,
+      partesB.length
+    );
+
+  for (
+    let indice = 0;
+    indice < tamanho;
+    indice += 1
+  ) {
+    const parteA =
+      partesA[indice] ?? 0;
+
+    const parteB =
+      partesB[indice] ?? 0;
+
+    if (parteA !== parteB) {
+      return parteA - parteB;
+    }
+  }
+
+  return 0;
+}
+
+
+function obterVersaoIntellicash(
+  ambiente: ReleaseEnvironment
+): string {
+  return (
+    ambiente.sistemas?.find(
+      sistema =>
+        sistema.chave ===
+        "intellicash"
+    )?.versao ??
+    ambiente.versoes.intellicash ??
+    ""
+  ).trim();
+}
+
+
 function ReleaseEnvironmentDrawer({
   environment,
+  environments = [],
   onClose,
   onSave,
 }: Props) {
@@ -56,29 +131,232 @@ function ReleaseEnvironmentDrawer({
     );
 
 
+  const ambienteJaExiste =
+    useMemo(
+      () =>
+        environments.some(
+          item =>
+            item.id === environment.id
+        ),
+      [environments, environment.id]
+    );
+
+
+  const ambienteAnterior =
+    useMemo(() => {
+      if (ambienteJaExiste) {
+        return null;
+      }
+
+      const versaoAtual =
+        form.sistemas?.find(
+          sistema =>
+            sistema.chave ===
+            "intellicash"
+        )?.versao.trim() ?? "";
+
+      if (!versaoAtual) {
+        return null;
+      }
+
+      const anteriores =
+        environments
+          .filter(ambiente => {
+            const versao =
+              obterVersaoIntellicash(
+                ambiente
+              );
+
+            return (
+              Boolean(versao) &&
+              compararVersoes(
+                versao,
+                versaoAtual
+              ) < 0
+            );
+          })
+          .sort(
+            (a, b) =>
+              compararVersoes(
+                obterVersaoIntellicash(b),
+                obterVersaoIntellicash(a)
+              )
+          );
+
+      if (anteriores[0]) {
+        return anteriores[0];
+      }
+
+      return (
+        environments
+          .filter(ambiente => {
+            const versao =
+              obterVersaoIntellicash(
+                ambiente
+              );
+
+            return (
+              Boolean(versao) &&
+              compararVersoes(
+                versao,
+                versaoAtual
+              ) > 0
+            );
+          })
+          .sort(
+            (a, b) =>
+              compararVersoes(
+                obterVersaoIntellicash(a),
+                obterVersaoIntellicash(b)
+              )
+          )[0] ?? null
+      );
+    }, [
+      ambienteJaExiste,
+      environments,
+      form.sistemas,
+    ]);
+
+
   function alterarVersao(
     chave: string,
     valor: string
   ) {
-    setForm(
-      estadoAtual => ({
-        ...estadoAtual,
+    setForm(estadoAtual => {
+      const sistemasAtuais =
+        estadoAtual.sistemas ?? [];
 
+      if (
+        chave !== "intellicash" ||
+        ambienteJaExiste
+      ) {
+        return {
+          ...estadoAtual,
+          sistemas:
+            sistemasAtuais.map(
+              sistema =>
+                sistema.chave === chave
+                  ? {
+                      ...sistema,
+                      versao: valor,
+                    }
+                  : sistema
+            ),
+        };
+      }
+
+      const anteriores =
+        environments
+          .filter(ambiente => {
+            const versao =
+              obterVersaoIntellicash(
+                ambiente
+              );
+
+            return (
+              Boolean(versao) &&
+              Boolean(valor.trim()) &&
+              compararVersoes(
+                versao,
+                valor
+              ) < 0
+            );
+          })
+          .sort(
+            (a, b) =>
+              compararVersoes(
+                obterVersaoIntellicash(b),
+                obterVersaoIntellicash(a)
+              )
+          );
+
+      const posteriores =
+        environments
+          .filter(ambiente => {
+            const versao =
+              obterVersaoIntellicash(
+                ambiente
+              );
+
+            return (
+              Boolean(versao) &&
+              Boolean(valor.trim()) &&
+              compararVersoes(
+                versao,
+                valor
+              ) > 0
+            );
+          })
+          .sort(
+            (a, b) =>
+              compararVersoes(
+                obterVersaoIntellicash(a),
+                obterVersaoIntellicash(b)
+              )
+          );
+
+      const ambienteBase =
+        anteriores[0] ??
+        posteriores[0];
+
+      const herdados =
+        new Map(
+          (ambienteBase?.sistemas ?? [])
+            .map(sistema => [
+              sistema.chave,
+              sistema,
+            ])
+        );
+
+      return {
+        ...estadoAtual,
         sistemas:
-          (
-            estadoAtual.sistemas ??
-            []
-          ).map(
-            sistema =>
-              sistema.chave === chave
-                ? {
-                    ...sistema,
-                    versao: valor,
-                  }
-                : sistema
+          sistemasAtuais.map(
+            sistema => {
+              if (
+                sistema.chave ===
+                "intellicash"
+              ) {
+                return {
+                  ...sistema,
+                  versao: valor,
+                };
+              }
+
+              if (
+                SISTEMAS_PRINCIPAIS.has(
+                  sistema.chave
+                )
+              ) {
+                return sistema;
+              }
+
+              const herdado =
+                herdados.get(
+                  sistema.chave
+                );
+
+              if (!herdado) {
+                return {
+                  ...sistema,
+                  versao: "",
+                };
+              }
+
+              return {
+                ...sistema,
+                versao:
+                  herdado.versao ?? "",
+                executavel:
+                  herdado.executavel ?? "",
+                mostrarNaTv:
+                  herdado.mostrarNaTv ??
+                  true,
+              };
+            }
           ),
-      })
-    );
+      };
+    });
   }
 
 
@@ -165,20 +443,20 @@ function ReleaseEnvironmentDrawer({
       return;
     }
 
-    const intellicash =
-      sistemas.find(
+    const principaisSemVersao =
+      sistemas.filter(
         sistema =>
-          sistema.chave ===
-          "intellicash"
+          SISTEMAS_PRINCIPAIS.has(
+            sistema.chave
+          ) &&
+          !sistema.versao.trim()
       );
 
-    if (
-      !intellicash
-        ?.versao
-        .trim()
-    ) {
+    if (principaisSemVersao.length) {
       alert(
-        "Informe a versão do IntelliCash."
+        `Informe a versão de: ${principaisSemVersao
+          .map(sistema => sistema.nome)
+          .join(", ")}.`
       );
 
       return;
@@ -275,8 +553,8 @@ function ReleaseEnvironmentDrawer({
             </h2>
 
             <span>
-              Defina o prazo da release, versões
-              e executáveis dos sistemas
+              Informe as versões principais da release.
+              As demais são herdadas automaticamente.
             </span>
           </div>
 
@@ -345,16 +623,35 @@ function ReleaseEnvironmentDrawer({
 
           <div className="release-reference">
             <strong>
-              Catálogo fixo
+              Versões principais
             </strong>
 
             <span>
-              Todos os ambientes possuem
-              os mesmos 19 sistemas. O prazo é
-              único para toda a release; versão
-              e executável são definidos por sistema.
+              IntelliCash, EasyCash, EasyCheckOut,
+              EasyPDV e IntelliStock devem ter a versão
+              informada em cada release. As demais
+              aplicações herdam a versão da release
+              anterior mais próxima. Se não houver uma
+              anterior cadastrada, é usada a próxima
+              release disponível. Alterações ficam na
+              página Compatibilidade.
             </span>
           </div>
+
+
+          {!ambienteJaExiste && ambienteAnterior && (
+            <div className="release-inheritance-note">
+              <strong>
+                Versões herdadas
+              </strong>
+
+              <span>
+                As aplicações secundárias foram
+                preenchidas com base em
+                <b> {ambienteAnterior.nome}</b>.
+              </span>
+            </div>
+          )}
 
 
           <div className="release-divider">
@@ -438,25 +735,53 @@ function ReleaseEnvironmentDrawer({
                       )}
                     </label>
 
-                    <input
-                      className="release-system-version"
-                      id={
-                        `version-${sistema.chave}`
-                      }
-                      placeholder="Sem versão"
-                      value={
-                        sistema.versao
-                      }
-                      onChange={
-                        event =>
-                          alterarVersao(
-                            sistema.chave,
-                            event
-                              .target
-                              .value
+                    <div className="release-system-version-wrap">
+                      <input
+                        className={`release-system-version ${
+                          SISTEMAS_PRINCIPAIS.has(
+                            sistema.chave
                           )
-                      }
-                    />
+                            ? ""
+                            : "release-system-version-inherited"
+                        }`}
+                        id={
+                          `version-${sistema.chave}`
+                        }
+                        placeholder="Sem versão"
+                        value={
+                          sistema.versao
+                        }
+                        readOnly={
+                          !SISTEMAS_PRINCIPAIS.has(
+                            sistema.chave
+                          )
+                        }
+                        title={
+                          SISTEMAS_PRINCIPAIS.has(
+                            sistema.chave
+                          )
+                            ? "Versão utilizada nesta release"
+                            : "Versão herdada. Altere pela página Compatibilidade."
+                        }
+                        onChange={
+                          event =>
+                            alterarVersao(
+                              sistema.chave,
+                              event
+                                .target
+                                .value
+                            )
+                        }
+                      />
+
+                      {!SISTEMAS_PRINCIPAIS.has(
+                        sistema.chave
+                      ) && (
+                        <small className="release-inherited-badge">
+                          Compatibilidade
+                        </small>
+                      )}
+                    </div>
 
                     <input
                       className="release-system-executable"

@@ -1002,6 +1002,7 @@ function ReleaseEnvironments() {
       {podeEditar && ambienteSelecionado && (
         <ReleaseEnvironmentDrawer
           environment={ambienteSelecionado}
+          environments={ambientes}
           onClose={() =>
             setAmbienteSelecionado(null)
           }
