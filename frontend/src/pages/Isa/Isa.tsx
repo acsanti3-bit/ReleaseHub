@@ -426,7 +426,7 @@ function Isa() {
       para obter ISA Servidor;
 
     - dados próprios do ISA,
-      para obter os aplicativos Android.
+      para obter os apps Android.
   */
 
   useEffect(
@@ -442,23 +442,9 @@ function Isa() {
           []
         );
 
-        setVersoesEdicao(
-          {}
-        );
-
         return;
 
       }
-
-
-      /*
-        Depois da validação acima,
-        o ID do ambiente é garantidamente
-        um número dentro deste efeito.
-      */
-
-      const idAmbiente =
-        environmentId;
 
 
       let ativo =
@@ -481,11 +467,11 @@ function Isa() {
             await Promise.all(
               [
                 buscarCompatibilidade(
-                  idAmbiente
+                  environmentId as number
                 ),
 
                 buscarIsaPorAmbiente(
-                  idAmbiente
+                  environmentId as number
                 ),
               ]
             );
@@ -545,7 +531,7 @@ function Isa() {
             {
               environment:
                 String(
-                  idAmbiente
+                  environmentId
                 ),
             },
             {
@@ -570,10 +556,6 @@ function Isa() {
 
             setAplicativos(
               []
-            );
-
-            setVersoesEdicao(
-              {}
             );
 
 
@@ -704,20 +686,13 @@ function Isa() {
       IsaApplication
   ) {
 
-    if (!environmentId) {
+    if (
+      !environmentId
+    ) {
 
       return;
 
     }
-
-
-    /*
-      Cria uma referência numérica
-      após validar o nullable.
-    */
-
-    const idAmbiente =
-      environmentId;
 
 
     const novaVersao =
@@ -755,7 +730,7 @@ function Isa() {
 
       const resposta =
         await atualizarVersaoIsa(
-          idAmbiente,
+          environmentId,
           aplicativo.id,
           novaVersao
         );
@@ -842,15 +817,6 @@ function Isa() {
     }
 
 
-    /*
-      Garante que o valor passado
-      aos serviços seja sempre number.
-    */
-
-    const idAmbiente =
-      environmentId;
-
-
     try {
 
       setCarregandoDados(
@@ -865,11 +831,11 @@ function Isa() {
         await Promise.all(
           [
             buscarCompatibilidade(
-              idAmbiente
+              environmentId
             ),
 
             buscarIsaPorAmbiente(
-              idAmbiente
+              environmentId
             ),
           ]
         );
@@ -918,12 +884,6 @@ function Isa() {
       );
 
     } catch (erro) {
-
-      console.error(
-        "Erro ao atualizar dados ISA:",
-        erro
-      );
-
 
       setFeedback(
         {
@@ -1086,7 +1046,6 @@ function Isa() {
                       ambiente.id
                     }
                   >
-
                     {
                       ambiente
                         .versoes
@@ -1098,7 +1057,6 @@ function Isa() {
                         ? ` — ${ambiente.nome}`
                         : ""
                     }
-
                   </option>
 
                 )
@@ -1169,9 +1127,10 @@ function Isa() {
                   </strong>
 
                   <small>
-                    Esta versão é definida
-                    pela Compatibilidade
-                    da release e não é
+                    Esta versão é
+                    definida pela
+                    Compatibilidade da
+                    release e não é
                     alterada nesta tela.
                   </small>
 
@@ -1215,8 +1174,9 @@ function Isa() {
                   </h2>
 
                   <p>
-                    Gerencie a versão de cada
-                    aplicativo para esta release.
+                    Cada aplicativo possui
+                    sua própria versão
+                    para esta release.
                   </p>
 
                 </div>
@@ -1293,7 +1253,8 @@ function Isa() {
                             <div>
 
                               <span>
-                                Aplicativo Android
+                                Aplicativo
+                                Android
                               </span>
 
                               <h3>
@@ -1307,10 +1268,27 @@ function Isa() {
                           </div>
 
 
+                          <div className="isa-app-current">
+
+                            <span>
+                              Versão atual
+                            </span>
+
+                            <strong>
+                              {
+                                aplicativo.version ||
+                                "Não informada"
+                              }
+                            </strong>
+
+                          </div>
+
+
                           <label className="isa-version-field">
 
                             <span>
-                              Versão
+                              Versão nesta
+                              release
                             </span>
 
                             <input
