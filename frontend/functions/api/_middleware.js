@@ -483,6 +483,7 @@ export async function onRequest(
     usuario.role === "qualidade" &&
     metodo === "DELETE"
   ) {
+
     return respostaJson(
       {
         erro:
@@ -493,6 +494,7 @@ export async function onRequest(
       },
       origemPermitida
     );
+
   }
 
 
@@ -512,6 +514,7 @@ export async function onRequest(
       usuario.role
     )
   ) {
+
     return respostaJson(
       {
         erro:
@@ -522,6 +525,7 @@ export async function onRequest(
       },
       origemPermitida
     );
+
   }
 
 
@@ -534,7 +538,8 @@ export async function onRequest(
     caminho === "/api/projects" ||
     caminho === "/api/environments" ||
     caminho === "/api/release-projects" ||
-    caminho === "/api/compatibility";
+    caminho === "/api/compatibility" ||
+    caminho === "/api/isa";
 
 
   const metodoAlteracao =

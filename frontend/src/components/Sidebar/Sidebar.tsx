@@ -193,6 +193,10 @@ function Sidebar() {
           Compatibilidade
         </NavLink>
 
+        <NavLink to="/isa">
+          ISA
+        </NavLink>
+
         <NavLink to="/tv">
           Modo TV
         </NavLink>

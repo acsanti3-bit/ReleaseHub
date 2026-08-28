@@ -44,6 +44,16 @@ const Compatibility =
       )
   );
 
+
+const Isa =
+  lazy(
+    () =>
+      import(
+        "../pages/Isa/Isa"
+      )
+  );
+
+
 const ReleaseEnvironments =
   lazy(
     () =>
@@ -134,6 +144,21 @@ function AppRoutes() {
 
             }
           />
+
+
+          <Route
+            path="/isa"
+            element={
+
+              <ProtectedRoute>
+
+                <Isa />
+
+              </ProtectedRoute>
+
+            }
+          />
+
 
           <Route
             path="/environments"
