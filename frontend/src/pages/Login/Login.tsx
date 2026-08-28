@@ -34,17 +34,22 @@ import "./Login.css";
 const TURNSTILE_SITE_KEY =
   "0x4AAAAAAETHPPp2o-cUo82B";
 
+
 type TurnstileWidgetId =
   string | number;
+
 
 interface TurnstileOptions {
   sitekey: string;
   action?: string;
   theme?: "light" | "dark" | "auto";
+
   callback?: (
     token: string
   ) => void;
+
   "expired-callback"?: () => void;
+
   "error-callback"?: () => void;
 }
 
@@ -53,49 +58,104 @@ function obterDestinoAposLogin(
   usuario: AuthUser,
   origem: string
 ): string {
+
+  /*
+    Administrador e Qualidade
+    podem retornar normalmente
+    para a rota que originou
+    o redirecionamento ao login.
+  */
+
   if (
     usuario.role !==
       "visualizador"
   ) {
+
     return origem;
+
   }
+
+
+  /*
+    O Visualizador não possui
+    acesso às telas de gerenciamento.
+
+    Caso o login tenha sido aberto
+    a partir de uma dessas rotas,
+    redireciona para o Dashboard.
+  */
+
+  const rotasRestritas = [
+    "/environments",
+    "/settings",
+  ];
+
+
+  const origemRestrita =
+    rotasRestritas.some(
+      rota =>
+        origem === rota ||
+        origem.startsWith(
+          `${rota}/`
+        )
+    );
+
 
   if (
-    origem === "/" ||
-    origem.startsWith(
-      "/settings"
-    )
+    origemRestrita
   ) {
-    return "/environments";
+
+    return "/";
+
   }
 
+
+  /*
+    Compatibilidade, ISA,
+    Dashboard e Modo TV
+    continuam acessíveis.
+  */
+
   return origem;
+
 }
 
+
 declare global {
+
   interface Window {
+
     turnstile?: {
+
       render: (
         container: HTMLElement,
         options: TurnstileOptions
       ) => TurnstileWidgetId;
+
       reset: (
         widgetId?: TurnstileWidgetId
       ) => void;
+
       remove: (
         widgetId: TurnstileWidgetId
       ) => void;
+
     };
+
   }
+
 }
+
 
 function Login() {
 
   const navigate =
     useNavigate();
 
+
   const location =
     useLocation();
+
 
   const [
     email,
@@ -103,11 +163,13 @@ function Login() {
   ] =
     useState("");
 
+
   const [
     senha,
     setSenha,
   ] =
     useState("");
+
 
   const [
     mostrarSenha,
@@ -115,11 +177,13 @@ function Login() {
   ] =
     useState(false);
 
+
   const [
     carregando,
     setCarregando,
   ] =
     useState(false);
+
 
   const [
     erro,
@@ -134,15 +198,22 @@ function Login() {
   ] =
     useState("");
 
+
   const turnstileContainerRef =
-    useRef<HTMLDivElement | null>(
+    useRef<
+      HTMLDivElement | null
+    >(
       null
     );
 
+
   const turnstileWidgetRef =
-    useRef<TurnstileWidgetId | null>(
+    useRef<
+      TurnstileWidgetId | null
+    >(
       null
     );
+
 
   const origem =
     (
@@ -154,9 +225,15 @@ function Login() {
     )?.from || "/";
 
 
+  /*
+    Carrega e renderiza
+    o Cloudflare Turnstile.
+  */
+
   useEffect(() => {
 
     let ativo = true;
+
 
     function renderizarTurnstile() {
 
@@ -164,12 +241,14 @@ function Login() {
         !ativo ||
         !turnstileContainerRef.current ||
         !window.turnstile ||
-        turnstileWidgetRef.current !== null
+        turnstileWidgetRef.current !==
+          null
       ) {
 
         return;
 
       }
+
 
       turnstileWidgetRef.current =
         window.turnstile.render(
@@ -219,6 +298,7 @@ function Login() {
                     ""
                   );
 
+
                   setErro(
                     "Não foi possível concluir a verificação de segurança. Tente novamente."
                   );
@@ -231,13 +311,18 @@ function Login() {
 
     }
 
+
     const scriptId =
       "cloudflare-turnstile-script";
+
 
     let script =
       document.getElementById(
         scriptId
-      ) as HTMLScriptElement | null;
+      ) as
+        | HTMLScriptElement
+        | null;
+
 
     const handleLoad =
       () => {
@@ -245,6 +330,7 @@ function Login() {
         renderizarTurnstile();
 
       };
+
 
     const handleError =
       () => {
@@ -258,6 +344,7 @@ function Login() {
         }
 
       };
+
 
     if (
       window.turnstile
@@ -274,14 +361,22 @@ function Login() {
             "script"
           );
 
+
         script.id =
           scriptId;
+
 
         script.src =
           "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
-        script.async = true;
-        script.defer = true;
+
+        script.async =
+          true;
+
+
+        script.defer =
+          true;
+
 
         document.head.appendChild(
           script
@@ -289,10 +384,12 @@ function Login() {
 
       }
 
+
       script.addEventListener(
         "load",
         handleLoad
       );
+
 
       script.addEventListener(
         "error",
@@ -301,9 +398,12 @@ function Login() {
 
     }
 
+
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
+
 
       if (script) {
 
@@ -312,6 +412,7 @@ function Login() {
           handleLoad
         );
 
+
         script.removeEventListener(
           "error",
           handleError
@@ -319,14 +420,17 @@ function Login() {
 
       }
 
+
       if (
         window.turnstile &&
-        turnstileWidgetRef.current !== null
+        turnstileWidgetRef.current !==
+          null
       ) {
 
         window.turnstile.remove(
           turnstileWidgetRef.current
         );
+
 
         turnstileWidgetRef.current =
           null;
@@ -337,9 +441,17 @@ function Login() {
 
   }, []);
 
+
+  /*
+    Se já existir uma sessão
+    válida, não mantém o usuário
+    parado na tela de login.
+  */
+
   useEffect(() => {
 
     let ativo = true;
+
 
     async function verificarSessao() {
 
@@ -347,6 +459,7 @@ function Login() {
 
         const usuario =
           await buscarSessao();
+
 
         if (
           ativo &&
@@ -359,7 +472,8 @@ function Login() {
               origem
             ),
             {
-              replace: true,
+              replace:
+                true,
             }
           );
 
@@ -376,11 +490,14 @@ function Login() {
 
     }
 
+
     void verificarSessao();
+
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
@@ -389,11 +506,14 @@ function Login() {
     origem,
   ]);
 
+
   async function handleSubmit(
-    event: SyntheticEvent<HTMLFormElement>
+    event:
+      SyntheticEvent<HTMLFormElement>
   ) {
 
     event.preventDefault();
+
 
     if (
       !email.trim() ||
@@ -403,6 +523,7 @@ function Login() {
       setErro(
         "Informe seu e-mail e sua senha."
       );
+
 
       return;
 
@@ -417,13 +538,21 @@ function Login() {
         "Conclua a verificação de segurança para entrar."
       );
 
+
       return;
 
     }
 
-    setCarregando(true);
 
-    setErro("");
+    setCarregando(
+      true
+    );
+
+
+    setErro(
+      ""
+    );
+
 
     try {
 
@@ -434,13 +563,15 @@ function Login() {
           turnstileToken
         );
 
+
       navigate(
         obterDestinoAposLogin(
           usuario,
           origem
         ),
         {
-          replace: true,
+          replace:
+            true,
         }
       );
 
@@ -452,13 +583,16 @@ function Login() {
           : "Não foi possível entrar."
       );
 
+
       setTurnstileToken(
         ""
       );
 
+
       if (
         window.turnstile &&
-        turnstileWidgetRef.current !== null
+        turnstileWidgetRef.current !==
+          null
       ) {
 
         window.turnstile.reset(
@@ -469,11 +603,14 @@ function Login() {
 
     } finally {
 
-      setCarregando(false);
+      setCarregando(
+        false
+      );
 
     }
 
   }
+
 
   return (
 
@@ -482,6 +619,7 @@ function Login() {
       <div className="login-decoration login-decoration-one" />
 
       <div className="login-decoration login-decoration-two" />
+
 
       <main className="login-card">
 
@@ -495,6 +633,7 @@ function Login() {
             />
 
           </div>
+
 
           <div>
 
@@ -510,6 +649,7 @@ function Login() {
 
         </div>
 
+
         <div className="login-heading">
 
           <h2>
@@ -522,6 +662,7 @@ function Login() {
 
         </div>
 
+
         <form
           onSubmit={
             handleSubmit
@@ -533,35 +674,41 @@ function Login() {
             E-mail
           </label>
 
+
           <div className="login-input">
 
             <MdOutlineEmail
               size={20}
             />
 
+
             <input
               type="email"
               autoComplete="email"
               placeholder="seu@email.com"
               value={email}
-              onChange={event =>
-                setEmail(
-                  event.target.value
-                )
+              onChange={
+                event =>
+                  setEmail(
+                    event.target.value
+                  )
               }
             />
 
           </div>
 
+
           <label>
             Senha
           </label>
+
 
           <div className="login-input">
 
             <MdLockOutline
               size={20}
             />
+
 
             <input
               type={
@@ -572,12 +719,14 @@ function Login() {
               autoComplete="current-password"
               placeholder="Digite sua senha"
               value={senha}
-              onChange={event =>
-                setSenha(
-                  event.target.value
-                )
+              onChange={
+                event =>
+                  setSenha(
+                    event.target.value
+                  )
               }
             />
+
 
             <button
               type="button"
@@ -613,16 +762,23 @@ function Login() {
 
           </div>
 
+
           <div
             ref={
               turnstileContainerRef
             }
             style={{
-              display: "flex",
-              justifyContent: "center",
-              minHeight: "65px",
+              display:
+                "flex",
+
+              justifyContent:
+                "center",
+
+              minHeight:
+                "65px",
             }}
           />
+
 
           {erro && (
 
@@ -633,6 +789,7 @@ function Login() {
             </div>
 
           )}
+
 
           <button
             type="submit"
@@ -651,6 +808,7 @@ function Login() {
 
         </form>
 
+
         <footer className="login-footer">
 
           <div className="login-footer-main">
@@ -665,6 +823,7 @@ function Login() {
 
           </div>
 
+
           <span className="login-credit">
             Desenvolvido por Ana Carolina Santi Teixeira • QA
           </span>
@@ -678,5 +837,6 @@ function Login() {
   );
 
 }
+
 
 export default Login;
