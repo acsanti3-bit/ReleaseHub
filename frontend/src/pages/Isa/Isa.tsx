@@ -199,9 +199,6 @@ function Isa() {
     A versão do ISA Servidor
     continua sendo controlada
     pela Compatibilidade.
-
-    Não existe uma segunda versão
-    salva no módulo ISA.
   */
 
   const isaServidor =
@@ -222,13 +219,6 @@ function Isa() {
               ) ===
               "isaservidor"
           ) ??
-
-          /*
-            Fallback para cadastros
-            antigos, antes da alteração
-            do nome IntelliStock
-            para ISA Servidor.
-          */
 
           itens.find(
             item =>
@@ -266,10 +256,8 @@ function Isa() {
 
 
   /*
-    Carrega:
-    - releases;
-    - usuário logado;
-    - ambiente inicial.
+    Carrega releases,
+    usuário e ambiente inicial.
   */
 
   useEffect(
@@ -409,8 +397,6 @@ function Isa() {
 
       };
 
-      // Ambiente da URL usado
-      // somente na carga inicial.
       // eslint-disable-next-line react-hooks/exhaustive-deps
 
     },
@@ -419,14 +405,7 @@ function Isa() {
 
 
   /*
-    Quando muda a release,
-    carrega em paralelo:
-
-    - Compatibilidade,
-      para obter ISA Servidor;
-
-    - dados próprios do ISA,
-      para obter os apps Android.
+    Carrega os dados da release selecionada.
   */
 
   useEffect(
@@ -440,10 +419,6 @@ function Isa() {
 
         setAplicativos(
           []
-        );
-
-        setVersoesEdicao(
-          {}
         );
 
         return;
@@ -562,10 +537,6 @@ function Isa() {
               []
             );
 
-            setVersoesEdicao(
-              {}
-            );
-
 
             setFeedback(
               {
@@ -615,8 +586,7 @@ function Isa() {
 
 
   /*
-    Feedback desaparece
-    automaticamente.
+    Remove o feedback automaticamente.
   */
 
   useEffect(
@@ -668,36 +638,22 @@ function Isa() {
   }
 
 
-  /*
-    Verifica se o valor digitado
-    é diferente da versão salva
-    para esta release.
-  */
-
   function possuiAlteracao(
     aplicativo:
       IsaApplication
   ) {
 
-    const valorEditado =
+    return (
       (
         versoesEdicao[
           aplicativo.id
         ] ??
         ""
-      ).trim();
-
-
-    const valorSalvo =
+      ).trim() !==
       (
         aplicativo.version ??
         ""
-      ).trim();
-
-
-    return (
-      valorEditado !==
-      valorSalvo
+      ).trim()
     );
 
   }
@@ -708,9 +664,7 @@ function Isa() {
       IsaApplication
   ) {
 
-    if (
-      !environmentId
-    ) {
+    if (!environmentId) {
 
       return;
 
@@ -949,11 +903,9 @@ function Isa() {
             </h1>
 
             <p>
-              Consulte o ISA Servidor
-              utilizado em cada versão
-              do IntelliCash e gerencie
-              individualmente as versões
-              dos aplicativos Android.
+              Consulte o ISA Servidor utilizado
+              em cada release e mantenha as
+              versões dos aplicativos Android.
             </p>
 
           </div>
@@ -1068,6 +1020,7 @@ function Isa() {
                       ambiente.id
                     }
                   >
+
                     {
                       ambiente
                         .versoes
@@ -1079,6 +1032,7 @@ function Isa() {
                         ? ` — ${ambiente.nome}`
                         : ""
                     }
+
                   </option>
 
                 )
@@ -1095,9 +1049,7 @@ function Isa() {
         carregandoDados ? (
 
           <section className="isa-loading">
-
             Carregando versões ISA...
-
           </section>
 
         ) : (
@@ -1149,11 +1101,9 @@ function Isa() {
                   </strong>
 
                   <small>
-                    Esta versão é
-                    definida pela
-                    Compatibilidade da
-                    release e não é
-                    alterada nesta tela.
+                    Esta versão é definida pela
+                    Compatibilidade da release e
+                    não é alterada nesta tela.
                   </small>
 
                 </div>
@@ -1196,9 +1146,9 @@ function Isa() {
                   </h2>
 
                   <p>
-                    Cada aplicativo possui
-                    sua própria versão
-                    para esta release.
+                    Informe a versão de cada
+                    aplicativo que acompanhará
+                    esta release.
                   </p>
 
                 </div>
@@ -1210,8 +1160,7 @@ function Isa() {
 
                   {" "}
 
-                  {aplicativos.length ===
-                  1
+                  {aplicativos.length === 1
                     ? "aplicativo"
                     : "aplicativos"}
 
@@ -1220,8 +1169,7 @@ function Isa() {
               </div>
 
 
-              {aplicativos.length ===
-              0 ? (
+              {aplicativos.length === 0 ? (
 
                 <div className="isa-empty">
 
@@ -1275,8 +1223,7 @@ function Isa() {
                             <div>
 
                               <span>
-                                Aplicativo
-                                Android
+                                Aplicativo Android
                               </span>
 
                               <h3>
@@ -1290,57 +1237,78 @@ function Isa() {
                           </div>
 
 
-                          <label className="isa-version-field">
+                          <div className="isa-version-area">
 
-                            <span>
-                              Versão
-                            </span>
+                            <div className="isa-version-heading">
 
-                            <input
-                              type="text"
-                              value={
-                                versoesEdicao[
-                                  aplicativo.id
-                                ] ??
-                                ""
-                              }
-                              placeholder="Ex.: 1.5.0"
-                              disabled={
-                                !podeEditar ||
-                                salvando
-                              }
-                              onChange={
-                                evento =>
-                                  alterarVersao(
-                                    aplicativo.id,
-                                    evento
-                                      .target
-                                      .value
-                                  )
-                              }
-                              onKeyDown={
-                                evento => {
+                              <span>
+                                Versão da release
+                              </span>
 
-                                  if (
-                                    evento.key ===
-                                      "Enter" &&
-                                    alterado &&
-                                    podeEditar
-                                  ) {
+                              {alterado && (
+                                <span className="isa-changed-badge">
+                                  Alterada
+                                </span>
+                              )}
 
-                                    evento.preventDefault();
+                            </div>
 
-                                    void salvarVersao(
-                                      aplicativo
-                                    );
+
+                            <label className="isa-version-field">
+
+                              <input
+                                type="text"
+                                value={
+                                  versoesEdicao[
+                                    aplicativo.id
+                                  ] ??
+                                  ""
+                                }
+                                placeholder="Ex.: 1.5.0"
+                                disabled={
+                                  !podeEditar ||
+                                  salvando
+                                }
+                                aria-label={`Versão da release do ${aplicativo.name}`}
+                                onChange={
+                                  evento =>
+                                    alterarVersao(
+                                      aplicativo.id,
+                                      evento
+                                        .target
+                                        .value
+                                    )
+                                }
+                                onKeyDown={
+                                  evento => {
+
+                                    if (
+                                      evento.key ===
+                                        "Enter" &&
+                                      alterado &&
+                                      podeEditar
+                                    ) {
+
+                                      evento.preventDefault();
+
+                                      void salvarVersao(
+                                        aplicativo
+                                      );
+
+                                    }
 
                                   }
-
                                 }
-                              }
-                            />
+                              />
 
-                          </label>
+                            </label>
+
+                            <p className="isa-version-help">
+                              Versão que será considerada
+                              para esta release.
+                            </p>
+
+                          </div>
 
 
                           <footer className="isa-app-footer">
@@ -1348,8 +1316,7 @@ function Isa() {
                             {!podeEditar ? (
 
                               <span className="isa-readonly">
-                                Somente
-                                visualização
+                                Somente visualização
                               </span>
 
                             ) : (
