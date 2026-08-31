@@ -442,6 +442,10 @@ function Isa() {
           []
         );
 
+        setVersoesEdicao(
+          {}
+        );
+
         return;
 
       }
@@ -558,6 +562,10 @@ function Isa() {
               []
             );
 
+            setVersoesEdicao(
+              {}
+            );
+
 
             setFeedback(
               {
@@ -660,22 +668,36 @@ function Isa() {
   }
 
 
+  /*
+    Verifica se o valor digitado
+    é diferente da versão salva
+    para esta release.
+  */
+
   function possuiAlteracao(
     aplicativo:
       IsaApplication
   ) {
 
-    return (
+    const valorEditado =
       (
         versoesEdicao[
           aplicativo.id
         ] ??
         ""
-      ).trim() !==
+      ).trim();
+
+
+    const valorSalvo =
       (
         aplicativo.version ??
         ""
-      ).trim()
+      ).trim();
+
+
+    return (
+      valorEditado !==
+      valorSalvo
     );
 
   }
@@ -1268,27 +1290,10 @@ function Isa() {
                           </div>
 
 
-                          <div className="isa-app-current">
-
-                            <span>
-                              Versão atual
-                            </span>
-
-                            <strong>
-                              {
-                                aplicativo.version ||
-                                "Não informada"
-                              }
-                            </strong>
-
-                          </div>
-
-
                           <label className="isa-version-field">
 
                             <span>
-                              Versão nesta
-                              release
+                              Versão
                             </span>
 
                             <input
