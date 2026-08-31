@@ -8,9 +8,9 @@
 }
 
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+/*
+  Cabeçalho
+*/
 
 .isa-header {
   display: flex;
@@ -31,7 +31,9 @@
     );
 
   box-shadow:
-    0 8px 28px
+    0
+    8px
+    28px
     rgba(15, 23, 42, 0.05);
 }
 
@@ -70,7 +72,10 @@
 .isa-header p {
   max-width: 720px;
 
-  margin: 10px 0 0;
+  margin:
+    10px
+    0
+    0;
 
   font-size: 14px;
   line-height: 1.6;
@@ -80,9 +85,9 @@
 }
 
 
-/* =========================================================
-   BOTÃO ATUALIZAR
-   ========================================================= */
+/*
+  Botão atualizar
+*/
 
 .isa-refresh-button {
   display: inline-flex;
@@ -92,14 +97,18 @@
 
   min-height: 42px;
 
-  padding: 0 16px;
+  padding:
+    0
+    16px;
 
   border: 1px solid #bfdbfe;
   border-radius: 10px;
 
-  background: #eff6ff;
+  background:
+    #eff6ff;
 
-  color: #1d4ed8;
+  color:
+    #1d4ed8;
 
   font-size: 14px;
   font-weight: 700;
@@ -115,13 +124,16 @@
 
 
 .isa-refresh-button:hover:not(:disabled) {
-  background: #dbeafe;
+  background:
+    #dbeafe;
 
   transform:
     translateY(-1px);
 
   box-shadow:
-    0 6px 16px
+    0
+    6px
+    16px
     rgba(37, 99, 235, 0.12);
 }
 
@@ -133,16 +145,18 @@
 }
 
 
-/* =========================================================
-   FEEDBACK
-   ========================================================= */
+/*
+  Feedback
+*/
 
 .isa-feedback {
   display: flex;
   align-items: center;
   gap: 10px;
 
-  padding: 13px 16px;
+  padding:
+    13px
+    16px;
 
   border-radius: 12px;
 
@@ -154,32 +168,44 @@
 .isa-feedback-sucesso {
   border: 1px solid #bbf7d0;
 
-  background: #f0fdf4;
+  background:
+    #f0fdf4;
 
-  color: #166534;
+  color:
+    #166534;
 }
 
 
 .isa-feedback-erro {
   border: 1px solid #fecaca;
 
-  background: #fef2f2;
+  background:
+    #fef2f2;
 
-  color: #991b1b;
+  color:
+    #991b1b;
 }
 
 
-/* =========================================================
-   RELEASE
-   ========================================================= */
+/*
+  Seleção da release
+
+  O conteúdo fica centralizado
+  verticalmente para não parecer
+  "solto" dentro do card.
+*/
 
 .isa-environment-card {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 28px;
 
-  padding: 22px 24px;
+  min-height: 104px;
+
+  padding:
+    20px
+    24px;
 
   border: 1px solid #dbe5ef;
   border-radius: 16px;
@@ -192,7 +218,9 @@
     );
 
   box-shadow:
-    0 6px 22px
+    0
+    6px
+    22px
     rgba(15, 23, 42, 0.04);
 }
 
@@ -200,7 +228,10 @@
 .isa-environment-title {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  gap: 6px;
+
+  min-width: 220px;
 }
 
 
@@ -215,6 +246,7 @@
 
 .isa-environment-title strong {
   font-size: 18px;
+  line-height: 1.25;
 
   color:
     var(--text-primary, #0f172a);
@@ -224,9 +256,13 @@
 .isa-environment-field {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 7px;
 
-  width: min(100%, 420px);
+  width: min(
+    100%,
+    420px
+  );
 }
 
 
@@ -234,7 +270,8 @@
   font-size: 12px;
   font-weight: 700;
 
-  color: #475569;
+  color:
+    #475569;
 }
 
 
@@ -242,12 +279,15 @@
   width: 100%;
   min-height: 42px;
 
-  padding: 0 12px;
+  padding:
+    0
+    12px;
 
   border: 1px solid #bfdbfe;
   border-radius: 10px;
 
-  background: #ffffff;
+  background:
+    #ffffff;
 
   color:
     var(--text-primary, #111827);
@@ -256,6 +296,8 @@
 
   outline: none;
 
+  cursor: pointer;
+
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -263,17 +305,21 @@
 
 
 .isa-environment-field select:focus {
-  border-color: #2563eb;
+  border-color:
+    #2563eb;
 
   box-shadow:
-    0 0 0 3px
+    0
+    0
+    0
+    3px
     rgba(37, 99, 235, 0.1);
 }
 
 
-/* =========================================================
-   LOADING / EMPTY
-   ========================================================= */
+/*
+  Loading / vazio
+*/
 
 .isa-loading,
 .isa-empty {
@@ -288,19 +334,19 @@
   border: 1px dashed #cbd5e1;
   border-radius: 14px;
 
-  background:
-    var(--card-background, #ffffff);
-
   color:
     var(--text-secondary, #64748b);
+
+  background:
+    var(--card-background, #ffffff);
 
   font-size: 14px;
 }
 
 
-/* =========================================================
-   SEÇÕES
-   ========================================================= */
+/*
+  Seções
+*/
 
 .isa-server-section,
 .isa-apps-section {
@@ -319,7 +365,10 @@
 
 
 .isa-section-heading h2 {
-  margin: 3px 0 0;
+  margin:
+    3px
+    0
+    0;
 
   font-size: 20px;
 
@@ -329,7 +378,10 @@
 
 
 .isa-section-heading p {
-  margin: 7px 0 0;
+  margin:
+    7px
+    0
+    0;
 
   font-size: 13px;
 
@@ -347,13 +399,14 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 
-  color: #2563eb;
+  color:
+    #2563eb;
 }
 
 
-/* =========================================================
-   ISA SERVIDOR
-   ========================================================= */
+/*
+  ISA Servidor
+*/
 
 .isa-server-card {
   display: grid;
@@ -367,7 +420,9 @@
 
   gap: 18px;
 
-  padding: 22px 24px;
+  padding:
+    22px
+    24px;
 
   border: 1px solid #bfdbfe;
   border-radius: 16px;
@@ -380,7 +435,9 @@
     );
 
   box-shadow:
-    0 8px 24px
+    0
+    8px
+    24px
     rgba(37, 99, 235, 0.07);
 }
 
@@ -402,10 +459,13 @@
       #1d4ed8
     );
 
-  color: #ffffff;
+  color:
+    #ffffff;
 
   box-shadow:
-    0 8px 18px
+    0
+    8px
+    18px
     rgba(37, 99, 235, 0.22);
 }
 
@@ -427,14 +487,16 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
-  color: #64748b;
+  color:
+    #64748b;
 }
 
 
 .isa-server-content > strong {
-  font-size: 24px;
+  font-size: 23px;
 
-  color: #1d4ed8;
+  color:
+    #1d4ed8;
 }
 
 
@@ -453,12 +515,16 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: center;
   gap: 5px;
+
+  min-width: 120px;
 
   padding-left: 24px;
 
   border-left:
-    1px solid
+    1px
+    solid
     #dbeafe;
 }
 
@@ -466,13 +532,14 @@
 .isa-server-release strong {
   font-size: 17px;
 
-  color: #1d4ed8;
+  color:
+    #1d4ed8;
 }
 
 
-/* =========================================================
-   CONTADOR
-   ========================================================= */
+/*
+  Contador de aplicativos
+*/
 
 .isa-app-count {
   display: inline-flex;
@@ -481,23 +548,27 @@
 
   min-height: 30px;
 
-  padding: 0 12px;
+  padding:
+    0
+    12px;
 
   border: 1px solid #bbf7d0;
   border-radius: 999px;
 
-  background: #f0fdf4;
+  background:
+    #f0fdf4;
 
-  color: #15803d;
+  color:
+    #15803d;
 
   font-size: 12px;
   font-weight: 700;
 }
 
 
-/* =========================================================
-   GRID DOS APLICATIVOS
-   ========================================================= */
+/*
+  Grid
+*/
 
 .isa-app-grid {
   display: grid;
@@ -508,13 +579,13 @@
       minmax(0, 1fr)
     );
 
-  gap: 18px;
+  gap: 16px;
 }
 
 
-/* =========================================================
-   CARD DO APLICATIVO
-   ========================================================= */
+/*
+  Card do aplicativo
+*/
 
 .isa-app-card {
   position: relative;
@@ -523,14 +594,14 @@
   flex-direction: column;
 
   min-width: 0;
-  min-height: 280px;
+  min-height: 250px;
 
-  padding: 21px;
+  padding: 20px;
 
   overflow: hidden;
 
   border: 1px solid #dbe5ef;
-  border-radius: 17px;
+  border-radius: 16px;
 
   background:
     linear-gradient(
@@ -538,10 +609,6 @@
       #ffffff 0%,
       #fbfdff 100%
     );
-
-  box-shadow:
-    0 3px 12px
-    rgba(15, 23, 42, 0.025);
 
   transition:
     border-color 0.2s ease,
@@ -571,31 +638,40 @@
 
 
 .isa-app-card:hover {
-  border-color: #bfdbfe;
+  border-color:
+    #bfdbfe;
 
   transform:
-    translateY(-2px);
+    translateY(-3px);
 
   box-shadow:
-    0 10px 28px
-    rgba(15, 23, 42, 0.08);
+    0
+    10px
+    28px
+    rgba(15, 23, 42, 0.09);
 }
 
 
 .isa-app-card-changed {
-  border-color: #2563eb;
+  border-color:
+    #2563eb;
 
   box-shadow:
-    0 0 0 1px
-    rgba(37, 99, 235, 0.08),
-    0 10px 28px
-    rgba(37, 99, 235, 0.09);
+    0
+    0
+    0
+    1px
+    rgba(37, 99, 235, 0.1),
+    0
+    8px
+    24px
+    rgba(37, 99, 235, 0.08);
 }
 
 
-/* =========================================================
-   CABEÇALHO DO CARD
-   ========================================================= */
+/*
+  Cabeçalho do aplicativo
+*/
 
 .isa-app-card-header {
   display: flex;
@@ -609,12 +685,12 @@
   align-items: center;
   justify-content: center;
 
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
 
   flex-shrink: 0;
 
-  border-radius: 13px;
+  border-radius: 12px;
 
   background:
     linear-gradient(
@@ -623,7 +699,8 @@
       #dcfce7
     );
 
-  color: #16a34a;
+  color:
+    #16a34a;
 
   box-shadow:
     inset
@@ -635,7 +712,7 @@
 }
 
 
-.isa-app-card-header > div:last-child {
+.isa-app-title {
   min-width: 0;
 }
 
@@ -643,7 +720,7 @@
 .isa-app-card-header span {
   display: block;
 
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 
   font-size: 10px;
   font-weight: 700;
@@ -651,7 +728,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 
-  color: #64748b;
+  color:
+    #64748b;
 }
 
 
@@ -660,7 +738,7 @@
 
   overflow: hidden;
 
-  font-size: 17px;
+  font-size: 16px;
 
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -670,26 +748,34 @@
 }
 
 
-/* =========================================================
-   ÁREA DA VERSÃO
-   ========================================================= */
+/*
+  Área da versão
+
+  Aqui existe somente UMA versão.
+*/
 
 .isa-version-area {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 
   margin-top: 24px;
 
-  padding: 16px;
+  padding:
+    15px;
 
-  border: 1px solid #dbeafe;
-  border-radius: 13px;
+  border:
+    1px
+    solid
+    #dbeafe;
+
+  border-radius: 12px;
 
   background:
     linear-gradient(
       135deg,
-      #f8fbff 0%,
-      #f1f6ff 100%
+      #f8fbff,
+      #f1f6ff
     );
 }
 
@@ -698,47 +784,67 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  gap: 10px;
-
-  margin-bottom: 9px;
+  gap: 12px;
 }
 
 
-.isa-version-heading > span:first-child {
-  font-size: 11px;
+.isa-version-heading > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+
+.isa-version-heading span {
+  font-size: 12px;
   font-weight: 700;
 
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-
-  color: #475569;
+  color:
+    #334155;
 }
 
 
-.isa-changed-badge {
+.isa-version-heading small {
+  font-size: 11px;
+
+  color:
+    #64748b;
+}
+
+
+.isa-version-status {
   display: inline-flex;
   align-items: center;
 
-  min-height: 22px;
+  min-height: 23px;
 
-  padding: 0 8px;
+  padding:
+    0
+    8px;
 
-  border: 1px solid #bfdbfe;
+  border:
+    1px
+    solid
+    #bfdbfe;
+
   border-radius: 999px;
 
-  background: #eff6ff;
+  background:
+    #eff6ff;
 
-  color: #2563eb;
+  color:
+    #2563eb;
 
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+
+  white-space: nowrap;
 }
 
 
-/* =========================================================
-   CAMPO DA VERSÃO
-   ========================================================= */
+/*
+  Campo da versão
+*/
 
 .isa-version-field {
   display: block;
@@ -749,24 +855,29 @@
 
 .isa-version-field input {
   width: 100%;
-  min-height: 54px;
+  min-height: 45px;
 
   box-sizing: border-box;
 
   padding:
     0
-    14px;
+    12px;
 
-  border: 1px solid #cbd5e1;
-  border-radius: 11px;
+  border:
+    1px
+    solid
+    #cbd5e1;
 
-  background: #ffffff;
+  border-radius: 10px;
+
+  background:
+    #ffffff;
 
   color:
-    var(--text-primary, #0f172a);
+    var(--text-primary, #111827);
 
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
 
   outline: none;
 
@@ -777,58 +888,46 @@
 }
 
 
-.isa-version-field input::placeholder {
-  color: #94a3b8;
-
-  font-size: 15px;
-  font-weight: 500;
-}
-
-
 .isa-version-field input:hover:not(:disabled) {
-  border-color: #93c5fd;
+  border-color:
+    #93c5fd;
 
-  background: #ffffff;
+  background:
+    #ffffff;
 }
 
 
 .isa-version-field input:focus {
-  border-color: #2563eb;
+  border-color:
+    #2563eb;
 
   box-shadow:
-    0 0 0 3px
-    rgba(37, 99, 235, 0.11);
+    0
+    0
+    0
+    3px
+    rgba(37, 99, 235, 0.1);
 }
 
 
 .isa-version-field input:disabled {
-  opacity: 0.65;
+  opacity: 0.7;
 
   cursor: not-allowed;
+
+  background:
+    #f8fafc;
 }
 
 
-/* =========================================================
-   TEXTO AUXILIAR
-   ========================================================= */
-
-.isa-version-help {
-  margin: 8px 1px 0;
-
-  font-size: 11px;
-  line-height: 1.45;
-
-  color: #64748b;
-}
-
-
-/* =========================================================
-   RODAPÉ DO CARD
-   ========================================================= */
+/*
+  Rodapé do card
+*/
 
 .isa-app-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 
   margin-top: auto;
 
@@ -842,9 +941,11 @@
   justify-content: center;
   gap: 7px;
 
-  min-height: 40px;
+  min-height: 38px;
 
-  padding: 0 15px;
+  padding:
+    0
+    14px;
 
   border: none;
   border-radius: 9px;
@@ -856,7 +957,8 @@
       #1d4ed8
     );
 
-  color: #ffffff;
+  color:
+    #ffffff;
 
   font-size: 12px;
   font-weight: 700;
@@ -864,7 +966,9 @@
   cursor: pointer;
 
   box-shadow:
-    0 6px 16px
+    0
+    6px
+    16px
     rgba(37, 99, 235, 0.18);
 
   transition:
@@ -879,7 +983,9 @@
     translateY(-1px);
 
   box-shadow:
-    0 8px 20px
+    0
+    8px
+    20px
     rgba(37, 99, 235, 0.24);
 }
 
@@ -893,28 +999,37 @@
 }
 
 
+/*
+  Somente visualização
+*/
+
 .isa-readonly {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
   min-height: 28px;
 
-  padding: 0 10px;
+  padding:
+    0
+    10px;
 
   border-radius: 999px;
 
-  background: #f1f5f9;
+  background:
+    #f1f5f9;
 
-  color: #64748b;
+  color:
+    #64748b;
 
   font-size: 11px;
   font-weight: 600;
 }
 
 
-/* =========================================================
-   NOTEBOOKS / TELAS MENORES
-   ========================================================= */
+/*
+  Tablet / notebooks menores
+*/
 
 @media (
   max-width: 1200px
@@ -931,9 +1046,9 @@
 }
 
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+/*
+  Tablet
+*/
 
 @media (
   max-width: 820px
@@ -951,8 +1066,14 @@
 
   .isa-environment-card {
     flex-direction: column;
-
     align-items: stretch;
+
+    min-height: auto;
+  }
+
+
+  .isa-environment-title {
+    min-width: 0;
   }
 
 
@@ -991,9 +1112,9 @@
 }
 
 
-/* =========================================================
-   CELULAR
-   ========================================================= */
+/*
+  Celular
+*/
 
 @media (
   max-width: 620px
@@ -1022,7 +1143,8 @@
 
 
   .isa-app-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
   }
 
 
@@ -1032,7 +1154,8 @@
 
 
   .isa-server-card {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     align-items: flex-start;
   }
@@ -1055,8 +1178,15 @@
   }
 
 
-  .isa-version-field input {
-    font-size: 18px;
+  .isa-version-heading {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  .isa-version-status {
+    align-self: flex-start;
   }
 
 }

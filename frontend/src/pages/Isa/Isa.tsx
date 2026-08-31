@@ -199,6 +199,9 @@ function Isa() {
     A versão do ISA Servidor
     continua sendo controlada
     pela Compatibilidade.
+
+    Não existe uma segunda versão
+    salva no módulo ISA.
   */
 
   const isaServidor =
@@ -219,6 +222,11 @@ function Isa() {
               ) ===
               "isaservidor"
           ) ??
+
+          /*
+            Fallback para cadastros
+            antigos.
+          */
 
           itens.find(
             item =>
@@ -256,8 +264,7 @@ function Isa() {
 
 
   /*
-    Carrega releases,
-    usuário e ambiente inicial.
+    Carrega releases e usuário.
   */
 
   useEffect(
@@ -405,7 +412,8 @@ function Isa() {
 
 
   /*
-    Carrega os dados da release selecionada.
+    Carrega os dados da release
+    selecionada.
   */
 
   useEffect(
@@ -586,7 +594,7 @@ function Isa() {
 
 
   /*
-    Remove o feedback automaticamente.
+    Remove feedback automaticamente.
   */
 
   useEffect(
@@ -903,9 +911,11 @@ function Isa() {
             </h1>
 
             <p>
-              Consulte o ISA Servidor utilizado
-              em cada release e mantenha as
-              versões dos aplicativos Android.
+              Consulte o ISA Servidor
+              utilizado em cada versão
+              do IntelliCash e gerencie
+              individualmente as versões
+              dos aplicativos Android.
             </p>
 
           </div>
@@ -1020,7 +1030,6 @@ function Isa() {
                       ambiente.id
                     }
                   >
-
                     {
                       ambiente
                         .versoes
@@ -1032,7 +1041,6 @@ function Isa() {
                         ? ` — ${ambiente.nome}`
                         : ""
                     }
-
                   </option>
 
                 )
@@ -1049,7 +1057,9 @@ function Isa() {
         carregandoDados ? (
 
           <section className="isa-loading">
+
             Carregando versões ISA...
+
           </section>
 
         ) : (
@@ -1101,9 +1111,11 @@ function Isa() {
                   </strong>
 
                   <small>
-                    Esta versão é definida pela
-                    Compatibilidade da release e
-                    não é alterada nesta tela.
+                    Esta versão é
+                    definida pela
+                    Compatibilidade da
+                    release e não é
+                    alterada nesta tela.
                   </small>
 
                 </div>
@@ -1146,9 +1158,9 @@ function Isa() {
                   </h2>
 
                   <p>
-                    Informe a versão de cada
-                    aplicativo que acompanhará
-                    esta release.
+                    Cada aplicativo possui
+                    uma única versão definida
+                    para a release selecionada.
                   </p>
 
                 </div>
@@ -1160,7 +1172,8 @@ function Isa() {
 
                   {" "}
 
-                  {aplicativos.length === 1
+                  {aplicativos.length ===
+                  1
                     ? "aplicativo"
                     : "aplicativos"}
 
@@ -1169,7 +1182,8 @@ function Isa() {
               </div>
 
 
-              {aplicativos.length === 0 ? (
+              {aplicativos.length ===
+              0 ? (
 
                 <div className="isa-empty">
 
@@ -1220,7 +1234,7 @@ function Isa() {
                             </div>
 
 
-                            <div>
+                            <div className="isa-app-title">
 
                               <span>
                                 Aplicativo Android
@@ -1241,20 +1255,32 @@ function Isa() {
 
                             <div className="isa-version-heading">
 
-                              <span>
-                                Versão da release
-                              </span>
+                              <div>
 
-                              {alterado && (
-                                <span className="isa-changed-badge">
-                                  Alterada
+                                <span>
+                                  Versão
+                                </span>
+
+                                <small>
+                                  Versão utilizada
+                                  nesta release
+                                </small>
+
+                              </div>
+
+
+                              {aplicativo.version && (
+                                <span className="isa-version-status">
+                                  Configurada
                                 </span>
                               )}
 
                             </div>
 
 
-                            <label className="isa-version-field">
+                            <label
+                              className="isa-version-field"
+                            >
 
                               <input
                                 type="text"
@@ -1269,7 +1295,6 @@ function Isa() {
                                   !podeEditar ||
                                   salvando
                                 }
-                                aria-label={`Versão da release do ${aplicativo.name}`}
                                 onChange={
                                   evento =>
                                     alterarVersao(
@@ -1303,11 +1328,6 @@ function Isa() {
 
                             </label>
 
-                            <p className="isa-version-help">
-                              Versão que será considerada
-                              para esta release.
-                            </p>
-
                           </div>
 
 
@@ -1316,7 +1336,9 @@ function Isa() {
                             {!podeEditar ? (
 
                               <span className="isa-readonly">
+
                                 Somente visualização
+
                               </span>
 
                             ) : (
