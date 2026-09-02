@@ -236,72 +236,6 @@ function ReleaseEnvironmentDrawer({
     );
 
 
-  const ambienteAnterior =
-    useMemo(() => {
-      if (!ambienteJaExiste) {
-        return undefined;
-      }
-
-      const anteriores =
-        environments
-          .filter(
-            ambiente =>
-              ambiente.id !== form.id &&
-              ambiente.versoes.intellicash &&
-              ambiente.versoes.intellicash !==
-                form.versoes.intellicash
-          )
-          .sort((a, b) => {
-            const versaoA =
-              a.versoes.intellicash
-                .split(".")
-                .map(
-                  parte =>
-                    Number(parte) || 0
-                );
-
-            const versaoB =
-              b.versoes.intellicash
-                .split(".")
-                .map(
-                  parte =>
-                    Number(parte) || 0
-                );
-
-            const tamanho =
-              Math.max(
-                versaoA.length,
-                versaoB.length
-              );
-
-            for (
-              let index = 0;
-              index < tamanho;
-              index++
-            ) {
-              const valorA =
-                versaoA[index] ?? 0;
-
-              const valorB =
-                versaoB[index] ?? 0;
-
-              if (valorA !== valorB) {
-                return valorB - valorA;
-              }
-            }
-
-            return 0;
-          });
-
-      return anteriores[0];
-    }, [
-      ambienteJaExiste,
-      environments,
-      form.id,
-      form.versoes.intellicash,
-    ]);
-
-
   function alterarCampo<
     K extends keyof ReleaseEnvironment
   >(
@@ -858,19 +792,6 @@ function ReleaseEnvironmentDrawer({
             </span>
           </div>
 
-          {ambienteAnterior && (
-            <div className="release-inheritance-note">
-              <strong>
-                Ambiente de referência
-              </strong>
-
-              <span>
-                As versões herdadas podem usar como referência o ambiente{" "}
-                <b>{ambienteAnterior.nome}</b>{" "}
-                ({ambienteAnterior.versoes.intellicash}).
-              </span>
-            </div>
-          )}
 
           <div className="release-divider">
             Sistemas da Release
