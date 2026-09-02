@@ -145,30 +145,6 @@ function converterDataBrasileira(
 }
 
 
-function formatarLiberadoEm(
-  valor?: string
-) {
-  if (!valor) {
-    return "-";
-  }
-
-  const data =
-    new Date(valor);
-
-  if (
-    Number.isNaN(
-      data.getTime()
-    )
-  ) {
-    return valor;
-  }
-
-  return data.toLocaleDateString(
-    "pt-BR"
-  );
-}
-
-
 function obterSituacaoPrazo(
   prazoTexto: string,
   concluido = false
@@ -176,7 +152,7 @@ function obterSituacaoPrazo(
   if (concluido) {
     return {
       texto: "Concluída",
-      detalhe: "Prazo não considerado",
+      detalhe: "Release liberada",
       classe: "neutral",
     };
   }
@@ -271,6 +247,71 @@ function obterSituacaoPrazo(
     detalhe: `${diferenca} dias restantes`,
     classe: "ok",
   };
+}
+
+
+function formatarData(
+  valor?: string
+) {
+  if (!valor) {
+    return "-";
+  }
+
+  const iso =
+    valor.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+  if (iso) {
+    return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  }
+
+  const brasileira =
+    valor.match(
+      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    );
+
+  if (brasileira) {
+    return valor;
+  }
+
+  const data =
+    new Date(valor);
+
+  if (
+    Number.isNaN(
+      data.getTime()
+    )
+  ) {
+    return valor;
+  }
+
+  return new Intl.DateTimeFormat(
+    "pt-BR"
+  ).format(data);
+}
+
+
+function formatarLiberadoEm(
+  valor?: string
+) {
+  if (!valor) {
+    return "-";
+  }
+
+  const data = new Date(valor);
+
+  if (Number.isNaN(data.getTime())) {
+    return valor;
+  }
+
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    {
+      dateStyle: "short",
+      timeStyle: "short",
+    }
+  ).format(data);
 }
 
 
@@ -743,31 +784,19 @@ function TvProjectCard({
         </div>
 
 
-        <div className="tv-card-date">
-          <small>
-            Prazo
-          </small>
+        {!concluido && (
+          <div className="tv-card-date">
+            <small>
+              Prazo
+            </small>
 
-          <strong>
-            {
-              project.prazo ||
-              "-"
-            }
-          </strong>
-        </div>
-
-
-        <div className="tv-card-date">
-          <small>
-            Liberado em
-          </small>
-
-          <strong>
-            {formatarLiberadoEm(
-              liberadoEm
-            )}
-          </strong>
-        </div>
+            <strong>
+              {formatarData(
+                project.prazo
+              )}
+            </strong>
+          </div>
+        )}
 
 
         <div className="tv-card-date tv-card-situation">
@@ -787,6 +816,21 @@ function TvProjectCard({
             </span>
           </div>
         </div>
+
+
+        {concluido && (
+          <div className="tv-card-date">
+            <small>
+              Liberado em
+            </small>
+
+            <strong>
+              {formatarLiberadoEm(
+                liberadoEm
+              )}
+            </strong>
+          </div>
+        )}
       </footer>
 
 
