@@ -657,6 +657,31 @@ function ReleaseEnvironments() {
     );
 
 
+  const historicoRemessasIntellicash =
+    [...ambientesOrdenados]
+      .reverse()
+      .flatMap(ambiente => {
+        const versao =
+          obterVersaoIntellicashDoAmbiente(
+            ambiente
+          );
+
+        return (
+          ambiente.remessas ?? []
+        )
+          .filter(
+            remessa =>
+              remessa.tarefas.intellicash > 0
+          )
+          .map(remessa => ({
+            id: `${ambiente.id}-${remessa.id}`,
+            versao,
+            quantidade:
+              remessa.tarefas.intellicash,
+          }));
+      });
+
+
   return (
     <Layout>
       <div className="release-page">
@@ -1064,6 +1089,61 @@ function ReleaseEnvironments() {
             })}
           </div>
         )}
+
+
+        {historicoRemessasIntellicash.length > 0 && (
+          <section className="release-remittance-history">
+            <div className="release-remittance-history-header">
+              <div>
+                <span className="release-remittance-history-kicker">
+                  Histórico
+                </span>
+
+                <h2>
+                  Remessas do IntelliCash
+                </h2>
+              </div>
+
+              <span className="release-remittance-history-count">
+                {historicoRemessasIntellicash.length}{" "}
+                {historicoRemessasIntellicash.length === 1
+                  ? "remessa"
+                  : "remessas"}
+              </span>
+            </div>
+
+            <div className="release-remittance-history-list">
+              {historicoRemessasIntellicash.map(
+                remessa => (
+                  <div
+                    key={remessa.id}
+                    className="release-remittance-history-item"
+                  >
+                    <div>
+                      <small>
+                        Versão
+                      </small>
+
+                      <strong>
+                        {remessa.versao}
+                      </strong>
+                    </div>
+
+                    <div className="release-remittance-history-tasks">
+                      <small>
+                        Tarefas
+                      </small>
+
+                      <strong>
+                        {remessa.quantidade}
+                      </strong>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </section>
+        )}
       </div>
 
 
@@ -1464,6 +1544,8 @@ function ReleaseEnvironments() {
           </div>
         </div>
       )}
+
+      )
     </Layout>
   );
 }

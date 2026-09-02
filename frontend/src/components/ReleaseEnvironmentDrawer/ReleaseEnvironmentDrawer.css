@@ -901,3 +901,119 @@
             repeat(2, minmax(0, 1fr));
     }
 }
+
+/* REMESSA OBRIGATÓRIA DO INTELLICASH */
+
+.release-intellicash-remessa-required {
+    grid-column: 1 / -1;
+
+    margin-top: 2px;
+    padding: 9px 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    background: #fff8f1;
+
+    border:
+        1px solid
+        #ffd7b5;
+
+    border-radius: 8px;
+}
+
+
+.release-intellicash-remessa-required > div {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.release-intellicash-remessa-required > div strong {
+    color: #b45309;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.release-intellicash-remessa-required > div span {
+    color: #7a838c;
+
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+
+.release-intellicash-remessa-required label {
+    width: 150px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.release-intellicash-remessa-required label span {
+    color: #667085;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.release-intellicash-remessa-required input {
+    width: 100%;
+    height: 32px;
+
+    padding: 0 8px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        #efb47e;
+
+    border-radius: 6px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #36414b;
+
+    font-size: 12px;
+}
+
+
+.release-intellicash-remessa-required input:focus {
+    border-color: #f58220;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(245, 130, 32, 0.09);
+}
+
+
+@media (max-width: 520px) {
+    .release-intellicash-remessa-required {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .release-intellicash-remessa-required label {
+        width: 100%;
+    }
+}

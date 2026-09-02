@@ -5,9 +5,7 @@ import {
 } from "react";
 
 import {
-  MdAdd,
   MdClose,
-  MdDeleteOutline,
 } from "react-icons/md";
 
 import {
@@ -61,46 +59,6 @@ const NOMES_SISTEMAS_PRINCIPAIS: Record<
 };
 
 
-type NovaRemessaForm = {
-  data: string;
-  intellicash: number;
-  easycash: number;
-  easycheckout: number;
-  easypdv: number;
-  intellistock: number;
-};
-
-
-function criarNovaRemessaForm(): NovaRemessaForm {
-  return {
-    data: "",
-    intellicash: 0,
-    easycash: 0,
-    easycheckout: 0,
-    easypdv: 0,
-    intellistock: 0,
-  };
-}
-
-
-function formatarData(
-  valor?: string
-): string {
-  if (!valor) {
-    return "Não informada";
-  }
-
-  const partes =
-    valor.includes("T")
-      ? valor.split("T")[0].split("-")
-      : valor.split("-");
-
-  if (partes.length === 3) {
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-  }
-
-  return valor;
-}
 
 
 function normalizarDateTimeLocal(
@@ -172,6 +130,38 @@ function criarIdRemessa(): string {
 }
 
 
+function normalizarDataExecutavel(
+  valor?: string
+): string | undefined {
+  const data =
+    valor?.trim();
+
+  if (!data) {
+    return undefined;
+  }
+
+  const brasileira =
+    data.match(
+      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    );
+
+  if (brasileira) {
+    return `${brasileira[3]}-${brasileira[2]}-${brasileira[1]}`;
+  }
+
+  const iso =
+    data.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+  if (iso) {
+    return data;
+  }
+
+  return undefined;
+}
+
+
 function ReleaseEnvironmentDrawer({
   environment,
   environments = [],
@@ -193,10 +183,10 @@ function ReleaseEnvironmentDrawer({
     useState(false);
 
 
-  const [novaRemessa, setNovaRemessa] =
-    useState<NovaRemessaForm>(
-      criarNovaRemessaForm
-    );
+  const [
+    quantidadeRemessaIntellicash,
+    setQuantidadeRemessaIntellicash,
+  ] = useState<string>("");
 
 
   const ambienteJaExiste =
@@ -219,9 +209,7 @@ function ReleaseEnvironmentDrawer({
         environment.remessas ?? [],
     });
 
-    setNovaRemessa(
-      criarNovaRemessaForm()
-    );
+    setQuantidadeRemessaIntellicash("");
   }, [environment]);
 
 
@@ -234,6 +222,30 @@ function ReleaseEnvironmentDrawer({
         ),
       [form.sistemas]
     );
+
+
+  const executavelIntellicashOriginal =
+    criarSistemasFixos(
+      environment.sistemas ?? [],
+      environment.versoes
+    ).find(
+      sistema =>
+        sistema.chave === "intellicash"
+    )?.executavel?.trim() ?? "";
+
+
+  const executavelIntellicashAtual =
+    sistemas.find(
+      sistema =>
+        sistema.chave === "intellicash"
+    )?.executavel?.trim() ?? "";
+
+
+  const executavelIntellicashAlterado =
+    executavelIntellicashAtual !==
+      executavelIntellicashOriginal;
+
+
 
 
   function alterarCampo<
@@ -366,124 +378,6 @@ function ReleaseEnvironmentDrawer({
   }
 
 
-  function alterarTarefaRemessa(
-    sistema: SistemaPrincipal,
-    valor: string
-  ) {
-    const quantidade =
-      Math.max(
-        0,
-        Number.parseInt(
-          valor,
-          10
-        ) || 0
-      );
-
-    setNovaRemessa(atual => ({
-      ...atual,
-      [sistema]: quantidade,
-    }));
-  }
-
-
-  function registrarRemessa() {
-    if (!novaRemessa.data) {
-      window.alert(
-        "Informe a data da remessa."
-      );
-
-      return;
-    }
-
-    const tarefas = {
-      intellicash:
-        novaRemessa.intellicash,
-
-      easycash:
-        novaRemessa.easycash,
-
-      easycheckout:
-        novaRemessa.easycheckout,
-
-      easypdv:
-        novaRemessa.easypdv,
-
-      intellistock:
-        novaRemessa.intellistock,
-    };
-
-
-    const totalTarefas =
-      Object.values(tarefas).reduce(
-        (
-          total,
-          quantidade
-        ) =>
-          total + quantidade,
-        0
-      );
-
-
-    if (totalTarefas <= 0) {
-      window.alert(
-        "Informe pelo menos uma tarefa para registrar a remessa."
-      );
-
-      return;
-    }
-
-
-    const remessa: ReleaseRemessa = {
-      id: criarIdRemessa(),
-
-      data:
-        novaRemessa.data,
-
-      tarefas,
-
-      totalTarefas,
-    };
-
-
-    setForm(atual => ({
-      ...atual,
-
-      remessas: [
-        ...(atual.remessas ?? []),
-        remessa,
-      ],
-    }));
-
-
-    setNovaRemessa(
-      criarNovaRemessaForm()
-    );
-  }
-
-
-  function excluirRemessa(
-    id: string
-  ) {
-    const confirmar =
-      window.confirm(
-        "Deseja remover esta remessa do histórico?"
-      );
-
-    if (!confirmar) {
-      return;
-    }
-
-
-    setForm(atual => ({
-      ...atual,
-
-      remessas:
-        (atual.remessas ?? []).filter(
-          remessa =>
-            remessa.id !== id
-        ),
-    }));
-  }
 
 
   function alterarLiberadoEm(
@@ -532,6 +426,38 @@ function ReleaseEnvironmentDrawer({
       if (!versao) {
         window.alert(
           `Informe a versão do ${NOMES_SISTEMAS_PRINCIPAIS[chave]}.`
+        );
+
+        return false;
+      }
+    }
+
+
+    if (executavelIntellicashAlterado) {
+      const quantidade =
+        Number.parseInt(
+          quantidadeRemessaIntellicash,
+          10
+        );
+
+      if (
+        !Number.isFinite(quantidade) ||
+        quantidade <= 0
+      ) {
+        window.alert(
+          "Informe a quantidade de tarefas da nova remessa do IntelliCash."
+        );
+
+        return false;
+      }
+
+      if (
+        !normalizarDataExecutavel(
+          executavelIntellicashAtual
+        )
+      ) {
+        window.alert(
+          "Informe a data do executável do IntelliCash no formato dd/mm/aaaa."
         );
 
         return false;
@@ -604,6 +530,46 @@ function ReleaseEnvironmentDrawer({
       };
 
 
+      const remessasAtualizadas =
+        [...(form.remessas ?? [])];
+
+
+      if (executavelIntellicashAlterado) {
+        const dataRemessa =
+          normalizarDataExecutavel(
+            executavelIntellicashAtual
+          );
+
+        const quantidade =
+          Number.parseInt(
+            quantidadeRemessaIntellicash,
+            10
+          );
+
+        if (dataRemessa) {
+          const remessa: ReleaseRemessa = {
+            id: criarIdRemessa(),
+
+            data: dataRemessa,
+
+            tarefas: {
+              intellicash: quantidade,
+              easycash: 0,
+              easycheckout: 0,
+              easypdv: 0,
+              intellistock: 0,
+            },
+
+            totalTarefas: quantidade,
+          };
+
+          remessasAtualizadas.push(
+            remessa
+          );
+        }
+      }
+
+
       const ambienteSalvo: ReleaseEnvironment = {
         ...form,
 
@@ -634,7 +600,7 @@ function ReleaseEnvironmentDrawer({
           ),
 
         remessas:
-          form.remessas ?? [],
+          remessasAtualizadas,
       };
 
 
@@ -655,34 +621,9 @@ function ReleaseEnvironmentDrawer({
   }
 
 
-  const remessas =
-    useMemo(
-      () =>
-        [...(form.remessas ?? [])].sort(
-          (a, b) =>
-            new Date(b.data).getTime() -
-            new Date(a.data).getTime()
-        ),
-      [form.remessas]
-    );
 
 
-  const totalRemessas =
-    useMemo(
-      () =>
-        remessas.reduce(
-          (
-            total,
-            remessa
-          ) =>
-            total +
-            remessa.totalTarefas,
-          0
-        ),
-      [remessas]
-    );
-
-  return (
+return (
     <>
       <div
         className="release-drawer-backdrop"
@@ -791,9 +732,7 @@ function ReleaseEnvironmentDrawer({
               é usada a próxima release disponível. Alterações ficam na página Compatibilidade.
             </span>
           </div>
-
-
-          <div className="release-divider">
+<div className="release-divider">
             Sistemas da Release
           </div>
 
@@ -895,12 +834,21 @@ function ReleaseEnvironmentDrawer({
                     type="text"
                     value={sistema.executavel ?? ""}
                     placeholder="Executável"
-                    onChange={evento =>
+                    onChange={evento => {
                       alterarExecutavel(
                         sistema.chave,
                         evento.target.value
-                      )
-                    }
+                      );
+
+                      if (
+                        sistema.chave ===
+                        "intellicash"
+                      ) {
+                        setQuantidadeRemessaIntellicash(
+                          ""
+                        );
+                      }
+                    }}
                   />
 
                   <label
@@ -925,142 +873,49 @@ function ReleaseEnvironmentDrawer({
 
                     Exibir na TV
                   </label>
+
+                  {sistema.chave === "intellicash" &&
+                    executavelIntellicashAlterado && (
+                      <div className="release-intellicash-remessa-required">
+                        <div>
+                          <strong>
+                            Nova remessa detectada
+                          </strong>
+
+                          <span>
+                            Informe quantas tarefas vieram com este novo executável do IntelliCash.
+                          </span>
+                        </div>
+
+                        <label>
+                          <span>
+                            Quantidade de tarefas
+                          </span>
+
+                          <input
+                            type="number"
+                            min="1"
+                            step="1"
+                            required
+                            value={
+                              quantidadeRemessaIntellicash
+                            }
+                            onChange={evento =>
+                              setQuantidadeRemessaIntellicash(
+                                evento.target.value
+                              )
+                            }
+                            placeholder="Ex.: 12"
+                          />
+                        </label>
+                      </div>
+                    )}
                 </div>
               );
             })}
           </div>
 
-          <div className="release-divider">
-            Remessas da Release
-          </div>
 
-          <div className="release-remessa-box">
-            <div className="release-remessa-heading">
-              <strong>
-                Registrar nova remessa
-              </strong>
-
-              <span>
-                Informe quantas tarefas vieram junto com a nova remessa dos sistemas principais.
-                {remessas.length > 0 &&
-                  ` Histórico: ${remessas.length} remessa${remessas.length === 1 ? "" : "s"} • ${totalRemessas} tarefas.`}
-              </span>
-            </div>
-
-            <div className="release-remessa-field">
-              <label htmlFor="release-remessa-date">
-                Data da remessa
-              </label>
-
-              <input
-                id="release-remessa-date"
-                type="date"
-                value={novaRemessa.data}
-                onChange={evento =>
-                  setNovaRemessa(atual => ({
-                    ...atual,
-                    data: evento.target.value,
-                  }))
-                }
-              />
-            </div>
-
-            <div className="release-remessa-grid">
-              {SISTEMAS_PRINCIPAIS.map(
-                sistema => (
-                  <label key={sistema}>
-                    <span>
-                      {
-                        NOMES_SISTEMAS_PRINCIPAIS[
-                          sistema
-                        ]
-                      }
-                    </span>
-
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={
-                        novaRemessa[sistema]
-                      }
-                      onChange={evento =>
-                        alterarTarefaRemessa(
-                          sistema,
-                          evento.target.value
-                        )
-                      }
-                    />
-                  </label>
-                )
-              )}
-            </div>
-
-            <button
-              type="button"
-              className="release-remessa-add"
-              onClick={registrarRemessa}
-            >
-              <MdAdd size={16} />
-              Registrar remessa
-            </button>
-          </div>
-
-          {remessas.length > 0 && (
-            <div className="release-remessa-history">
-              <div className="release-remessa-history-heading">
-                <strong>
-                  Histórico de remessas
-                </strong>
-
-                <span>
-                  As remessas anteriores permanecem registradas.
-                </span>
-              </div>
-
-              {remessas.map(remessa => (
-                <div
-                  key={remessa.id}
-                  className="release-remessa-history-item"
-                >
-                  <div>
-                    <strong>
-                      {formatarData(remessa.data)}
-                    </strong>
-
-                    <span>
-                      IntelliCash {remessa.tarefas.intellicash}
-                      {" • "}
-                      EasyCash {remessa.tarefas.easycash}
-                      {" • "}
-                      EasyCheckOut {remessa.tarefas.easycheckout}
-                      {" • "}
-                      EasyPDV {remessa.tarefas.easypdv}
-                      {" • "}
-                      IntelliStock {remessa.tarefas.intellistock}
-                      {" • "}
-                      {remessa.totalTarefas} tarefas
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    title="Remover remessa"
-                    aria-label={`Remover remessa de ${formatarData(
-                      remessa.data
-                    )}`}
-                    onClick={() =>
-                      excluirRemessa(
-                        remessa.id
-                      )
-                    }
-                  >
-                    <MdDeleteOutline size={16} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
 
           <button
             type="button"
