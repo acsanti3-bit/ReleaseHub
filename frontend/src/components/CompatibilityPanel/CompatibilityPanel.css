@@ -7,7 +7,7 @@
     display:grid;
 
     grid-template-columns:
-        185px
+        145px
         minmax(0,1fr);
 
     align-items:stretch;
@@ -25,6 +25,7 @@
     overflow:hidden;
 
 }
+
 
 
 /* TÍTULO */
@@ -58,6 +59,7 @@
 }
 
 
+
 .compatibility-title strong{
 
     color:#005AA9;
@@ -73,6 +75,7 @@
 }
 
 
+
 .compatibility-title small{
 
     color:#8C969F;
@@ -86,6 +89,7 @@
     white-space:nowrap;
 
 }
+
 
 
 /* LISTA COMPACTA */
@@ -107,6 +111,7 @@
     justify-content:center;
 
 }
+
 
 
 .compatibility-version{
@@ -162,6 +167,7 @@
 }
 
 
+
 /* LINK DO MANUAL DO INTELLICASH */
 
 .compatibility-wiki-link{
@@ -204,6 +210,7 @@
 }
 
 
+
 .compatibility-wiki-link:hover{
 
     background:#EAF3FB;
@@ -215,6 +222,7 @@
 }
 
 
+
 .compatibility-wiki-link:focus-visible{
 
     outline:2px solid #005AA9;
@@ -222,6 +230,7 @@
     outline-offset:2px;
 
 }
+
 
 
 /* INFORMAÇÕES */
@@ -247,6 +256,7 @@
 }
 
 
+
 .compatibility-system-info strong{
 
     width:100%;
@@ -268,13 +278,14 @@
 }
 
 
+
 .compatibility-system-info small{
 
     width:100%;
 
     color:#45515C;
 
-    font-size:11px;
+    font-size:12px;
 
     line-height:1.1;
 
@@ -289,6 +300,7 @@
 }
 
 
+
 /* SISTEMA SEM VERSÃO */
 
 .compatibility-version-empty{
@@ -298,7 +310,9 @@
 }
 
 
+
 .compatibility-version-empty
+
 .compatibility-system-info strong{
 
     color:#78909C;
@@ -306,12 +320,15 @@
 }
 
 
+
 .compatibility-version-empty
+
 .compatibility-system-info small{
 
     color:#B0B8BF;
 
 }
+
 
 
 /* VAZIO OU CARREGAMENTO */
@@ -345,6 +362,7 @@
 }
 
 
+
 .compatibility-empty strong{
 
     margin-left:4px;
@@ -354,6 +372,7 @@
     font-weight:700;
 
 }
+
 
 
 /* TELAS INTERMEDIÁRIAS */
@@ -370,6 +389,7 @@
 }
 
 
+
 @media(max-width:1450px){
 
     .compatibility-line{
@@ -380,15 +400,17 @@
     }
 
 
+
     .compatibility-panel{
 
         grid-template-columns:
-            165px
+            140px
             minmax(0,1fr);
 
     }
 
 }
+
 
 
 @media(max-width:1200px){
@@ -403,6 +425,7 @@
 }
 
 
+
 /* TVs LARGAS E BAIXAS */
 
 @media(max-height:700px) and (min-width:1500px){
@@ -410,10 +433,11 @@
     .compatibility-panel{
 
         grid-template-columns:
-            175px
+            145px
             minmax(0,1fr);
 
     }
+
 
 
     .compatibility-title{
@@ -425,11 +449,13 @@
     }
 
 
+
     .compatibility-title strong{
 
         font-size:12.5px;
 
     }
+
 
 
     .compatibility-title small{
@@ -439,12 +465,14 @@
     }
 
 
+
     .compatibility-line{
 
         --compatibility-columns:
             10 !important;
 
     }
+
 
 
     .compatibility-version{
@@ -458,6 +486,7 @@
     }
 
 
+
     .compatibility-system-info strong{
 
         font-size:11.5px;
@@ -467,13 +496,15 @@
     }
 
 
+
     .compatibility-system-info small{
 
-        font-size:10.5px;
+        font-size:11.5px;
 
         line-height:1.08;
 
     }
+
 
 
     .compatibility-empty{
@@ -485,6 +516,7 @@
     }
 
 }
+
 
 
 /* RESPONSIVO */
@@ -500,6 +532,7 @@
         overflow:visible;
 
     }
+
 
 
     .compatibility-title{
@@ -519,6 +552,7 @@
     }
 
 
+
     .compatibility-line{
 
         --compatibility-columns:
@@ -531,11 +565,13 @@
     }
 
 
+
     .compatibility-version{
 
         min-height:40px;
 
     }
+
 
 
     .compatibility-wiki-link{
@@ -553,6 +589,7 @@
 }
 
 
+
 @media(max-width:650px){
 
     .compatibility-line{
@@ -563,6 +600,7 @@
     }
 
 }
+
 
 
 @media(max-width:460px){
