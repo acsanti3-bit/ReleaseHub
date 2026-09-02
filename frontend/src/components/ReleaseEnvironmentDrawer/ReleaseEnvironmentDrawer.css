@@ -1,903 +1,571 @@
-.release-drawer-backdrop {
+.release-environment-drawer-overlay {
     position: fixed;
     inset: 0;
     z-index: 999;
-
-    background:
-        rgba(15, 23, 42, 0.28);
-
-    backdrop-filter:
-        blur(2px);
+    display: flex;
+    justify-content: flex-end;
+    background: rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(2px);
 }
 
-
-.release-drawer {
-    position: fixed;
-
-    top: 0;
-    right: 0;
-
-    width: 690px;
-    max-width: 100%;
+.release-environment-drawer {
+    width: min(760px, 100%);
     height: 100vh;
-
-    z-index: 1000;
-
     display: flex;
     flex-direction: column;
-
-    background: #ffffff;
-
-    box-shadow:
-        -10px 0 30px
-        rgba(0, 0, 0, 0.14);
+    background: #fff;
+    box-shadow: -14px 0 40px rgba(15, 23, 42, 0.18);
 }
 
-
-/* CABEÇALHO */
-
-.release-drawer-header {
-    padding: 18px 24px;
-
+.release-environment-drawer-header {
+    padding: 20px 24px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 18px;
-
-    border-bottom:
-        1px solid
-        #e7ebef;
+    border-bottom: 1px solid #e7ebef;
 }
 
-
-.release-drawer-header h2 {
-    margin: 0;
-
-    color: #005aa9;
-
-    font-size: 22px;
-}
-
-
-.release-drawer-header span {
+.release-environment-drawer-kicker {
     display: block;
-
-    margin-top: 4px;
-
-    color: #7a838c;
-
-    font-size: 12px;
+    margin-bottom: 3px;
+    color: #84909b;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
 }
 
+.release-environment-drawer-header h2 {
+    margin: 0;
+    color: #162231;
+    font-size: 22px;
+    line-height: 1.2;
+}
 
-.release-drawer-header button {
-    width: 36px;
-    height: 36px;
-
+.release-environment-drawer-close {
+    width: 38px;
+    height: 38px;
     flex-shrink: 0;
-
+    display: grid;
+    place-items: center;
     border: 0;
-    border-radius: 8px;
-
+    border-radius: 9px;
     background: #f2f4f7;
-    color: #444444;
-
-    font-size: 25px;
-
+    color: #4f5b66;
     cursor: pointer;
 }
 
+.release-environment-drawer-close:hover {
+    background: #e8edf2;
+}
 
-/* CONTEÚDO */
-
-.release-drawer-body {
+.release-environment-drawer-content {
     flex: 1;
-
-    padding: 18px 24px 22px;
-
+    padding: 20px 24px 26px;
     overflow-y: auto;
+    background: #f8fafc;
 }
 
-
-.release-field {
-    margin-bottom: 14px;
+.release-environment-drawer-section {
+    padding: 18px;
+    margin-bottom: 16px;
+    background: #fff;
+    border: 1px solid #e5eaf0;
+    border-radius: 12px;
 }
 
-
-.release-field label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: #344054;
-
-    font-size: 13px;
-    font-weight: 600;
+.release-environment-drawer-section:last-child {
+    margin-bottom: 0;
 }
 
-
-.release-field input {
-    width: 100%;
-    height: 40px;
-
-    padding: 0 12px;
-
-    box-sizing: border-box;
-
-    border:
-        1px solid
-        #d6dbe1;
-
-    border-radius: 8px;
-
-    outline: none;
-
-    font-size: 14px;
-
-    transition: 0.2s;
+.release-environment-drawer-section-heading {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
 }
 
-
-.release-field input:focus {
-    border-color: #005aa9;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(0, 90, 169, 0.08);
+.release-environment-drawer-section-heading h3 {
+    margin: 0 0 3px;
+    color: #1f2d3d;
+    font-size: 15px;
 }
 
-
-/* AVISO */
-
-.release-reference {
-    margin: 14px 0;
-
-    padding: 10px 13px;
-
-    background: #eef6fd;
-
-    border-left:
-        4px solid
-        #005aa9;
-
-    border-radius: 8px;
+.release-environment-drawer-section-heading p {
+    margin: 0;
+    color: #7b8794;
+    font-size: 11px;
+    line-height: 1.45;
 }
 
-
-.release-reference strong {
-    display: block;
-
+.release-environment-drawer-section-total {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #eaf4fd;
     color: #005aa9;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 
+.release-environment-drawer-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+.release-environment-drawer-field {
+    min-width: 0;
+}
+
+.release-environment-drawer-field-full {
+    grid-column: 1 / -1;
+}
+
+.release-environment-drawer-field label,
+.release-remessa-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #344054;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.release-environment-drawer-field input,
+.release-remessa-field input,
+.release-remessa-grid input,
+.release-environment-drawer-system-row > input {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #d7dde4;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #2f3a45;
     font-size: 12px;
 }
 
+.release-environment-drawer-field input:focus,
+.release-remessa-field input:focus,
+.release-remessa-grid input:focus,
+.release-environment-drawer-system-row > input:focus {
+    border-color: #1780c6;
+    box-shadow: 0 0 0 3px rgba(0, 90, 169, .07);
+}
 
-.release-reference span {
+.release-environment-drawer-field small {
     display: block;
-
-    margin-top: 2px;
-
-    color: #65717c;
-
-    font-size: 11px;
+    margin-top: 5px;
+    color: #8a949e;
+    font-size: 9px;
     line-height: 1.35;
 }
 
-
-.release-divider {
-    margin: 16px 0 9px;
-
-    padding-bottom: 7px;
-
-    border-bottom:
-        1px solid
-        #e5e7eb;
-
-    color: #667085;
-
-    font-size: 11px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-
-/* CONTROLES DA TV */
-
-.release-tv-controls {
-    margin-bottom: 9px;
-
-    padding: 9px 11px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 14px;
-
-    box-sizing: border-box;
-
-    background: #f7fafe;
-
-    border:
-        1px solid
-        #dbe7f1;
-
-    border-radius: 9px;
-}
-
-
-.release-tv-controls-text {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 2px;
-}
-
-
-.release-tv-controls-text strong {
-    color: #005aa9;
-
-    font-size: 12px;
-}
-
-
-.release-tv-controls-text span {
-    color: #7a838c;
-
-    font-size: 10px;
-}
-
-
-.release-tv-actions {
-    display: flex;
-
-    gap: 6px;
-
-    flex-shrink: 0;
-}
-
-
-.release-tv-actions button {
-    height: 29px;
-
-    padding: 0 10px;
-
-    border:
-        1px solid
-        #cbd9e5;
-
-    border-radius: 7px;
-
-    background: #ffffff;
-    color: #005aa9;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    cursor: pointer;
-}
-
-
-.release-tv-actions button:last-child {
-    color: #64707b;
-}
-
-
-.release-tv-actions button:hover {
-    border-color: #005aa9;
-
-    background: #eef6fd;
-}
-
-
-/* LISTA COMPACTA */
-
-.release-system-list {
-    display: flex;
-    flex-direction: column;
-
-    gap: 6px;
-}
-
-
-.release-system-row {
-    min-height: 48px;
-
-    padding: 6px 9px 6px 12px;
-
-    display: grid;
-
-    grid-template-columns:
-        minmax(140px, 1fr)
-        minmax(135px, 0.9fr)
-        minmax(125px, 0.8fr)
-        105px;
-
-    align-items: center;
-
-    gap: 10px;
-
-    box-sizing: border-box;
-
-    background: #ffffff;
-
-    border:
-        1px solid
-        #e2e7ec;
-
-    border-radius: 9px;
-}
-
-
-.release-system-name {
-    min-width: 0;
-
-    display: flex;
-    align-items: center;
-
-    gap: 7px;
-
-    color: #44515c;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-.release-system-name > span {
-    min-width: 0;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-
-.release-system-name small {
-    padding: 3px 5px;
-
-    border-radius: 5px;
-
-    background: #e4f1fb;
-    color: #005aa9;
-
-    font-size: 8px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-
-    white-space: nowrap;
-}
-
-
-.release-system-version,
-.release-system-executable {
-    width: 100%;
-    height: 34px;
-
-    padding: 0 10px;
-
-    box-sizing: border-box;
-
-    border:
-        1px solid
-        #d8dee4;
-
-    border-radius: 7px;
-
-    outline: none;
-
-    color: #36414b;
-
-    font-size: 12px;
-}
-
-
-.release-system-version:focus,
-.release-system-executable:focus {
-    border-color: #005aa9;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(0, 90, 169, 0.07);
-}
-
-
-.release-tv-toggle {
-    min-width: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-
-    gap: 7px;
-
-    color: #8a939d;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    white-space: nowrap;
-
-    cursor: pointer;
-}
-
-
-.release-tv-toggle input {
-    width: 16px;
-    height: 16px;
-
-    margin: 0;
-
-    flex-shrink: 0;
-
-    accent-color: #005aa9;
-
-    cursor: pointer;
-}
-
-
-.release-tv-toggle-active {
-    color: #2e7d32;
-}
-
-
-.release-system-row-reference {
-    background: #f4f9fd;
-
-    border-color: #bfd9ef;
-}
-
-
-.release-system-row-reference
-.release-system-name {
-    color: #005aa9;
-}
-
-
-.release-system-row-reference
-.release-system-version {
-    border-color: #9fc6e5;
-
-    color: #005aa9;
-
-    font-weight: 600;
-}
-
-
-/* SALVAR */
-
-.release-save {
-    width: 100%;
-    height: 42px;
-
+.release-environment-drawer-reference {
     margin-top: 14px;
-
-    border: none;
-    border-radius: 9px;
-
-    background: #005aa9;
-    color: #ffffff;
-
-    font-size: 13px;
-    font-weight: 700;
-
-    cursor: pointer;
-}
-
-
-.release-save:hover {
-    background: #004a8b;
-}
-
-
-@media (max-width: 720px) {
-    .release-drawer {
-        width: 100%;
-    }
-
-
-    .release-drawer-body {
-        padding:
-            16px
-            14px
-            20px;
-    }
-
-
-    .release-tv-controls {
-        align-items: flex-start;
-
-        flex-direction: column;
-    }
-
-
-    .release-system-row {
-        grid-template-columns:
-            minmax(120px, 1fr)
-            minmax(115px, 0.9fr)
-            minmax(110px, 0.8fr)
-            96px;
-
-        gap: 7px;
-
-        padding:
-            6px
-            7px
-            6px
-            9px;
-    }
-}
-
-
-@media (max-width: 520px) {
-    .release-system-row {
-        grid-template-columns:
-            1fr
-            1fr;
-
-        gap: 7px;
-    }
-
-
-    .release-system-name {
-        grid-column: 1 / -1;
-    }
-
-
-    .release-tv-toggle {
-        grid-column: 1 / -1;
-
-        justify-content: flex-end;
-    }
-}
-
-
-/* HERANÇA DE VERSÕES */
-.release-inheritance-note {
-    margin: -4px 0 14px;
-    padding: 10px 13px;
-    background: #f7fafc;
-    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    border-left: 3px solid #1681c4;
     border-radius: 8px;
+    background: #eef7fd;
 }
 
-.release-inheritance-note strong {
+.release-environment-drawer-reference strong {
     display: block;
-    color: #475467;
-    font-size: 12px;
+    margin-bottom: 2px;
+    color: #005aa9;
+    font-size: 10px;
 }
 
-.release-inheritance-note span {
-    display: block;
-    margin-top: 3px;
-    color: #667085;
-    font-size: 11px;
+.release-environment-drawer-reference span {
+    color: #65717c;
+    font-size: 10px;
     line-height: 1.4;
 }
 
-.release-system-version-wrap {
-    position: relative;
-    min-width: 0;
+.release-environment-drawer-system-header,
+.release-environment-drawer-system-row {
+    display: grid;
+    grid-template-columns: minmax(130px, 1.1fr) minmax(125px, .9fr) minmax(125px, .9fr) 42px;
+    gap: 9px;
+    align-items: center;
 }
 
-.release-system-version-wrap .release-system-version {
-    width: 100%;
-}
-
-.release-system-version-inherited {
-    padding-right: 92px !important;
-    background: #f8fafc !important;
-    color: #667085 !important;
-    cursor: default;
-}
-
-.release-inherited-badge {
-    position: absolute;
-    top: 50%;
-    right: 8px;
-    transform: translateY(-50%);
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: #eaf2f8;
-    color: #005aa9;
+.release-environment-drawer-system-header {
+    padding: 0 10px 6px;
+    color: #8c96a0;
     font-size: 9px;
     font-weight: 700;
-    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: .35px;
+}
+
+.release-environment-drawer-systems {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.release-environment-drawer-system-row {
+    min-height: 48px;
+    padding: 6px 9px 6px 11px;
+    border: 1px solid #e1e6eb;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.release-environment-drawer-system-row.is-main {
+    border-color: #c4dcec;
+    background: #f7fbfe;
+}
+
+.release-environment-drawer-system-row > input:disabled {
+    background: #f3f5f7;
+    color: #7c8791;
+    cursor: not-allowed;
+}
+
+.release-environment-drawer-system-name {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.release-environment-drawer-system-name strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #44515c;
+    font-size: 11px;
+}
+
+.release-environment-drawer-system-name small {
+    padding: 3px 5px;
+    border-radius: 5px;
+    background: #e4f1fb;
+    color: #005aa9;
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.release-environment-drawer-tv-checkbox {
+    width: 34px;
+    height: 22px;
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.release-environment-drawer-tv-checkbox input {
+    position: absolute;
+    opacity: 0;
     pointer-events: none;
 }
 
-.release-field-hint {
-    display: block;
-    margin-top: 5px;
-
-    color: #8a939d;
-
-    font-size: 10px;
-    line-height: 1.35;
+.release-environment-drawer-tv-checkbox span {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: #cbd3db;
+    transition: .18s;
 }
 
+.release-environment-drawer-tv-checkbox span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    transition: .18s;
+}
+
+.release-environment-drawer-tv-checkbox input:checked + span {
+    background: #1681c4;
+}
+
+.release-environment-drawer-tv-checkbox input:checked + span::after {
+    transform: translateX(12px);
+}
+
+.release-environment-drawer-tv-actions {
+    margin-top: 10px;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid #edf0f3;
+    color: #7b8794;
+    font-size: 10px;
+}
+
+.release-environment-drawer-tv-actions button {
+    height: 29px;
+    padding: 0 10px;
+    border: 1px solid #cbd9e5;
+    border-radius: 7px;
+    background: #fff;
+    color: #005aa9;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.release-environment-drawer-tv-actions button:hover {
+    border-color: #1681c4;
+    background: #eef7fd;
+}
 
 .release-remessa-box {
-    margin-top: 10px;
-
-    padding: 12px;
-
-    background: #f7fafe;
-
-    border:
-        1px solid
-        #dbe7f1;
-
-    border-radius: 9px;
+    padding: 14px;
+    border: 1px solid #dfe6ec;
+    border-radius: 10px;
+    background: #f8fafc;
 }
-
 
 .release-remessa-heading {
-    margin-bottom: 11px;
+    margin-bottom: 12px;
 }
 
-
-.release-remessa-heading strong {
+.release-remessa-heading strong,
+.release-remessa-history-heading strong {
     display: block;
-
-    color: #005aa9;
-
-    font-size: 12px;
+    margin-bottom: 2px;
+    color: #344054;
+    font-size: 11px;
 }
 
-
-.release-remessa-heading span {
+.release-remessa-heading span,
+.release-remessa-history-heading span {
     display: block;
-
-    margin-top: 3px;
-
-    color: #7a838c;
-
-    font-size: 10px;
-    line-height: 1.35;
+    color: #89939d;
+    font-size: 9px;
+    line-height: 1.4;
 }
-
 
 .release-remessa-field {
-    margin-bottom: 10px;
+    width: 190px;
+    margin-bottom: 12px;
 }
-
-
-.release-remessa-field label {
-    display: block;
-
-    margin-bottom: 5px;
-
-    color: #475467;
-
-    font-size: 11px;
-    font-weight: 700;
-}
-
-
-.release-remessa-field input {
-    width: 100%;
-    height: 34px;
-
-    padding: 0 9px;
-
-    box-sizing: border-box;
-
-    border:
-        1px solid
-        #d8dee4;
-
-    border-radius: 7px;
-
-    outline: none;
-
-    background: #ffffff;
-
-    color: #36414b;
-
-    font-size: 12px;
-}
-
 
 .release-remessa-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(5, minmax(0, 1fr));
-
-    gap: 7px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
 }
-
 
 .release-remessa-grid label {
     min-width: 0;
 }
 
-
-.release-remessa-grid label span {
+.release-remessa-grid label > span {
     display: block;
-
-    margin-bottom: 4px;
-
-    color: #667085;
-
-    font-size: 9px;
-    font-weight: 700;
-
-    white-space: nowrap;
+    margin-bottom: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #56616c;
+    font-size: 9px;
+    font-weight: 700;
 }
-
 
 .release-remessa-grid input {
-    width: 100%;
-    height: 32px;
-
-    padding: 0 8px;
-
-    box-sizing: border-box;
-
-    border:
-        1px solid
-        #d8dee4;
-
-    border-radius: 6px;
-
-    outline: none;
-
-    background: #ffffff;
-
-    font-size: 12px;
+    text-align: center;
 }
 
-
-.release-remessa-grid input:focus,
-.release-remessa-field input:focus {
-    border-color: #005aa9;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(0, 90, 169, 0.07);
+.release-remessa-total {
+    margin-top: 11px;
+    padding: 9px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-radius: 8px;
+    background: #eef7fd;
+    color: #63707b;
+    font-size: 10px;
 }
 
+.release-remessa-total strong {
+    color: #005aa9;
+    font-size: 11px;
+}
 
 .release-remessa-add {
-    width: 100%;
     height: 34px;
-
-    margin-top: 11px;
-
-    border: none;
-    border-radius: 7px;
-
+    margin-top: 10px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 0;
+    border-radius: 8px;
     background: #005aa9;
-    color: #ffffff;
-
-    font-size: 11px;
+    color: #fff;
+    font-size: 10px;
     font-weight: 700;
-
     cursor: pointer;
 }
-
 
 .release-remessa-add:hover {
     background: #004a8b;
 }
 
-
 .release-remessa-history {
-    margin-top: 10px;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 5px;
+    margin-top: 14px;
 }
-
 
 .release-remessa-history-heading {
-    margin-bottom: 2px;
+    margin-bottom: 8px;
 }
-
-
-.release-remessa-history-heading strong {
-    display: block;
-
-    color: #475467;
-
-    font-size: 11px;
-}
-
-
-.release-remessa-history-heading span {
-    display: block;
-
-    margin-top: 2px;
-
-    color: #8a939d;
-
-    font-size: 9px;
-}
-
 
 .release-remessa-history-item {
-    min-height: 38px;
-
-    padding: 6px 9px;
-
+    padding: 10px 11px;
+    margin-bottom: 7px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    box-sizing: border-box;
-
-    background: #ffffff;
-
-    border:
-        1px solid
-        #e2e7ec;
-
-    border-radius: 7px;
+    gap: 10px;
+    border: 1px solid #e3e8ed;
+    border-radius: 9px;
+    background: #fff;
 }
 
+.release-remessa-history-main {
+    min-width: 0;
+    flex: 1;
+}
 
-.release-remessa-history-item > div {
+.release-remessa-history-main > div:first-child {
+    margin-bottom: 5px;
     display: flex;
-    align-items: center;
-
+    align-items: baseline;
     gap: 8px;
 }
 
-
-.release-remessa-history-item strong {
-    color: #44515c;
-
+.release-remessa-history-main > div:first-child strong {
+    color: #344054;
     font-size: 11px;
 }
 
-
-.release-remessa-history-item span {
-    color: #7a838c;
-
-    font-size: 10px;
+.release-remessa-history-main > div:first-child span {
+    color: #005aa9;
+    font-size: 9px;
+    font-weight: 700;
 }
 
+.release-remessa-history-systems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+}
 
-.release-remessa-history-item button {
-    width: 24px;
-    height: 24px;
+.release-remessa-history-systems > span {
+    color: #7a858f;
+    font-size: 8px;
+}
 
-    border: none;
-    border-radius: 5px;
-
-    background: #f5f6f7;
-    color: #7a838c;
-
-    font-size: 17px;
-
+.release-remessa-delete {
+    width: 31px;
+    height: 31px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 7px;
+    background: #fff0f0;
+    color: #d64545;
     cursor: pointer;
 }
 
-
-.release-remessa-history-item button:hover {
-    background: #feecec;
-    color: #c62828;
+.release-remessa-delete:hover {
+    background: #ffe5e5;
 }
 
+.release-environment-drawer-footer {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    border-top: 1px solid #e7ebef;
+    background: #fff;
+}
 
-@media (max-width: 520px) {
+.release-environment-drawer-footer button {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.release-environment-drawer-cancel {
+    border: 1px solid #d6dde4;
+    background: #fff;
+    color: #66717b;
+}
+
+.release-environment-drawer-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: #005aa9;
+    color: #fff;
+}
+
+.release-environment-drawer-save:hover {
+    background: #004a8b;
+}
+
+.release-environment-drawer-footer button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+    .release-environment-drawer {
+        width: 100%;
+    }
+
+    .release-environment-drawer-content {
+        padding: 14px;
+    }
+
+    .release-environment-drawer-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .release-environment-drawer-field-full {
+        grid-column: auto;
+    }
+
+    .release-environment-drawer-system-header {
+        display: none;
+    }
+
+    .release-environment-drawer-system-row {
+        grid-template-columns: 1fr 1fr 40px;
+    }
+
+    .release-environment-drawer-system-name {
+        grid-column: 1 / -1;
+    }
+
     .release-remessa-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
