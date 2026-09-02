@@ -614,3 +614,290 @@
     line-height: 1.4;
     pointer-events: none;
 }
+
+.release-field-hint {
+    display: block;
+    margin-top: 5px;
+
+    color: #8a939d;
+
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+
+.release-remessa-box {
+    margin-top: 10px;
+
+    padding: 12px;
+
+    background: #f7fafe;
+
+    border:
+        1px solid
+        #dbe7f1;
+
+    border-radius: 9px;
+}
+
+
+.release-remessa-heading {
+    margin-bottom: 11px;
+}
+
+
+.release-remessa-heading strong {
+    display: block;
+
+    color: #005aa9;
+
+    font-size: 12px;
+}
+
+
+.release-remessa-heading span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7a838c;
+
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+
+.release-remessa-field {
+    margin-bottom: 10px;
+}
+
+
+.release-remessa-field label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #475467;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.release-remessa-field input {
+    width: 100%;
+    height: 34px;
+
+    padding: 0 9px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        #d8dee4;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #36414b;
+
+    font-size: 12px;
+}
+
+
+.release-remessa-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 7px;
+}
+
+
+.release-remessa-grid label {
+    min-width: 0;
+}
+
+
+.release-remessa-grid label span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #667085;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.release-remessa-grid input {
+    width: 100%;
+    height: 32px;
+
+    padding: 0 8px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        #d8dee4;
+
+    border-radius: 6px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    font-size: 12px;
+}
+
+
+.release-remessa-grid input:focus,
+.release-remessa-field input:focus {
+    border-color: #005aa9;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0, 90, 169, 0.07);
+}
+
+
+.release-remessa-add {
+    width: 100%;
+    height: 34px;
+
+    margin-top: 11px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #005aa9;
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.release-remessa-add:hover {
+    background: #004a8b;
+}
+
+
+.release-remessa-history {
+    margin-top: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.release-remessa-history-heading {
+    margin-bottom: 2px;
+}
+
+
+.release-remessa-history-heading strong {
+    display: block;
+
+    color: #475467;
+
+    font-size: 11px;
+}
+
+
+.release-remessa-history-heading span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #8a939d;
+
+    font-size: 9px;
+}
+
+
+.release-remessa-history-item {
+    min-height: 38px;
+
+    padding: 6px 9px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border:
+        1px solid
+        #e2e7ec;
+
+    border-radius: 7px;
+}
+
+
+.release-remessa-history-item > div {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.release-remessa-history-item strong {
+    color: #44515c;
+
+    font-size: 11px;
+}
+
+
+.release-remessa-history-item span {
+    color: #7a838c;
+
+    font-size: 10px;
+}
+
+
+.release-remessa-history-item button {
+    width: 24px;
+    height: 24px;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #f5f6f7;
+    color: #7a838c;
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+
+.release-remessa-history-item button:hover {
+    background: #feecec;
+    color: #c62828;
+}
+
+
+@media (max-width: 520px) {
+    .release-remessa-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}

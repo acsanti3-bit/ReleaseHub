@@ -20,6 +20,7 @@ import type {
 interface Props {
   project: Project;
   concluido?: boolean;
+  liberadoEm?: string;
 }
 
 
@@ -144,6 +145,30 @@ function converterDataBrasileira(
 }
 
 
+function formatarLiberadoEm(
+  valor?: string
+) {
+  if (!valor) {
+    return "-";
+  }
+
+  const data =
+    new Date(valor);
+
+  if (
+    Number.isNaN(
+      data.getTime()
+    )
+  ) {
+    return valor;
+  }
+
+  return data.toLocaleDateString(
+    "pt-BR"
+  );
+}
+
+
 function obterSituacaoPrazo(
   prazoTexto: string,
   concluido = false
@@ -252,6 +277,7 @@ function obterSituacaoPrazo(
 function TvProjectCard({
   project,
   concluido = false,
+  liberadoEm,
 }: Props) {
   const navigate =
     useNavigate();
@@ -727,6 +753,19 @@ function TvProjectCard({
               project.prazo ||
               "-"
             }
+          </strong>
+        </div>
+
+
+        <div className="tv-card-date">
+          <small>
+            Liberado em
+          </small>
+
+          <strong>
+            {formatarLiberadoEm(
+              liberadoEm
+            )}
           </strong>
         </div>
 

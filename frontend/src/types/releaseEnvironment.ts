@@ -15,6 +15,20 @@ export interface ReleaseSystemVersion {
   mostrarNaTv?: boolean;
 }
 
+export interface ReleaseRemessa {
+  id: string;
+  data: string;
+
+  tarefas: {
+    intellicash: number;
+    easycash: number;
+    easycheckout: number;
+    easypdv: number;
+    intellistock: number;
+  };
+
+  totalTarefas: number;
+}
 
 export interface ReleaseEnvironment {
   id: number;
@@ -22,11 +36,23 @@ export interface ReleaseEnvironment {
   prazo?: string;
 
   /*
-    Quando true, a release fica arquivada:
-    não é sincronizada automaticamente
-    e não aparece no Modo TV.
+    Quando true, a release fica concluída:
+    não é sincronizada automaticamente,
+    mas continua disponível no histórico e na TV.
   */
   concluido?: boolean;
+
+  /**
+   * Data em que a release foi liberada.
+   * É preenchida automaticamente ao concluir,
+   * mas pode ser corrigida manualmente.
+   */
+  liberadoEm?: string;
+
+  /**
+   * Histórico das remessas recebidas nesta release.
+   */
+  remessas?: ReleaseRemessa[];
 
   /*
     Estrutura antiga mantida

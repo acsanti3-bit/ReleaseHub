@@ -48,6 +48,26 @@ type ReleaseFeedback = {
 };
 
 
+function formatarLiberadoEm(
+  valor?: string
+): string {
+  if (!valor) {
+    return "-";
+  }
+
+  const data =
+    new Date(valor);
+
+  if (Number.isNaN(data.getTime())) {
+    return valor;
+  }
+
+  return data.toLocaleDateString(
+    "pt-BR"
+  );
+}
+
+
 function obterSistemasDoAmbiente(
   ambiente: ReleaseEnvironment
 ): ReleaseSystemVersion[] {
@@ -594,13 +614,19 @@ function ReleaseEnvironments() {
       setSalvando(true);
       setFeedback(null);
 
-      const ambienteSalvo =
-        await editarAmbiente({
-          ...ambienteConfirmacao,
-          concluido:
-            vaiConcluir,
-        });
+   const ambienteSalvo =
+  await editarAmbiente({
+    ...ambienteConfirmacao,
 
+    concluido: vaiConcluir,
+
+    liberadoEm:
+      vaiConcluir
+        ? ambienteConfirmacao.liberadoEm ??
+          new Date().toISOString()
+        : ambienteConfirmacao.liberadoEm,
+  });
+  
       setAmbientes(
         listaAtual =>
           listaAtual.map(
@@ -868,6 +894,16 @@ function ReleaseEnvironments() {
 
                           <strong>
                             {prazoRelease}
+                          </strong>
+                        </span>
+
+                        <span>
+                          Liberado em{" "}
+
+                          <strong>
+                            {formatarLiberadoEm(
+                              ambiente.liberadoEm
+                            )}
                           </strong>
                         </span>
 

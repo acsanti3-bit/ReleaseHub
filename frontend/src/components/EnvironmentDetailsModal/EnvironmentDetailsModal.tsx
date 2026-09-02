@@ -444,10 +444,19 @@ function EnvironmentDetailsModal({
     );
 
 
+  /*
+   * Quando existir liberadoEm, ele passa a ser
+   * a data oficial de liberação do ambiente.
+   *
+   * O histórico de auditoria continua sendo
+   * utilizado como fallback para ambientes antigos.
+   */
   const dataConclusao =
-    conclusao
-      ? normalizarData(conclusao.createdAt)
-      : null;
+    environment.liberadoEm
+      ? normalizarData(environment.liberadoEm)
+      : conclusao
+        ? normalizarData(conclusao.createdAt)
+        : null;
 
 
   const ultimaMovimentacao =
@@ -472,6 +481,31 @@ function EnvironmentDetailsModal({
         )
       );
     }, [projetos]);
+
+
+  /*
+   * As remessas são ordenadas da mais recente
+   * para a mais antiga.
+   *
+   * O próprio ReleaseEnvironment já contém
+   * somente as quantidades dos cinco sistemas
+   * principais:
+   *
+   * IntelliCash
+   * EasyCash
+   * EasyCheckOut
+   * EasyPDV
+   * IntelliStock
+   */
+  const remessasOrdenadas =
+    useMemo(() => {
+      return [...(environment.remessas ?? [])]
+        .sort(
+          (a, b) =>
+            new Date(b.data).getTime() -
+            new Date(a.data).getTime()
+        );
+    }, [environment.remessas]);
 
 
   const fimDoCiclo =
@@ -572,8 +606,14 @@ function EnvironmentDetailsModal({
         >
           <button
             type="button"
-            className={aba === "resumo" ? "is-active" : ""}
-            onClick={() => setAba("resumo")}
+            className={
+              aba === "resumo"
+                ? "is-active"
+                : ""
+            }
+            onClick={() =>
+              setAba("resumo")
+            }
           >
             <MdInfoOutline size={18} />
             Resumo
@@ -581,8 +621,14 @@ function EnvironmentDetailsModal({
 
           <button
             type="button"
-            className={aba === "historico" ? "is-active" : ""}
-            onClick={() => setAba("historico")}
+            className={
+              aba === "historico"
+                ? "is-active"
+                : ""
+            }
+            onClick={() =>
+              setAba("historico")
+            }
           >
             <MdHistory size={18} />
             Histórico
@@ -590,11 +636,18 @@ function EnvironmentDetailsModal({
 
           <button
             type="button"
-            className={aba === "observacoes" ? "is-active" : ""}
-            onClick={() => setAba("observacoes")}
+            className={
+              aba === "observacoes"
+                ? "is-active"
+                : ""
+            }
+            onClick={() =>
+              setAba("observacoes")
+            }
           >
             <MdNotes size={18} />
             Observações
+
             {observacoes.length > 0 && (
               <span className="environment-details-tab-count">
                 {observacoes.length}
@@ -616,9 +669,12 @@ function EnvironmentDetailsModal({
             </div>
           ) : aba === "resumo" ? (
             <div className="environment-details-summary">
+
               <div className="environment-details-metrics">
+
                 <div className="environment-details-metric">
                   <span>Status</span>
+
                   <strong>
                     {environment.concluido
                       ? "Concluído"
@@ -626,21 +682,30 @@ function EnvironmentDetailsModal({
                   </strong>
                 </div>
 
+
                 <div className="environment-details-metric">
                   <span>Prazo</span>
+
                   <strong>
-                    {formatarData(environment.prazo)}
+                    {formatarData(
+                      environment.prazo
+                    )}
                   </strong>
                 </div>
 
+
                 <div className="environment-details-metric">
                   <span>Criação</span>
+
                   <strong>
                     {dataCriacao
-                      ? formatarDataHora(dataCriacao.toISOString())
+                      ? formatarDataHora(
+                          dataCriacao.toISOString()
+                        )
                       : "Não disponível"}
                   </strong>
                 </div>
+
 
                 <div className="environment-details-metric">
                   <span>
@@ -648,6 +713,7 @@ function EnvironmentDetailsModal({
                       ? "Tempo de ciclo"
                       : "Tempo em andamento"}
                   </span>
+
                   <strong>
                     {formatarDuracao(
                       dataCriacao,
@@ -656,31 +722,63 @@ function EnvironmentDetailsModal({
                   </strong>
                 </div>
 
+
                 <div className="environment-details-metric">
-                  <span>Última movimentação</span>
+                  <span>
+                    Última movimentação
+                  </span>
+
                   <strong>
                     {ultimaMovimentacao
-                      ? formatarDataHora(ultimaMovimentacao.toISOString())
+                      ? formatarDataHora(
+                          ultimaMovimentacao.toISOString()
+                        )
                       : "Não disponível"}
                   </strong>
                 </div>
 
+
                 <div className="environment-details-metric">
                   <span>Tarefas</span>
-                  <strong>{totalTarefas}</strong>
+
+                  <strong>
+                    {totalTarefas}
+                  </strong>
                 </div>
+
+
+                <div className="environment-details-metric">
+                  <span>
+                    Liberado em
+                  </span>
+
+                  <strong>
+                    {environment.liberadoEm
+                      ? formatarDataHora(
+                          environment.liberadoEm
+                        )
+                      : "Ainda não liberado"}
+                  </strong>
+                </div>
+
               </div>
+
 
               {environment.concluido && (
                 <div className="environment-details-conclusion">
                   <MdCheckCircle size={19} />
+
                   <div>
                     <strong>
                       Conclusão
                     </strong>
+
                     <span>
                       {dataConclusao
-                        ? `${formatarDataHora(conclusao?.createdAt)}${
+                        ? `${formatarDataHora(
+                            environment.liberadoEm ??
+                            conclusao?.createdAt
+                          )}${
                             conclusao?.userName
                               ? ` por ${conclusao.userName}`
                               : ""
@@ -691,34 +789,52 @@ function EnvironmentDetailsModal({
                 </div>
               )}
 
+
               <section className="environment-details-section">
                 <div className="environment-details-section-heading">
                   <div>
-                    <h3>Tarefas por situação</h3>
+                    <h3>
+                      Tarefas por situação
+                    </h3>
+
                     <p>
-                      Situações com tarefas nesta release.
+                      Situações com tarefas
+                      nesta release.
                     </p>
                   </div>
                 </div>
 
+
                 {totalTarefas === 0 ? (
                   <div className="environment-details-empty-inline">
-                    Nenhuma tarefa sincronizada para este ambiente.
+                    Nenhuma tarefa sincronizada
+                    para este ambiente.
                   </div>
                 ) : (
                   <div className="environment-details-status-grid">
                     {STATUS_RESUMO
                       .filter(status =>
-                        totaisSituacoes[status.chave] > 0
+                        totaisSituacoes[
+                          status.chave
+                        ] > 0
                       )
                       .map(status => (
                         <div
-                          key={status.chave}
+                          key={
+                            status.chave
+                          }
                           className="environment-details-status-item"
                         >
-                          <span>{status.nome}</span>
+                          <span>
+                            {status.nome}
+                          </span>
+
                           <strong>
-                            {totaisSituacoes[status.chave]}
+                            {
+                              totaisSituacoes[
+                                status.chave
+                              ]
+                            }
                           </strong>
                         </div>
                       ))}
@@ -726,84 +842,290 @@ function EnvironmentDetailsModal({
                 )}
               </section>
 
+
               <section className="environment-details-section">
                 <div className="environment-details-section-heading">
                   <div>
-                    <h3>Versões e executáveis</h3>
+                    <h3>
+                      Versões e executáveis
+                    </h3>
+
                     <p>
-                      Somente sistemas configurados neste ambiente.
+                      Somente sistemas
+                      configurados neste
+                      ambiente.
                     </p>
                   </div>
                 </div>
 
-                {sistemasConfigurados.length === 0 ? (
+
+                {sistemasConfigurados.length ===
+                0 ? (
                   <div className="environment-details-empty-inline">
-                    Nenhum sistema configurado.
+                    Nenhum sistema
+                    configurado.
                   </div>
                 ) : (
                   <div className="environment-details-systems">
-                    {sistemasConfigurados.map(sistema => (
-                      <div
-                        key={sistema.chave}
-                        className="environment-details-system"
-                      >
-                        <div>
-                          <span>{sistema.nome}</span>
-                          <strong>{sistema.versao}</strong>
-                        </div>
+                    {sistemasConfigurados.map(
+                      sistema => (
+                        <div
+                          key={
+                            sistema.chave
+                          }
+                          className="environment-details-system"
+                        >
+                          <div>
+                            <span>
+                              {sistema.nome}
+                            </span>
 
-                        <small>
-                          Executável: {sistema.executavel?.trim() || "Não informado"}
-                        </small>
-                      </div>
-                    ))}
+                            <strong>
+                              {sistema.versao}
+                            </strong>
+                          </div>
+
+                          <small>
+                            Executável:{" "}
+                            {sistema.executavel?.trim() ||
+                              "Não informado"}
+                          </small>
+                        </div>
+                      )
+                    )}
                   </div>
                 )}
               </section>
+
+
+              <section className="environment-details-section">
+                <div className="environment-details-section-heading">
+                  <div>
+                    <h3>
+                      Informações das remessas
+                    </h3>
+
+                    <p>
+                      Quantidade de tarefas
+                      recebidas em cada remessa
+                      dos cinco sistemas
+                      principais.
+                    </p>
+                  </div>
+                </div>
+
+
+                {remessasOrdenadas.length ===
+                0 ? (
+                  <div className="environment-details-empty-inline">
+                    Nenhuma remessa registrada
+                    para este ambiente.
+                  </div>
+                ) : (
+                  <div className="environment-details-remessas">
+
+                    {remessasOrdenadas.map(
+                      remessa => (
+                        <article
+                          key={remessa.id}
+                          className="environment-details-remessa"
+                        >
+
+                          <header>
+                            <div>
+                              <strong>
+                                Remessa de{" "}
+                                {formatarData(
+                                  remessa.data
+                                )}
+                              </strong>
+
+                              <span>
+                                {
+                                  remessa.totalTarefas
+                                }{" "}
+                                tarefas no total · IntelliCash: {" "}
+                                <b>
+                                  {
+                                    remessa.tarefas.intellicash
+                                  }
+                                </b>
+                              </span>
+                            </div>
+                          </header>
+
+
+                          <div className="environment-details-remessa-grid">
+
+                            <div>
+                              <span>
+                                IntelliCash
+                              </span>
+
+                              <strong>
+                                {
+                                  remessa
+                                    .tarefas
+                                    .intellicash
+                                }
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                EasyCash
+                              </span>
+
+                              <strong>
+                                {
+                                  remessa
+                                    .tarefas
+                                    .easycash
+                                }
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                EasyCheckOut
+                              </span>
+
+                              <strong>
+                                {
+                                  remessa
+                                    .tarefas
+                                    .easycheckout
+                                }
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                EasyPDV
+                              </span>
+
+                              <strong>
+                                {
+                                  remessa
+                                    .tarefas
+                                    .easypdv
+                                }
+                              </strong>
+                            </div>
+
+
+                            <div>
+                              <span>
+                                IntelliStock
+                              </span>
+
+                              <strong>
+                                {
+                                  remessa
+                                    .tarefas
+                                    .intellistock
+                                }
+                              </strong>
+                            </div>
+
+                          </div>
+
+
+                          <footer>
+                            <span>
+                              Total da remessa
+                            </span>
+
+                            <strong>
+                              {
+                                remessa.totalTarefas
+                              }{" "}
+                              tarefas
+                            </strong>
+                          </footer>
+
+                        </article>
+                      )
+                    )}
+
+                  </div>
+                )}
+              </section>
+
             </div>
           ) : aba === "historico" ? (
+
             <div className="environment-details-history">
+
               {eventosHistorico.length === 0 ? (
                 <div className="environment-details-empty">
                   <MdHistory size={28} />
-                  <strong>Nenhum histórico disponível</strong>
+
+                  <strong>
+                    Nenhum histórico disponível
+                  </strong>
+
                   <span>
-                    Ambientes mais antigos podem não possuir registros anteriores à implantação da auditoria.
+                    Ambientes mais antigos podem
+                    não possuir registros anteriores
+                    à implantação da auditoria.
                   </span>
                 </div>
               ) : (
-                eventosHistorico.map(registro => (
-                  <article
-                    key={registro.id}
-                    className="environment-details-history-item"
-                  >
-                    <div className="environment-details-history-icon">
-                      {iconeAcao(registro.action)}
-                    </div>
-
-                    <div className="environment-details-history-body">
-                      <div className="environment-details-history-title">
-                        <strong>
-                          {NOMES_ACAO[registro.action] ?? registro.action}
-                        </strong>
-
-                        <time>
-                          {formatarDataHora(registro.createdAt)}
-                        </time>
+                eventosHistorico.map(
+                  registro => (
+                    <article
+                      key={registro.id}
+                      className="environment-details-history-item"
+                    >
+                      <div className="environment-details-history-icon">
+                        {iconeAcao(
+                          registro.action
+                        )}
                       </div>
 
-                      <span>
-                        {registro.userName || "Sistema/Redmine"}
-                      </span>
-                    </div>
-                  </article>
-                ))
+                      <div className="environment-details-history-body">
+                        <div className="environment-details-history-title">
+                          <strong>
+                            {
+                              NOMES_ACAO[
+                                registro.action
+                              ] ??
+                              registro.action
+                            }
+                          </strong>
+
+                          <time>
+                            {formatarDataHora(
+                              registro.createdAt
+                            )}
+                          </time>
+                        </div>
+
+                        <span>
+                          {
+                            registro.userName ||
+                            "Sistema/Redmine"
+                          }
+                        </span>
+                      </div>
+                    </article>
+                  )
+                )
               )}
+
             </div>
+
           ) : (
+
             <div className="environment-details-notes">
+
               {canAddObservation && (
                 <div className="environment-details-note-form">
+
                   <label htmlFor="environment-observation">
                     Nova observação
                   </label>
@@ -814,11 +1136,14 @@ function EnvironmentDetailsModal({
                     maxLength={1000}
                     placeholder="Ex.: Aguardando correção da tarefa #10913..."
                     onChange={evento =>
-                      setObservacao(evento.target.value)
+                      setObservacao(
+                        evento.target.value
+                      )
                     }
                   />
 
                   <div className="environment-details-note-form-footer">
+
                     <span>
                       {observacao.length}/1000
                     </span>
@@ -834,44 +1159,75 @@ function EnvironmentDetailsModal({
                       }
                     >
                       <MdSend size={17} />
+
                       {salvandoObservacao
                         ? "Salvando..."
                         : "Adicionar"}
                     </button>
+
                   </div>
+
                 </div>
               )}
+
 
               {observacoes.length === 0 ? (
                 <div className="environment-details-empty">
+
                   <MdNotes size={28} />
-                  <strong>Nenhuma observação registrada</strong>
+
+                  <strong>
+                    Nenhuma observação registrada
+                  </strong>
+
                   <span>
-                    Use este espaço para registrar contexto interno da release sem poluir o card principal.
+                    Use este espaço para registrar
+                    contexto interno da release sem
+                    poluir o card principal.
                   </span>
+
                 </div>
               ) : (
                 <div className="environment-details-note-list">
-                  {observacoes.map(registro => (
-                    <article
-                      key={registro.id}
-                      className="environment-details-note"
-                    >
-                      <p>
-                        {obterObservacao(registro)}
-                      </p>
 
-                      <footer>
-                        <span>{registro.userName}</span>
-                        <time>
-                          <MdSchedule size={14} />
-                          {formatarDataHora(registro.createdAt)}
-                        </time>
-                      </footer>
-                    </article>
-                  ))}
+                  {observacoes.map(
+                    registro => (
+                      <article
+                        key={registro.id}
+                        className="environment-details-note"
+                      >
+
+                        <p>
+                          {obterObservacao(
+                            registro
+                          )}
+                        </p>
+
+                        <footer>
+
+                          <span>
+                            {registro.userName}
+                          </span>
+
+                          <time>
+                            <MdSchedule
+                              size={14}
+                            />
+
+                            {formatarDataHora(
+                              registro.createdAt
+                            )}
+                          </time>
+
+                        </footer>
+
+                      </article>
+                    )
+                  )}
+
                 </div>
               )}
+
             </div>
           )}
         </div>

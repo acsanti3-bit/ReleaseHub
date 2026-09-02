@@ -1029,6 +1029,10 @@ function TvDashboard() {
                       ?.concluido
                   )
                 }
+                liberadoEm={
+                  ambienteSelecionado
+                    ?.liberadoEm
+                }
               />
 
             )

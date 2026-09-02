@@ -50,6 +50,324 @@ function respostaErro(
 }
 
 
+async function garantirTabelasComplementares(
+  context
+) {
+  await context.env.DB
+    .prepare(
+      `
+        CREATE TABLE IF NOT EXISTS release_environment_metadata (
+          environment_id INTEGER PRIMARY KEY,
+          liberado_em TEXT NOT NULL DEFAULT ''
+        )
+      `
+    )
+    .run();
+
+  await context.env.DB
+    .prepare(
+      `
+        CREATE TABLE IF NOT EXISTS release_environment_remessas (
+          id TEXT PRIMARY KEY,
+          environment_id INTEGER NOT NULL,
+          data TEXT NOT NULL,
+          payload_json TEXT NOT NULL,
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `
+    )
+    .run();
+
+  await context.env.DB
+    .prepare(
+      `
+        CREATE INDEX IF NOT EXISTS idx_release_environment_remessas_environment
+        ON release_environment_remessas (environment_id, data)
+      `
+    )
+    .run();
+}
+
+
+function numeroNaoNegativo(valor) {
+  const numero = Number(valor);
+
+  if (!Number.isFinite(numero)) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    Math.trunc(numero)
+  );
+}
+
+
+function normalizarRemessas(
+  remessas = []
+) {
+  if (!Array.isArray(remessas)) {
+    return [];
+  }
+
+  return remessas
+    .map((remessa, indice) => {
+      const tarefas = {
+        intellicash: numeroNaoNegativo(
+          remessa?.tarefas?.intellicash
+        ),
+        easycash: numeroNaoNegativo(
+          remessa?.tarefas?.easycash
+        ),
+        easycheckout: numeroNaoNegativo(
+          remessa?.tarefas?.easycheckout
+        ),
+        easypdv: numeroNaoNegativo(
+          remessa?.tarefas?.easypdv
+        ),
+        intellistock: numeroNaoNegativo(
+          remessa?.tarefas?.intellistock
+        ),
+      };
+
+      const totalTarefas =
+        Object.values(tarefas).reduce(
+          (total, quantidade) =>
+            total + quantidade,
+          0
+        );
+
+      return {
+        id: String(
+          remessa?.id ??
+          `${Date.now()}-${indice}`
+        ),
+        data: String(
+          remessa?.data ?? ''
+        ).trim(),
+        tarefas,
+        totalTarefas,
+      };
+    })
+    .filter(remessa =>
+      Boolean(remessa.data)
+    );
+}
+
+
+async function listarLiberacoes(
+  context
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            environment_id,
+            liberado_em
+          FROM release_environment_metadata
+        `
+      )
+      .all();
+
+  return new Map(
+    (resultado.results ?? []).map(
+      row => [
+        Number(row.environment_id),
+        String(row.liberado_em ?? ''),
+      ]
+    )
+  );
+}
+
+
+async function listarRemessasPorAmbiente(
+  context
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            environment_id,
+            data,
+            payload_json
+          FROM release_environment_remessas
+          ORDER BY data DESC, created_at DESC
+        `
+      )
+      .all();
+
+  const mapa = new Map();
+
+  for (const row of resultado.results ?? []) {
+    let payload = null;
+
+    try {
+      payload = JSON.parse(
+        String(row.payload_json ?? '{}')
+      );
+    } catch {
+      payload = null;
+    }
+
+    const normalizada =
+      normalizarRemessas([
+        {
+          ...(payload ?? {}),
+          id: row.id,
+          data: row.data,
+        },
+      ])[0];
+
+    if (!normalizada) {
+      continue;
+    }
+
+    const environmentId =
+      Number(row.environment_id);
+
+    if (!mapa.has(environmentId)) {
+      mapa.set(environmentId, []);
+    }
+
+    mapa.get(environmentId).push(
+      normalizada
+    );
+  }
+
+  return mapa;
+}
+
+
+async function buscarComplementosAmbiente(
+  context,
+  environmentId
+) {
+  const [metadata, remessasResultado] =
+    await Promise.all([
+      context.env.DB
+        .prepare(
+          `
+            SELECT liberado_em
+            FROM release_environment_metadata
+            WHERE environment_id = ?
+            LIMIT 1
+          `
+        )
+        .bind(environmentId)
+        .first(),
+
+      context.env.DB
+        .prepare(
+          `
+            SELECT id, data, payload_json
+            FROM release_environment_remessas
+            WHERE environment_id = ?
+            ORDER BY data DESC, created_at DESC
+          `
+        )
+        .bind(environmentId)
+        .all(),
+    ]);
+
+  const remessas = [];
+
+  for (const row of remessasResultado.results ?? []) {
+    let payload = null;
+
+    try {
+      payload = JSON.parse(
+        String(row.payload_json ?? '{}')
+      );
+    } catch {
+      payload = null;
+    }
+
+    const normalizada =
+      normalizarRemessas([
+        {
+          ...(payload ?? {}),
+          id: row.id,
+          data: row.data,
+        },
+      ])[0];
+
+    if (normalizada) {
+      remessas.push(normalizada);
+    }
+  }
+
+  return {
+    liberadoEm:
+      String(
+        metadata?.liberado_em ?? ''
+      ) || undefined,
+    remessas,
+  };
+}
+
+
+async function salvarComplementosAmbiente(
+  context,
+  environmentId,
+  liberadoEm,
+  remessas
+) {
+  await context.env.DB
+    .prepare(
+      `
+        INSERT INTO release_environment_metadata (
+          environment_id,
+          liberado_em
+        )
+        VALUES (?, ?)
+        ON CONFLICT(environment_id)
+        DO UPDATE SET
+          liberado_em = excluded.liberado_em
+      `
+    )
+    .bind(
+      environmentId,
+      String(liberadoEm ?? '').trim()
+    )
+    .run();
+
+  await context.env.DB
+    .prepare(
+      `
+        DELETE FROM release_environment_remessas
+        WHERE environment_id = ?
+      `
+    )
+    .bind(environmentId)
+    .run();
+
+  for (const remessa of normalizarRemessas(remessas)) {
+    await context.env.DB
+      .prepare(
+        `
+          INSERT INTO release_environment_remessas (
+            id,
+            environment_id,
+            data,
+            payload_json
+          )
+          VALUES (?, ?, ?, ?)
+        `
+      )
+      .bind(
+        remessa.id,
+        environmentId,
+        remessa.data,
+        JSON.stringify(remessa)
+      )
+      .run();
+  }
+}
+
+
 function normalizarTexto(valor) {
   return String(valor ?? "")
     .normalize("NFD")
@@ -258,7 +576,8 @@ function obterVersaoSistema(
 
 function transformarAmbiente(
   row,
-  sistemas
+  sistemas,
+  complementos = {}
 ) {
   return {
     id: row.id,
@@ -266,6 +585,13 @@ function transformarAmbiente(
     prazo: row.prazo ?? "",
     concluido:
       Number(row.concluido) !== 0,
+
+    liberadoEm:
+      complementos.liberadoEm ||
+      undefined,
+
+    remessas:
+      complementos.remessas ?? [],
 
     versoes: {
       intellicash:
@@ -609,7 +935,9 @@ function criarRespostaAmbiente(
   nome,
   sistemas,
   prazo,
-  concluido = false
+  concluido = false,
+  liberadoEm = "",
+  remessas = []
 ) {
   return {
     id,
@@ -617,6 +945,12 @@ function criarRespostaAmbiente(
     prazo: prazo ?? "",
     concluido:
       Boolean(concluido),
+
+    liberadoEm:
+      liberadoEm || undefined,
+
+    remessas:
+      normalizarRemessas(remessas),
 
     versoes: {
       intellicash:
@@ -729,12 +1063,19 @@ async function buscarAmbientePorId(
       })
     );
 
+  const complementos =
+    await buscarComplementosAmbiente(
+      context,
+      id
+    );
+
   return transformarAmbiente(
     row,
     normalizarSistemas(
       sistemasSalvos,
       row
-    )
+    ),
+    complementos
   );
 }
 
@@ -910,6 +1251,10 @@ export async function onRequestGet(
   context
 ) {
   try {
+    await garantirTabelasComplementares(
+      context
+    );
+
     const resultado =
       await context.env.DB
         .prepare(
@@ -933,10 +1278,16 @@ export async function onRequestGet(
         )
         .all();
 
-    const sistemasPorAmbiente =
-      await listarSistemas(
-        context
-      );
+    const [
+      sistemasPorAmbiente,
+      liberacoesPorAmbiente,
+      remessasPorAmbiente,
+    ] =
+      await Promise.all([
+        listarSistemas(context),
+        listarLiberacoes(context),
+        listarRemessasPorAmbiente(context),
+      ]);
 
     const ambientes =
       resultado.results.map(
@@ -959,7 +1310,17 @@ export async function onRequestGet(
 
           return transformarAmbiente(
             row,
-            sistemas
+            sistemas,
+            {
+              liberadoEm:
+                liberacoesPorAmbiente.get(
+                  Number(row.id)
+                ) || undefined,
+              remessas:
+                remessasPorAmbiente.get(
+                  Number(row.id)
+                ) ?? [],
+            }
           );
         }
       );
@@ -987,6 +1348,10 @@ export async function onRequestPost(
   context
 ) {
   try {
+    await garantirTabelasComplementares(
+      context
+    );
+
     const body =
       await context.request.json();
 
@@ -1035,6 +1400,19 @@ export async function onRequestPost(
 
     const id =
       body.id ?? Date.now();
+
+    const liberadoEm =
+      String(
+        body.liberadoEm ??
+        (body.concluido
+          ? new Date().toISOString()
+          : "")
+      ).trim();
+
+    const remessas =
+      normalizarRemessas(
+        body.remessas
+      );
 
     await context.env.DB
       .prepare(
@@ -1091,6 +1469,13 @@ export async function onRequestPost(
       sistemas
     );
 
+    await salvarComplementosAmbiente(
+      context,
+      id,
+      liberadoEm,
+      remessas
+    );
+
     await sincronizarProjetos(
       context,
       id,
@@ -1108,7 +1493,9 @@ export async function onRequestPost(
         String(
           body.prazo ?? ""
         ).trim(),
-        Boolean(body.concluido)
+        Boolean(body.concluido),
+        liberadoEm,
+        remessas
       );
 
     await registrarAuditoria(
@@ -1150,6 +1537,10 @@ export async function onRequestPut(
   context
 ) {
   try {
+    await garantirTabelasComplementares(
+      context
+    );
+
     const body =
       await context.request.json();
 
@@ -1203,6 +1594,39 @@ export async function onRequestPut(
         404
       );
     }
+
+    const vaiConcluir =
+      !ambienteAnterior.concluido &&
+      Boolean(body.concluido);
+
+    const liberadoInformado =
+      Object.prototype.hasOwnProperty.call(
+        body,
+        "liberadoEm"
+      );
+
+    let liberadoEm =
+      liberadoInformado
+        ? String(
+            body.liberadoEm ?? ""
+          ).trim()
+        : String(
+            ambienteAnterior.liberadoEm ?? ""
+          ).trim();
+
+    if (vaiConcluir && !liberadoEm) {
+      liberadoEm =
+        new Date().toISOString();
+    }
+
+    const remessas =
+      Array.isArray(body.remessas)
+        ? normalizarRemessas(
+            body.remessas
+          )
+        : normalizarRemessas(
+            ambienteAnterior.remessas
+          );
 
     await context.env.DB
       .prepare(
@@ -1258,6 +1682,13 @@ export async function onRequestPut(
       sistemas
     );
 
+    await salvarComplementosAmbiente(
+      context,
+      body.id,
+      liberadoEm,
+      remessas
+    );
+
     await sincronizarProjetos(
       context,
       body.id,
@@ -1275,7 +1706,9 @@ export async function onRequestPut(
         String(
           body.prazo ?? ""
         ).trim(),
-        Boolean(body.concluido)
+        Boolean(body.concluido),
+        liberadoEm,
+        remessas
       );
 
     let acao = "EDITAR";
@@ -1329,6 +1762,10 @@ export async function onRequestDelete(
   context
 ) {
   try {
+    await garantirTabelasComplementares(
+      context
+    );
+
     const usuario =
       await buscarUsuarioLogado(
         context
@@ -1379,6 +1816,26 @@ export async function onRequestDelete(
         404
       );
     }
+
+    await context.env.DB
+      .prepare(
+        `
+          DELETE FROM release_environment_remessas
+          WHERE environment_id = ?
+        `
+      )
+      .bind(id)
+      .run();
+
+    await context.env.DB
+      .prepare(
+        `
+          DELETE FROM release_environment_metadata
+          WHERE environment_id = ?
+        `
+      )
+      .bind(id)
+      .run();
 
     await context.env.DB
       .prepare(

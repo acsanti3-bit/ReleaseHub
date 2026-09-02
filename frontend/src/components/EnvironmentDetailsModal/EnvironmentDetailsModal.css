@@ -569,3 +569,143 @@
         gap: 2px;
     }
 }
+
+.environment-details-remessas {
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+}
+
+
+.environment-details-remessa {
+    padding: 12px 13px;
+
+    background: #f8fafc;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius: 9px;
+}
+
+
+.environment-details-remessa header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+
+.environment-details-remessa header > div {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.environment-details-remessa header strong {
+    color: #344054;
+
+    font-size: 12px;
+}
+
+
+.environment-details-remessa header span {
+    padding: 3px 7px;
+
+    border-radius: 999px;
+
+    background: #eaf2f8;
+    color: #005aa9;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+.environment-details-remessa-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 6px;
+}
+
+
+.environment-details-remessa-grid > div {
+    padding: 8px;
+
+    background: #ffffff;
+
+    border:
+        1px solid
+        #e5e7eb;
+
+    border-radius: 7px;
+}
+
+
+.environment-details-remessa-grid span {
+    display: block;
+
+    color: #7a838c;
+
+    font-size: 9px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.environment-details-remessa-grid strong {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #344054;
+
+    font-size: 14px;
+}
+
+
+.environment-details-remessa footer {
+    margin-top: 9px;
+    padding-top: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-top:
+        1px solid
+        #e5e7eb;
+}
+
+
+.environment-details-remessa footer span {
+    color: #667085;
+
+    font-size: 10px;
+}
+
+
+.environment-details-remessa footer strong {
+    color: #005aa9;
+
+    font-size: 12px;
+}
+
+
+@media (max-width: 700px) {
+    .environment-details-remessa-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
