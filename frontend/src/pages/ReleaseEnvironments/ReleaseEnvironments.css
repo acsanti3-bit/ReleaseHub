@@ -958,3 +958,14 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+.release-remittance-history-date {
+    align-items: center;
+    text-align: center;
+}
+
+.release-remittance-history-date strong {
+    color: #44515c;
+    font-size: 12px;
+}

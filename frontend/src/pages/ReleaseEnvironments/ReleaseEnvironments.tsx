@@ -657,6 +657,23 @@ function ReleaseEnvironments() {
     );
 
 
+  function formatarDataRemessa(
+    valor: string
+  ): string {
+    const partes =
+      valor.split("-");
+
+    if (
+      partes.length === 3 &&
+      partes[0].length === 4
+    ) {
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    return valor;
+  }
+
+
   const historicoRemessasIntellicash =
     [...ambientesOrdenados]
       .reverse()
@@ -676,6 +693,7 @@ function ReleaseEnvironments() {
           .map(remessa => ({
             id: `${ambiente.id}-${remessa.id}`,
             versao,
+            data: remessa.data,
             quantidade:
               remessa.tarefas.intellicash,
           }));
@@ -1129,6 +1147,18 @@ function ReleaseEnvironments() {
                       </strong>
                     </div>
 
+                    <div className="release-remittance-history-date">
+                      <small>
+                        Data da remessa
+                      </small>
+
+                      <strong>
+                        {formatarDataRemessa(
+                          remessa.data
+                        )}
+                      </strong>
+                    </div>
+
                     <div className="release-remittance-history-tasks">
                       <small>
                         Tarefas
@@ -1545,7 +1575,6 @@ function ReleaseEnvironments() {
         </div>
       )}
 
-      )
     </Layout>
   );
 }
