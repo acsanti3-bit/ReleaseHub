@@ -145,6 +145,48 @@ function converterDataBrasileira(
 }
 
 
+function formatarPrazo(
+  valor?: string
+) {
+  if (!valor) {
+    return "-";
+  }
+
+  const iso =
+    valor.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+  if (iso) {
+    return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  }
+
+  const brasileira =
+    valor.match(
+      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    );
+
+  if (brasileira) {
+    return valor;
+  }
+
+  const data =
+    new Date(valor);
+
+  if (
+    Number.isNaN(
+      data.getTime()
+    )
+  ) {
+    return valor;
+  }
+
+  return new Intl.DateTimeFormat(
+    "pt-BR"
+  ).format(data);
+}
+
+
 function obterSituacaoPrazo(
   prazoTexto: string,
   concluido = false
@@ -152,7 +194,7 @@ function obterSituacaoPrazo(
   if (concluido) {
     return {
       texto: "Concluída",
-      detalhe: "Release liberada",
+      detalhe: "Prazo não considerado",
       classe: "neutral",
     };
   }
@@ -250,48 +292,6 @@ function obterSituacaoPrazo(
 }
 
 
-function formatarData(
-  valor?: string
-) {
-  if (!valor) {
-    return "-";
-  }
-
-  const iso =
-    valor.match(
-      /^(\d{4})-(\d{2})-(\d{2})$/
-    );
-
-  if (iso) {
-    return `${iso[3]}/${iso[2]}/${iso[1]}`;
-  }
-
-  const brasileira =
-    valor.match(
-      /^(\d{2})\/(\d{2})\/(\d{4})$/
-    );
-
-  if (brasileira) {
-    return valor;
-  }
-
-  const data =
-    new Date(valor);
-
-  if (
-    Number.isNaN(
-      data.getTime()
-    )
-  ) {
-    return valor;
-  }
-
-  return new Intl.DateTimeFormat(
-    "pt-BR"
-  ).format(data);
-}
-
-
 function formatarLiberadoEm(
   valor?: string
 ) {
@@ -306,11 +306,7 @@ function formatarLiberadoEm(
   }
 
   return new Intl.DateTimeFormat(
-    "pt-BR",
-    {
-      dateStyle: "short",
-      timeStyle: "short",
-    }
+    "pt-BR"
   ).format(data);
 }
 
@@ -784,38 +780,38 @@ function TvProjectCard({
         </div>
 
 
-        {!concluido && (
-          <div className="tv-card-date">
-            <small>
-              Prazo
-            </small>
-
-            <strong>
-              {formatarData(
-                project.prazo
-              )}
-            </strong>
-          </div>
-        )}
-
-
-        <div className="tv-card-date tv-card-situation">
+        <div className="tv-card-date">
           <small>
-            Situação
+            Prazo
           </small>
 
-          <div
-            className={`tv-deadline-status tv-deadline-${situacaoPrazo.classe}`}
-          >
-            <strong>
-              {situacaoPrazo.texto}
-            </strong>
-
-            <span>
-              {situacaoPrazo.detalhe}
-            </span>
-          </div>
+          <strong>
+            {formatarPrazo(
+              project.prazo
+            )}
+          </strong>
         </div>
+
+
+        {!concluido && (
+          <div className="tv-card-date tv-card-situation">
+            <small>
+              Situação
+            </small>
+
+            <div
+              className={`tv-deadline-status tv-deadline-${situacaoPrazo.classe}`}
+            >
+              <strong>
+                {situacaoPrazo.texto}
+              </strong>
+
+              <span>
+                {situacaoPrazo.detalhe}
+              </span>
+            </div>
+          </div>
+        )}
 
 
         {concluido && (
