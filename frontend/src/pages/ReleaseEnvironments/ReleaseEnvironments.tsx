@@ -1464,8 +1464,6 @@ function ReleaseEnvironments() {
           </div>
         </div>
       )}
-
-      )
     </Layout>
   );
 }
