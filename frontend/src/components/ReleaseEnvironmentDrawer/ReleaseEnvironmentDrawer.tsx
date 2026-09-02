@@ -8,7 +8,6 @@ import {
   MdAdd,
   MdClose,
   MdDeleteOutline,
-  MdSave,
 } from "react-icons/md";
 
 import {
@@ -101,34 +100,6 @@ function formatarData(
   }
 
   return valor;
-}
-
-
-function normalizarDataExecutavel(
-  valor: string
-): string {
-  const texto =
-    valor.trim();
-
-  const brasileiro =
-    texto.match(
-      /^(\d{2})\/(\d{2})\/(\d{4})$/
-    );
-
-  if (brasileiro) {
-    return `${brasileiro[3]}-${brasileiro[2]}-${brasileiro[1]}`;
-  }
-
-  const iso =
-    texto.match(
-      /^(\d{4})-(\d{2})-(\d{2})/
-    );
-
-  if (iso) {
-    return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  }
-
-  return "";
 }
 
 
@@ -420,25 +391,6 @@ function ReleaseEnvironmentDrawer({
               : sistema
         ),
     }));
-
-    /*
-      O IntelliCash é a principal referência de remessa.
-      Ao trocar a data do executável, sugerimos a mesma
-      data no formulário da nova remessa.
-    */
-    if (chave === "intellicash") {
-      const dataRemessa =
-        normalizarDataExecutavel(
-          valor
-        );
-
-      if (dataRemessa) {
-        setNovaRemessa(atual => ({
-          ...atual,
-          data: dataRemessa,
-        }));
-      }
-    }
   }
 
 
@@ -796,51 +748,37 @@ function ReleaseEnvironmentDrawer({
       [remessas]
     );
 
-
-  const todosNaTv =
-    sistemas.length > 0 &&
-    sistemas.every(
-      sistema =>
-        sistema.mostrarNaTv !== false
-    );
-
-
   return (
-    <div
-      className="release-environment-drawer-overlay"
-      role="presentation"
-      onMouseDown={evento => {
-        if (
-          evento.target ===
-          evento.currentTarget
-        ) {
-          onClose();
-        }
-      }}
-    >
+    <>
+      <div
+        className="release-drawer-backdrop"
+        role="presentation"
+        onMouseDown={evento => {
+          if (evento.target === evento.currentTarget) {
+            onClose();
+          }
+        }}
+      />
+
       <aside
-        className="release-environment-drawer"
+        className="release-drawer"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="release-environment-drawer-title"
+        aria-labelledby="release-drawer-title"
       >
-        <header className="release-environment-drawer-header">
+        <header className="release-drawer-header">
           <div>
-            <span className="release-environment-drawer-kicker">
-              {ambienteJaExiste
-                ? "Editar ambiente"
-                : "Novo ambiente"}
-            </span>
-
-            <h2 id="release-environment-drawer-title">
-              {form.nome ||
-                "Ambiente da release"}
+            <h2 id="release-drawer-title">
+              Ambiente da Release
             </h2>
+
+            <span>
+              Informe as versões principais da release. As demais são herdadas automaticamente.
+            </span>
           </div>
 
           <button
             type="button"
-            className="release-environment-drawer-close"
             onClick={onClose}
             aria-label="Fechar"
           >
@@ -848,517 +786,376 @@ function ReleaseEnvironmentDrawer({
           </button>
         </header>
 
+        <div className="release-drawer-body">
+          <div className="release-field">
+            <label htmlFor="environment-name">
+              Nome do Ambiente
+            </label>
 
-        <div className="release-environment-drawer-content">
-          <section className="release-environment-drawer-section">
-            <div className="release-environment-drawer-section-heading">
-              <div>
-                <h3>
-                  Informações do ambiente
-                </h3>
+            <input
+              id="environment-name"
+              type="text"
+              value={form.nome}
+              onChange={evento =>
+                alterarCampo(
+                  "nome",
+                  evento.target.value
+                )
+              }
+            />
+          </div>
 
-                <p>
-                  Identificação e datas
-                  principais da release.
-                </p>
-              </div>
-            </div>
+          <div className="release-field">
+            <label htmlFor="environment-deadline">
+              Prazo da Release
+            </label>
 
+            <input
+              id="environment-deadline"
+              type="date"
+              value={form.prazo ?? ""}
+              onChange={evento =>
+                alterarCampo(
+                  "prazo",
+                  evento.target.value
+                )
+              }
+            />
+          </div>
 
-            <div className="release-environment-drawer-fields">
-              <div className="release-environment-drawer-field release-environment-drawer-field-full">
-                <label htmlFor="environment-name">
-                  Nome do Ambiente
-                </label>
+          <div className="release-field">
+            <label htmlFor="environment-released-at">
+              Liberado em
+            </label>
 
-                <input
-                  id="environment-name"
-                  type="text"
-                  value={form.nome}
-                  placeholder="Ex.: Produção 1.5.5.0"
-                  onChange={evento =>
-                    alterarCampo(
-                      "nome",
-                      evento.target.value
-                    )
-                  }
-                />
-              </div>
-
-
-              <div className="release-environment-drawer-field">
-                <label htmlFor="environment-deadline">
-                  Prazo da Release
-                </label>
-
-                <input
-                  id="environment-deadline"
-                  type="date"
-                  value={
-                    form.prazo ?? ""
-                  }
-                  onChange={evento =>
-                    alterarCampo(
-                      "prazo",
-                      evento.target.value
-                    )
-                  }
-                />
-              </div>
-
-
-              <div className="release-environment-drawer-field">
-                <label htmlFor="environment-released-at">
-                  Liberado em
-                </label>
-
-                <input
-                  id="environment-released-at"
-                  type="datetime-local"
-                  value={normalizarDateTimeLocal(
-                    form.liberadoEm
-                  )}
-                  onChange={evento =>
-                    alterarLiberadoEm(
-                      evento.target.value
-                    )
-                  }
-                />
-
-                <small>
-                  Preenchido automaticamente
-                  ao concluir a release, mas
-                  pode ser corrigido manualmente.
-                </small>
-              </div>
-            </div>
-
-
-            {ambienteAnterior && (
-              <div className="release-environment-drawer-reference">
-                <strong>
-                  Ambiente de referência
-                </strong>
-
-                <span>
-                  As versões podem ser
-                  baseadas no ambiente{" "}
-                  <b>
-                    {ambienteAnterior.nome}
-                  </b>{" "}
-                  (
-                  {
-                    ambienteAnterior
-                      .versoes
-                      .intellicash
-                  }
-                  ).
-                </span>
-              </div>
-            )}
-          </section>
-
-
-          <section className="release-environment-drawer-section">
-            <div className="release-environment-drawer-section-heading">
-              <div>
-                <h3>
-                  Sistemas
-                </h3>
-
-                <p>
-                  Versões, executáveis e
-                  sistemas exibidos na TV.
-                </p>
-              </div>
-            </div>
-
-
-            <div className="release-environment-drawer-system-header">
-              <span>
-                Sistema
-              </span>
-
-              <span>
-                Versão
-              </span>
-
-              <span>
-                Executável
-              </span>
-
-              <span>
-                TV
-              </span>
-            </div>
-
-
-            <div className="release-environment-drawer-systems">
-              {sistemas.map(
-                sistema => {
-                  const principal =
-                    SISTEMAS_PRINCIPAIS.includes(
-                      sistema.chave as SistemaPrincipal
-                    );
-
-
-                  return (
-                    <div
-                      key={
-                        sistema.chave
-                      }
-                      className={`release-environment-drawer-system-row ${
-                        principal
-                          ? "is-main"
-                          : ""
-                      }`}
-                    >
-                      <div className="release-environment-drawer-system-name">
-                        <strong>
-                          {sistema.nome}
-                        </strong>
-
-                        {principal && (
-                          <small>
-                            Principal
-                          </small>
-                        )}
-                      </div>
-
-
-                      <input
-                        type="text"
-                        value={
-                          sistema.versao ??
-                          ""
-                        }
-                        disabled={
-                          !principal &&
-                          ambienteJaExiste
-                        }
-                        placeholder="Versão"
-                        onChange={evento =>
-                          alterarVersao(
-                            sistema.chave,
-                            evento.target.value
-                          )
-                        }
-                      />
-
-
-                      <input
-                        type="text"
-                        value={
-                          sistema.executavel ??
-                          ""
-                        }
-                        placeholder="Executável"
-                        onChange={evento =>
-                          alterarExecutavel(
-                            sistema.chave,
-                            evento.target.value
-                          )
-                        }
-                      />
-
-
-                      <label className="release-environment-drawer-tv-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={
-                            sistema.mostrarNaTv !==
-                            false
-                          }
-                          onChange={evento =>
-                            alterarExibicaoNaTv(
-                              sistema.chave,
-                              evento.target.checked
-                            )
-                          }
-                        />
-
-                        <span />
-                      </label>
-                    </div>
-                  );
-                }
+            <input
+              id="environment-released-at"
+              type="datetime-local"
+              value={normalizarDateTimeLocal(
+                form.liberadoEm
               )}
+              onChange={evento =>
+                alterarLiberadoEm(
+                  evento.target.value
+                )
+              }
+            />
+
+            <span className="release-field-hint">
+              Preenchido automaticamente ao concluir a release, mas pode ser corrigido manualmente.
+            </span>
+          </div>
+
+          <div className="release-reference">
+            <strong>
+              Versões principais
+            </strong>
+
+            <span>
+              IntelliCash, EasyCash, EasyCheckOut, EasyPDV e IntelliStock devem ter a versão informada em cada release.
+              As demais aplicações herdam a versão da release anterior mais próxima. Se não houver uma anterior cadastrada,
+              é usada a próxima release disponível. Alterações ficam na página Compatibilidade.
+            </span>
+          </div>
+
+          {ambienteAnterior && (
+            <div className="release-inheritance-note">
+              <strong>
+                Ambiente de referência
+              </strong>
+
+              <span>
+                As versões herdadas podem usar como referência o ambiente{" "}
+                <b>{ambienteAnterior.nome}</b>{" "}
+                ({ambienteAnterior.versoes.intellicash}).
+              </span>
+            </div>
+          )}
+
+          <div className="release-divider">
+            Sistemas da Release
+          </div>
+
+          <div className="release-tv-controls">
+            <div className="release-tv-controls-text">
+              <strong>
+                Projetos exibidos na TV
+              </strong>
+
+              <span>
+                Desmarque os projetos que não devem aparecer no painel.
+              </span>
             </div>
 
-
-            <div className="release-environment-drawer-tv-actions">
-              <span>
-                Projetos exibidos na TV
-              </span>
+            <div className="release-tv-actions">
+              <button
+                type="button"
+                onClick={() =>
+                  alterarTodosNaTv(true)
+                }
+              >
+                Marcar todos
+              </button>
 
               <button
                 type="button"
                 onClick={() =>
-                  alterarTodosNaTv(
-                    !todosNaTv
-                  )
+                  alterarTodosNaTv(false)
                 }
               >
-                {todosNaTv
-                  ? "Desmarcar todos"
-                  : "Marcar todos"}
+                Desmarcar
               </button>
             </div>
-          </section>
+          </div>
 
+          <div className="release-system-list">
+            {sistemas.map(sistema => {
+              const principal =
+                SISTEMAS_PRINCIPAIS.includes(
+                  sistema.chave as SistemaPrincipal
+                );
 
-          <section className="release-environment-drawer-section">
-            <div className="release-environment-drawer-section-heading">
-              <div>
-                <h3>
-                  Remessas
-                </h3>
+              const referencia =
+                sistema.chave === "intellicash";
 
-                <p>
-                  Registre a quantidade de
-                  tarefas recebidas em cada
-                  nova remessa.
-                </p>
-              </div>
+              const herdado =
+                !principal &&
+                ambienteJaExiste;
 
-              {remessas.length > 0 && (
-                <span className="release-environment-drawer-section-total">
-                  {totalRemessas} tarefas
-                </span>
+              return (
+                <div
+                  key={sistema.chave}
+                  className={`release-system-row ${
+                    referencia
+                      ? "release-system-row-reference"
+                      : ""
+                  }`}
+                >
+                  <div className="release-system-name">
+                    <span>
+                      {sistema.nome}
+                    </span>
+
+                    {referencia && (
+                      <small>
+                        Referência
+                      </small>
+                    )}
+                  </div>
+
+                  <div className="release-system-version-wrap">
+                    <input
+                      className={`release-system-version ${
+                        herdado
+                          ? "release-system-version-inherited"
+                          : ""
+                      }`}
+                      type="text"
+                      value={sistema.versao ?? ""}
+                      disabled={herdado}
+                      placeholder="Versão"
+                      onChange={evento =>
+                        alterarVersao(
+                          sistema.chave,
+                          evento.target.value
+                        )
+                      }
+                    />
+
+                    {herdado && (
+                      <span className="release-inherited-badge">
+                        Compatibilidade
+                      </span>
+                    )}
+                  </div>
+
+                  <input
+                    className="release-system-executable"
+                    type="text"
+                    value={sistema.executavel ?? ""}
+                    placeholder="Executável"
+                    onChange={evento =>
+                      alterarExecutavel(
+                        sistema.chave,
+                        evento.target.value
+                      )
+                    }
+                  />
+
+                  <label
+                    className={`release-tv-toggle ${
+                      sistema.mostrarNaTv !== false
+                        ? "release-tv-toggle-active"
+                        : ""
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={
+                        sistema.mostrarNaTv !== false
+                      }
+                      onChange={evento =>
+                        alterarExibicaoNaTv(
+                          sistema.chave,
+                          evento.target.checked
+                        )
+                      }
+                    />
+
+                    Exibir na TV
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="release-divider">
+            Remessas da Release
+          </div>
+
+          <div className="release-remessa-box">
+            <div className="release-remessa-heading">
+              <strong>
+                Registrar nova remessa
+              </strong>
+
+              <span>
+                Informe quantas tarefas vieram junto com a nova remessa dos sistemas principais.
+                {remessas.length > 0 &&
+                  ` Histórico: ${remessas.length} remessa${remessas.length === 1 ? "" : "s"} • ${totalRemessas} tarefas.`}
+              </span>
+            </div>
+
+            <div className="release-remessa-field">
+              <label htmlFor="release-remessa-date">
+                Data da remessa
+              </label>
+
+              <input
+                id="release-remessa-date"
+                type="date"
+                value={novaRemessa.data}
+                onChange={evento =>
+                  setNovaRemessa(atual => ({
+                    ...atual,
+                    data: evento.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="release-remessa-grid">
+              {SISTEMAS_PRINCIPAIS.map(
+                sistema => (
+                  <label key={sistema}>
+                    <span>
+                      {
+                        NOMES_SISTEMAS_PRINCIPAIS[
+                          sistema
+                        ]
+                      }
+                    </span>
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={
+                        novaRemessa[sistema]
+                      }
+                      onChange={evento =>
+                        alterarTarefaRemessa(
+                          sistema,
+                          evento.target.value
+                        )
+                      }
+                    />
+                  </label>
+                )
               )}
             </div>
 
+            <button
+              type="button"
+              className="release-remessa-add"
+              onClick={registrarRemessa}
+            >
+              <MdAdd size={16} />
+              Registrar remessa
+            </button>
+          </div>
 
-            <div className="release-remessa-box">
-              <div className="release-remessa-heading">
-                <div>
-                  <strong>
-                    Registrar nova remessa
-                  </strong>
-
-                  <span>
-                    Considere somente os cinco
-                    sistemas principais. Ao alterar
-                    o executável do IntelliCash, a
-                    data da remessa é sugerida aqui.
-                  </span>
-                </div>
-              </div>
-
-
-              <div className="release-remessa-field">
-                <label htmlFor="release-remessa-date">
-                  Data da remessa
-                </label>
-
-                <input
-                  id="release-remessa-date"
-                  type="date"
-                  value={
-                    novaRemessa.data
-                  }
-                  onChange={evento =>
-                    setNovaRemessa(
-                      atual => ({
-                        ...atual,
-                        data:
-                          evento.target.value,
-                      })
-                    )
-                  }
-                />
-              </div>
-
-
-              <div className="release-remessa-grid">
-                {SISTEMAS_PRINCIPAIS.map(
-                  sistema => (
-                    <label
-                      key={sistema}
-                    >
-                      <span>
-                        {
-                          NOMES_SISTEMAS_PRINCIPAIS[
-                            sistema
-                          ]
-                        }
-                      </span>
-
-                      <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={
-                          novaRemessa[
-                            sistema
-                          ]
-                        }
-                        onChange={evento =>
-                          alterarTarefaRemessa(
-                            sistema,
-                            evento.target.value
-                          )
-                        }
-                      />
-                    </label>
-                  )
-                )}
-              </div>
-
-
-              <div className="release-remessa-total">
-                <span>
-                  Total da nova remessa
-                </span>
-
+          {remessas.length > 0 && (
+            <div className="release-remessa-history">
+              <div className="release-remessa-history-heading">
                 <strong>
-                  {
-                    novaRemessa.intellicash +
-                    novaRemessa.easycash +
-                    novaRemessa.easycheckout +
-                    novaRemessa.easypdv +
-                    novaRemessa.intellistock
-                  }{" "}
-                  tarefas
+                  Histórico de remessas
                 </strong>
+
+                <span>
+                  As remessas anteriores permanecem registradas.
+                </span>
               </div>
 
-
-              <button
-                type="button"
-                className="release-remessa-add"
-                onClick={
-                  registrarRemessa
-                }
-              >
-                <MdAdd size={17} />
-                Registrar remessa
-              </button>
-            </div>
-
-
-            {remessas.length > 0 && (
-              <div className="release-remessa-history">
-                <div className="release-remessa-history-heading">
+              {remessas.map(remessa => (
+                <div
+                  key={remessa.id}
+                  className="release-remessa-history-item"
+                >
                   <div>
                     <strong>
-                      Histórico de remessas
+                      {formatarData(remessa.data)}
                     </strong>
 
                     <span>
-                      As remessas anteriores
-                      permanecem registradas.
+                      IntelliCash {remessa.tarefas.intellicash}
+                      {" • "}
+                      EasyCash {remessa.tarefas.easycash}
+                      {" • "}
+                      EasyCheckOut {remessa.tarefas.easycheckout}
+                      {" • "}
+                      EasyPDV {remessa.tarefas.easypdv}
+                      {" • "}
+                      IntelliStock {remessa.tarefas.intellistock}
+                      {" • "}
+                      {remessa.totalTarefas} tarefas
                     </span>
                   </div>
-                </div>
 
-
-                {remessas.map(
-                  remessa => (
-                    <article
-                      key={
+                  <button
+                    type="button"
+                    title="Remover remessa"
+                    aria-label={`Remover remessa de ${formatarData(
+                      remessa.data
+                    )}`}
+                    onClick={() =>
+                      excluirRemessa(
                         remessa.id
-                      }
-                      className="release-remessa-history-item"
-                    >
-                      <div className="release-remessa-history-main">
-                        <div>
-                          <strong>
-                            {formatarData(
-                              remessa.data
-                            )}
-                          </strong>
-
-                          <span>
-                            {
-                              remessa.totalTarefas
-                            }{" "}
-                            tarefas
-                          </span>
-                        </div>
-
-
-                        <div className="release-remessa-history-systems">
-                          {SISTEMAS_PRINCIPAIS.map(
-                            sistema => (
-                              <span
-                                key={
-                                  sistema
-                                }
-                              >
-                                {
-                                  NOMES_SISTEMAS_PRINCIPAIS[
-                                    sistema
-                                  ]
-                                }:{" "}
-                                <strong>
-                                  {
-                                    remessa
-                                      .tarefas[
-                                      sistema
-                                    ]
-                                  }
-                                </strong>
-                              </span>
-                            )
-                          )}
-                        </div>
-                      </div>
-
-
-                      <button
-                        type="button"
-                        className="release-remessa-delete"
-                        title="Remover remessa"
-                        aria-label={`Remover remessa de ${formatarData(
-                          remessa.data
-                        )}`}
-                        onClick={() =>
-                          excluirRemessa(
-                            remessa.id
-                          )
-                        }
-                      >
-                        <MdDeleteOutline
-                          size={17}
-                        />
-                      </button>
-                    </article>
-                  )
-                )}
-              </div>
-            )}
-          </section>
-        </div>
-
-
-        <footer className="release-environment-drawer-footer">
-          <button
-            type="button"
-            className="release-environment-drawer-cancel"
-            onClick={onClose}
-            disabled={salvando}
-          >
-            Cancelar
-          </button>
+                      )
+                    }
+                  >
+                    <MdDeleteOutline size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           <button
             type="button"
-            className="release-environment-drawer-save"
+            className="release-save"
             onClick={() =>
               void salvar()
             }
             disabled={salvando}
           >
-            <MdSave size={18} />
-
             {salvando
               ? "Salvando..."
-              : "Salvar ambiente"}
+              : "Salvar Ambiente"}
           </button>
-        </footer>
+        </div>
       </aside>
-    </div>
+    </>
   );
 }
 

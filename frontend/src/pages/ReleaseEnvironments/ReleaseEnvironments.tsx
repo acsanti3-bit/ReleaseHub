@@ -48,26 +48,6 @@ type ReleaseFeedback = {
 };
 
 
-function formatarLiberadoEm(
-  valor?: string
-): string {
-  if (!valor) {
-    return "-";
-  }
-
-  const data =
-    new Date(valor);
-
-  if (Number.isNaN(data.getTime())) {
-    return valor;
-  }
-
-  return data.toLocaleDateString(
-    "pt-BR"
-  );
-}
-
-
 function obterSistemasDoAmbiente(
   ambiente: ReleaseEnvironment
 ): ReleaseSystemVersion[] {
@@ -894,16 +874,6 @@ function ReleaseEnvironments() {
 
                           <strong>
                             {prazoRelease}
-                          </strong>
-                        </span>
-
-                        <span>
-                          Liberado em{" "}
-
-                          <strong>
-                            {formatarLiberadoEm(
-                              ambiente.liberadoEm
-                            )}
                           </strong>
                         </span>
 

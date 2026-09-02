@@ -36,9 +36,9 @@ export interface ReleaseEnvironment {
   prazo?: string;
 
   /*
-    Quando true, a release fica concluída:
-    não é sincronizada automaticamente,
-    mas continua disponível no histórico e na TV.
+    Quando true, a release fica arquivada:
+    não é sincronizada automaticamente
+    e não aparece no Modo TV.
   */
   concluido?: boolean;
 
