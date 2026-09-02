@@ -225,6 +225,24 @@ function ReleaseEnvironments() {
   const [feedback, setFeedback] =
     useState<ReleaseFeedback | null>(null);
 
+
+  const [remessaEditando, setRemessaEditando] =
+    useState<{
+      ambienteId: number;
+      remessaId: string;
+      data: string;
+      quantidade: string;
+    } | null>(null);
+
+  const [remessaExcluindo, setRemessaExcluindo] =
+    useState<{
+      ambienteId: number;
+      remessaId: string;
+      versao: string;
+      data: string;
+      quantidade: number;
+    } | null>(null);
+
   const [
     ambientesRecolhidos,
     setAmbientesRecolhidos,
@@ -651,6 +669,197 @@ function ReleaseEnvironments() {
   }
 
 
+  function iniciarEdicaoRemessa(
+    ambienteId: number,
+    remessaId: string,
+    data: string,
+    quantidade: number
+  ) {
+    setRemessaEditando({
+      ambienteId,
+      remessaId,
+      data,
+      quantidade:
+        String(quantidade),
+    });
+  }
+
+
+  async function salvarEdicaoRemessa() {
+    if (
+      !remessaEditando ||
+      salvando
+    ) {
+      return;
+    }
+
+    const quantidade =
+      Number.parseInt(
+        remessaEditando.quantidade,
+        10
+      );
+
+    if (
+      !remessaEditando.data ||
+      !Number.isFinite(quantidade) ||
+      quantidade <= 0
+    ) {
+      window.alert(
+        "Informe uma data válida e uma quantidade de tarefas maior que zero."
+      );
+
+      return;
+    }
+
+    const ambiente =
+      ambientes.find(
+        item =>
+          item.id ===
+          remessaEditando.ambienteId
+      );
+
+    if (!ambiente) {
+      return;
+    }
+
+    const remessasAtualizadas =
+      (ambiente.remessas ?? []).map(
+        remessa =>
+          remessa.id ===
+          remessaEditando.remessaId
+            ? {
+                ...remessa,
+                data:
+                  remessaEditando.data,
+                tarefas: {
+                  ...remessa.tarefas,
+                  intellicash:
+                    quantidade,
+                },
+                totalTarefas:
+                  quantidade,
+              }
+            : remessa
+      );
+
+    try {
+      setSalvando(true);
+      setFeedback(null);
+
+      const ambienteSalvo =
+        await editarAmbiente({
+          ...ambiente,
+          remessas:
+            remessasAtualizadas,
+        });
+
+      setAmbientes(
+        listaAtual =>
+          listaAtual.map(
+            item =>
+              item.id ===
+              ambienteSalvo.id
+                ? ambienteSalvo
+                : item
+          )
+      );
+
+      setRemessaEditando(null);
+
+      setFeedback({
+        tipo: "sucesso",
+        texto:
+          "Remessa atualizada com sucesso.",
+      });
+    } catch (erro) {
+      console.error(
+        "Erro ao editar remessa:",
+        erro
+      );
+
+      setFeedback({
+        tipo: "erro",
+        texto:
+          "Não foi possível atualizar a remessa.",
+      });
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+
+  async function confirmarExclusaoRemessa() {
+    if (
+      !remessaExcluindo ||
+      salvando
+    ) {
+      return;
+    }
+
+    const ambiente =
+      ambientes.find(
+        item =>
+          item.id ===
+          remessaExcluindo.ambienteId
+      );
+
+    if (!ambiente) {
+      return;
+    }
+
+    const remessasAtualizadas =
+      (ambiente.remessas ?? []).filter(
+        remessa =>
+          remessa.id !==
+          remessaExcluindo.remessaId
+      );
+
+    try {
+      setSalvando(true);
+      setFeedback(null);
+
+      const ambienteSalvo =
+        await editarAmbiente({
+          ...ambiente,
+          remessas:
+            remessasAtualizadas,
+        });
+
+      setAmbientes(
+        listaAtual =>
+          listaAtual.map(
+            item =>
+              item.id ===
+              ambienteSalvo.id
+                ? ambienteSalvo
+                : item
+          )
+      );
+
+      setRemessaExcluindo(null);
+
+      setFeedback({
+        tipo: "sucesso",
+        texto:
+          "Remessa excluída com sucesso.",
+      });
+    } catch (erro) {
+      console.error(
+        "Erro ao excluir remessa:",
+        erro
+      );
+
+      setFeedback({
+        tipo: "erro",
+        texto:
+          "Não foi possível excluir a remessa.",
+      });
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+
   const ambientesOrdenados =
     [...ambientes].sort(
       compararAmbientesPorVersao
@@ -675,8 +884,7 @@ function ReleaseEnvironments() {
 
 
   const historicoRemessasIntellicash =
-    [...ambientesOrdenados]
-      .reverse()
+    ambientesOrdenados
       .flatMap(ambiente => {
         const versao =
           obterVersaoIntellicashDoAmbiente(
@@ -692,12 +900,19 @@ function ReleaseEnvironments() {
           )
           .map(remessa => ({
             id: `${ambiente.id}-${remessa.id}`,
+            ambienteId: ambiente.id,
+            remessaId: remessa.id,
             versao,
             data: remessa.data,
             quantidade:
               remessa.tarefas.intellicash,
           }));
-      });
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.data).getTime() -
+          new Date(b.data).getTime()
+      );
 
 
   return (
@@ -1168,6 +1383,48 @@ function ReleaseEnvironments() {
                         {remessa.quantidade}
                       </strong>
                     </div>
+
+                    {podeEditar && (
+                      <div className="release-remittance-history-actions">
+                        <button
+                          type="button"
+                          title="Editar remessa"
+                          aria-label="Editar remessa"
+                          onClick={() =>
+                            iniciarEdicaoRemessa(
+                              remessa.ambienteId,
+                              remessa.remessaId,
+                              remessa.data,
+                              remessa.quantidade
+                            )
+                          }
+                        >
+                          <MdEdit size={16} />
+                        </button>
+
+                        <button
+                          type="button"
+                          title="Excluir remessa"
+                          aria-label="Excluir remessa"
+                          onClick={() =>
+                            setRemessaExcluindo({
+                              ambienteId:
+                                remessa.ambienteId,
+                              remessaId:
+                                remessa.remessaId,
+                              versao:
+                                remessa.versao,
+                              data:
+                                remessa.data,
+                              quantidade:
+                                remessa.quantidade,
+                            })
+                          }
+                        >
+                          <MdDeleteOutline size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )
               )}
@@ -1175,6 +1432,182 @@ function ReleaseEnvironments() {
           </section>
         )}
       </div>
+
+
+      {remessaEditando && (
+        <div
+          className="release-modal-overlay"
+          role="presentation"
+          onClick={() =>
+            !salvando &&
+            setRemessaEditando(null)
+          }
+        >
+          <div
+            className="release-remittance-edit-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="release-remittance-edit-title"
+            onClick={evento =>
+              evento.stopPropagation()
+            }
+          >
+            <h2 id="release-remittance-edit-title">
+              Editar remessa
+            </h2>
+
+            <div className="release-remittance-edit-field">
+              <label htmlFor="edit-remittance-date">
+                Data da remessa
+              </label>
+
+              <input
+                id="edit-remittance-date"
+                type="date"
+                value={
+                  remessaEditando.data
+                }
+                onChange={evento =>
+                  setRemessaEditando(
+                    atual =>
+                      atual
+                        ? {
+                            ...atual,
+                            data:
+                              evento.target.value,
+                          }
+                        : atual
+                  )
+                }
+              />
+            </div>
+
+            <div className="release-remittance-edit-field">
+              <label htmlFor="edit-remittance-tasks">
+                Quantidade de tarefas
+              </label>
+
+              <input
+                id="edit-remittance-tasks"
+                type="number"
+                min="1"
+                step="1"
+                value={
+                  remessaEditando.quantidade
+                }
+                onChange={evento =>
+                  setRemessaEditando(
+                    atual =>
+                      atual
+                        ? {
+                            ...atual,
+                            quantidade:
+                              evento.target.value,
+                          }
+                        : atual
+                  )
+                }
+              />
+            </div>
+
+            <div className="release-remittance-edit-actions">
+              <button
+                type="button"
+                className="release-remittance-edit-cancel"
+                disabled={salvando}
+                onClick={() =>
+                  setRemessaEditando(null)
+                }
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="release-remittance-edit-save"
+                disabled={salvando}
+                onClick={() =>
+                  void salvarEdicaoRemessa()
+                }
+              >
+                {salvando
+                  ? "Salvando..."
+                  : "Salvar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {remessaExcluindo && (
+        <div
+          className="release-modal-overlay"
+          role="presentation"
+          onClick={() =>
+            !salvando &&
+            setRemessaExcluindo(null)
+          }
+        >
+          <div
+            className="release-remittance-delete-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="release-remittance-delete-title"
+            onClick={evento =>
+              evento.stopPropagation()
+            }
+          >
+            <h2 id="release-remittance-delete-title">
+              Excluir remessa?
+            </h2>
+
+            <p>
+              A remessa da versão{" "}
+              <strong>
+                {remessaExcluindo.versao}
+              </strong>{" "}
+              de{" "}
+              <strong>
+                {formatarDataRemessa(
+                  remessaExcluindo.data
+                )}
+              </strong>{" "}
+              com{" "}
+              <strong>
+                {remessaExcluindo.quantidade} tarefas
+              </strong>{" "}
+              será removida do histórico.
+            </p>
+
+            <div className="release-remittance-edit-actions">
+              <button
+                type="button"
+                className="release-remittance-edit-cancel"
+                disabled={salvando}
+                onClick={() =>
+                  setRemessaExcluindo(null)
+                }
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="release-remittance-delete-confirm"
+                disabled={salvando}
+                onClick={() =>
+                  void confirmarExclusaoRemessa()
+                }
+              >
+                {salvando
+                  ? "Excluindo..."
+                  : "Excluir"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
 
       {ambienteDetalhes && (
