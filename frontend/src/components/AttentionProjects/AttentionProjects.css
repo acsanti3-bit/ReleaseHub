@@ -128,3 +128,65 @@
         justify-content: flex-start;
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .attention-projects {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 5px 16px
+        rgba(0, 0, 0, .20);
+}
+
+
+html.dark .attention-projects h2 {
+    color: #60A5FA;
+}
+
+
+html.dark .attention-projects-heading p {
+    color: #94A3B8;
+}
+
+
+html.dark .attention-projects-heading > strong {
+    background: rgba(245, 130, 32, .10);
+    color: #FB923C;
+}
+
+
+html.dark .attention-row {
+    border-bottom-color: #263548;
+}
+
+
+html.dark .attention-row:not(:disabled):hover
+.attention-project-name > strong {
+    color: #60A5FA;
+}
+
+
+html.dark .attention-project-name > strong {
+    color: #E2E8F0;
+}
+
+
+html.dark .attention-project-name small {
+    color: #94A3B8;
+}
+
+
+html.dark .attention-badges span {
+    background: rgba(245, 130, 32, .10);
+    color: #FB923C;
+    border-color: rgba(245, 130, 32, .28);
+}
+
+
+html.dark .attention-empty {
+    color: #94A3B8;
+}

@@ -709,3 +709,295 @@
             repeat(2, minmax(0, 1fr));
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .environment-details-modal {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 26px 80px
+        rgba(0, 0, 0, .45);
+}
+
+
+/* CABEÇALHO */
+
+html.dark .environment-details-header {
+    border-bottom-color: #263548;
+}
+
+html.dark .environment-details-kicker {
+    color: #7C8CA1;
+}
+
+html.dark .environment-details-title-row h2 {
+    color: #F1F5F9;
+}
+
+html.dark .environment-details-status.is-active {
+    background: rgba(34, 197, 94, .10);
+    color: #86EFAC;
+}
+
+html.dark .environment-details-status.is-finished {
+    background: #263548;
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-close {
+    background: #1E293B;
+    color: #94A3B8;
+}
+
+html.dark .environment-details-close:hover {
+    background: #263548;
+    color: #F1F5F9;
+}
+
+
+/* ABAS */
+
+html.dark .environment-details-tabs {
+    background: #151F2E;
+    border-bottom-color: #263548;
+}
+
+html.dark .environment-details-tabs button {
+    color: #94A3B8;
+}
+
+html.dark .environment-details-tabs button:hover {
+    color: #60A5FA;
+}
+
+html.dark .environment-details-tabs button.is-active {
+    color: #60A5FA;
+    border-bottom-color: #60A5FA;
+}
+
+html.dark .environment-details-tab-count {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+
+/* CONTEÚDO */
+
+html.dark .environment-details-loading {
+    color: #94A3B8;
+}
+
+html.dark .environment-details-error {
+    background: rgba(239, 68, 68, .10);
+    border-color: rgba(239, 68, 68, .28);
+    color: #FCA5A5;
+}
+
+
+/* MÉTRICAS */
+
+html.dark .environment-details-metric {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .environment-details-metric span {
+    color: #7C8CA1;
+}
+
+html.dark .environment-details-metric strong {
+    color: #E2E8F0;
+}
+
+
+/* CONCLUSÃO */
+
+html.dark .environment-details-conclusion {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .25);
+    color: #86EFAC;
+}
+
+html.dark .environment-details-conclusion span {
+    color: #A7B8AB;
+}
+
+
+/* SEÇÕES */
+
+html.dark .environment-details-section-heading h3 {
+    color: #E2E8F0;
+}
+
+html.dark .environment-details-section-heading p {
+    color: #94A3B8;
+}
+
+
+/* STATUS */
+
+html.dark .environment-details-status-item {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .environment-details-status-item span {
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-status-item strong {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+
+/* SISTEMAS */
+
+html.dark .environment-details-system {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .environment-details-system span {
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-system strong {
+    color: #60A5FA;
+}
+
+html.dark .environment-details-system small {
+    color: #7C8CA1;
+}
+
+
+/* HISTÓRICO */
+
+html.dark .environment-details-history-item:not(:last-child)::before {
+    background: #334155;
+}
+
+html.dark .environment-details-history-icon {
+    background: #1E293B;
+    border-color: #334155;
+    color: #60A5FA;
+}
+
+html.dark .environment-details-history-title strong {
+    color: #E2E8F0;
+}
+
+html.dark .environment-details-history-title time,
+html.dark .environment-details-history-body > span {
+    color: #7C8CA1;
+}
+
+
+/* ANOTAÇÃO */
+
+html.dark .environment-details-note-form {
+    background: #151F2E;
+    border-color: #263548;
+}
+
+html.dark .environment-details-note-form label {
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-note-form textarea {
+    background: #1E293B;
+    border-color: #334155;
+    color: #F1F5F9;
+}
+
+html.dark .environment-details-note-form textarea:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+html.dark .environment-details-note-form textarea::placeholder {
+    color: #7C8CA1;
+}
+
+html.dark .environment-details-note-form-footer > span {
+    color: #7C8CA1;
+}
+
+
+/* NOTAS */
+
+html.dark .environment-details-note {
+    background: #1B2737;
+    border-color: #2C3B4E;
+    border-left-color: #F58220;
+}
+
+html.dark .environment-details-note p {
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-note footer {
+    color: #7C8CA1;
+}
+
+
+/* VAZIOS */
+
+html.dark .environment-details-empty,
+html.dark .environment-details-empty-inline {
+    border-color: #334155;
+    color: #94A3B8;
+}
+
+html.dark .environment-details-empty strong {
+    color: #CBD5E1;
+}
+
+
+/* REMESSAS */
+
+html.dark .environment-details-remessa {
+    background: #151F2E;
+    border-color: #263548;
+}
+
+html.dark .environment-details-remessa header strong {
+    color: #CBD5E1;
+}
+
+html.dark .environment-details-remessa header span {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .environment-details-remessa-grid > div {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .environment-details-remessa-grid span {
+    color: #94A3B8;
+}
+
+html.dark .environment-details-remessa-grid strong {
+    color: #E2E8F0;
+}
+
+html.dark .environment-details-remessa footer {
+    border-top-color: #263548;
+}
+
+html.dark .environment-details-remessa footer span {
+    color: #94A3B8;
+}
+
+html.dark .environment-details-remessa footer strong {
+    color: #60A5FA;
+}

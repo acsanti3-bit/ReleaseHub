@@ -59,3 +59,46 @@
     line-height: 1.25;
     font-weight: 600;
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .stats-card {
+    background: #162131;
+    border-color: #263548;
+    border-top-color: #3B82F6;
+
+    box-shadow:
+        0 4px 14px
+        rgba(0, 0, 0, .20);
+}
+
+html.dark .stats-card:hover {
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, .28);
+}
+
+html.dark .stats-card-active {
+    background: #142235;
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(96, 165, 250, .10),
+        0 7px 18px
+        rgba(0, 0, 0, .22);
+}
+
+html.dark .stats-card small {
+    color: #94A3B8;
+}
+
+html.dark .stats-card strong {
+    color: #F1F5F9;
+}
+
+html.dark .stats-card > span {
+    color: #7C8CA1;
+}

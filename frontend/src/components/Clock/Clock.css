@@ -17,3 +17,19 @@
     color:#999;
     font-size:15px;
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .clock h1 {
+    color: #60A5FA;
+}
+
+html.dark .clock h2 {
+    color: #CBD5E1;
+}
+
+html.dark .clock span {
+    color: #94A3B8;
+}

@@ -21,3 +21,66 @@
     font-size:22px;
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .tasks-chart {
+    background: #162131;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, .22);
+}
+
+
+html.dark .tasks-chart h2 {
+    color: #60A5FA;
+}
+
+
+/* TEXTOS DO GRÁFICO */
+
+html.dark .tasks-chart .recharts-text {
+    fill: #CBD5E1;
+}
+
+
+html.dark .tasks-chart .recharts-pie-label-text {
+    fill: #CBD5E1;
+}
+
+
+/* LEGENDA */
+
+html.dark .tasks-chart .recharts-legend-item-text {
+    color: #CBD5E1 !important;
+}
+
+
+/* TOOLTIP */
+
+html.dark .tasks-chart .recharts-default-tooltip {
+    background: #1E293B !important;
+
+    border:
+        1px solid
+        #334155 !important;
+
+    border-radius: 8px !important;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, .25);
+}
+
+
+html.dark .tasks-chart .recharts-tooltip-label {
+    color: #F1F5F9 !important;
+}
+
+
+html.dark .tasks-chart .recharts-tooltip-item {
+    color: #CBD5E1;
+}

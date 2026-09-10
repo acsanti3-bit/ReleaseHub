@@ -272,3 +272,142 @@
         grid-template-columns: 1fr;
     }
 }
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .release-project-card {
+    background: #162131;
+    border-color: #263548;
+    border-left-color: #3B82F6;
+
+    box-shadow:
+        0 5px 16px
+        rgba(0, 0, 0, .20);
+}
+
+
+html.dark .release-project-card:hover {
+    box-shadow:
+        0 9px 22px
+        rgba(0, 0, 0, .28);
+}
+
+
+html.dark .release-project-title h2 {
+    color: #60A5FA;
+}
+
+
+html.dark .release-project-subtitle > span:first-child {
+    color: #94A3B8;
+}
+
+
+html.dark .release-project-subtitle > span:first-child strong {
+    color: #CBD5E1;
+}
+
+
+html.dark .release-task-total {
+    background: rgba(59, 130, 246, .14);
+    color: #93C5FD;
+}
+
+
+html.dark .release-edit-button {
+    background: #1E293B;
+    color: #60A5FA;
+    border-color: #334155;
+}
+
+
+html.dark .release-edit-button:hover {
+    background: #2563EB;
+    border-color: #2563EB;
+    color: #FFF;
+}
+
+
+html.dark .release-project-info {
+    border-top-color: #263548;
+    border-bottom-color: #263548;
+}
+
+
+html.dark .release-project-info small {
+    color: #7C8CA1;
+}
+
+
+html.dark .release-project-info > div > strong {
+    color: #E2E8F0;
+}
+
+
+html.dark .release-deadline-status span,
+html.dark .release-movement-status span {
+    color: #94A3B8;
+}
+
+
+html.dark .release-deadline-status.ok strong,
+html.dark .release-movement-status.fresh strong {
+    color: #4ADE80;
+}
+
+
+html.dark .release-deadline-status.warning strong,
+html.dark .release-movement-status.warning strong {
+    color: #FB923C;
+}
+
+
+html.dark .release-deadline-status.late strong,
+html.dark .release-deadline-status.invalid strong,
+html.dark .release-movement-status.late strong {
+    color: #F87171;
+}
+
+
+html.dark .release-deadline-status.neutral strong,
+html.dark .release-movement-status.neutral strong {
+    color: #94A3B8;
+}
+
+
+html.dark .release-status-item {
+    background: #1B2737;
+    border-color: #263548;
+}
+
+
+html.dark .release-status-label {
+    color: #CBD5E1;
+}
+
+
+html.dark .release-status-item > strong {
+    color: #F1F5F9;
+}
+
+
+html.dark .release-status-item-resolved {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .24);
+}
+
+
+html.dark .release-status-item-resolved .release-status-label {
+    color: #86EFAC;
+}
+
+
+html.dark .release-status-item-resolved > strong {
+    color: #86EFAC;
+}
+
+
+html.dark .release-status-empty {
+    color: #7C8CA1;
+}

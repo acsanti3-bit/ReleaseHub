@@ -488,3 +488,187 @@
         flex-direction:column;
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .drawer {
+    background: #162131;
+
+    box-shadow:
+        -10px 0 35px
+        rgba(0, 0, 0, .34);
+}
+
+
+/* CABEÇALHO */
+
+html.dark .drawer-header {
+    background: #162131;
+    border-bottom-color: #263548;
+}
+
+html.dark .drawer-header h2 {
+    color: #60A5FA;
+}
+
+html.dark .drawer-header button {
+    background: #1E293B;
+    color: #CBD5E1;
+}
+
+html.dark .drawer-header button:hover {
+    background: #F58220;
+    color: #FFF;
+}
+
+
+/* CONTEÚDO */
+
+html.dark .drawer-body label {
+    color: #94A3B8;
+}
+
+html.dark .drawer-body input {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+}
+
+html.dark .drawer-body input:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+html.dark .drawer-body h3 {
+    color: #60A5FA;
+}
+
+
+/* LINHAS */
+
+html.dark .drawer-row {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .drawer-row:hover {
+    background: #223043;
+}
+
+html.dark .drawer-row span {
+    color: #CBD5E1;
+}
+
+
+/* RESUMO DA RELEASE */
+
+html.dark .drawer-release-summary {
+    background: #142235;
+    border-color: #29415B;
+    border-left-color: #60A5FA;
+}
+
+html.dark .drawer-release-summary strong {
+    color: #60A5FA;
+}
+
+html.dark .drawer-release-summary > div > span {
+    color: #94A3B8;
+}
+
+html.dark .drawer-release-badge {
+    background: #1E293B;
+    border-color: #334155;
+    color: #60A5FA;
+}
+
+
+/* SEÇÕES */
+
+html.dark .drawer-section {
+    background: #162131;
+    border-color: #263548;
+}
+
+html.dark .drawer-section-readonly {
+    background: #151F2E;
+}
+
+html.dark .drawer-section-kicker {
+    color: #7C8CA1;
+}
+
+
+/* BADGES */
+
+html.dark .drawer-managed-badge {
+    background: #263548;
+    color: #CBD5E1;
+    border-color: #334155;
+}
+
+html.dark .drawer-editable-badge {
+    background: rgba(245, 130, 32, .10);
+    color: #FB923C;
+    border-color: rgba(245, 130, 32, .28);
+}
+
+
+/* CAMPOS */
+
+html.dark .drawer-field input,
+html.dark .drawer-field select {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+}
+
+html.dark .drawer-field input:focus,
+html.dark .drawer-field select:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+
+/* SOMENTE LEITURA */
+
+html.dark .drawer-input-readonly {
+    background: #151F2E !important;
+    color: #94A3B8 !important;
+    border-color: #263548 !important;
+}
+
+html.dark .drawer-input-readonly:focus {
+    border-color: #263548 !important;
+}
+
+
+/* AVISO GERENCIADO */
+
+html.dark .drawer-managed-note {
+    background: #151F2E;
+    border-color: #263548;
+}
+
+html.dark .drawer-managed-note strong {
+    color: #CBD5E1;
+}
+
+html.dark .drawer-managed-note span {
+    color: #94A3B8;
+}
+
+
+/* DESCRIÇÃO */
+
+html.dark .drawer-section-description {
+    color: #94A3B8;
+}

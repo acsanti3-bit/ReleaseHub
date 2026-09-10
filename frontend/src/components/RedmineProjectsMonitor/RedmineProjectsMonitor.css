@@ -487,3 +487,245 @@ a.redmine-monitor-total:hover{
         flex-direction:column;
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .redmine-monitor {
+    background: #162131;
+    border-color: #263548;
+    border-top-color: #F58220;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, .20);
+}
+
+
+/* CABEÇALHO */
+
+html.dark .redmine-monitor-header h2 {
+    color: #60A5FA;
+}
+
+html.dark .redmine-monitor-header p {
+    color: #94A3B8;
+}
+
+
+/* ATUALIZAR */
+
+html.dark .redmine-monitor-refresh {
+    background: #1E293B;
+    border-color: #334155;
+    color: #60A5FA;
+}
+
+html.dark .redmine-monitor-refresh:hover:not(:disabled) {
+    background: #223249;
+    border-color: #60A5FA;
+}
+
+
+/* RESUMO */
+
+html.dark .redmine-monitor-summary > div {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .redmine-monitor-summary span {
+    color: #94A3B8;
+}
+
+html.dark .redmine-monitor-summary strong {
+    color: #60A5FA;
+}
+
+html.dark .redmine-monitor-summary .is-highlighted,
+html.dark .redmine-monitor-summary .is-outside-releasehub {
+    background: rgba(245, 130, 32, .10);
+    border-color: rgba(245, 130, 32, .28);
+}
+
+html.dark .redmine-monitor-summary .is-highlighted strong,
+html.dark .redmine-monitor-summary .is-outside-releasehub strong {
+    color: #FB923C;
+}
+
+
+/* BUSCA */
+
+html.dark .redmine-monitor-search {
+    background: #1E293B;
+    border-color: #334155;
+    color: #94A3B8;
+}
+
+html.dark .redmine-monitor-search:focus-within {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+html.dark .redmine-monitor-search input {
+    color: #F1F5F9;
+}
+
+html.dark .redmine-monitor-search input::placeholder {
+    color: #7C8CA1;
+}
+
+
+/* FILTROS */
+
+html.dark .redmine-monitor-filter {
+    background: #1E293B;
+    border-color: #334155;
+    color: #CBD5E1;
+}
+
+html.dark .redmine-monitor-filter:hover,
+html.dark .redmine-monitor-filter.is-active {
+    background: rgba(245, 130, 32, .10);
+    border-color: #F58220;
+    color: #FB923C;
+}
+
+
+/* ERRO */
+
+html.dark .redmine-monitor-error {
+    background: rgba(239, 68, 68, .10);
+    border-color: rgba(239, 68, 68, .28);
+    color: #FCA5A5;
+}
+
+
+/* PROJETOS */
+
+html.dark .redmine-monitor-project {
+    background: #1B2737;
+    border-color: #2C3B4E;
+    border-left-color: #60A5FA;
+
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, .18);
+}
+
+html.dark .redmine-monitor-project:hover {
+    box-shadow:
+        0 6px 15px
+        rgba(0, 0, 0, .25);
+}
+
+html.dark .redmine-monitor-project.has-no-open-tasks {
+    background: #151F2E;
+    border-left-color: #64748B;
+}
+
+html.dark .redmine-monitor-project.is-outside-releasehub {
+    border-left-color: #F58220;
+}
+
+
+/* PROJETO */
+
+html.dark .redmine-monitor-project-header > div > a {
+    color: #60A5FA;
+}
+
+html.dark .redmine-monitor-project-header > div > a:hover {
+    color: #FB923C;
+}
+
+html.dark .redmine-monitor-project-meta > span {
+    color: #7C8CA1;
+}
+
+html.dark .redmine-monitor-project-meta > strong {
+    background: rgba(245, 130, 32, .10);
+    border-color: rgba(245, 130, 32, .28);
+    color: #FB923C;
+}
+
+
+/* TOTAL */
+
+html.dark .redmine-monitor-total {
+    background: rgba(245, 130, 32, .10);
+    color: #FB923C;
+}
+
+html.dark a.redmine-monitor-total:hover {
+    background: #F58220;
+    color: #FFFFFF;
+}
+
+html.dark .redmine-monitor-total.is-zero {
+    background: #263548;
+    color: #94A3B8;
+}
+
+
+/* STATUS */
+
+html.dark .redmine-monitor-statuses a {
+    background: #151F2E;
+    border-color: #263548;
+    color: #CBD5E1;
+}
+
+html.dark .redmine-monitor-statuses a:hover {
+    background: #223249;
+    border-color: #60A5FA;
+    color: #60A5FA;
+}
+
+html.dark .redmine-monitor-statuses strong {
+    color: #F1F5F9;
+}
+
+
+/* SEM TAREFAS */
+
+html.dark .redmine-monitor-no-tasks {
+    border-color: #334155;
+    color: #94A3B8;
+}
+
+
+/* VAZIO */
+
+html.dark .redmine-monitor-empty {
+    border-color: #334155;
+    color: #94A3B8;
+}
+
+html.dark .redmine-monitor-empty strong {
+    color: #60A5FA;
+}
+
+
+/* LOADER */
+
+html.dark .redmine-monitor-loader {
+    border-color: #334155;
+    border-top-color: #F58220;
+}
+
+
+/* RODAPÉ */
+
+html.dark .redmine-monitor-footer {
+    border-top-color: #263548;
+    color: #94A3B8;
+}
+
+html.dark .redmine-monitor-footer strong {
+    color: #60A5FA;
+}

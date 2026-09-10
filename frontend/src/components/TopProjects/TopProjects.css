@@ -55,3 +55,35 @@
     font-size:20px;
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .top-projects {
+    background: #162131;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0, 0, 0, .22);
+}
+
+
+html.dark .top-projects h2 {
+    color: #60A5FA;
+}
+
+
+html.dark .top-project-row {
+    border-bottom-color: #263548;
+}
+
+
+html.dark .top-project-row span {
+    color: #CBD5E1;
+}
+
+
+html.dark .top-project-row strong {
+    color: #FB923C;
+}

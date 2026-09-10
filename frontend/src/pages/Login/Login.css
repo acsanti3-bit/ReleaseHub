@@ -545,3 +545,156 @@
     }
 
 }
+
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .login-page {
+    background:
+        linear-gradient(
+            135deg,
+            #0F172A 0%,
+            #111827 55%,
+            #1B1A17 100%
+        );
+}
+
+
+html.dark .login-decoration-one {
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            .08
+        );
+}
+
+
+html.dark .login-decoration-two {
+    background:
+        rgba(
+            245,
+            130,
+            32,
+            .08
+        );
+}
+
+
+/* CARD */
+
+html.dark .login-card {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 24px 60px
+        rgba(0, 0, 0, .35);
+}
+
+
+/* LOGO */
+
+html.dark .login-logo-container {
+    background: #1E293B;
+    border-color: #334155;
+}
+
+
+/* MARCA */
+
+html.dark .login-brand h1 {
+    color: #60A5FA;
+}
+
+
+/* TÍTULO */
+
+html.dark .login-heading h2 {
+    color: #F1F5F9;
+}
+
+html.dark .login-heading p {
+    color: #94A3B8;
+}
+
+
+/* FORMULÁRIO */
+
+html.dark .login-form > label {
+    color: #CBD5E1;
+}
+
+
+/* INPUT */
+
+html.dark .login-input {
+    background: #1E293B;
+    border-color: #334155;
+    color: #94A3B8;
+}
+
+html.dark .login-input:focus-within {
+    background: #1E293B;
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+
+    color: #60A5FA;
+}
+
+html.dark .login-input input {
+    color: #F1F5F9;
+}
+
+html.dark .login-input input::placeholder {
+    color: #7C8CA1;
+}
+
+
+/* MOSTRAR SENHA */
+
+html.dark .login-show-password {
+    color: #94A3B8;
+}
+
+html.dark .login-show-password:hover {
+    color: #60A5FA;
+}
+
+
+/* ERRO */
+
+html.dark .login-error {
+    background: rgba(239, 68, 68, .10);
+    border-color: rgba(239, 68, 68, .28);
+    color: #FCA5A5;
+}
+
+
+/* LINK MODO TV */
+
+html.dark .login-tv-link {
+    color: #94A3B8;
+}
+
+html.dark .login-tv-link:hover {
+    color: #FB923C;
+}
+
+
+/* RODAPÉ */
+
+html.dark .login-footer {
+    border-top-color: #263548;
+    color: #7C8CA1;
+}
+
+html.dark .login-credit {
+    color: #7C8CA1;
+}

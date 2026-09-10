@@ -613,3 +613,104 @@
     }
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .compatibility-panel {
+    background: #162131;
+
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, .18);
+}
+
+
+/* TÍTULO */
+
+html.dark .compatibility-title {
+    border-right-color: #263548;
+}
+
+html.dark .compatibility-title strong {
+    color: #60A5FA;
+}
+
+html.dark .compatibility-title small {
+    color: #94A3B8;
+}
+
+
+/* ITENS */
+
+html.dark .compatibility-version {
+    background: #1B2737;
+
+    border-right-color: #263548;
+    border-bottom-color: #263548;
+}
+
+
+/* LINK WIKI */
+
+html.dark .compatibility-wiki-link {
+    border-color: #334155;
+    background: #1E293B;
+    color: #60A5FA;
+}
+
+html.dark .compatibility-wiki-link:hover {
+    background: #223249;
+    border-color: #60A5FA;
+}
+
+
+/* INFORMAÇÕES */
+
+html.dark .compatibility-system-info strong {
+    color: #60A5FA;
+}
+
+html.dark .compatibility-system-info small {
+    color: #CBD5E1;
+}
+
+
+/* SISTEMA SEM VERSÃO */
+
+html.dark .compatibility-version-empty {
+    background: #151F2E;
+}
+
+html.dark .compatibility-version-empty
+.compatibility-system-info strong {
+    color: #7C8CA1;
+}
+
+html.dark .compatibility-version-empty
+.compatibility-system-info small {
+    color: #64748B;
+}
+
+
+/* VAZIO / CARREGAMENTO */
+
+html.dark .compatibility-empty {
+    color: #94A3B8;
+}
+
+html.dark .compatibility-empty strong {
+    color: #60A5FA;
+}
+
+
+/* RESPONSIVO */
+
+@media(max-width:900px) {
+
+    html.dark .compatibility-title {
+        border-bottom-color: #263548;
+    }
+
+}

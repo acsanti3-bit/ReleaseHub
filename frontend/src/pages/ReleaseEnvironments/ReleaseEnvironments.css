@@ -1155,3 +1155,400 @@
     background: #c62828;
     color: #ffffff;
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .release-page-header h1 {
+    color: #F1F5F9;
+}
+
+html.dark .release-page-header p {
+    color: #94A3B8;
+}
+
+
+/* AVISO */
+
+html.dark .release-info {
+    background: #142235;
+    border-color: #29415B;
+    color: #60A5FA;
+}
+
+html.dark .release-info span {
+    color: #A3B0BF;
+}
+
+
+/* CARD DO AMBIENTE */
+
+html.dark .release-environment-card {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, .20);
+}
+
+html.dark .release-environment-card-header {
+    background: #162131;
+    border-bottom-color: #263548;
+}
+
+html.dark .release-environment-label {
+    color: #7C8CA1;
+}
+
+html.dark .release-environment-heading h2 {
+    color: #E2E8F0;
+}
+
+html.dark .release-environment-summary {
+    color: #94A3B8;
+}
+
+html.dark .release-environment-reference {
+    color: #60A5FA;
+}
+
+
+/* AÇÕES */
+
+html.dark .release-actions button {
+    background: #1E293B;
+    color: #60A5FA;
+}
+
+html.dark .release-actions button:hover {
+    background: #263548;
+}
+
+html.dark .release-actions .release-collapse-button {
+    background: #1B2737;
+    color: #AAB6C4;
+}
+
+html.dark .release-actions .release-collapse-button:hover {
+    background: #263548;
+    color: #F1F5F9;
+}
+
+html.dark .release-actions .delete-environment {
+    color: #F87171;
+    background: rgba(239, 68, 68, .10);
+}
+
+html.dark .release-actions .delete-environment:hover {
+    background: rgba(239, 68, 68, .18);
+}
+
+
+/* GRID DOS SISTEMAS */
+
+html.dark .release-systems-grid {
+    background: #111C2B;
+}
+
+
+/* SISTEMA */
+
+html.dark .release-system-item {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .release-system-item span {
+    color: #94A3B8;
+}
+
+html.dark .release-system-item strong {
+    color: #E2E8F0;
+}
+
+
+/* INTELLICASH */
+
+html.dark .release-system-reference {
+    background: rgba(59, 130, 246, .10);
+    border-color: rgba(96, 165, 250, .35);
+}
+
+html.dark .release-system-reference span,
+html.dark .release-system-reference strong {
+    color: #60A5FA;
+}
+
+
+/* SEM VERSÃO */
+
+html.dark .release-system-empty {
+    background: #151F2E;
+    border-color: #263548;
+}
+
+html.dark .release-system-empty span {
+    color: #7C8CA1;
+}
+
+html.dark .release-system-empty strong {
+    color: #64748B;
+}
+
+
+/* ESTADO VAZIO */
+
+html.dark .release-empty {
+    background: #162131;
+    color: #94A3B8;
+
+    box-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, .18);
+}
+
+
+/* FEEDBACK */
+
+html.dark .release-feedback-success {
+    border-color: rgba(34, 197, 94, .28);
+    background: #14251D;
+    color: #86EFAC;
+}
+
+html.dark .release-feedback-error {
+    border-color: rgba(239, 68, 68, .28);
+    background: #2A1818;
+    color: #FCA5A5;
+}
+
+html.dark .release-feedback > button:hover {
+    background: rgba(255, 255, 255, .06);
+}
+
+
+/* MODAIS */
+
+html.dark .release-delete-modal,
+html.dark .release-wiki-modal,
+html.dark .release-remittance-edit-modal,
+html.dark .release-remittance-delete-modal {
+    background: #162131;
+
+    box-shadow:
+        0 24px 70px
+        rgba(0, 0, 0, .45);
+}
+
+
+/* MODAL EXCLUSÃO */
+
+html.dark .release-delete-badge {
+    background: rgba(239, 68, 68, .10);
+    color: #F87171;
+}
+
+html.dark .release-delete-modal h2 {
+    color: #F1F5F9;
+}
+
+html.dark .release-delete-question {
+    color: #CBD5E1;
+}
+
+html.dark .release-delete-question strong {
+    color: #F1F5F9;
+}
+
+html.dark .release-delete-warning {
+    border-color: rgba(239, 68, 68, .30);
+    background: rgba(239, 68, 68, .08);
+    color: #FCA5A5;
+}
+
+html.dark .release-modal-cancel-button {
+    border-color: #334155;
+    background: #1E293B;
+    color: #CBD5E1;
+}
+
+html.dark .release-modal-cancel-button:hover:not(:disabled) {
+    background: #263548;
+}
+
+
+/* MODAL WIKI */
+
+html.dark .release-wiki-badge {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .release-wiki-modal h2 {
+    color: #F1F5F9;
+}
+
+html.dark .release-wiki-question {
+    color: #CBD5E1;
+}
+
+html.dark .release-wiki-question strong {
+    color: #F1F5F9;
+}
+
+html.dark .release-wiki-version {
+    color: #94A3B8;
+}
+
+html.dark .release-wiki-version strong {
+    color: #60A5FA;
+}
+
+html.dark .release-wiki-code-row code {
+    border-color: #334155;
+    background: #111C2B;
+    color: #CBD5E1;
+}
+
+html.dark .release-wiki-copy-button {
+    border-color: #334155;
+    background: #1E293B;
+    color: #60A5FA;
+}
+
+html.dark .release-wiki-copy-button:hover {
+    border-color: #60A5FA;
+    background: #223249;
+}
+
+html.dark .release-wiki-help {
+    border-color: #29415B;
+    background: #142235;
+    color: #A7B4C4;
+}
+
+html.dark .release-wiki-later-button {
+    border-color: #334155;
+    background: #1E293B;
+    color: #CBD5E1;
+}
+
+html.dark .release-wiki-later-button:hover {
+    background: #263548;
+}
+
+
+/* CABEÇALHO EXPANDIR */
+
+html.dark .release-environment-heading-toggle:hover {
+    background: rgba(96, 165, 250, .07);
+}
+
+html.dark .release-environment-heading-toggle:focus-visible {
+    outline-color: #60A5FA;
+}
+
+
+/* HISTÓRICO DE REMESSAS */
+
+html.dark .release-remittance-history {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 5px 16px
+        rgba(0, 0, 0, .18);
+}
+
+html.dark .release-remittance-history-kicker {
+    color: #7C8CA1;
+}
+
+html.dark .release-remittance-history-header h2 {
+    color: #F1F5F9;
+}
+
+html.dark .release-remittance-history-count {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .release-remittance-history-item {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .release-remittance-history-item small {
+    color: #7C8CA1;
+}
+
+html.dark .release-remittance-history-item strong {
+    color: #60A5FA;
+}
+
+html.dark .release-remittance-history-tasks strong {
+    color: #F1F5F9;
+}
+
+html.dark .release-remittance-history-date strong {
+    color: #CBD5E1;
+}
+
+
+/* AÇÕES DO HISTÓRICO */
+
+html.dark .release-remittance-history-actions button {
+    border-color: #334155;
+    background: #1E293B;
+    color: #94A3B8;
+}
+
+html.dark .release-remittance-history-actions button:first-child:hover {
+    border-color: #60A5FA;
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .release-remittance-history-actions button:last-child:hover {
+    border-color: rgba(239, 68, 68, .35);
+    background: rgba(239, 68, 68, .10);
+    color: #F87171;
+}
+
+
+/* MODAL DE REMESSA */
+
+html.dark .release-remittance-edit-modal h2,
+html.dark .release-remittance-delete-modal h2 {
+    color: #F1F5F9;
+}
+
+html.dark .release-remittance-delete-modal p {
+    color: #CBD5E1;
+}
+
+html.dark .release-remittance-edit-field label {
+    color: #CBD5E1;
+}
+
+html.dark .release-remittance-edit-field input {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+}
+
+html.dark .release-remittance-edit-field input:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+html.dark .release-remittance-edit-cancel {
+    border-color: #334155;
+    background: #1E293B;
+    color: #CBD5E1;
+}

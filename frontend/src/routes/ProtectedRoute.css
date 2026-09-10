@@ -65,3 +65,21 @@
     }
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .auth-loading {
+    background: #0F172A;
+    color: #60A5FA;
+}
+
+html.dark .auth-loading-spinner {
+    border-color: #334155;
+    border-top-color: #F58220;
+}
+
+html.dark .auth-loading span {
+    color: #94A3B8;
+}

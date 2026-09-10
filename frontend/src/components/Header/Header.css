@@ -26,3 +26,15 @@
     color:#666;
     font-size:20px;
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .header h1 {
+    color: #60A5FA;
+}
+
+html.dark .header p {
+    color: #94A3B8;
+}

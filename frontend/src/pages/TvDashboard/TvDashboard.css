@@ -960,3 +960,117 @@
     }
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .tv-dashboard {
+    background: #0F172A;
+}
+
+
+/* HEADER */
+
+html.dark .tv-header {
+    background: #162131;
+
+    box-shadow:
+        0 5px 16px
+        rgba(0, 0, 0, .20);
+}
+
+html.dark .tv-brand-text h1 {
+    color: #60A5FA;
+}
+
+html.dark .tv-brand-subtitle > span {
+    color: #94A3B8;
+}
+
+html.dark .tv-online {
+    background: rgba(34, 197, 94, .10);
+    color: #86EFAC;
+}
+
+html.dark .tv-online-dot {
+    background: #4ADE80;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(74, 222, 128, .12);
+}
+
+
+/* RELÓGIO */
+
+html.dark .tv-clock strong {
+    color: #60A5FA;
+}
+
+html.dark .tv-clock small {
+    color: #94A3B8;
+}
+
+
+/* ÁREA DAS RELEASES */
+
+html.dark .tv-release-area {
+    background: #162131;
+
+    box-shadow:
+        0 4px 12px
+        rgba(0, 0, 0, .18);
+}
+
+html.dark .tv-release-tabs-header > span {
+    color: #60A5FA;
+}
+
+html.dark .tv-release-tabs-header small {
+    color: #7C8CA1;
+}
+
+
+/* ABAS */
+
+html.dark .tv-release-tab {
+    background: #1B2737;
+    border-color: #2C3B4E;
+    color: #CBD5E1;
+}
+
+html.dark .tv-release-tab:hover {
+    background: #223043;
+    border-color: #60A5FA;
+}
+
+html.dark .tv-release-tab small {
+    color: #94A3B8;
+}
+
+html.dark .tv-release-tab-active {
+    background: #005AA9;
+    border-color: #005AA9;
+    color: #FFFFFF;
+}
+
+html.dark .tv-release-tab-active span {
+    color: #FFFFFF;
+}
+
+html.dark .tv-release-tab-active small {
+    color: rgba(255, 255, 255, .75);
+}
+
+html.dark .tv-release-tabs-loading {
+    color: #94A3B8;
+}
+
+
+/* CARREGAMENTO */
+
+html.dark .tv-loading {
+    background: #162131;
+    color: #94A3B8;
+}

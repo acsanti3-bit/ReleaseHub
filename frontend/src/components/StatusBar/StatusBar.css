@@ -51,3 +51,19 @@
     text-align:right;
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .status-label {
+    color: #CBD5E1;
+}
+
+html.dark .status-progress {
+    background: #263548;
+}
+
+html.dark .status-bar strong {
+    color: #60A5FA;
+}

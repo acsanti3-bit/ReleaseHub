@@ -1017,3 +1017,325 @@
         width: 100%;
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .release-drawer {
+    background: #162131;
+
+    box-shadow:
+        -10px 0 30px
+        rgba(0, 0, 0, .32);
+}
+
+
+/* CABEÇALHO */
+
+html.dark .release-drawer-header {
+    border-bottom-color: #263548;
+}
+
+html.dark .release-drawer-header h2 {
+    color: #60A5FA;
+}
+
+html.dark .release-drawer-header span {
+    color: #94A3B8;
+}
+
+html.dark .release-drawer-header button {
+    background: #1E293B;
+    color: #CBD5E1;
+}
+
+html.dark .release-drawer-header button:hover {
+    background: #263548;
+    color: #F1F5F9;
+}
+
+
+/* CAMPOS */
+
+html.dark .release-field label {
+    color: #CBD5E1;
+}
+
+html.dark .release-field input {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+}
+
+html.dark .release-field input:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+
+/* AVISO */
+
+html.dark .release-reference {
+    background: #142235;
+
+    border-left-color: #60A5FA;
+}
+
+html.dark .release-reference strong {
+    color: #60A5FA;
+}
+
+html.dark .release-reference span {
+    color: #A3B0BF;
+}
+
+
+/* DIVISOR */
+
+html.dark .release-divider {
+    border-bottom-color: #263548;
+    color: #94A3B8;
+}
+
+
+/* CONTROLES DA TV */
+
+html.dark .release-tv-controls {
+    background: #142235;
+    border-color: #29415B;
+}
+
+html.dark .release-tv-controls-text strong {
+    color: #60A5FA;
+}
+
+html.dark .release-tv-controls-text span {
+    color: #94A3B8;
+}
+
+html.dark .release-tv-actions button {
+    background: #1E293B;
+    color: #60A5FA;
+    border-color: #334155;
+}
+
+html.dark .release-tv-actions button:last-child {
+    color: #AAB6C4;
+}
+
+html.dark .release-tv-actions button:hover {
+    border-color: #60A5FA;
+    background: #223249;
+}
+
+
+/* LISTA DOS SISTEMAS */
+
+html.dark .release-system-row {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .release-system-name {
+    color: #CBD5E1;
+}
+
+html.dark .release-system-name small {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+
+/* INPUTS DE SISTEMA */
+
+html.dark .release-system-version,
+html.dark .release-system-executable {
+    background: #111C2B;
+    color: #E2E8F0;
+    border-color: #334155;
+}
+
+html.dark .release-system-version:focus,
+html.dark .release-system-executable:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+
+/* TOGGLE TV */
+
+html.dark .release-tv-toggle {
+    color: #94A3B8;
+}
+
+html.dark .release-tv-toggle-active {
+    color: #86EFAC;
+}
+
+
+/* INTELLICASH */
+
+html.dark .release-system-row-reference {
+    background: rgba(59, 130, 246, .08);
+    border-color: rgba(96, 165, 250, .30);
+}
+
+html.dark .release-system-row-reference
+.release-system-name {
+    color: #60A5FA;
+}
+
+html.dark .release-system-row-reference
+.release-system-version {
+    border-color: rgba(96, 165, 250, .45);
+    color: #93C5FD;
+}
+
+
+/* HERANÇA */
+
+html.dark .release-inheritance-note {
+    background: #151F2E;
+    border-color: #263548;
+}
+
+html.dark .release-inheritance-note strong {
+    color: #CBD5E1;
+}
+
+html.dark .release-inheritance-note span {
+    color: #94A3B8;
+}
+
+html.dark .release-system-version-inherited {
+    background: #151F2E !important;
+    color: #94A3B8 !important;
+}
+
+html.dark .release-inherited-badge {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .release-field-hint {
+    color: #7C8CA1;
+}
+
+
+/* REMESSA */
+
+html.dark .release-remessa-box {
+    background: #142235;
+    border-color: #29415B;
+}
+
+html.dark .release-remessa-heading strong {
+    color: #60A5FA;
+}
+
+html.dark .release-remessa-heading span {
+    color: #94A3B8;
+}
+
+html.dark .release-remessa-field label {
+    color: #CBD5E1;
+}
+
+html.dark .release-remessa-field input,
+html.dark .release-remessa-grid input {
+    background: #1E293B;
+    color: #F1F5F9;
+    border-color: #334155;
+}
+
+html.dark .release-remessa-grid label span {
+    color: #94A3B8;
+}
+
+html.dark .release-remessa-grid input:focus,
+html.dark .release-remessa-field input:focus {
+    border-color: #60A5FA;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(96, 165, 250, .10);
+}
+
+
+/* HISTÓRICO DENTRO DO DRAWER */
+
+html.dark .release-remessa-history-heading strong {
+    color: #CBD5E1;
+}
+
+html.dark .release-remessa-history-heading span {
+    color: #7C8CA1;
+}
+
+html.dark .release-remessa-history-item {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .release-remessa-history-item strong {
+    color: #CBD5E1;
+}
+
+html.dark .release-remessa-history-item span {
+    color: #94A3B8;
+}
+
+html.dark .release-remessa-history-item button {
+    background: #263548;
+    color: #94A3B8;
+}
+
+html.dark .release-remessa-history-item button:hover {
+    background: rgba(239, 68, 68, .12);
+    color: #F87171;
+}
+
+
+/* REMESSA OBRIGATÓRIA INTELLICASH */
+
+html.dark .release-intellicash-remessa-required {
+    background: rgba(245, 130, 32, .08);
+
+    border-color:
+        rgba(245, 130, 32, .28);
+}
+
+html.dark .release-intellicash-remessa-required > div strong {
+    color: #FB923C;
+}
+
+html.dark .release-intellicash-remessa-required > div span {
+    color: #A3B0BF;
+}
+
+html.dark .release-intellicash-remessa-required label span {
+    color: #CBD5E1;
+}
+
+html.dark .release-intellicash-remessa-required input {
+    background: #1E293B;
+    color: #F1F5F9;
+
+    border-color:
+        rgba(245, 130, 32, .45);
+}
+
+html.dark .release-intellicash-remessa-required input:focus {
+    border-color: #F58220;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(245, 130, 32, .12);
+}

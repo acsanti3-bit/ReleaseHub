@@ -47,3 +47,29 @@
     font-weight:700;
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .kpi-card {
+    background: #162131;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, .22);
+}
+
+html.dark .kpi-card:hover {
+    box-shadow:
+        0 12px 28px
+        rgba(0, 0, 0, .30);
+}
+
+html.dark .kpi-title {
+    color: #94A3B8;
+}
+
+html.dark .kpi-value {
+    color: #60A5FA;
+}

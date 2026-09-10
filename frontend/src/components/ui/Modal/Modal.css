@@ -73,3 +73,28 @@
     padding:24px;
 
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .modal-container {
+    background: #162131;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0, 0, 0, .38);
+}
+
+html.dark .modal-content {
+    color: #E2E8F0;
+}
+
+html.dark .modal-header {
+    background: #005AA9;
+    color: #FFFFFF;
+}
+
+html.dark .modal-close {
+    color: #FFFFFF;
+}

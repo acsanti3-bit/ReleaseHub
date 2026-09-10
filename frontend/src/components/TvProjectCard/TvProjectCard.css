@@ -1074,3 +1074,225 @@
         width:100%;
     }
 }
+
+/* =========================
+   MODO NOTURNO
+   ========================= */
+
+html.dark .tv-project-card {
+    color-scheme: dark;
+
+    background: #162131;
+    color: #E2E8F0;
+
+    border-color: #263548;
+
+    box-shadow:
+        0 7px 20px
+        rgba(0, 0, 0, .22);
+}
+
+
+/* HEADER */
+
+html.dark .tv-card-header {
+    border-bottom-color: #263548;
+}
+
+html.dark .tv-card-project-label {
+    color: #7C8CA1;
+}
+
+
+/* VERSÃO */
+
+html.dark .tv-card-version small {
+    color: #7C8CA1;
+}
+
+html.dark .tv-card-version strong {
+    background: #1E293B;
+    color: #CBD5E1;
+}
+
+
+/* STATUS */
+
+html.dark .tv-status-card {
+    background: #1B2737;
+    border-color: #2C3B4E;
+}
+
+html.dark .tv-status-card-clickable:hover {
+    background: #223043;
+    border-color: #475569;
+
+    box-shadow:
+        0 3px 8px
+        rgba(0, 0, 0, .22);
+}
+
+html.dark .tv-status-card-clickable:focus-visible {
+    outline-color: #60A5FA;
+}
+
+html.dark .tv-status-card-top {
+    color: #CBD5E1;
+}
+
+
+/* RESOLVIDAS */
+
+html.dark .tv-status-card-resolved {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .25);
+}
+
+html.dark .tv-status-card-resolved
+.tv-status-card-top {
+    color: #86EFAC;
+}
+
+
+/* TOTAL */
+
+html.dark .tv-status-card-total {
+    background: rgba(59, 130, 246, .12);
+    border-color: rgba(96, 165, 250, .28);
+}
+
+html.dark .tv-status-card-total
+.tv-status-indicator {
+    background: #60A5FA;
+}
+
+html.dark .tv-status-card-total
+.tv-status-card-top {
+    color: #60A5FA;
+}
+
+html.dark .tv-status-card-total strong {
+    color: #60A5FA;
+}
+
+
+/* STATUS ZERADOS */
+
+html.dark .tv-status-card-zero {
+    background: #151F2E;
+}
+
+html.dark .tv-status-card-zero
+.tv-status-card-top {
+    color: #64748B;
+}
+
+html.dark .tv-status-card-zero strong {
+    color: #64748B !important;
+}
+
+
+/* FOOTER */
+
+html.dark .tv-card-footer {
+    background: #151F2E;
+    border-top-color: #263548;
+}
+
+html.dark .tv-card-date small {
+    color: #7C8CA1;
+}
+
+html.dark .tv-card-date strong {
+    color: #CBD5E1;
+}
+
+
+/* SITUAÇÃO */
+
+html.dark .tv-deadline-ok strong,
+html.dark .tv-deadline-ok span {
+    color: #4ADE80;
+}
+
+html.dark .tv-deadline-warning strong,
+html.dark .tv-deadline-warning span {
+    color: #FB923C;
+}
+
+html.dark .tv-deadline-late strong,
+html.dark .tv-deadline-late span {
+    color: #F87171;
+}
+
+html.dark .tv-deadline-neutral strong,
+html.dark .tv-deadline-neutral span {
+    color: #94A3B8;
+}
+
+html.dark .tv-deadline-invalid strong,
+html.dark .tv-deadline-invalid span {
+    color: #C084FC;
+}
+
+
+/* BLOCO DE RESOLVIDAS DO FOOTER */
+
+html.dark .tv-card-resolved {
+    background: rgba(34, 197, 94, .10);
+    border-color: rgba(34, 197, 94, .25);
+}
+
+html.dark .tv-card-resolved small,
+html.dark .tv-card-resolved span {
+    color: #86B991;
+}
+
+html.dark .tv-card-resolved strong {
+    color: #4ADE80;
+}
+
+
+/* LOGIN REDMINE */
+
+html.dark .tv-redmine-login-modal {
+    background: #162131;
+    border-color: #263548;
+
+    box-shadow:
+        0 24px 65px
+        rgba(0, 0, 0, .45);
+}
+
+html.dark .tv-redmine-login-close {
+    color: #94A3B8;
+}
+
+html.dark .tv-redmine-login-close:hover {
+    background: #263548;
+    color: #F1F5F9;
+}
+
+html.dark .tv-redmine-login-badge {
+    background: rgba(59, 130, 246, .12);
+    color: #60A5FA;
+}
+
+html.dark .tv-redmine-login-modal h2 {
+    color: #F1F5F9;
+}
+
+html.dark .tv-redmine-login-modal p {
+    color: #94A3B8;
+}
+
+html.dark .tv-redmine-login-cancel {
+    background: #1E293B;
+    border-color: #334155;
+    color: #CBD5E1;
+}
+
+html.dark .tv-redmine-login-cancel:hover {
+    background: #263548;
+    border-color: #475569;
+}
