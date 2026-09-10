@@ -49,31 +49,17 @@ function Layout({
 
         <div className="layout">
 
-            <Sidebar />
-
-            <button
-                type="button"
-                className="theme-toggle"
-                onClick={() =>
+            <Sidebar
+                darkMode={darkMode}
+                onToggleTheme={() =>
                     setDarkMode(
                         valor => !valor
                     )
                 }
-                title={
-                    darkMode
-                        ? "Ativar modo claro"
-                        : "Ativar modo noturno"
-                }
-            >
-                {darkMode
-                    ? "☀️"
-                    : "🌙"}
-            </button>
+            />
 
             <main className="content">
-
                 {children}
-
             </main>
 
         </div>

@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 
 import {
+  MdDarkMode,
+  MdLightMode,
   MdLogout,
 } from "react-icons/md";
 
@@ -24,7 +26,17 @@ import type {
 import "./Sidebar.css";
 import "./SidebarAuth.css";
 
-function Sidebar() {
+
+interface Props {
+  darkMode: boolean;
+  onToggleTheme: () => void;
+}
+
+
+function Sidebar({
+  darkMode,
+  onToggleTheme,
+}: Props) {
 
   const navigate =
     useNavigate();
@@ -83,6 +95,7 @@ function Sidebar() {
 
   }, []);
 
+
   async function handleLogout() {
 
     if (saindo) {
@@ -119,12 +132,14 @@ function Sidebar() {
 
   }
 
+
   const inicial =
     usuario?.nome
       ?.trim()
       .charAt(0)
       .toUpperCase() ||
     "U";
+
 
   function descricaoPerfil() {
 
@@ -152,12 +167,15 @@ function Sidebar() {
 
   }
 
+
   const podeAcessarAmbientes =
     usuario?.role === "admin" ||
     usuario?.role === "qualidade";
 
+
   const podeAcessarConfiguracoes =
     podeAcessarAmbientes;
+
 
   return (
 
@@ -174,6 +192,7 @@ function Sidebar() {
         </span>
 
       </div>
+
 
       <nav>
 
@@ -211,7 +230,44 @@ function Sidebar() {
 
       </nav>
 
+
       <div className="sidebar-auth">
+
+        <button
+          type="button"
+          className="sidebar-theme-toggle"
+          onClick={onToggleTheme}
+          title={
+            darkMode
+              ? "Ativar modo claro"
+              : "Ativar modo noturno"
+          }
+        >
+
+          {darkMode ? (
+
+            <MdLightMode
+              size={18}
+            />
+
+          ) : (
+
+            <MdDarkMode
+              size={18}
+            />
+
+          )}
+
+          <span>
+
+            {darkMode
+              ? "Modo claro"
+              : "Modo noturno"}
+
+          </span>
+
+        </button>
+
 
         <div className="sidebar-auth-user">
 
@@ -235,6 +291,7 @@ function Sidebar() {
           </div>
 
         </div>
+
 
         <button
           type="button"
