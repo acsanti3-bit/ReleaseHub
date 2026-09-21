@@ -570,10 +570,17 @@
     border-radius: 8px;
 }
 
-.release-inheritance-note strong {
+.release-inheritance-note > strong {
     display: block;
     color: #475467;
     font-size: 12px;
+}
+
+.release-inheritance-note span strong {
+    display: inline;
+    color: #344054;
+    font-size: inherit;
+    font-weight: 700;
 }
 
 .release-inheritance-note span {
