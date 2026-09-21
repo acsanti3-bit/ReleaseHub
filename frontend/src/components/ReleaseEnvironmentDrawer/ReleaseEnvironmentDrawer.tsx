@@ -59,106 +59,241 @@ const NOMES_SISTEMAS_PRINCIPAIS: Record<
 };
 
 
+function obterPartesVersao(
+  valor: string
+): number[] {
+
+  return (
+    valor
+      .match(/\d+/g)
+      ?.map(Number) ??
+    []
+  );
+
+}
+
+
+function compararVersoes(
+  versaoA: string,
+  versaoB: string
+): number {
+
+  const partesA =
+    obterPartesVersao(
+      versaoA
+    );
+
+  const partesB =
+    obterPartesVersao(
+      versaoB
+    );
+
+  const quantidade =
+    Math.max(
+      partesA.length,
+      partesB.length
+    );
+
+
+  for (
+    let indice = 0;
+    indice < quantidade;
+    indice += 1
+  ) {
+
+    const parteA =
+      partesA[indice] ?? 0;
+
+    const parteB =
+      partesB[indice] ?? 0;
+
+
+    if (
+      parteA !== parteB
+    ) {
+
+      return (
+        parteA - parteB
+      );
+
+    }
+
+  }
+
+
+  return 0;
+
+}
+
+
+function obterVersaoIntellicash(
+  ambiente: ReleaseEnvironment
+): string {
+
+  return (
+    criarSistemasFixos(
+      ambiente.sistemas ?? [],
+      ambiente.versoes
+    ).find(
+      sistema =>
+        sistema.chave ===
+        "intellicash"
+    )?.versao?.trim() ??
+    ambiente.versoes
+      .intellicash
+      ?.trim() ??
+    ""
+  );
+
+}
 
 
 function normalizarDateTimeLocal(
   valor?: string
 ): string {
+
   if (!valor) {
     return "";
   }
 
-  const data = new Date(valor);
 
-  if (Number.isNaN(data.getTime())) {
+  const data =
+    new Date(valor);
+
+
+  if (
+    Number.isNaN(
+      data.getTime()
+    )
+  ) {
+
     return "";
+
   }
+
 
   const ano =
     data.getFullYear();
 
+
   const mes =
-    String(data.getMonth() + 1).padStart(
+    String(
+      data.getMonth() + 1
+    ).padStart(
       2,
       "0"
     );
+
 
   const dia =
-    String(data.getDate()).padStart(
+    String(
+      data.getDate()
+    ).padStart(
       2,
       "0"
     );
+
 
   const horas =
-    String(data.getHours()).padStart(
+    String(
+      data.getHours()
+    ).padStart(
       2,
       "0"
     );
+
 
   const minutos =
-    String(data.getMinutes()).padStart(
+    String(
+      data.getMinutes()
+    ).padStart(
       2,
       "0"
     );
 
+
   return `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+
 }
 
 
 function paraIsoDateTime(
   valor: string
 ): string {
+
   if (!valor) {
     return "";
   }
 
+
   const data =
     new Date(valor);
 
-  if (Number.isNaN(data.getTime())) {
+
+  if (
+    Number.isNaN(
+      data.getTime()
+    )
+  ) {
+
     return "";
+
   }
 
+
   return data.toISOString();
+
 }
 
 
 function criarIdRemessa(): string {
+
   return `${Date.now()}-${Math.random()
     .toString(36)
     .slice(2, 9)}`;
+
 }
 
 
 function normalizarDataExecutavel(
   valor?: string
 ): string | undefined {
+
   const data =
     valor?.trim();
+
 
   if (!data) {
     return undefined;
   }
+
 
   const brasileira =
     data.match(
       /^(\d{2})\/(\d{2})\/(\d{4})$/
     );
 
+
   if (brasileira) {
+
     return `${brasileira[3]}-${brasileira[2]}-${brasileira[1]}`;
+
   }
+
 
   const iso =
     data.match(
       /^(\d{4})-(\d{2})-(\d{2})$/
     );
 
+
   if (iso) {
     return data;
   }
 
+
   return undefined;
+
 }
 
 
@@ -168,59 +303,233 @@ function ReleaseEnvironmentDrawer({
   onClose,
   onSave,
 }: Props) {
-  const [form, setForm] =
-    useState<ReleaseEnvironment>(() => ({
-      ...environment,
-      sistemas: criarSistemasFixos(
-        environment.sistemas ?? [],
-        environment.versoes
-      ),
-      remessas: environment.remessas ?? [],
-    }));
+
+  const [
+    form,
+    setForm,
+  ] =
+    useState<ReleaseEnvironment>(
+      () => ({
+        ...environment,
+
+        sistemas:
+          criarSistemasFixos(
+            environment.sistemas ?? [],
+            environment.versoes
+          ),
+
+        remessas:
+          environment.remessas ?? [],
+      })
+    );
 
 
-  const [salvando, setSalvando] =
+  const [
+    salvando,
+    setSalvando,
+  ] =
     useState(false);
 
 
   const [
     quantidadeRemessaIntellicash,
     setQuantidadeRemessaIntellicash,
-  ] = useState<string>("");
+  ] =
+    useState<string>("");
 
 
   const ambienteJaExiste =
     environments.some(
       ambiente =>
-        ambiente.id === environment.id
+        ambiente.id ===
+        environment.id
     );
 
 
-  useEffect(() => {
-    setForm({
-      ...environment,
+  const versaoIntellicashAtual =
+    form.sistemas
+      ?.find(
+        sistema =>
+          sistema.chave ===
+          "intellicash"
+      )
+      ?.versao
+      ?.trim() ??
+    form.versoes
+      .intellicash
+      ?.trim() ??
+    "";
 
-      sistemas: criarSistemasFixos(
-        environment.sistemas ?? [],
-        environment.versoes
-      ),
 
-      remessas:
-        environment.remessas ?? [],
-    });
+  const ambienteReferencia =
+    useMemo(
+      () => {
 
-    setQuantidadeRemessaIntellicash("");
-  }, [environment]);
+        if (
+          !versaoIntellicashAtual
+        ) {
+
+          return null;
+
+        }
+
+
+        const candidatos =
+          environments
+            .filter(
+              ambiente =>
+                ambiente.id !==
+                environment.id
+            )
+            .map(
+              ambiente => ({
+
+                ambiente,
+
+                versao:
+                  obterVersaoIntellicash(
+                    ambiente
+                  ),
+
+              })
+            )
+            .filter(
+              item =>
+                Boolean(
+                  item.versao
+                )
+            );
+
+
+        const anteriores =
+          candidatos
+            .filter(
+              item =>
+                compararVersoes(
+                  item.versao,
+                  versaoIntellicashAtual
+                ) < 0
+            )
+            .sort(
+              (a, b) =>
+                compararVersoes(
+                  b.versao,
+                  a.versao
+                )
+            );
+
+
+        if (
+          anteriores.length > 0
+        ) {
+
+          return anteriores[0];
+
+        }
+
+
+        const posteriores =
+          candidatos
+            .filter(
+              item =>
+                compararVersoes(
+                  item.versao,
+                  versaoIntellicashAtual
+                ) > 0
+            )
+            .sort(
+              (a, b) =>
+                compararVersoes(
+                  a.versao,
+                  b.versao
+                )
+            );
+
+
+        return (
+          posteriores[0] ??
+          null
+        );
+
+      },
+      [
+        environments,
+        environment.id,
+        versaoIntellicashAtual,
+      ]
+    );
+
+
+  const sistemasReferencia =
+    useMemo(
+      () => {
+
+        if (
+          !ambienteReferencia
+        ) {
+
+          return [];
+
+        }
+
+
+        return criarSistemasFixos(
+          ambienteReferencia
+            .ambiente
+            .sistemas ?? [],
+          ambienteReferencia
+            .ambiente
+            .versoes
+        );
+
+      },
+      [
+        ambienteReferencia,
+      ]
+    );
+
+
+  useEffect(
+    () => {
+
+      setForm({
+        ...environment,
+
+        sistemas:
+          criarSistemasFixos(
+            environment.sistemas ?? [],
+            environment.versoes
+          ),
+
+        remessas:
+          environment.remessas ?? [],
+      });
+
+
+      setQuantidadeRemessaIntellicash(
+        ""
+      );
+
+    },
+    [
+      environment,
+    ]
+  );
 
 
   const sistemas =
     useMemo(
       () =>
-        [...(form.sistemas ?? [])].sort(
+        [
+          ...(form.sistemas ?? []),
+        ].sort(
           (a, b) =>
-            a.ordem - b.ordem
+            a.ordem -
+            b.ordem
         ),
-      [form.sistemas]
+      [
+        form.sistemas,
+      ]
     );
 
 
@@ -230,22 +539,24 @@ function ReleaseEnvironmentDrawer({
       environment.versoes
     ).find(
       sistema =>
-        sistema.chave === "intellicash"
-    )?.executavel?.trim() ?? "";
+        sistema.chave ===
+        "intellicash"
+    )?.executavel?.trim() ??
+    "";
 
 
   const executavelIntellicashAtual =
     sistemas.find(
       sistema =>
-        sistema.chave === "intellicash"
-    )?.executavel?.trim() ?? "";
+        sistema.chave ===
+        "intellicash"
+    )?.executavel?.trim() ??
+    "";
 
 
   const executavelIntellicashAlterado =
     executavelIntellicashAtual !==
-      executavelIntellicashOriginal;
-
-
+    executavelIntellicashOriginal;
 
 
   function alterarCampo<
@@ -254,10 +565,14 @@ function ReleaseEnvironmentDrawer({
     campo: K,
     valor: ReleaseEnvironment[K]
   ) {
-    setForm(atual => ({
-      ...atual,
-      [campo]: valor,
-    }));
+
+    setForm(
+      atual => ({
+        ...atual,
+        [campo]: valor,
+      })
+    );
+
   }
 
 
@@ -265,57 +580,86 @@ function ReleaseEnvironmentDrawer({
     chave: string,
     valor: string
   ) {
+
     const sistemaPrincipal =
       SISTEMAS_PRINCIPAIS.includes(
         chave as SistemaPrincipal
       );
 
-    setForm(atual => {
-      const sistemasAtualizados =
-        (atual.sistemas ?? []).map(
-          sistema => {
-            if (sistema.chave !== chave) {
-              return sistema;
+
+    setForm(
+      atual => {
+
+        const sistemasAtualizados =
+          (
+            atual.sistemas ??
+            []
+          ).map(
+            sistema => {
+
+              if (
+                sistema.chave !==
+                chave
+              ) {
+
+                return sistema;
+
+              }
+
+
+              return {
+                ...sistema,
+                versao: valor,
+              };
+
             }
+          );
 
-            return {
-              ...sistema,
-              versao: valor,
-            };
-          }
-        );
 
-      const versoesAtualizadas = {
-        ...atual.versoes,
-      };
+        const versoesAtualizadas = {
+          ...atual.versoes,
+        };
 
-      if (
-        chave in versoesAtualizadas
-      ) {
-        (
-          versoesAtualizadas as Record<
-            string,
-            string
-          >
-        )[chave] = valor;
+
+        if (
+          chave in
+          versoesAtualizadas
+        ) {
+
+          (
+            versoesAtualizadas as Record<
+              string,
+              string
+            >
+          )[chave] =
+            valor;
+
+        }
+
+
+        return {
+          ...atual,
+
+          versoes:
+            versoesAtualizadas,
+
+          sistemas:
+            sistemasAtualizados,
+        };
+
       }
-
-      return {
-        ...atual,
-        versoes:
-          versoesAtualizadas,
-        sistemas:
-          sistemasAtualizados,
-      };
-    });
+    );
 
 
     if (
       !sistemaPrincipal &&
       ambienteJaExiste
     ) {
+
       return;
+
     }
+
   }
 
 
@@ -323,20 +667,29 @@ function ReleaseEnvironmentDrawer({
     chave: string,
     valor: string
   ) {
-    setForm(atual => ({
-      ...atual,
 
-      sistemas:
-        (atual.sistemas ?? []).map(
-          sistema =>
-            sistema.chave === chave
-              ? {
-                  ...sistema,
-                  executavel: valor,
-                }
-              : sistema
-        ),
-    }));
+    setForm(
+      atual => ({
+        ...atual,
+
+        sistemas:
+          (
+            atual.sistemas ??
+            []
+          ).map(
+            sistema =>
+              sistema.chave ===
+              chave
+                ? {
+                    ...sistema,
+                    executavel:
+                      valor,
+                  }
+                : sistema
+          ),
+      })
+    );
+
   }
 
 
@@ -344,61 +697,86 @@ function ReleaseEnvironmentDrawer({
     chave: string,
     valor: boolean
   ) {
-    setForm(atual => ({
-      ...atual,
 
-      sistemas:
-        (atual.sistemas ?? []).map(
-          sistema =>
-            sistema.chave === chave
-              ? {
-                  ...sistema,
-                  mostrarNaTv: valor,
-                }
-              : sistema
-        ),
-    }));
+    setForm(
+      atual => ({
+        ...atual,
+
+        sistemas:
+          (
+            atual.sistemas ??
+            []
+          ).map(
+            sistema =>
+              sistema.chave ===
+              chave
+                ? {
+                    ...sistema,
+                    mostrarNaTv:
+                      valor,
+                  }
+                : sistema
+          ),
+      })
+    );
+
   }
 
 
   function alterarTodosNaTv(
     valor: boolean
   ) {
-    setForm(atual => ({
-      ...atual,
 
-      sistemas:
-        (atual.sistemas ?? []).map(
-          sistema => ({
-            ...sistema,
-            mostrarNaTv: valor,
-          })
-        ),
-    }));
+    setForm(
+      atual => ({
+        ...atual,
+
+        sistemas:
+          (
+            atual.sistemas ??
+            []
+          ).map(
+            sistema => ({
+              ...sistema,
+
+              mostrarNaTv:
+                valor,
+            })
+          ),
+      })
+    );
+
   }
-
-
 
 
   function alterarLiberadoEm(
     valor: string
   ) {
+
     alterarCampo(
       "liberadoEm",
       valor
-        ? paraIsoDateTime(valor)
+        ? paraIsoDateTime(
+            valor
+          )
         : undefined
     );
+
   }
 
 
   function validar(): boolean {
-    if (!form.nome.trim()) {
+
+    if (
+      !form.nome.trim()
+    ) {
+
       window.alert(
         "Informe o nome do ambiente."
       );
 
       return false;
+
     }
 
 
@@ -410,135 +788,203 @@ function ReleaseEnvironmentDrawer({
       const chave
       of versoesObrigatorias
     ) {
+
       const sistema =
         form.sistemas?.find(
           item =>
-            item.chave === chave
+            item.chave ===
+            chave
         );
 
+
       const versao =
-        sistema?.versao?.trim() ||
+        sistema
+          ?.versao
+          ?.trim() ||
         form.versoes[
           chave
         ]?.trim();
 
 
-      if (!versao) {
+      if (
+        !versao
+      ) {
+
         window.alert(
           `Informe a versão do ${NOMES_SISTEMAS_PRINCIPAIS[chave]}.`
         );
 
         return false;
+
       }
+
     }
 
 
-    if (executavelIntellicashAlterado) {
+    if (
+      executavelIntellicashAlterado
+    ) {
+
       const quantidade =
         Number.parseInt(
           quantidadeRemessaIntellicash,
           10
         );
 
+
       if (
-        !Number.isFinite(quantidade) ||
+        !Number.isFinite(
+          quantidade
+        ) ||
         quantidade <= 0
       ) {
+
         window.alert(
           "Informe a quantidade de tarefas da nova remessa do IntelliCash."
         );
 
         return false;
+
       }
+
 
       if (
         !normalizarDataExecutavel(
           executavelIntellicashAtual
         )
       ) {
+
         window.alert(
           "Informe a data do executável do IntelliCash no formato dd/mm/aaaa."
         );
 
         return false;
+
       }
+
     }
 
 
     return true;
+
   }
 
 
   async function salvar() {
-    if (!validar()) {
+
+    if (
+      !validar()
+    ) {
+
       return;
+
     }
 
 
     try {
-      setSalvando(true);
+
+      setSalvando(
+        true
+      );
 
 
       const versoes = {
+
         intellicash:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "intellicash"
-          )?.versao?.trim() ||
-          form.versoes.intellicash,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "intellicash"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .intellicash,
+
 
         easycash:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "easycash"
-          )?.versao?.trim() ||
-          form.versoes.easycash,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "easycash"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .easycash,
+
 
         easycheckout:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "easycheckout"
-          )?.versao?.trim() ||
-          form.versoes.easycheckout,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "easycheckout"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .easycheckout,
+
 
         easypdv:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "easypdv"
-          )?.versao?.trim() ||
-          form.versoes.easypdv,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "easypdv"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .easypdv,
+
 
         intellistock:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "intellistock"
-          )?.versao?.trim() ||
-          form.versoes.intellistock,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "intellistock"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .intellistock,
+
 
         iwbserver:
-          form.sistemas?.find(
-            sistema =>
-              sistema.chave ===
-              "iwbserver"
-          )?.versao?.trim() ||
-          form.versoes.iwbserver,
+          form.sistemas
+            ?.find(
+              sistema =>
+                sistema.chave ===
+                "iwbserver"
+            )
+            ?.versao
+            ?.trim() ||
+          form.versoes
+            .iwbserver,
+
       };
 
 
       const remessasAtualizadas =
-        [...(form.remessas ?? [])];
+        [
+          ...(form.remessas ?? []),
+        ];
 
 
-      if (executavelIntellicashAlterado) {
+      if (
+        executavelIntellicashAlterado
+      ) {
+
         const dataRemessa =
           normalizarDataExecutavel(
             executavelIntellicashAtual
           );
+
 
         const quantidade =
           Number.parseInt(
@@ -546,61 +992,100 @@ function ReleaseEnvironmentDrawer({
             10
           );
 
-        if (dataRemessa) {
-          const remessa: ReleaseRemessa = {
-            id: criarIdRemessa(),
 
-            data: dataRemessa,
+        if (
+          dataRemessa
+        ) {
+
+          const remessa:
+            ReleaseRemessa = {
+
+            id:
+              criarIdRemessa(),
+
+            data:
+              dataRemessa,
 
             tarefas: {
-              intellicash: quantidade,
-              easycash: 0,
-              easycheckout: 0,
-              easypdv: 0,
-              intellistock: 0,
+              intellicash:
+                quantidade,
+
+              easycash:
+                0,
+
+              easycheckout:
+                0,
+
+              easypdv:
+                0,
+
+              intellistock:
+                0,
             },
 
-            totalTarefas: quantidade,
+            totalTarefas:
+              quantidade,
+
           };
+
 
           remessasAtualizadas.push(
             remessa
           );
+
         }
+
       }
 
 
-      const ambienteSalvo: ReleaseEnvironment = {
+      const ambienteSalvo:
+        ReleaseEnvironment = {
+
         ...form,
+
 
         nome:
           form.nome.trim(),
 
+
         prazo:
-          form.prazo?.trim() || "",
+          form.prazo
+            ?.trim() ||
+          "",
+
 
         liberadoEm:
-          form.liberadoEm || undefined,
+          form.liberadoEm ||
+          undefined,
+
 
         versoes,
 
+
         sistemas:
-          (form.sistemas ?? []).map(
+          (
+            form.sistemas ??
+            []
+          ).map(
             sistema => ({
               ...sistema,
 
               versao:
-                sistema.versao?.trim() ||
+                sistema.versao
+                  ?.trim() ||
                 "",
 
               executavel:
-                sistema.executavel?.trim() ||
+                sistema.executavel
+                  ?.trim() ||
                 undefined,
             })
           ),
 
+
         remessas:
           remessasAtualizadas,
+
       };
 
 
@@ -608,32 +1093,52 @@ function ReleaseEnvironmentDrawer({
         ambienteSalvo
       );
 
+
       onClose();
-    } catch (error) {
+
+    } catch (
+      error
+    ) {
+
       window.alert(
         error instanceof Error
           ? error.message
           : "Não foi possível salvar o ambiente."
       );
+
     } finally {
-      setSalvando(false);
+
+      setSalvando(
+        false
+      );
+
     }
+
   }
 
 
-
-
-return (
+  return (
     <>
+
       <div
         className="release-drawer-backdrop"
         role="presentation"
-        onMouseDown={evento => {
-          if (evento.target === evento.currentTarget) {
-            onClose();
+        onMouseDown={
+          evento => {
+
+            if (
+              evento.target ===
+              evento.currentTarget
+            ) {
+
+              onClose();
+
+            }
+
           }
-        }}
+        }
       />
+
 
       <aside
         className="release-drawer"
@@ -641,87 +1146,147 @@ return (
         aria-modal="true"
         aria-labelledby="release-drawer-title"
       >
-        <header className="release-drawer-header">
+
+        <header
+          className="release-drawer-header"
+        >
+
           <div>
-            <h2 id="release-drawer-title">
+
+            <h2
+              id="release-drawer-title"
+            >
               Ambiente da Release
             </h2>
 
             <span>
               Informe as versões principais da release. As demais são herdadas automaticamente.
             </span>
+
           </div>
+
 
           <button
             type="button"
             onClick={onClose}
             aria-label="Fechar"
           >
-            <MdClose size={21} />
+
+            <MdClose
+              size={21}
+            />
+
           </button>
+
         </header>
 
-        <div className="release-drawer-body">
-          <div className="release-field">
-            <label htmlFor="environment-name">
+
+        <div
+          className="release-drawer-body"
+        >
+
+          <div
+            className="release-field"
+          >
+
+            <label
+              htmlFor="environment-name"
+            >
               Nome do Ambiente
             </label>
 
             <input
               id="environment-name"
               type="text"
-              value={form.nome}
-              onChange={evento =>
-                alterarCampo(
-                  "nome",
-                  evento.target.value
-                )
+              value={
+                form.nome
+              }
+              onChange={
+                evento =>
+                  alterarCampo(
+                    "nome",
+                    evento
+                      .target
+                      .value
+                  )
               }
             />
+
           </div>
 
-          <div className="release-field">
-            <label htmlFor="environment-deadline">
+
+          <div
+            className="release-field"
+          >
+
+            <label
+              htmlFor="environment-deadline"
+            >
               Prazo da Release
             </label>
 
             <input
               id="environment-deadline"
               type="date"
-              value={form.prazo ?? ""}
-              onChange={evento =>
-                alterarCampo(
-                  "prazo",
-                  evento.target.value
-                )
+              value={
+                form.prazo ??
+                ""
+              }
+              onChange={
+                evento =>
+                  alterarCampo(
+                    "prazo",
+                    evento
+                      .target
+                      .value
+                  )
               }
             />
+
           </div>
 
-          <div className="release-field">
-            <label htmlFor="environment-released-at">
+
+          <div
+            className="release-field"
+          >
+
+            <label
+              htmlFor="environment-released-at"
+            >
               Liberado em
             </label>
 
             <input
               id="environment-released-at"
               type="datetime-local"
-              value={normalizarDateTimeLocal(
-                form.liberadoEm
-              )}
-              onChange={evento =>
-                alterarLiberadoEm(
-                  evento.target.value
+              value={
+                normalizarDateTimeLocal(
+                  form.liberadoEm
                 )
+              }
+              onChange={
+                evento =>
+                  alterarLiberadoEm(
+                    evento
+                      .target
+                      .value
+                  )
               }
             />
 
-            <span className="release-field-hint">
+            <span
+              className="release-field-hint"
+            >
               Preenchido automaticamente ao concluir a release, mas pode ser corrigido manualmente.
             </span>
+
           </div>
 
-          <div className="release-reference">
+
+          <div
+            className="release-reference"
+          >
+
             <strong>
               Versões principais
             </strong>
@@ -731,13 +1296,62 @@ return (
               As demais aplicações herdam a versão da release anterior mais próxima. Se não houver uma anterior cadastrada,
               é usada a próxima release disponível. Alterações ficam na página Compatibilidade.
             </span>
+
           </div>
-<div className="release-divider">
+
+
+          {versaoIntellicashAtual && (
+
+            <div
+              className="release-inheritance-note"
+            >
+
+              <strong>
+                Versões herdadas
+              </strong>
+
+              <span>
+
+                {ambienteReferencia ? (
+                  <>
+                    As aplicações secundárias foram preenchidas com base em{" "}
+                    <strong>
+                      Release{" "}
+                      {
+                        ambienteReferencia
+                          .versao
+                      }
+                    </strong>.
+                  </>
+                ) : (
+                  <>
+                    Nenhuma release de referência foi encontrada.
+                    As aplicações secundárias ficarão sem versão herdada.
+                  </>
+                )}
+
+              </span>
+
+            </div>
+
+          )}
+
+
+          <div
+            className="release-divider"
+          >
             Sistemas da Release
           </div>
 
-          <div className="release-tv-controls">
-            <div className="release-tv-controls-text">
+
+          <div
+            className="release-tv-controls"
+          >
+
+            <div
+              className="release-tv-controls-text"
+            >
+
               <strong>
                 Projetos exibidos na TV
               </strong>
@@ -745,13 +1359,21 @@ return (
               <span>
                 Desmarque os projetos que não devem aparecer no painel.
               </span>
+
             </div>
 
-            <div className="release-tv-actions">
+
+            <div
+              className="release-tv-actions"
+            >
+
               <button
                 type="button"
-                onClick={() =>
-                  alterarTodosNaTv(true)
+                onClick={
+                  () =>
+                    alterarTodosNaTv(
+                      true
+                    )
                 }
               >
                 Marcar todos
@@ -759,180 +1381,302 @@ return (
 
               <button
                 type="button"
-                onClick={() =>
-                  alterarTodosNaTv(false)
+                onClick={
+                  () =>
+                    alterarTodosNaTv(
+                      false
+                    )
                 }
               >
                 Desmarcar
               </button>
+
             </div>
+
           </div>
 
-          <div className="release-system-list">
-            {sistemas.map(sistema => {
-              const principal =
-                SISTEMAS_PRINCIPAIS.includes(
-                  sistema.chave as SistemaPrincipal
-                );
 
-              const referencia =
-                sistema.chave === "intellicash";
+          <div
+            className="release-system-list"
+          >
 
-              const herdado =
-                !principal &&
-                ambienteJaExiste;
+            {sistemas.map(
+              sistema => {
 
-              return (
-                <div
-                  key={sistema.chave}
-                  className={`release-system-row ${
-                    referencia
-                      ? "release-system-row-reference"
-                      : ""
-                  }`}
-                >
-                  <div className="release-system-name">
-                    <span>
-                      {sistema.nome}
-                    </span>
+                const principal =
+                  SISTEMAS_PRINCIPAIS
+                    .includes(
+                      sistema.chave as
+                        SistemaPrincipal
+                    );
 
-                    {referencia && (
-                      <small>
-                        Referência
-                      </small>
-                    )}
-                  </div>
 
-                  <div className="release-system-version-wrap">
-                    <input
-                      className={`release-system-version ${
-                        herdado
-                          ? "release-system-version-inherited"
-                          : ""
-                      }`}
-                      type="text"
-                      value={sistema.versao ?? ""}
-                      disabled={herdado}
-                      placeholder="Versão"
-                      onChange={evento =>
-                        alterarVersao(
-                          sistema.chave,
-                          evento.target.value
-                        )
-                      }
-                    />
+                const referencia =
+                  sistema.chave ===
+                  "intellicash";
 
-                    {herdado && (
-                      <span className="release-inherited-badge">
-                        Compatibilidade
-                      </span>
-                    )}
-                  </div>
 
-                  <input
-                    className="release-system-executable"
-                    type="text"
-                    value={sistema.executavel ?? ""}
-                    placeholder="Executável"
-                    onChange={evento => {
-                      alterarExecutavel(
-                        sistema.chave,
-                        evento.target.value
-                      );
+                const herdado =
+                  !principal;
 
-                      if (
-                        sistema.chave ===
-                        "intellicash"
-                      ) {
-                        setQuantidadeRemessaIntellicash(
-                          ""
-                        );
-                      }
-                    }}
-                  />
 
-                  <label
-                    className={`release-tv-toggle ${
-                      sistema.mostrarNaTv !== false
-                        ? "release-tv-toggle-active"
+                const sistemaOrigem =
+                  sistemasReferencia
+                    .find(
+                      item =>
+                        item.chave ===
+                        sistema.chave
+                    );
+
+
+                const versaoExibida =
+                  herdado &&
+                  !ambienteJaExiste
+                    ? sistemaOrigem
+                        ?.versao ??
+                      ""
+                    : sistema
+                        .versao ??
+                      "";
+
+
+                return (
+
+                  <div
+                    key={
+                      sistema.chave
+                    }
+                    className={`release-system-row ${
+                      referencia
+                        ? "release-system-row-reference"
                         : ""
                     }`}
                   >
+
+                    <div
+                      className="release-system-name"
+                    >
+
+                      <span>
+                        {
+                          sistema.nome
+                        }
+                      </span>
+
+
+                      {referencia && (
+
+                        <small>
+                          Referência
+                        </small>
+
+                      )}
+
+                    </div>
+
+
+                    <div
+                      className="release-system-version-wrap"
+                    >
+
+                      <input
+                        className={`release-system-version ${
+                          herdado
+                            ? "release-system-version-inherited"
+                            : ""
+                        }`}
+                        type="text"
+                        value={
+                          versaoExibida
+                        }
+                        disabled={
+                          herdado
+                        }
+                        placeholder="Versão"
+                        onChange={
+                          evento =>
+                            alterarVersao(
+                              sistema
+                                .chave,
+                              evento
+                                .target
+                                .value
+                            )
+                        }
+                      />
+
+
+                      {herdado && (
+
+                        <span
+                          className="release-inherited-badge"
+                        >
+                          Compatibilidade
+                        </span>
+
+                      )}
+
+                    </div>
+
+
                     <input
-                      type="checkbox"
-                      checked={
-                        sistema.mostrarNaTv !== false
+                      className="release-system-executable"
+                      type="text"
+                      value={
+                        sistema
+                          .executavel ??
+                        ""
                       }
-                      onChange={evento =>
-                        alterarExibicaoNaTv(
-                          sistema.chave,
-                          evento.target.checked
-                        )
+                      placeholder="Executável"
+                      onChange={
+                        evento => {
+
+                          alterarExecutavel(
+                            sistema
+                              .chave,
+                            evento
+                              .target
+                              .value
+                          );
+
+
+                          if (
+                            sistema.chave ===
+                            "intellicash"
+                          ) {
+
+                            setQuantidadeRemessaIntellicash(
+                              ""
+                            );
+
+                          }
+
+                        }
                       }
                     />
 
-                    Exibir na TV
-                  </label>
 
-                  {sistema.chave === "intellicash" &&
-                    executavelIntellicashAlterado && (
-                      <div className="release-intellicash-remessa-required">
-                        <div>
-                          <strong>
-                            Nova remessa detectada
-                          </strong>
+                    <label
+                      className={`release-tv-toggle ${
+                        sistema
+                          .mostrarNaTv !==
+                        false
+                          ? "release-tv-toggle-active"
+                          : ""
+                      }`}
+                    >
 
-                          <span>
-                            Informe quantas tarefas vieram com este novo executável do IntelliCash.
-                          </span>
+                      <input
+                        type="checkbox"
+                        checked={
+                          sistema
+                            .mostrarNaTv !==
+                          false
+                        }
+                        onChange={
+                          evento =>
+                            alterarExibicaoNaTv(
+                              sistema
+                                .chave,
+                              evento
+                                .target
+                                .checked
+                            )
+                        }
+                      />
+
+                      Exibir na TV
+
+                    </label>
+
+
+                    {sistema.chave ===
+                      "intellicash" &&
+                      executavelIntellicashAlterado && (
+
+                        <div
+                          className="release-intellicash-remessa-required"
+                        >
+
+                          <div>
+
+                            <strong>
+                              Nova remessa detectada
+                            </strong>
+
+                            <span>
+                              Informe quantas tarefas vieram com este novo executável do IntelliCash.
+                            </span>
+
+                          </div>
+
+
+                          <label>
+
+                            <span>
+                              Quantidade de tarefas
+                            </span>
+
+                            <input
+                              type="number"
+                              min="1"
+                              step="1"
+                              required
+                              value={
+                                quantidadeRemessaIntellicash
+                              }
+                              onChange={
+                                evento =>
+                                  setQuantidadeRemessaIntellicash(
+                                    evento
+                                      .target
+                                      .value
+                                  )
+                              }
+                              placeholder="Ex.: 12"
+                            />
+
+                          </label>
+
                         </div>
 
-                        <label>
-                          <span>
-                            Quantidade de tarefas
-                          </span>
+                      )}
 
-                          <input
-                            type="number"
-                            min="1"
-                            step="1"
-                            required
-                            value={
-                              quantidadeRemessaIntellicash
-                            }
-                            onChange={evento =>
-                              setQuantidadeRemessaIntellicash(
-                                evento.target.value
-                              )
-                            }
-                            placeholder="Ex.: 12"
-                          />
-                        </label>
-                      </div>
-                    )}
-                </div>
-              );
-            })}
+                  </div>
+
+                );
+
+              }
+            )}
+
           </div>
-
 
 
           <button
             type="button"
             className="release-save"
-            onClick={() =>
-              void salvar()
+            onClick={
+              () =>
+                void salvar()
             }
-            disabled={salvando}
+            disabled={
+              salvando
+            }
           >
+
             {salvando
               ? "Salvando..."
               : "Salvar Ambiente"}
+
           </button>
+
         </div>
+
       </aside>
+
     </>
   );
+
 }
 
 
