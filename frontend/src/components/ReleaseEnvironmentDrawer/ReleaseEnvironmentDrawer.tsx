@@ -1320,8 +1320,8 @@ function ReleaseEnvironmentDrawer({
                       {
                         ambienteReferencia
                           .versao
-                      }
-                    </strong>.
+                      }.
+                    </strong>
                   </>
                 ) : (
                   <>
