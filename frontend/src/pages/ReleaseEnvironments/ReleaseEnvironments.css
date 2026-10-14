@@ -797,12 +797,15 @@
     outline-offset: 3px;
 }
 
-
 /* HISTÓRICO DE REMESSAS INTELLICASH */
 
 .release-remittance-history {
-    margin-top: 18px;
+    margin: 0 0 20px;
     padding: 18px 20px;
+
+    min-width: 0;
+
+    box-sizing: border-box;
 
     background: #ffffff;
 
@@ -825,7 +828,7 @@
 
     gap: 16px;
 
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 
@@ -869,33 +872,128 @@
 }
 
 
-.release-remittance-history-list {
-    display: grid;
+/* GRUPOS DE VERSÃO */
 
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(180px, 1fr)
-        );
+.release-remittance-version-groups {
+    display: flex;
+    flex-direction: column;
 
-    gap: 8px;
+    gap: 14px;
 }
 
 
-.release-remittance-history-item {
-    min-height: 54px;
+.release-remittance-version-group {
+    min-width: 0;
 
-    padding: 9px 12px;
+    padding: 14px;
+
+    box-sizing: border-box;
+
+    background: #fbfcfd;
+
+    border:
+        1px solid
+        #e4e9ef;
+
+    border-radius: 11px;
+}
+
+
+.release-remittance-version-header {
+    margin-bottom: 11px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     gap: 14px;
+}
+
+
+.release-remittance-version-header > div {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.release-remittance-version-header span {
+    color: #8995a1;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+}
+
+
+.release-remittance-version-header strong {
+    color: #005aa9;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+
+.release-remittance-version-header small {
+    padding: 4px 8px;
+
+    flex-shrink: 0;
+
+    border-radius: 999px;
+
+    background: #eef4f8;
+    color: #667085;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+/* LISTA DE REMESSAS */
+
+.release-remittance-history-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(
+                min(100%, 260px),
+                1fr
+            )
+        );
+
+    gap: 8px;
+
+    min-width: 0;
+}
+
+
+.release-remittance-history-item {
+    min-width: 0;
+    min-height: 58px;
+
+    padding: 9px 10px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(105px, 1fr)
+        auto
+        auto;
+
+    align-items: center;
+
+    gap: 12px;
 
     box-sizing: border-box;
 
-    background: #f8fafc;
+    background: #ffffff;
 
     border:
         1px solid
@@ -906,6 +1004,8 @@
 
 
 .release-remittance-history-item > div {
+    min-width: 0;
+
     display: flex;
     flex-direction: column;
 
@@ -932,8 +1032,30 @@
 }
 
 
+/* DATA */
+
+.release-remittance-history-date {
+    align-items: flex-start;
+
+    text-align: left;
+}
+
+
+.release-remittance-history-date strong {
+    color: #44515c;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* TAREFAS */
+
 .release-remittance-history-tasks {
-    align-items: flex-end;
+    align-items: center;
+
+    text-align: center;
 }
 
 
@@ -944,35 +1066,11 @@
 }
 
 
-@media (max-width: 520px) {
-    .release-remittance-history {
-        padding: 16px;
-    }
-
-    .release-remittance-history-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .release-remittance-history-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-
-.release-remittance-history-date {
-    align-items: center;
-    text-align: center;
-}
-
-.release-remittance-history-date strong {
-    color: #44515c;
-    font-size: 12px;
-}
-
+/* AÇÕES */
 
 .release-remittance-history-actions {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center;
     justify-content: flex-end;
 
@@ -983,6 +1081,8 @@
 .release-remittance-history-actions button {
     width: 30px;
     height: 30px;
+
+    flex-shrink: 0;
 
     display: inline-flex;
     align-items: center;
@@ -1016,6 +1116,91 @@
 
     background: #fff1f1;
     color: #c62828;
+}
+
+
+/* RESPONSIVO DO HISTÓRICO */
+
+@media (max-width: 900px) {
+    .release-remittance-history-list {
+        grid-template-columns:
+            repeat(
+                auto-fit,
+                minmax(
+                    min(100%, 240px),
+                    1fr
+                )
+            );
+    }
+}
+
+
+@media (max-width: 650px) {
+    .release-remittance-history {
+        padding: 16px;
+    }
+
+
+    .release-remittance-history-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .release-remittance-version-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 7px;
+    }
+
+
+    .release-remittance-history-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 420px) {
+    .release-remittance-history {
+        padding: 13px;
+    }
+
+
+    .release-remittance-version-group {
+        padding: 11px;
+    }
+
+
+    .release-remittance-version-header > div {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 2px;
+    }
+
+
+    .release-remittance-history-item {
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+
+        gap: 8px 12px;
+    }
+
+
+    .release-remittance-history-tasks {
+        align-items: flex-end;
+    }
+
+
+    .release-remittance-history-actions {
+        grid-column: 1 / -1;
+
+        justify-content: flex-end;
+    }
 }
 
 
@@ -1551,4 +1736,25 @@ html.dark .release-remittance-edit-cancel {
     border-color: #334155;
     background: #1E293B;
     color: #CBD5E1;
+}
+
+html.dark .release-remittance-version-group {
+    background: #151f2e;
+    border-color: #263548;
+}
+
+
+html.dark .release-remittance-version-header span {
+    color: #7c8ca1;
+}
+
+
+html.dark .release-remittance-version-header strong {
+    color: #60a5fa;
+}
+
+
+html.dark .release-remittance-version-header small {
+    background: #1e293b;
+    color: #94a3b8;
 }

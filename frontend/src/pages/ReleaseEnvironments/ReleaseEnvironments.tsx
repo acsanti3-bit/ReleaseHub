@@ -884,35 +884,85 @@ function ReleaseEnvironments() {
 
 
   const historicoRemessasIntellicash =
-    ambientesOrdenados
-      .flatMap(ambiente => {
-        const versao =
-          obterVersaoIntellicashDoAmbiente(
-            ambiente
-          );
+  ambientesOrdenados
+    .flatMap(ambiente => {
+      const versao =
+        obterVersaoIntellicashDoAmbiente(
+          ambiente
+        );
 
-        return (
-          ambiente.remessas ?? []
+      return (
+        ambiente.remessas ?? []
+      )
+        .filter(
+          remessa =>
+            remessa.tarefas.intellicash > 0
         )
-          .filter(
-            remessa =>
-              remessa.tarefas.intellicash > 0
-          )
-          .map(remessa => ({
-            id: `${ambiente.id}-${remessa.id}`,
-            ambienteId: ambiente.id,
-            remessaId: remessa.id,
-            versao,
-            data: remessa.data,
-            quantidade:
-              remessa.tarefas.intellicash,
-          }));
-      })
-      .sort(
-        (a, b) =>
-          new Date(a.data).getTime() -
-          new Date(b.data).getTime()
-      );
+        .map(remessa => ({
+          id: `${ambiente.id}-${remessa.id}`,
+          ambienteId: ambiente.id,
+          remessaId: remessa.id,
+          versao,
+          data: remessa.data,
+          quantidade:
+            remessa.tarefas.intellicash,
+        }));
+    })
+    .sort(
+      (a, b) =>
+        b.data.localeCompare(
+          a.data
+        )
+    );
+
+
+const versoesHistoricoRemessas =
+  Array.from(
+    new Set(
+      historicoRemessasIntellicash.map(
+        remessa =>
+          remessa.versao
+      )
+    )
+  ).sort(
+    (versaoA, versaoB) => {
+      const partesA =
+        obterPartesNumericas(
+          versaoA
+        );
+
+      const partesB =
+        obterPartesNumericas(
+          versaoB
+        );
+
+      const maiorQuantidade =
+        Math.max(
+          partesA.length,
+          partesB.length
+        );
+
+      for (
+        let indice = 0;
+        indice < maiorQuantidade;
+        indice += 1
+      ) {
+        const parteA =
+          partesA[indice] ?? 0;
+
+        const parteB =
+          partesB[indice] ?? 0;
+
+        if (
+          parteA !== parteB
+        ) {
+          return parteB - parteA;
+        }
+      }
+
+      return 0;
+    }
+  );
 
 
   return (
@@ -990,6 +1040,149 @@ function ReleaseEnvironments() {
             </span>
           </div>
         </div>
+
+        {historicoRemessasIntellicash.length > 0 && (
+  <section className="release-remittance-history">
+    <div className="release-remittance-history-header">
+      <div>
+        <span className="release-remittance-history-kicker">
+          Histórico
+        </span>
+
+        <h2>
+          Remessas do IntelliCash
+        </h2>
+      </div>
+
+      <span className="release-remittance-history-count">
+        {historicoRemessasIntellicash.length}{" "}
+        {historicoRemessasIntellicash.length === 1
+          ? "remessa"
+          : "remessas"}
+      </span>
+    </div>
+
+
+    <div className="release-remittance-version-groups">
+      {versoesHistoricoRemessas.map(
+        versao => {
+          const remessasDaVersao =
+            historicoRemessasIntellicash.filter(
+              remessa =>
+                remessa.versao ===
+                versao
+            );
+
+          return (
+            <div
+              key={versao}
+              className="release-remittance-version-group"
+            >
+              <div className="release-remittance-version-header">
+                <div>
+                  <span>
+                    Versão do IntelliCash
+                  </span>
+
+                  <strong>
+                    {versao}
+                  </strong>
+                </div>
+
+                <small>
+                  {remessasDaVersao.length}{" "}
+                  {remessasDaVersao.length === 1
+                    ? "remessa"
+                    : "remessas"}
+                </small>
+              </div>
+
+
+              <div className="release-remittance-history-list">
+                {remessasDaVersao.map(
+                  remessa => (
+                    <div
+                      key={remessa.id}
+                      className="release-remittance-history-item"
+                    >
+                      <div className="release-remittance-history-date">
+                        <small>
+                          Data da remessa
+                        </small>
+
+                        <strong>
+                          {formatarDataRemessa(
+                            remessa.data
+                          )}
+                        </strong>
+                      </div>
+
+
+                      <div className="release-remittance-history-tasks">
+                        <small>
+                          Tarefas
+                        </small>
+
+                        <strong>
+                          {remessa.quantidade}
+                        </strong>
+                      </div>
+
+
+                      {podeEditar && (
+                        <div className="release-remittance-history-actions">
+                          <button
+                            type="button"
+                            title="Editar remessa"
+                            aria-label="Editar remessa"
+                            onClick={() =>
+                              iniciarEdicaoRemessa(
+                                remessa.ambienteId,
+                                remessa.remessaId,
+                                remessa.data,
+                                remessa.quantidade
+                              )
+                            }
+                          >
+                            <MdEdit size={16} />
+                          </button>
+
+                          <button
+                            type="button"
+                            title="Excluir remessa"
+                            aria-label="Excluir remessa"
+                            onClick={() =>
+                              setRemessaExcluindo({
+                                ambienteId:
+                                  remessa.ambienteId,
+                                remessaId:
+                                  remessa.remessaId,
+                                versao:
+                                  remessa.versao,
+                                data:
+                                  remessa.data,
+                                quantidade:
+                                  remessa.quantidade,
+                              })
+                            }
+                          >
+                            <MdDeleteOutline
+                              size={16}
+                            />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          );
+        }
+      )}
+    </div>
+  </section>
+)}
 
 
         {carregando ? (
@@ -1323,114 +1516,6 @@ function ReleaseEnvironments() {
           </div>
         )}
 
-
-        {historicoRemessasIntellicash.length > 0 && (
-          <section className="release-remittance-history">
-            <div className="release-remittance-history-header">
-              <div>
-                <span className="release-remittance-history-kicker">
-                  Histórico
-                </span>
-
-                <h2>
-                  Remessas do IntelliCash
-                </h2>
-              </div>
-
-              <span className="release-remittance-history-count">
-                {historicoRemessasIntellicash.length}{" "}
-                {historicoRemessasIntellicash.length === 1
-                  ? "remessa"
-                  : "remessas"}
-              </span>
-            </div>
-
-            <div className="release-remittance-history-list">
-              {historicoRemessasIntellicash.map(
-                remessa => (
-                  <div
-                    key={remessa.id}
-                    className="release-remittance-history-item"
-                  >
-                    <div>
-                      <small>
-                        Versão
-                      </small>
-
-                      <strong>
-                        {remessa.versao}
-                      </strong>
-                    </div>
-
-                    <div className="release-remittance-history-date">
-                      <small>
-                        Data da remessa
-                      </small>
-
-                      <strong>
-                        {formatarDataRemessa(
-                          remessa.data
-                        )}
-                      </strong>
-                    </div>
-
-                    <div className="release-remittance-history-tasks">
-                      <small>
-                        Tarefas
-                      </small>
-
-                      <strong>
-                        {remessa.quantidade}
-                      </strong>
-                    </div>
-
-                    {podeEditar && (
-                      <div className="release-remittance-history-actions">
-                        <button
-                          type="button"
-                          title="Editar remessa"
-                          aria-label="Editar remessa"
-                          onClick={() =>
-                            iniciarEdicaoRemessa(
-                              remessa.ambienteId,
-                              remessa.remessaId,
-                              remessa.data,
-                              remessa.quantidade
-                            )
-                          }
-                        >
-                          <MdEdit size={16} />
-                        </button>
-
-                        <button
-                          type="button"
-                          title="Excluir remessa"
-                          aria-label="Excluir remessa"
-                          onClick={() =>
-                            setRemessaExcluindo({
-                              ambienteId:
-                                remessa.ambienteId,
-                              remessaId:
-                                remessa.remessaId,
-                              versao:
-                                remessa.versao,
-                              data:
-                                remessa.data,
-                              quantidade:
-                                remessa.quantidade,
-                            })
-                          }
-                        >
-                          <MdDeleteOutline size={16} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )
-              )}
-            </div>
-          </section>
-        )}
       </div>
 
 
