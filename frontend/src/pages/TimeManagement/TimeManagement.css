@@ -1,0 +1,234 @@
+.time-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.time-management-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.time-management-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #8a98a8;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.time-management-header h1 {
+  margin: 0;
+  color: #17212b;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.time-management-header p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.time-management-filters {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(170px, 1fr)
+    );
+  gap: 12px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8ef;
+  border-radius: 14px;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.04);
+}
+
+.time-management-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-management-field label {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.time-management-field input,
+.time-management-field select {
+  width: 100%;
+  height: 38px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid #d8e0e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17212b;
+  font-size: 12px;
+  outline: none;
+}
+
+.time-management-field input:focus,
+.time-management-field select:focus {
+  border-color: #005aa9;
+  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.08);
+}
+
+.time-management-filter-button {
+  height: 38px;
+  align-self: end;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #005aa9;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.time-management-filter-button:hover {
+  background: #004b8d;
+}
+
+.time-management-summary {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 12px;
+}
+
+.time-management-summary-card {
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8ef;
+  border-radius: 12px;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.04);
+}
+
+.time-management-summary-card span {
+  display: block;
+  color: #8995a1;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+}
+
+.time-management-summary-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #17212b;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.time-management-table-card {
+  min-width: 0;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8ef;
+  border-radius: 14px;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.04);
+}
+
+.time-management-table-header {
+  margin-bottom: 14px;
+}
+
+.time-management-table-header h2 {
+  margin: 0;
+  color: #17212b;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.time-management-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.time-management-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.time-management-table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8ef;
+  color: #8995a1;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+}
+
+.time-management-table td {
+  padding: 12px;
+  border-bottom: 1px solid #edf1f5;
+  color: #44515c;
+  font-size: 12px;
+}
+
+.time-management-empty-row td {
+  padding: 28px 12px;
+  color: #98a2b3;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .time-management-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .time-management-header h1 {
+    font-size: 22px;
+  }
+}
+
+html.dark .time-management-header h1,
+html.dark .time-management-table-header h2,
+html.dark .time-management-summary-card strong {
+  color: #f8fafc;
+}
+
+html.dark .time-management-header p,
+html.dark .time-management-field label,
+html.dark .time-management-table td {
+  color: #94a3b8;
+}
+
+html.dark .time-management-filters,
+html.dark .time-management-summary-card,
+html.dark .time-management-table-card {
+  background: #111827;
+  border-color: #263548;
+}
+
+html.dark .time-management-field input,
+html.dark .time-management-field select {
+  background: #151f2e;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+html.dark .time-management-table th {
+  border-bottom-color: #263548;
+  color: #7c8ca1;
+}
+
+html.dark .time-management-table td {
+  border-bottom-color: #1f2937;
+}

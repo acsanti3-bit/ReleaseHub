@@ -74,6 +74,10 @@ function nomePerfil(
 
       return "Qualidade";
 
+    case "gestor":
+
+      return "Gestor";
+
     case "visualizador":
 
       return "Visualizador";
@@ -953,6 +957,10 @@ function Settings() {
 
                 <option value="qualidade">
                   Qualidade
+                </option>
+
+                <option value="gestor">
+                  Gestor
                 </option>
 
                 {administrador && (

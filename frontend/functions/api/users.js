@@ -31,6 +31,7 @@ function normalizarRole(
   const rolesPermitidas = [
     "admin",
     "qualidade",
+    "gestor",
     "visualizador",
   ];
 

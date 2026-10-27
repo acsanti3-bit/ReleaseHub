@@ -5,6 +5,7 @@ import {
 export type UserRole =
   | "admin"
   | "qualidade"
+  | "gestor"
   | "visualizador";
 
 

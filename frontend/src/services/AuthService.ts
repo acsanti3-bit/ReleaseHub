@@ -5,6 +5,7 @@ import {
 export type AuthRole =
   | "admin"
   | "qualidade"
+  | "gestor"
   | "visualizador";
 
 

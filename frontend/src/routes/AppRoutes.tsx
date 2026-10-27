@@ -62,6 +62,16 @@ const ReleaseEnvironments =
       )
   );
 
+
+const TimeManagement =
+  lazy(
+    () =>
+      import(
+        "../pages/TimeManagement/TimeManagement"
+      )
+  );
+
+
 const Login =
   lazy(
     () =>
@@ -172,6 +182,25 @@ function AppRoutes() {
               >
 
                 <ReleaseEnvironments />
+
+              </ProtectedRoute>
+
+            }
+          />
+
+
+          <Route
+            path="/gestao-horas"
+            element={
+
+              <ProtectedRoute
+                requiredRoles={[
+                  "admin",
+                  "gestor",
+                ]}
+              >
+
+                <TimeManagement />
 
               </ProtectedRoute>
 

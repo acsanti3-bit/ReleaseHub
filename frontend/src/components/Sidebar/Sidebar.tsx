@@ -155,6 +155,10 @@ function Sidebar({
 
         return "Qualidade";
 
+      case "gestor":
+
+        return "Gestor";
+
       case "visualizador":
 
         return "Visualizador";
@@ -175,6 +179,11 @@ function Sidebar({
 
   const podeAcessarConfiguracoes =
     podeAcessarAmbientes;
+
+
+  const podeAcessarGestaoHoras =
+    usuario?.role === "admin" ||
+    usuario?.role === "gestor";
 
 
   return (
@@ -215,6 +224,14 @@ function Sidebar({
         <NavLink to="/isa">
           ISA
         </NavLink>
+
+        {podeAcessarGestaoHoras && (
+
+          <NavLink to="/gestao-horas">
+            Gestão de Horas
+          </NavLink>
+
+        )}
 
         <NavLink to="/tv">
           Modo TV
