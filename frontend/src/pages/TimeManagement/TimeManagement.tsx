@@ -3,6 +3,8 @@ import {
   useState,
 } from "react";
 
+import Layout from "../../components/layout";
+
 import "./TimeManagement.css";
 
 
@@ -526,477 +528,481 @@ function TimeManagement() {
 
   return (
 
-    <div className="time-management-page">
+    <Layout>
 
-      <div className="time-management-header">
+      <div className="time-management-page">
 
-        <div>
-
-          <span className="time-management-kicker">
-            Relatórios
-          </span>
-
-          <h1>
-            Gestão de Horas
-          </h1>
-
-          <p>
-            Consulte o tempo registrado por usuário,
-            projeto, tarefa e atividade.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <section className="time-management-filters">
-
-        <div className="time-management-field">
-
-          <label htmlFor="time-from">
-            Data inicial
-          </label>
-
-          <input
-            id="time-from"
-            type="date"
-            value={dataInicial}
-            onChange={
-              event =>
-                setDataInicial(
-                  event.target.value
-                )
-            }
-          />
-
-        </div>
-
-
-        <div className="time-management-field">
-
-          <label htmlFor="time-to">
-            Data final
-          </label>
-
-          <input
-            id="time-to"
-            type="date"
-            value={dataFinal}
-            onChange={
-              event =>
-                setDataFinal(
-                  event.target.value
-                )
-            }
-          />
-
-        </div>
-
-
-        <div className="time-management-field">
-
-          <label htmlFor="time-user">
-            Usuário
-          </label>
-
-          <select
-            id="time-user"
-            value={
-              usuarioSelecionado
-            }
-            onChange={
-              event =>
-                setUsuarioSelecionado(
-                  event.target.value
-                )
-            }
-          >
-
-            <option value="">
-              Todos
-            </option>
-
-            {usuarios.map(
-              usuario => (
-
-                <option
-                  key={
-                    usuario.id
-                  }
-                  value={
-                    usuario.id
-                  }
-                >
-                  {usuario.nome}
-                </option>
-
-              )
-            )}
-
-          </select>
-
-        </div>
-
-
-        <div className="time-management-field">
-
-          <label htmlFor="time-project">
-            Projeto
-          </label>
-
-          <select
-            id="time-project"
-            value={
-              projetoSelecionado
-            }
-            onChange={
-              event =>
-                setProjetoSelecionado(
-                  event.target.value
-                )
-            }
-          >
-
-            <option value="">
-              Todos
-            </option>
-
-            {projetos.map(
-              projeto => (
-
-                <option
-                  key={
-                    projeto.id
-                  }
-                  value={
-                    projeto.id
-                  }
-                >
-                  {projeto.nome}
-                </option>
-
-              )
-            )}
-
-          </select>
-
-        </div>
-
-
-        <div className="time-management-field">
-
-          <label htmlFor="time-activity">
-            Atividade
-          </label>
-
-          <select
-            id="time-activity"
-            value={
-              atividadeSelecionada
-            }
-            onChange={
-              event =>
-                setAtividadeSelecionada(
-                  event.target.value
-                )
-            }
-          >
-
-            <option value="">
-              Todas
-            </option>
-
-            {atividades.map(
-              atividade => (
-
-                <option
-                  key={
-                    atividade.id
-                  }
-                  value={
-                    atividade.id
-                  }
-                >
-                  {atividade.nome}
-                </option>
-
-              )
-            )}
-
-          </select>
-
-        </div>
-
-
-        <button
-          type="button"
-          className="time-management-filter-button"
-          onClick={() =>
-            void consultar()
-          }
-          disabled={
-            carregando
-          }
-        >
-
-          {carregando
-            ? "Consultando..."
-            : "Consultar"}
-
-        </button>
-
-      </section>
-
-
-      {erro && (
-
-        <div
-          style={{
-            padding: "12px 14px",
-            borderRadius: "8px",
-            background:
-              "rgba(220, 38, 38, 0.08)",
-            color:
-              "#dc2626",
-            fontSize:
-              "12px",
-            fontWeight:
-              600,
-          }}
-        >
-          {erro}
-        </div>
-
-      )}
-
-
-      <section className="time-management-summary">
-
-        <div className="time-management-summary-card">
-
-          <span>
-            Total de horas
-          </span>
-
-          <strong>
-            {formatarHoras(
-              totalHoras
-            )}h
-          </strong>
-
-        </div>
-
-
-        <div className="time-management-summary-card">
-
-          <span>
-            Usuários
-          </span>
-
-          <strong>
-            {totalUsuarios}
-          </strong>
-
-        </div>
-
-
-        <div className="time-management-summary-card">
-
-          <span>
-            Tarefas
-          </span>
-
-          <strong>
-            {totalTarefas}
-          </strong>
-
-        </div>
-
-      </section>
-
-
-      <section className="time-management-table-card">
-
-        <div className="time-management-table-header">
+        <div className="time-management-header">
 
           <div>
 
             <span className="time-management-kicker">
-              Detalhamento
+              Relatórios
             </span>
 
-            <h2>
-              Apontamentos de horas
-            </h2>
+            <h1>
+              Gestão de Horas
+            </h1>
+
+            <p>
+              Consulte o tempo registrado por usuário,
+              projeto, tarefa e atividade.
+            </p>
 
           </div>
 
         </div>
 
 
-        <div className="time-management-table-wrapper">
+        <section className="time-management-filters">
 
-          <table className="time-management-table">
+          <div className="time-management-field">
 
-            <thead>
+            <label htmlFor="time-from">
+              Data inicial
+            </label>
 
-              <tr>
-
-                <th>
-                  Data
-                </th>
-
-                <th>
-                  Usuário
-                </th>
-
-                <th>
-                  Projeto
-                </th>
-
-                <th>
-                  Tarefa
-                </th>
-
-                <th>
-                  Atividade
-                </th>
-
-                <th>
-                  Horas
-                </th>
-
-                <th>
-                  Comentário
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody>
-
-              {!consultado && (
-
-                <tr className="time-management-empty-row">
-
-                  <td colSpan={7}>
-
-                    Selecione um período para consultar
-                    os apontamentos do Redmine.
-
-                  </td>
-
-                </tr>
-
-              )}
-
-
-              {consultado &&
-                carregando && (
-
-                <tr className="time-management-empty-row">
-
-                  <td colSpan={7}>
-
-                    Consultando apontamentos...
-
-                  </td>
-
-                </tr>
-
-              )}
-
-
-              {consultado &&
-                !carregando &&
-                apontamentosFiltrados.length ===
-                  0 && (
-
-                <tr className="time-management-empty-row">
-
-                  <td colSpan={7}>
-
-                    Nenhum apontamento encontrado
-                    para os filtros selecionados.
-
-                  </td>
-
-                </tr>
-
-              )}
-
-
-              {!carregando &&
-                apontamentosFiltrados.map(
-                  apontamento => (
-
-                    <tr
-                      key={
-                        apontamento.id
-                      }
-                    >
-
-                      <td>
-                        {formatarData(
-                          apontamento.data
-                        )}
-                      </td>
-
-                      <td>
-                        {apontamento.usuario
-                          ?.nome ||
-                          "-"}
-                      </td>
-
-                      <td>
-                        {apontamento.projeto
-                          ?.nome ||
-                          "-"}
-                      </td>
-
-                      <td>
-
-                        {apontamento.tarefa
-                          ?.id
-                          ? `#${apontamento.tarefa.id}`
-                          : "-"}
-
-                      </td>
-
-                      <td>
-                        {apontamento.atividade
-                          ?.nome ||
-                          "-"}
-                      </td>
-
-                      <td>
-                        {formatarHoras(
-                          apontamento.horas
-                        )}h
-                      </td>
-
-                      <td>
-                        {apontamento.comentario ||
-                          "-"}
-                      </td>
-
-                    </tr>
-
+            <input
+              id="time-from"
+              type="date"
+              value={dataInicial}
+              onChange={
+                event =>
+                  setDataInicial(
+                    event.target.value
                   )
+              }
+            />
+
+          </div>
+
+
+          <div className="time-management-field">
+
+            <label htmlFor="time-to">
+              Data final
+            </label>
+
+            <input
+              id="time-to"
+              type="date"
+              value={dataFinal}
+              onChange={
+                event =>
+                  setDataFinal(
+                    event.target.value
+                  )
+              }
+            />
+
+          </div>
+
+
+          <div className="time-management-field">
+
+            <label htmlFor="time-user">
+              Usuário
+            </label>
+
+            <select
+              id="time-user"
+              value={
+                usuarioSelecionado
+              }
+              onChange={
+                event =>
+                  setUsuarioSelecionado(
+                    event.target.value
+                  )
+              }
+            >
+
+              <option value="">
+                Todos
+              </option>
+
+              {usuarios.map(
+                usuario => (
+
+                  <option
+                    key={
+                      usuario.id
+                    }
+                    value={
+                      usuario.id
+                    }
+                  >
+                    {usuario.nome}
+                  </option>
+
+                )
+              )}
+
+            </select>
+
+          </div>
+
+
+          <div className="time-management-field">
+
+            <label htmlFor="time-project">
+              Projeto
+            </label>
+
+            <select
+              id="time-project"
+              value={
+                projetoSelecionado
+              }
+              onChange={
+                event =>
+                  setProjetoSelecionado(
+                    event.target.value
+                  )
+              }
+            >
+
+              <option value="">
+                Todos
+              </option>
+
+              {projetos.map(
+                projeto => (
+
+                  <option
+                    key={
+                      projeto.id
+                    }
+                    value={
+                      projeto.id
+                    }
+                  >
+                    {projeto.nome}
+                  </option>
+
+                )
+              )}
+
+            </select>
+
+          </div>
+
+
+          <div className="time-management-field">
+
+            <label htmlFor="time-activity">
+              Atividade
+            </label>
+
+            <select
+              id="time-activity"
+              value={
+                atividadeSelecionada
+              }
+              onChange={
+                event =>
+                  setAtividadeSelecionada(
+                    event.target.value
+                  )
+              }
+            >
+
+              <option value="">
+                Todas
+              </option>
+
+              {atividades.map(
+                atividade => (
+
+                  <option
+                    key={
+                      atividade.id
+                    }
+                    value={
+                      atividade.id
+                    }
+                  >
+                    {atividade.nome}
+                  </option>
+
+                )
+              )}
+
+            </select>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="time-management-filter-button"
+            onClick={() =>
+              void consultar()
+            }
+            disabled={
+              carregando
+            }
+          >
+
+            {carregando
+              ? "Consultando..."
+              : "Consultar"}
+
+          </button>
+
+        </section>
+
+
+        {erro && (
+
+          <div
+            style={{
+              padding: "12px 14px",
+              borderRadius: "8px",
+              background:
+                "rgba(220, 38, 38, 0.08)",
+              color:
+                "#dc2626",
+              fontSize:
+                "12px",
+              fontWeight:
+                600,
+            }}
+          >
+            {erro}
+          </div>
+
+        )}
+
+
+        <section className="time-management-summary">
+
+          <div className="time-management-summary-card">
+
+            <span>
+              Total de horas
+            </span>
+
+            <strong>
+              {formatarHoras(
+                totalHoras
+              )}h
+            </strong>
+
+          </div>
+
+
+          <div className="time-management-summary-card">
+
+            <span>
+              Usuários
+            </span>
+
+            <strong>
+              {totalUsuarios}
+            </strong>
+
+          </div>
+
+
+          <div className="time-management-summary-card">
+
+            <span>
+              Tarefas
+            </span>
+
+            <strong>
+              {totalTarefas}
+            </strong>
+
+          </div>
+
+        </section>
+
+
+        <section className="time-management-table-card">
+
+          <div className="time-management-table-header">
+
+            <div>
+
+              <span className="time-management-kicker">
+                Detalhamento
+              </span>
+
+              <h2>
+                Apontamentos de horas
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div className="time-management-table-wrapper">
+
+            <table className="time-management-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Data
+                  </th>
+
+                  <th>
+                    Usuário
+                  </th>
+
+                  <th>
+                    Projeto
+                  </th>
+
+                  <th>
+                    Tarefa
+                  </th>
+
+                  <th>
+                    Atividade
+                  </th>
+
+                  <th>
+                    Horas
+                  </th>
+
+                  <th>
+                    Comentário
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {!consultado && (
+
+                  <tr className="time-management-empty-row">
+
+                    <td colSpan={7}>
+
+                      Selecione um período para consultar
+                      os apontamentos do Redmine.
+
+                    </td>
+
+                  </tr>
+
                 )}
 
-            </tbody>
 
-          </table>
+                {consultado &&
+                  carregando && (
 
-        </div>
+                  <tr className="time-management-empty-row">
 
-      </section>
+                    <td colSpan={7}>
 
-    </div>
+                      Consultando apontamentos...
+
+                    </td>
+
+                  </tr>
+
+                )}
+
+
+                {consultado &&
+                  !carregando &&
+                  apontamentosFiltrados.length ===
+                    0 && (
+
+                  <tr className="time-management-empty-row">
+
+                    <td colSpan={7}>
+
+                      Nenhum apontamento encontrado
+                      para os filtros selecionados.
+
+                    </td>
+
+                  </tr>
+
+                )}
+
+
+                {!carregando &&
+                  apontamentosFiltrados.map(
+                    apontamento => (
+
+                      <tr
+                        key={
+                          apontamento.id
+                        }
+                      >
+
+                        <td>
+                          {formatarData(
+                            apontamento.data
+                          )}
+                        </td>
+
+                        <td>
+                          {apontamento.usuario
+                            ?.nome ||
+                            "-"}
+                        </td>
+
+                        <td>
+                          {apontamento.projeto
+                            ?.nome ||
+                            "-"}
+                        </td>
+
+                        <td>
+
+                          {apontamento.tarefa
+                            ?.id
+                            ? `#${apontamento.tarefa.id}`
+                            : "-"}
+
+                        </td>
+
+                        <td>
+                          {apontamento.atividade
+                            ?.nome ||
+                            "-"}
+                        </td>
+
+                        <td>
+                          {formatarHoras(
+                            apontamento.horas
+                          )}h
+                        </td>
+
+                        <td>
+                          {apontamento.comentario ||
+                            "-"}
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </Layout>
 
   );
 
