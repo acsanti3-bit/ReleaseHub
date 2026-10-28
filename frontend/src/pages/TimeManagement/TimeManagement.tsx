@@ -1,6 +1,9 @@
 import {
   useMemo,
   useState,
+  type Dispatch,
+  type KeyboardEvent,
+  type SetStateAction,
 } from "react";
 
 import Layout from "../../components/layout";
@@ -40,6 +43,20 @@ interface TimeEntriesResponse {
   total: number;
   dados: TimeEntry[];
 }
+
+
+type CampoOrdenacao =
+  | "data"
+  | "usuario"
+  | "projeto"
+  | "tarefa"
+  | "atividade"
+  | "horas";
+
+
+type DirecaoOrdenacao =
+  | "asc"
+  | "desc";
 
 
 function formatarData(
@@ -85,6 +102,16 @@ function formatarHoras(
   const minutos =
     totalMinutos % 60;
 
+
+  if (
+    horasInteiras === 0
+  ) {
+
+    return `${minutos}min`;
+
+  }
+
+
   if (
     minutos === 0
   ) {
@@ -92,6 +119,7 @@ function formatarHoras(
     return `${horasInteiras}h`;
 
   }
+
 
   return `${horasInteiras}h ${minutos}min`;
 
@@ -133,6 +161,23 @@ function TimeManagement() {
 
 
   const [
+    campoOrdenacao,
+    setCampoOrdenacao,
+  ] =
+    useState<CampoOrdenacao>(
+      "data"
+    );
+
+  const [
+    direcaoOrdenacao,
+    setDirecaoOrdenacao,
+  ] =
+    useState<DirecaoOrdenacao>(
+      "desc"
+    );
+
+
+  const [
     apontamentos,
     setApontamentos,
   ] =
@@ -155,6 +200,60 @@ function TimeManagement() {
     setErro,
   ] =
     useState("");
+
+
+  function preencherDataAtual(
+    event:
+      KeyboardEvent<HTMLInputElement>,
+    setter:
+      Dispatch<SetStateAction<string>>
+  ) {
+
+    if (
+      event.code !== "Space"
+    ) {
+
+      return;
+
+    }
+
+
+    event.preventDefault();
+
+
+    const hoje =
+      new Date();
+
+
+    const ano =
+      hoje.getFullYear();
+
+
+    const mes =
+      String(
+        hoje.getMonth() + 1
+      )
+        .padStart(
+          2,
+          "0"
+        );
+
+
+    const dia =
+      String(
+        hoje.getDate()
+      )
+        .padStart(
+          2,
+          "0"
+        );
+
+
+    setter(
+      `${ano}-${mes}-${dia}`
+    );
+
+  }
 
 
   const usuarios =
@@ -193,12 +292,38 @@ function TimeManagement() {
     ]);
 
 
+  const apontamentosDoUsuario =
+    useMemo(() => {
+
+      if (
+        !usuarioSelecionado
+      ) {
+
+        return apontamentos;
+
+      }
+
+
+      return apontamentos.filter(
+        apontamento =>
+          apontamento.usuario
+            ?.nome
+            ?.trim() ===
+          usuarioSelecionado
+      );
+
+    }, [
+      apontamentos,
+      usuarioSelecionado,
+    ]);
+
+
   const projetos =
     useMemo(() => {
 
       return Array.from(
         new Set(
-          apontamentos
+          apontamentosDoUsuario
             .map(
               apontamento =>
                 apontamento.projeto
@@ -225,7 +350,33 @@ function TimeManagement() {
         );
 
     }, [
-      apontamentos,
+      apontamentosDoUsuario,
+    ]);
+
+
+  const apontamentosDoProjeto =
+    useMemo(() => {
+
+      if (
+        !projetoSelecionado
+      ) {
+
+        return apontamentosDoUsuario;
+
+      }
+
+
+      return apontamentosDoUsuario.filter(
+        apontamento =>
+          apontamento.projeto
+            ?.nome
+            ?.trim() ===
+          projetoSelecionado
+      );
+
+    }, [
+      apontamentosDoUsuario,
+      projetoSelecionado,
     ]);
 
 
@@ -234,7 +385,7 @@ function TimeManagement() {
 
       return Array.from(
         new Set(
-          apontamentos
+          apontamentosDoProjeto
             .map(
               apontamento =>
                 apontamento.atividade
@@ -261,7 +412,7 @@ function TimeManagement() {
         );
 
     }, [
-      apontamentos,
+      apontamentosDoProjeto,
     ]);
 
 
@@ -336,6 +487,137 @@ function TimeManagement() {
     ]);
 
 
+  const apontamentosOrdenados =
+    useMemo(() => {
+
+      const lista =
+        [
+          ...apontamentosFiltrados,
+        ];
+
+
+      lista.sort(
+        (
+          a,
+          b
+        ) => {
+
+          let comparacao =
+            0;
+
+
+          switch (
+            campoOrdenacao
+          ) {
+
+            case "data":
+
+              comparacao =
+                a.data.localeCompare(
+                  b.data
+                );
+
+              break;
+
+
+            case "usuario":
+
+              comparacao =
+                (
+                  a.usuario?.nome ||
+                  ""
+                )
+                  .localeCompare(
+                    b.usuario?.nome ||
+                    "",
+                    "pt-BR"
+                  );
+
+              break;
+
+
+            case "projeto":
+
+              comparacao =
+                (
+                  a.projeto?.nome ||
+                  ""
+                )
+                  .localeCompare(
+                    b.projeto?.nome ||
+                    "",
+                    "pt-BR"
+                  );
+
+              break;
+
+
+            case "tarefa":
+
+              comparacao =
+                Number(
+                  a.tarefa?.id ||
+                  0
+                ) -
+                Number(
+                  b.tarefa?.id ||
+                  0
+                );
+
+              break;
+
+
+            case "atividade":
+
+              comparacao =
+                (
+                  a.atividade?.nome ||
+                  ""
+                )
+                  .localeCompare(
+                    b.atividade?.nome ||
+                    "",
+                    "pt-BR"
+                  );
+
+              break;
+
+
+            case "horas":
+
+              comparacao =
+                Number(
+                  a.horas ||
+                  0
+                ) -
+                Number(
+                  b.horas ||
+                  0
+                );
+
+              break;
+
+          }
+
+
+          return direcaoOrdenacao ===
+            "asc"
+            ? comparacao
+            : comparacao * -1;
+
+        }
+      );
+
+
+      return lista;
+
+    }, [
+      apontamentosFiltrados,
+      campoOrdenacao,
+      direcaoOrdenacao,
+    ]);
+
+
   const totalHoras =
     useMemo(() => {
 
@@ -391,6 +673,111 @@ function TimeManagement() {
     }, [
       apontamentosFiltrados,
     ]);
+
+
+  function ordenarPor(
+    campo: CampoOrdenacao
+  ) {
+
+    if (
+      campoOrdenacao ===
+      campo
+    ) {
+
+      setDirecaoOrdenacao(
+        atual =>
+          atual === "asc"
+            ? "desc"
+            : "asc"
+      );
+
+      return;
+
+    }
+
+
+    setCampoOrdenacao(
+      campo
+    );
+
+    setDirecaoOrdenacao(
+      "asc"
+    );
+
+  }
+
+
+  function indicadorOrdenacao(
+    campo: CampoOrdenacao
+  ) {
+
+    if (
+      campoOrdenacao !==
+      campo
+    ) {
+
+      return "↕";
+
+    }
+
+
+    return direcaoOrdenacao ===
+      "asc"
+      ? "↑"
+      : "↓";
+
+  }
+
+
+  function alterarUsuario(
+    usuario: string
+  ) {
+
+    setUsuarioSelecionado(
+      usuario
+    );
+
+    setProjetoSelecionado(
+      ""
+    );
+
+    setAtividadeSelecionada(
+      ""
+    );
+
+  }
+
+
+  function alterarProjeto(
+    projeto: string
+  ) {
+
+    setProjetoSelecionado(
+      projeto
+    );
+
+    setAtividadeSelecionada(
+      ""
+    );
+
+  }
+
+
+  function limparFiltros() {
+
+    setUsuarioSelecionado(
+      ""
+    );
+
+    setProjetoSelecionado(
+      ""
+    );
+
+    setAtividadeSelecionada(
+      ""
+    );
+
+  }
 
 
   async function consultar() {
@@ -460,7 +847,9 @@ function TimeManagement() {
         await response.json();
 
 
-      if (!response.ok) {
+      if (
+        !response.ok
+      ) {
 
         throw new Error(
           data.erro ||
@@ -483,11 +872,29 @@ function TimeManagement() {
       );
 
 
-      setUsuarioSelecionado("");
-      setProjetoSelecionado("");
-      setAtividadeSelecionada("");
+      setUsuarioSelecionado(
+        ""
+      );
 
-      setConsultado(true);
+      setProjetoSelecionado(
+        ""
+      );
+
+      setAtividadeSelecionada(
+        ""
+      );
+
+      setCampoOrdenacao(
+        "data"
+      );
+
+      setDirecaoOrdenacao(
+        "desc"
+      );
+
+      setConsultado(
+        true
+      );
 
     } catch (error) {
 
@@ -497,9 +904,13 @@ function TimeManagement() {
       );
 
 
-      setApontamentos([]);
+      setApontamentos(
+        []
+      );
 
-      setConsultado(true);
+      setConsultado(
+        true
+      );
 
 
       setErro(
@@ -510,7 +921,9 @@ function TimeManagement() {
 
     } finally {
 
-      setCarregando(false);
+      setCarregando(
+        false
+      );
 
     }
 
@@ -522,6 +935,7 @@ function TimeManagement() {
     <Layout>
 
       <div className="time-management-page">
+
 
         <div className="time-management-header">
 
@@ -536,8 +950,8 @@ function TimeManagement() {
             </h1>
 
             <p>
-              Consulte o tempo registrado por usuário,
-              projeto, tarefa e atividade.
+              Consulte e analise os apontamentos
+              registrados no Redmine.
             </p>
 
           </div>
@@ -545,238 +959,118 @@ function TimeManagement() {
         </div>
 
 
-        <section className="time-management-filters">
+        <section className="time-management-query-card">
 
-          <div className="time-management-field">
+          <div className="time-management-section-heading">
 
-            <label htmlFor="time-from">
-              Data inicial
-            </label>
+            <div className="time-management-step">
+              1
+            </div>
 
-            <input
-              id="time-from"
-              type="date"
-              value={
-                dataInicial
-              }
-              onChange={
-                event =>
-                  setDataInicial(
-                    event.target.value
-                  )
-              }
-            />
+            <div>
+
+              <h2>
+                Consultar período
+              </h2>
+
+              <p>
+                Primeiro escolha o período que deseja analisar.
+              </p>
+
+            </div>
 
           </div>
 
 
-          <div className="time-management-field">
+          <div className="time-management-query-fields">
 
-            <label htmlFor="time-to">
-              Data final
-            </label>
+            <div className="time-management-field">
 
-            <input
-              id="time-to"
-              type="date"
-              value={
-                dataFinal
+              <label htmlFor="time-from">
+                Data inicial
+              </label>
+
+              <input
+                id="time-from"
+                type="date"
+                value={
+                  dataInicial
+                }
+                onChange={
+                  event =>
+                    setDataInicial(
+                      event.target.value
+                    )
+                }
+                onKeyDown={
+                  event =>
+                    preencherDataAtual(
+                      event,
+                      setDataInicial
+                    )
+                }
+                title="Pressione Espaço para preencher com a data de hoje"
+              />
+
+            </div>
+
+
+            <div className="time-management-field">
+
+              <label htmlFor="time-to">
+                Data final
+              </label>
+
+              <input
+                id="time-to"
+                type="date"
+                value={
+                  dataFinal
+                }
+                onChange={
+                  event =>
+                    setDataFinal(
+                      event.target.value
+                    )
+                }
+                onKeyDown={
+                  event =>
+                    preencherDataAtual(
+                      event,
+                      setDataFinal
+                    )
+                }
+                title="Pressione Espaço para preencher com a data de hoje"
+              />
+
+            </div>
+
+
+            <button
+              type="button"
+              className="time-management-filter-button"
+              onClick={() =>
+                void consultar()
               }
-              onChange={
-                event =>
-                  setDataFinal(
-                    event.target.value
-                  )
-              }
-            />
-
-          </div>
-
-
-          <div className="time-management-field">
-
-            <label htmlFor="time-user">
-              Usuário
-            </label>
-
-            <select
-              id="time-user"
-              value={
-                usuarioSelecionado
-              }
-              onChange={
-                event =>
-                  setUsuarioSelecionado(
-                    event.target.value
-                  )
+              disabled={
+                carregando
               }
             >
 
-              <option value="">
-                Todos
-              </option>
+              {carregando
+                ? "Buscando..."
+                : "Buscar apontamentos"}
 
-              {usuarios.map(
-                usuario => (
-
-                  <option
-                    key={
-                      usuario
-                    }
-                    value={
-                      usuario
-                    }
-                  >
-
-                    {usuario}
-
-                  </option>
-
-                )
-              )}
-
-            </select>
+            </button>
 
           </div>
-
-
-          <div className="time-management-field">
-
-            <label htmlFor="time-project">
-              Projeto
-            </label>
-
-            <select
-              id="time-project"
-              value={
-                projetoSelecionado
-              }
-              onChange={
-                event =>
-                  setProjetoSelecionado(
-                    event.target.value
-                  )
-              }
-            >
-
-              <option value="">
-                Todos
-              </option>
-
-              {projetos.map(
-                projeto => (
-
-                  <option
-                    key={
-                      projeto
-                    }
-                    value={
-                      projeto
-                    }
-                  >
-
-                    {projeto}
-
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-          </div>
-
-
-          <div className="time-management-field">
-
-            <label htmlFor="time-activity">
-              Atividade
-            </label>
-
-            <select
-              id="time-activity"
-              value={
-                atividadeSelecionada
-              }
-              onChange={
-                event =>
-                  setAtividadeSelecionada(
-                    event.target.value
-                  )
-              }
-            >
-
-              <option value="">
-                Todas
-              </option>
-
-              {atividades.map(
-                atividade => (
-
-                  <option
-                    key={
-                      atividade
-                    }
-                    value={
-                      atividade
-                    }
-                  >
-
-                    {atividade}
-
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-          </div>
-
-
-          <button
-            type="button"
-            className="time-management-filter-button"
-            onClick={() =>
-              void consultar()
-            }
-            disabled={
-              carregando
-            }
-          >
-
-            {carregando
-              ? "Consultando..."
-              : "Consultar"}
-
-          </button>
 
         </section>
 
 
         {erro && (
 
-          <div
-            style={{
-              padding:
-                "12px 14px",
-
-              borderRadius:
-                "8px",
-
-              background:
-                "rgba(220, 38, 38, 0.08)",
-
-              color:
-                "#dc2626",
-
-              fontSize:
-                "12px",
-
-              fontWeight:
-                600,
-            }}
-          >
+          <div className="time-management-error">
 
             {erro}
 
@@ -785,51 +1079,246 @@ function TimeManagement() {
         )}
 
 
-        <section className="time-management-summary">
+        {consultado &&
+          apontamentos.length > 0 && (
 
-          <div className="time-management-summary-card">
+          <section className="time-management-refine-card">
 
-            <span>
-              Total de horas
-            </span>
+            <div className="time-management-refine-header">
 
-            <strong>
+              <div className="time-management-section-heading">
 
-              {formatarHoras(
-                totalHoras
-              )}
+                <div className="time-management-step">
+                  2
+                </div>
 
-            </strong>
+                <div>
 
-          </div>
+                  <h2>
+                    Refinar resultados
+                  </h2>
 
+                  <p>
+                    Use os filtros abaixo sobre os dados
+                    encontrados no período.
+                  </p>
 
-          <div className="time-management-summary-card">
+                </div>
 
-            <span>
-              Usuários
-            </span>
-
-            <strong>
-              {totalUsuarios}
-            </strong>
-
-          </div>
+              </div>
 
 
-          <div className="time-management-summary-card">
+              <button
+                type="button"
+                className="time-management-clear-button"
+                onClick={
+                  limparFiltros
+                }
+                disabled={
+                  !usuarioSelecionado &&
+                  !projetoSelecionado &&
+                  !atividadeSelecionada
+                }
+              >
+                Limpar filtros
+              </button>
 
-            <span>
-              Tarefas
-            </span>
+            </div>
 
-            <strong>
-              {totalTarefas}
-            </strong>
 
-          </div>
+            <div className="time-management-refine-fields">
 
-        </section>
+
+              <div className="time-management-field">
+
+                <label htmlFor="time-user">
+                  Usuário
+                </label>
+
+                <select
+                  id="time-user"
+                  value={
+                    usuarioSelecionado
+                  }
+                  onChange={
+                    event =>
+                      alterarUsuario(
+                        event.target.value
+                      )
+                  }
+                >
+
+                  <option value="">
+                    Todos os usuários
+                  </option>
+
+                  {usuarios.map(
+                    usuario => (
+
+                      <option
+                        key={
+                          usuario
+                        }
+                        value={
+                          usuario
+                        }
+                      >
+                        {usuario}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+
+              <div className="time-management-field">
+
+                <label htmlFor="time-project">
+                  Projeto
+                </label>
+
+                <select
+                  id="time-project"
+                  value={
+                    projetoSelecionado
+                  }
+                  onChange={
+                    event =>
+                      alterarProjeto(
+                        event.target.value
+                      )
+                  }
+                >
+
+                  <option value="">
+                    Todos os projetos
+                  </option>
+
+                  {projetos.map(
+                    projeto => (
+
+                      <option
+                        key={
+                          projeto
+                        }
+                        value={
+                          projeto
+                        }
+                      >
+                        {projeto}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+
+              <div className="time-management-field">
+
+                <label htmlFor="time-activity">
+                  Atividade
+                </label>
+
+                <select
+                  id="time-activity"
+                  value={
+                    atividadeSelecionada
+                  }
+                  onChange={
+                    event =>
+                      setAtividadeSelecionada(
+                        event.target.value
+                      )
+                  }
+                >
+
+                  <option value="">
+                    Todas as atividades
+                  </option>
+
+                  {atividades.map(
+                    atividade => (
+
+                      <option
+                        key={
+                          atividade
+                        }
+                        value={
+                          atividade
+                        }
+                      >
+                        {atividade}
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+        {consultado && (
+
+          <section className="time-management-summary">
+
+            <div className="time-management-summary-card">
+
+              <span>
+                Total de horas
+              </span>
+
+              <strong>
+
+                {formatarHoras(
+                  totalHoras
+                )}
+
+              </strong>
+
+            </div>
+
+
+            <div className="time-management-summary-card">
+
+              <span>
+                Usuários
+              </span>
+
+              <strong>
+                {totalUsuarios}
+              </strong>
+
+            </div>
+
+
+            <div className="time-management-summary-card">
+
+              <span>
+                Tarefas
+              </span>
+
+              <strong>
+                {totalTarefas}
+              </strong>
+
+            </div>
+
+          </section>
+
+        )}
 
 
         <section className="time-management-table-card">
@@ -846,7 +1335,35 @@ function TimeManagement() {
                 Apontamentos de horas
               </h2>
 
+              {consultado && (
+
+                <p>
+                  {apontamentosFiltrados.length}
+                  {" "}
+                  apontamento
+                  {apontamentosFiltrados.length === 1
+                    ? ""
+                    : "s"}
+                  {" "}
+                  encontrado
+                  {apontamentosFiltrados.length === 1
+                    ? ""
+                    : "s"}
+                </p>
+
+              )}
+
             </div>
+
+
+            {consultado &&
+              apontamentos.length > 0 && (
+
+              <span className="time-management-sort-hint">
+                Clique no título da coluna para ordenar
+              </span>
+
+            )}
 
           </div>
 
@@ -860,28 +1377,166 @@ function TimeManagement() {
                 <tr>
 
                   <th>
-                    Data
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "data"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "data"
+                        )
+                      }
+                    >
+                      Data
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "data"
+                        )}
+                      </span>
+                    </button>
+
                   </th>
 
-                  <th>
-                    Usuário
-                  </th>
 
                   <th>
-                    Projeto
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "usuario"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "usuario"
+                        )
+                      }
+                    >
+                      Usuário
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "usuario"
+                        )}
+                      </span>
+                    </button>
+
                   </th>
 
-                  <th>
-                    Tarefa
-                  </th>
 
                   <th>
-                    Atividade
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "projeto"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "projeto"
+                        )
+                      }
+                    >
+                      Projeto
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "projeto"
+                        )}
+                      </span>
+                    </button>
+
                   </th>
 
+
                   <th>
-                    Horas
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "tarefa"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "tarefa"
+                        )
+                      }
+                    >
+                      Tarefa
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "tarefa"
+                        )}
+                      </span>
+                    </button>
+
                   </th>
+
+
+                  <th>
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "atividade"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "atividade"
+                        )
+                      }
+                    >
+                      Atividade
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "atividade"
+                        )}
+                      </span>
+                    </button>
+
+                  </th>
+
+
+                  <th>
+
+                    <button
+                      type="button"
+                      className={
+                        campoOrdenacao === "horas"
+                          ? "time-management-sort active"
+                          : "time-management-sort"
+                      }
+                      onClick={() =>
+                        ordenarPor(
+                          "horas"
+                        )
+                      }
+                    >
+                      Horas
+
+                      <span>
+                        {indicadorOrdenacao(
+                          "horas"
+                        )}
+                      </span>
+                    </button>
+
+                  </th>
+
 
                   <th>
                     Comentário
@@ -900,8 +1555,8 @@ function TimeManagement() {
 
                     <td colSpan={7}>
 
-                      Selecione um período para consultar
-                      os apontamentos do Redmine.
+                      Escolha um período acima para
+                      consultar os apontamentos do Redmine.
 
                     </td>
 
@@ -928,7 +1583,7 @@ function TimeManagement() {
 
                 {consultado &&
                   !carregando &&
-                  apontamentosFiltrados.length ===
+                  apontamentosOrdenados.length ===
                     0 && (
 
                   <tr className="time-management-empty-row">
@@ -946,7 +1601,7 @@ function TimeManagement() {
 
 
                 {!carregando &&
-                  apontamentosFiltrados.map(
+                  apontamentosOrdenados.map(
                     apontamento => (
 
                       <tr
@@ -965,9 +1620,13 @@ function TimeManagement() {
 
                         <td>
 
-                          {apontamento.usuario
-                            ?.nome ||
-                            "-"}
+                          <strong className="time-management-user-name">
+
+                            {apontamento.usuario
+                              ?.nome ||
+                              "-"}
+
+                          </strong>
 
                         </td>
 
@@ -998,13 +1657,17 @@ function TimeManagement() {
 
                         <td>
 
-                          {formatarHoras(
-                            apontamento.horas
-                          )}
+                          <strong className="time-management-hours">
+
+                            {formatarHoras(
+                              apontamento.horas
+                            )}
+
+                          </strong>
 
                         </td>
 
-                        <td>
+                        <td className="time-management-comment">
 
                           {apontamento.comentario ||
                             "-"}
