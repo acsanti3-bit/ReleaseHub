@@ -237,6 +237,12 @@ function TimeManagement() {
   ] =
     useState("");
 
+  const [
+    buscaComentario,
+    setBuscaComentario,
+  ] =
+    useState("");
+
 
   const [
     campoOrdenacao,
@@ -518,6 +524,12 @@ function TimeManagement() {
               ?.trim() ||
             "";
 
+          const comentario =
+            apontamento.comentario
+              ?.toLowerCase()
+              ?.trim() ||
+            "";
+
 
           if (
             usuarioSelecionado &&
@@ -552,6 +564,20 @@ function TimeManagement() {
           }
 
 
+          if (
+            buscaComentario &&
+            !comentario.includes(
+              buscaComentario
+                .toLowerCase()
+                .trim()
+            )
+          ) {
+
+            return false;
+
+          }
+
+
           return true;
 
         }
@@ -562,6 +588,7 @@ function TimeManagement() {
       usuarioSelecionado,
       projetoSelecionado,
       atividadeSelecionada,
+      buscaComentario,
     ]);
 
 
@@ -903,6 +930,10 @@ function TimeManagement() {
       ""
     );
 
+    setBuscaComentario(
+      ""
+    );
+
   }
 
 
@@ -1007,6 +1038,10 @@ function TimeManagement() {
       );
 
       setAtividadeSelecionada(
+        ""
+      );
+
+      setBuscaComentario(
         ""
       );
 
@@ -1361,7 +1396,8 @@ function TimeManagement() {
                 disabled={
                   !usuarioSelecionado &&
                   !projetoSelecionado &&
-                  !atividadeSelecionada
+                  !atividadeSelecionada &&
+                  !buscaComentario
                 }
               >
                 Limpar filtros
@@ -1504,6 +1540,30 @@ function TimeManagement() {
                   )}
 
                 </select>
+
+              </div>
+
+
+              <div className="time-management-field">
+
+                <label htmlFor="time-comment">
+                  Buscar comentário
+                </label>
+
+                <input
+                  id="time-comment"
+                  type="text"
+                  placeholder="Ex.: teste, reunião, documentação..."
+                  value={
+                    buscaComentario
+                  }
+                  onChange={
+                    event =>
+                      setBuscaComentario(
+                        event.target.value
+                      )
+                  }
+                />
 
               </div>
 
@@ -1945,17 +2005,17 @@ function TimeManagement() {
                         <td>
 
                           {apontamento.tarefa?.id ? (
-                              <a
-                                href={`https://redmine.iws.com.br/issues/${apontamento.tarefa.id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="time-management-task-link"
-                              >
-                                #{apontamento.tarefa.id}
-                              </a>
-                            ) : (
-                              "-"
-                            )}
+                            <a
+                              href={`https://redmine.iws.com.br/issues/${apontamento.tarefa.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="time-management-task-link"
+                            >
+                              #{apontamento.tarefa.id}
+                            </a>
+                          ) : (
+                            "-"
+                          )}
 
                         </td>
 

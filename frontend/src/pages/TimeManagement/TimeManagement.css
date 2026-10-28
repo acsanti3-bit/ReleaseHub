@@ -113,8 +113,8 @@
   display: grid;
   grid-template-columns:
     repeat(
-      3,
-      minmax(180px, 1fr)
+      4,
+      minmax(160px, 1fr)
     );
   gap: 12px;
   margin-top: 18px;
@@ -712,6 +712,9 @@ html.dark .time-management-hours {
 html.dark .time-management-comment {
   color: #94a3b8;
 }
+
+
+/* LINK DA TAREFA */
 
 .time-management-task-link {
   color: #005aa9;
