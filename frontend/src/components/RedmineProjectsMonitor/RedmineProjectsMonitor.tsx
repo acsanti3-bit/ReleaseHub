@@ -193,7 +193,7 @@ function RedmineProjectsMonitor() {
     carregando,
     setCarregando,
   ] =
-    useState(false);
+    useState(true);
 
   const [
     atualizando,
@@ -223,7 +223,7 @@ function RedmineProjectsMonitor() {
     somenteForaReleaseHub,
     setSomenteForaReleaseHub,
   ] =
-    useState(true);
+    useState(false);
 
   const requisicaoEmAndamento =
     useRef(false);
@@ -385,6 +385,32 @@ function RedmineProjectsMonitor() {
         resumo,
         somenteComTarefas,
         somenteForaReleaseHub,
+      ]
+    );
+
+
+  const projetosComTarefas =
+    useMemo(
+      () =>
+        projetosVisiveis.filter(
+          projeto =>
+            projeto.totalAbertas > 0
+        ),
+      [
+        projetosVisiveis,
+      ]
+    );
+
+
+  const projetosSemTarefas =
+    useMemo(
+      () =>
+        projetosVisiveis.filter(
+          projeto =>
+            projeto.totalAbertas === 0
+        ),
+      [
+        projetosVisiveis,
       ]
     );
 
@@ -557,12 +583,16 @@ function RedmineProjectsMonitor() {
       )}
 
       {carregando && !resumo ? (
-        <div className="redmine-monitor-empty">
+        <div className="redmine-monitor-loading">
           <div className="redmine-monitor-loader" />
 
           <strong>
-            Consultando projetos e tarefas abertas...
+            Consultando o Redmine...
           </strong>
+
+          <span>
+            Carregando projetos e tarefas abertas.
+          </span>
         </div>
       ) : projetosVisiveis.length === 0 ? (
         <div className="redmine-monitor-empty">
@@ -571,133 +601,200 @@ function RedmineProjectsMonitor() {
           </strong>
 
           <span>
-            Ajuste a pesquisa ou o filtro selecionado.
+            Ajuste a pesquisa ou os filtros selecionados.
           </span>
         </div>
       ) : (
-        <div className="redmine-monitor-grid">
-          {projetosVisiveis.map(
-            projeto => (
-              <article
-                key={
-                  projeto.id
-                }
-                className={[
-                  "redmine-monitor-project",
-                  projeto.totalAbertas === 0
-                    ? "has-no-open-tasks"
-                    : "",
-                  projeto.cadastradoNoReleaseHub === false
-                    ? "is-outside-releasehub"
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                <div className="redmine-monitor-project-header">
-                  <div>
-                    <a
-                      href={
-                        projeto.totalAbertas > 0
-                          ? projeto.urlTarefasAbertas
-                          : projeto.urlProjeto
-                      }
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {projeto.nome}
+        <div className="redmine-monitor-sections">
+          {projetosComTarefas.length > 0 && (
+            <section className="redmine-monitor-section">
+              <div className="redmine-monitor-section-header">
+                <div>
+                  <span>
+                    Prioridade operacional
+                  </span>
 
-                      <MdOpenInNew
-                        size={16}
-                      />
-                    </a>
-
-                    <div className="redmine-monitor-project-meta">
-                      <span>
-                        Projeto do Redmine
-                      </span>
-
-                      {projeto.cadastradoNoReleaseHub === false && (
-                        <strong>
-                          Fora do ReleaseHub
-                        </strong>
-                      )}
-                    </div>
-                  </div>
-
-                  {projeto.totalAbertas > 0 ? (
-                    <a
-                      className="redmine-monitor-total"
-                      href={
-                        projeto.urlTarefasAbertas
-                      }
-                      target="_blank"
-                      rel="noreferrer"
-                      title="Abrir todas as tarefas abertas deste projeto no Redmine"
-                    >
-                      <strong>
-                        {projeto.totalAbertas}
-                      </strong>
-
-                      <span>
-                        {projeto.totalAbertas === 1
-                          ? "aberta"
-                          : "abertas"}
-                      </span>
-                    </a>
-                  ) : (
-                    <span className="redmine-monitor-total is-zero">
-                      <strong>
-                        0
-                      </strong>
-
-                      <span>
-                        abertas
-                      </span>
-                    </span>
-                  )}
+                  <h3>
+                    Com tarefas abertas
+                  </h3>
                 </div>
 
-                {projeto.situacoes.length > 0 ? (
-                  <div className="redmine-monitor-statuses">
-                    {projeto.situacoes.map(
-                      situacao => (
+                <strong>
+                  {projetosComTarefas.length}
+                </strong>
+              </div>
+
+              <div className="redmine-monitor-grid">
+                {projetosComTarefas.map(
+                  projeto => (
+                    <article
+                      key={
+                        projeto.id
+                      }
+                      className={[
+                        "redmine-monitor-project",
+                        projeto.cadastradoNoReleaseHub === false
+                          ? "is-outside-releasehub"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <div className="redmine-monitor-project-header">
+                        <div>
+                          <a
+                            href={
+                              projeto.urlTarefasAbertas
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {projeto.nome}
+
+                            <MdOpenInNew
+                              size={16}
+                            />
+                          </a>
+
+                          <div className="redmine-monitor-project-meta">
+                            <span>
+                              Projeto do Redmine
+                            </span>
+
+                            {projeto.cadastradoNoReleaseHub === false && (
+                              <strong>
+                                Fora do ReleaseHub
+                              </strong>
+                            )}
+                          </div>
+                        </div>
+
                         <a
-                          key={`${projeto.id}-${situacao.id ?? situacao.nome}`}
+                          className="redmine-monitor-total"
                           href={
-                            situacao.url
+                            projeto.urlTarefasAbertas
                           }
                           target="_blank"
                           rel="noreferrer"
-                          title={`Abrir ${situacao.quantidade} tarefa(s) em ${situacao.nome} no Redmine`}
+                          title="Abrir todas as tarefas abertas deste projeto no Redmine"
                         >
-                          <span>
-                            <i
-                              style={{
-                                backgroundColor:
-                                  corSituacao(
-                                    situacao.nome
-                                  ),
-                              }}
-                            />
-
-                            {situacao.nome}
-                          </span>
-
                           <strong>
-                            {situacao.quantidade}
+                            {projeto.totalAbertas}
                           </strong>
+
+                          <span>
+                            {projeto.totalAbertas === 1
+                              ? "aberta"
+                              : "abertas"}
+                          </span>
                         </a>
-                      )
-                    )}
-                  </div>
-                ) : (
-                  <div className="redmine-monitor-no-tasks">
-                    Nenhuma tarefa aberta neste projeto.
-                  </div>
+                      </div>
+
+                      <div className="redmine-monitor-statuses">
+                        {projeto.situacoes.map(
+                          situacao => (
+                            <a
+                              key={`${projeto.id}-${situacao.id ?? situacao.nome}`}
+                              href={
+                                situacao.url
+                              }
+                              target="_blank"
+                              rel="noreferrer"
+                              title={`Abrir ${situacao.quantidade} tarefa(s) em ${situacao.nome} no Redmine`}
+                            >
+                              <span>
+                                <i
+                                  style={{
+                                    backgroundColor:
+                                      corSituacao(
+                                        situacao.nome
+                                      ),
+                                  }}
+                                />
+
+                                {situacao.nome}
+                              </span>
+
+                              <strong>
+                                {situacao.quantidade}
+                              </strong>
+                            </a>
+                          )
+                        )}
+                      </div>
+                    </article>
+                  )
                 )}
-              </article>
-            )
+              </div>
+            </section>
+          )}
+
+          {projetosSemTarefas.length > 0 && (
+            <section className="redmine-monitor-section">
+              <div className="redmine-monitor-section-header is-secondary">
+                <div>
+                  <span>
+                    Consulta
+                  </span>
+
+                  <h3>
+                    Sem tarefas abertas
+                  </h3>
+                </div>
+
+                <strong>
+                  {projetosSemTarefas.length}
+                </strong>
+              </div>
+
+              <div className="redmine-monitor-zero-list">
+                {projetosSemTarefas.map(
+                  projeto => (
+                    <a
+                      key={
+                        projeto.id
+                      }
+                      className={[
+                        "redmine-monitor-zero-project",
+                        projeto.cadastradoNoReleaseHub === false
+                          ? "is-outside-releasehub"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      href={
+                        projeto.urlProjeto
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <div>
+                        <strong>
+                          {projeto.nome}
+                        </strong>
+
+                        <span>
+                          Projeto do Redmine
+                          {projeto.cadastradoNoReleaseHub === false
+                            ? " • Fora do ReleaseHub"
+                            : ""}
+                        </span>
+                      </div>
+
+                      <div className="redmine-monitor-zero-meta">
+                        <span>
+                          0 tarefas abertas
+                        </span>
+
+                        <MdOpenInNew
+                          size={16}
+                        />
+                      </div>
+                    </a>
+                  )
+                )}
+              </div>
+            </section>
           )}
         </div>
       )}
