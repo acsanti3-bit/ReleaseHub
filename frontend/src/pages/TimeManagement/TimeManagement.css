@@ -109,12 +109,18 @@
   gap: 16px;
 }
 
+.time-management-refine-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .time-management-refine-fields {
   display: grid;
   grid-template-columns:
     repeat(
-      4,
-      minmax(160px, 1fr)
+      3,
+      minmax(180px, 1fr)
     );
   gap: 12px;
   margin-top: 18px;
@@ -160,6 +166,9 @@
     rgba(0, 90, 169, 0.08);
 }
 
+
+/* BOTÕES */
+
 .time-management-filter-button {
   height: 40px;
   padding: 0 20px;
@@ -186,6 +195,35 @@
 
 .time-management-filter-button:disabled {
   opacity: 0.65;
+  cursor: default;
+}
+
+.time-management-export-button {
+  padding: 8px 14px;
+  border: 1px solid #005aa9;
+  border-radius: 8px;
+  background: #005aa9;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.time-management-export-button:hover:not(:disabled) {
+  background: #004b8d;
+  border-color: #004b8d;
+}
+
+.time-management-export-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.time-management-export-button:disabled {
+  opacity: 0.45;
   cursor: default;
 }
 
@@ -551,6 +589,19 @@
 }
 
 
+/* LINK DA TAREFA */
+
+.time-management-task-link {
+  color: #005aa9;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.time-management-task-link:hover {
+  text-decoration: underline;
+}
+
+
 /* RESPONSIVO */
 
 @media (max-width: 900px) {
@@ -600,6 +651,11 @@
   .time-management-table-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .time-management-refine-actions {
+    width: 100%;
+    flex-wrap: wrap;
   }
 
 }
@@ -671,6 +727,16 @@ html.dark .time-management-clear-button:hover:not(:disabled) {
   border-color: #475569;
 }
 
+html.dark .time-management-export-button {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+html.dark .time-management-export-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
 html.dark .time-management-table-wrapper {
   border-color: #263548;
 }
@@ -711,19 +777,6 @@ html.dark .time-management-hours {
 
 html.dark .time-management-comment {
   color: #94a3b8;
-}
-
-
-/* LINK DA TAREFA */
-
-.time-management-task-link {
-  color: #005aa9;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.time-management-task-link:hover {
-  text-decoration: underline;
 }
 
 html.dark .time-management-task-link {

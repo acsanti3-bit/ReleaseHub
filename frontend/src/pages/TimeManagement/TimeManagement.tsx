@@ -132,6 +132,29 @@ function formatarHoras(
 }
 
 
+function escaparCsv(
+  valor:
+    string |
+    number |
+    undefined |
+    null
+) {
+
+  const texto =
+    String(
+      valor ??
+      ""
+    );
+
+
+  return `"${texto.replace(
+    /"/g,
+    '""'
+  )}"`;
+
+}
+
+
 function agruparHoras(
   apontamentos: TimeEntry[],
   obterNome:
@@ -234,12 +257,6 @@ function TimeManagement() {
   const [
     atividadeSelecionada,
     setAtividadeSelecionada,
-  ] =
-    useState("");
-
-  const [
-    buscaComentario,
-    setBuscaComentario,
   ] =
     useState("");
 
@@ -524,12 +541,6 @@ function TimeManagement() {
               ?.trim() ||
             "";
 
-          const comentario =
-            apontamento.comentario
-              ?.toLowerCase()
-              ?.trim() ||
-            "";
-
 
           if (
             usuarioSelecionado &&
@@ -564,20 +575,6 @@ function TimeManagement() {
           }
 
 
-          if (
-            buscaComentario &&
-            !comentario.includes(
-              buscaComentario
-                .toLowerCase()
-                .trim()
-            )
-          ) {
-
-            return false;
-
-          }
-
-
           return true;
 
         }
@@ -588,7 +585,6 @@ function TimeManagement() {
       usuarioSelecionado,
       projetoSelecionado,
       atividadeSelecionada,
-      buscaComentario,
     ]);
 
 
@@ -930,8 +926,142 @@ function TimeManagement() {
       ""
     );
 
-    setBuscaComentario(
-      ""
+  }
+
+
+  function exportarCsv() {
+
+    if (
+      apontamentosFiltrados.length === 0
+    ) {
+
+      return;
+
+    }
+
+
+    const cabecalho = [
+      "Data",
+      "Usuário",
+      "Projeto",
+      "Tarefa",
+      "Atividade",
+      "Horas",
+      "Horas formatadas",
+      "Comentário",
+    ];
+
+
+    const linhas =
+      apontamentosFiltrados.map(
+        apontamento => [
+
+          apontamento.data,
+
+          apontamento.usuario
+            ?.nome ||
+          "",
+
+          apontamento.projeto
+            ?.nome ||
+          "",
+
+          apontamento.tarefa
+            ?.id
+            ? `#${apontamento.tarefa.id}`
+            : "",
+
+          apontamento.atividade
+            ?.nome ||
+          "",
+
+          Number(
+            apontamento.horas ||
+            0
+          )
+            .toFixed(2)
+            .replace(
+              ".",
+              ","
+            ),
+
+          formatarHoras(
+            apontamento.horas
+          ),
+
+          apontamento.comentario ||
+          "",
+
+        ]
+          .map(
+            escaparCsv
+          )
+          .join(";")
+      );
+
+
+    const conteudoCsv = [
+      cabecalho
+        .map(
+          escaparCsv
+        )
+        .join(";"),
+      ...linhas,
+    ]
+      .join("\r\n");
+
+
+    const blob =
+      new Blob(
+        [
+          "\uFEFF",
+          conteudoCsv,
+        ],
+        {
+          type:
+            "text/csv;charset=utf-8;",
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+
+    const nomeArquivo =
+      `gestao-horas-${dataInicial}-a-${dataFinal}.csv`;
+
+
+    link.href =
+      url;
+
+    link.download =
+      nomeArquivo;
+
+
+    document.body.appendChild(
+      link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+      link
+    );
+
+
+    URL.revokeObjectURL(
+      url
     );
 
   }
@@ -1038,10 +1168,6 @@ function TimeManagement() {
       );
 
       setAtividadeSelecionada(
-        ""
-      );
-
-      setBuscaComentario(
         ""
       );
 
@@ -1387,21 +1513,38 @@ function TimeManagement() {
               </div>
 
 
-              <button
-                type="button"
-                className="time-management-clear-button"
-                onClick={
-                  limparFiltros
-                }
-                disabled={
-                  !usuarioSelecionado &&
-                  !projetoSelecionado &&
-                  !atividadeSelecionada &&
-                  !buscaComentario
-                }
-              >
-                Limpar filtros
-              </button>
+              <div className="time-management-refine-actions">
+
+                <button
+                  type="button"
+                  className="time-management-export-button"
+                  onClick={
+                    exportarCsv
+                  }
+                  disabled={
+                    apontamentosFiltrados.length === 0
+                  }
+                >
+                  Exportar CSV
+                </button>
+
+
+                <button
+                  type="button"
+                  className="time-management-clear-button"
+                  onClick={
+                    limparFiltros
+                  }
+                  disabled={
+                    !usuarioSelecionado &&
+                    !projetoSelecionado &&
+                    !atividadeSelecionada
+                  }
+                >
+                  Limpar filtros
+                </button>
+
+              </div>
 
             </div>
 
@@ -1540,30 +1683,6 @@ function TimeManagement() {
                   )}
 
                 </select>
-
-              </div>
-
-
-              <div className="time-management-field">
-
-                <label htmlFor="time-comment">
-                  Buscar comentário
-                </label>
-
-                <input
-                  id="time-comment"
-                  type="text"
-                  placeholder="Ex.: teste, reunião, documentação..."
-                  value={
-                    buscaComentario
-                  }
-                  onChange={
-                    event =>
-                      setBuscaComentario(
-                        event.target.value
-                      )
-                  }
-                />
 
               </div>
 
