@@ -103,12 +103,39 @@ function getProjectColor(
 function converterDataBrasileira(
   valor: string
 ) {
-  const partes =
+  const brasileira =
     valor.match(
       /^(\d{2})\/(\d{2})\/(\d{4})$/
     );
 
-  if (!partes) {
+  const iso =
+    valor.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+  let dia: number;
+  let mes: number;
+  let ano: number;
+
+  if (brasileira) {
+    dia =
+      Number(brasileira[1]);
+
+    mes =
+      Number(brasileira[2]);
+
+    ano =
+      Number(brasileira[3]);
+  } else if (iso) {
+    ano =
+      Number(iso[1]);
+
+    mes =
+      Number(iso[2]);
+
+    dia =
+      Number(iso[3]);
+  } else {
     const data =
       new Date(valor);
 
@@ -118,13 +145,6 @@ function converterDataBrasileira(
       ? null
       : data;
   }
-
-  const dia =
-    Number(partes[1]);
-  const mes =
-    Number(partes[2]);
-  const ano =
-    Number(partes[3]);
 
   const data =
     new Date(
