@@ -373,11 +373,26 @@ function RedmineProjectsMonitor() {
             (
               projetoA,
               projetoB
-            ) =>
-              compararNomesProjetos(
+            ) => {
+              const foraA =
+                projetoA.cadastradoNoReleaseHub === false;
+
+              const foraB =
+                projetoB.cadastradoNoReleaseHub === false;
+
+              if (
+                foraA !== foraB
+              ) {
+                return foraA
+                  ? -1
+                  : 1;
+              }
+
+              return compararNomesProjetos(
                 projetoA.nome,
                 projetoB.nome
-              )
+              );
+            }
           );
       },
       [
