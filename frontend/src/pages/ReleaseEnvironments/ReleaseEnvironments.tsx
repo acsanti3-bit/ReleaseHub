@@ -1236,8 +1236,11 @@ const versoesHistoricoRemessas =
                 ).length;
 
               const prazoRelease =
-                ambiente.prazo?.trim() ||
-                "Sem prazo";
+                ambiente.prazo?.trim()
+                  ? formatarDataRemessa(
+                      ambiente.prazo.trim()
+                    )
+                  : "Sem prazo";
 
               return (
                 <article
@@ -1564,6 +1567,33 @@ const versoesHistoricoRemessas =
                         : atual
                   )
                 }
+                onKeyDown={evento => {
+                  if (evento.code !== "Space") {
+                    return;
+                  }
+
+                  evento.preventDefault();
+
+                  const hoje = new Date();
+                  const ano = hoje.getFullYear();
+                  const mes = String(
+                    hoje.getMonth() + 1
+                  ).padStart(2, "0");
+                  const dia = String(
+                    hoje.getDate()
+                  ).padStart(2, "0");
+
+                  setRemessaEditando(
+                    atual =>
+                      atual
+                        ? {
+                            ...atual,
+                            data: `${ano}-${mes}-${dia}`,
+                          }
+                        : atual
+                  );
+                }}
+                title="Pressione Espaço para preencher com a data de hoje"
               />
             </div>
 

@@ -1241,6 +1241,28 @@ function ReleaseEnvironmentDrawer({
                       .value
                   )
               }
+              onKeyDown={evento => {
+                if (evento.code !== "Space") {
+                  return;
+                }
+
+                evento.preventDefault();
+
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = String(
+                  hoje.getMonth() + 1
+                ).padStart(2, "0");
+                const dia = String(
+                  hoje.getDate()
+                ).padStart(2, "0");
+
+                alterarCampo(
+                  "prazo",
+                  `${ano}-${mes}-${dia}`
+                );
+              }}
+              title="Pressione Espaço para preencher com a data de hoje"
             />
 
           </div>
