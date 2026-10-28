@@ -178,6 +178,7 @@ function AppRoutes() {
                 requiredRoles={[
                   "admin",
                   "qualidade",
+                  "gestor",
                 ]}
               >
 
@@ -215,6 +216,7 @@ function AppRoutes() {
                 requiredRoles={[
                   "admin",
                   "qualidade",
+                  "gestor",
                 ]}
               >
 

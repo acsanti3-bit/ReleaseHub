@@ -76,7 +76,7 @@ function nomePerfil(
 
     case "gestor":
 
-      return "Gestor";
+      return "Gestora";
 
     case "visualizador":
 
@@ -152,6 +152,13 @@ function Settings() {
 
   const qualidade =
     usuarioLogado?.role === "qualidade";
+
+  const gestora =
+    usuarioLogado?.role === "gestor";
+
+  const perfilOperacional =
+    qualidade ||
+    gestora;
 
 
   async function carregarUsuarioLogado() {
@@ -265,7 +272,9 @@ function Settings() {
       role:
         qualidade
           ? "qualidade"
-          : formularioVazio.role,
+          : gestora
+            ? "gestor"
+            : formularioVazio.role,
     });
 
     setErro("");
@@ -279,12 +288,12 @@ function Settings() {
   ) {
 
     if (
-      qualidade &&
+      perfilOperacional &&
       usuario.role === "admin"
     ) {
 
       setErro(
-        "O perfil Qualidade não pode alterar usuários administradores."
+        "Este perfil não pode alterar usuários administradores."
       );
 
       return;
@@ -389,7 +398,7 @@ function Settings() {
     }
 
     if (
-      qualidade &&
+      perfilOperacional &&
       editando &&
       !formulario.senha
     ) {
@@ -756,7 +765,7 @@ function Settings() {
                           <button
                             type="button"
                             title={
-                              qualidade &&
+                              perfilOperacional &&
                               usuario.role === "admin"
                                 ? "Somente administradores podem alterar este usuário"
                                 : administrador
@@ -764,7 +773,7 @@ function Settings() {
                                   : "Redefinir senha"
                             }
                             disabled={
-                              qualidade &&
+                              perfilOperacional &&
                               usuario.role === "admin"
                             }
                             onClick={() =>
@@ -888,7 +897,7 @@ function Settings() {
                 }
                 placeholder="Nome do usuário"
                 disabled={
-                  qualidade &&
+                  perfilOperacional &&
                   editando
                 }
                 onChange={event =>
@@ -913,7 +922,7 @@ function Settings() {
                 }
                 placeholder="usuario@empresa.com"
                 disabled={
-                  qualidade &&
+                  perfilOperacional &&
                   editando
                 }
                 onChange={event =>
@@ -936,7 +945,7 @@ function Settings() {
                   formulario.role
                 }
                 disabled={
-                  qualidade &&
+                  perfilOperacional &&
                   editando
                 }
                 onChange={event =>
@@ -960,7 +969,7 @@ function Settings() {
                 </option>
 
                 <option value="gestor">
-                  Gestor
+                  Gestora
                 </option>
 
                 {administrador && (
@@ -1035,7 +1044,7 @@ function Settings() {
                   }
                   placeholder={
                     editando
-                      ? qualidade
+                      ? perfilOperacional
                         ? "Mínimo 12 caracteres"
                         : "Deixe em branco para manter"
                       : "Mínimo 12 caracteres"
@@ -1057,7 +1066,7 @@ function Settings() {
 
                 <small className="settings-password-help">
 
-                  {qualidade
+                  {perfilOperacional
                     ? "Informe a nova senha para concluir a redefinição."
                     : "Preencha somente caso queira redefinir a senha."}
 
@@ -1102,7 +1111,7 @@ function Settings() {
 
                   {salvando
                     ? "Salvando..."
-                    : qualidade && editando
+                    : perfilOperacional && editando
                       ? "Redefinir senha"
                       : "Salvar"}
 

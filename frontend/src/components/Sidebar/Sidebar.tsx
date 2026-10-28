@@ -157,7 +157,7 @@ function Sidebar({
 
       case "gestor":
 
-        return "Gestor";
+        return "Gestora";
 
       case "visualizador":
 
@@ -174,7 +174,8 @@ function Sidebar({
 
   const podeAcessarAmbientes =
     usuario?.role === "admin" ||
-    usuario?.role === "qualidade";
+    usuario?.role === "qualidade" ||
+    usuario?.role === "gestor";
 
 
   const podeAcessarConfiguracoes =
@@ -206,7 +207,7 @@ function Sidebar({
       <nav>
 
         <NavLink to="/">
-          Dashboard
+          Monitoramento
         </NavLink>
 
         {podeAcessarAmbientes && (
