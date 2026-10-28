@@ -1944,10 +1944,18 @@ function TimeManagement() {
 
                         <td>
 
-                          {apontamento.tarefa
-                            ?.id
-                            ? `#${apontamento.tarefa.id}`
-                            : "-"}
+                          {apontamento.tarefa?.id ? (
+                              <a
+                                href={`https://redmine.iws.com.br/issues/${apontamento.tarefa.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="time-management-task-link"
+                              >
+                                #{apontamento.tarefa.id}
+                              </a>
+                            ) : (
+                              "-"
+                            )}
 
                         </td>
 

@@ -712,3 +712,17 @@ html.dark .time-management-hours {
 html.dark .time-management-comment {
   color: #94a3b8;
 }
+
+.time-management-task-link {
+  color: #005aa9;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.time-management-task-link:hover {
+  text-decoration: underline;
+}
+
+html.dark .time-management-task-link {
+  color: #60a5fa;
+}
