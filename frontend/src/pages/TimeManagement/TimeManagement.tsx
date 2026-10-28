@@ -45,6 +45,12 @@ interface TimeEntriesResponse {
 }
 
 
+interface DistribuicaoItem {
+  nome: string;
+  horas: number;
+}
+
+
 type CampoOrdenacao =
   | "data"
   | "usuario"
@@ -122,6 +128,78 @@ function formatarHoras(
 
 
   return `${horasInteiras}h ${minutos}min`;
+
+}
+
+
+function agruparHoras(
+  apontamentos: TimeEntry[],
+  obterNome:
+    (apontamento: TimeEntry) => string
+): DistribuicaoItem[] {
+
+  const mapa =
+    new Map<
+      string,
+      number
+    >();
+
+
+  apontamentos.forEach(
+    apontamento => {
+
+      const nome =
+        obterNome(
+          apontamento
+        )
+          .trim();
+
+
+      if (!nome) {
+
+        return;
+
+      }
+
+
+      mapa.set(
+        nome,
+        (
+          mapa.get(
+            nome
+          ) ||
+          0
+        ) +
+        Number(
+          apontamento.horas ||
+          0
+        )
+      );
+
+    }
+  );
+
+
+  return Array.from(
+    mapa.entries()
+  )
+    .map(
+      ([
+        nome,
+        horas,
+      ]) => ({
+        nome,
+        horas,
+      })
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.horas -
+        a.horas
+    );
 
 }
 
@@ -675,6 +753,54 @@ function TimeManagement() {
     ]);
 
 
+  const horasPorUsuario =
+    useMemo(() => {
+
+      return agruparHoras(
+        apontamentosFiltrados,
+        apontamento =>
+          apontamento.usuario
+            ?.nome ||
+          ""
+      );
+
+    }, [
+      apontamentosFiltrados,
+    ]);
+
+
+  const horasPorProjeto =
+    useMemo(() => {
+
+      return agruparHoras(
+        apontamentosFiltrados,
+        apontamento =>
+          apontamento.projeto
+            ?.nome ||
+          ""
+      );
+
+    }, [
+      apontamentosFiltrados,
+    ]);
+
+
+  const horasPorAtividade =
+    useMemo(() => {
+
+      return agruparHoras(
+        apontamentosFiltrados,
+        apontamento =>
+          apontamento.atividade
+            ?.nome ||
+          ""
+      );
+
+    }, [
+      apontamentosFiltrados,
+    ]);
+
+
   function ordenarPor(
     campo: CampoOrdenacao
   ) {
@@ -926,6 +1052,124 @@ function TimeManagement() {
       );
 
     }
+
+  }
+
+
+  function renderDistribuicao(
+    titulo: string,
+    itens: DistribuicaoItem[]
+  ) {
+
+    const maiorValor =
+      itens.length > 0
+        ? Math.max(
+            ...itens.map(
+              item =>
+                item.horas
+            )
+          )
+        : 0;
+
+
+    return (
+
+      <div className="time-management-distribution-card">
+
+        <div className="time-management-distribution-title">
+
+          <h3>
+            {titulo}
+          </h3>
+
+          <span>
+            {itens.length}
+            {" "}
+            item
+            {itens.length === 1
+              ? ""
+              : "s"}
+          </span>
+
+        </div>
+
+
+        <div className="time-management-distribution-list">
+
+          {itens.length === 0 && (
+
+            <div className="time-management-distribution-empty">
+              Nenhum dado disponível.
+            </div>
+
+          )}
+
+
+          {itens.map(
+            item => {
+
+              const percentual =
+                maiorValor > 0
+                  ? (
+                      item.horas /
+                      maiorValor
+                    ) * 100
+                  : 0;
+
+
+              return (
+
+                <div
+                  key={
+                    item.nome
+                  }
+                  className="time-management-distribution-item"
+                >
+
+                  <div className="time-management-distribution-row">
+
+                    <span
+                      className="time-management-distribution-name"
+                      title={
+                        item.nome
+                      }
+                    >
+                      {item.nome}
+                    </span>
+
+                    <strong>
+                      {formatarHoras(
+                        item.horas
+                      )}
+                    </strong>
+
+                  </div>
+
+
+                  <div className="time-management-distribution-bar">
+
+                    <div
+                      className="time-management-distribution-progress"
+                      style={{
+                        width:
+                          `${percentual}%`,
+                      }}
+                    />
+
+                  </div>
+
+                </div>
+
+              );
+
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    );
 
   }
 
@@ -1313,6 +1557,66 @@ function TimeManagement() {
               <strong>
                 {totalTarefas}
               </strong>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+        {consultado &&
+          apontamentosFiltrados.length > 0 && (
+
+          <section className="time-management-distribution-section">
+
+            <div className="time-management-distribution-header">
+
+              <div>
+
+                <span className="time-management-kicker">
+                  Análise
+                </span>
+
+                <h2>
+                  Distribuição das horas
+                </h2>
+
+                <p>
+
+                  {usuarioSelecionado
+                    ? `Detalhamento das horas de ${usuarioSelecionado}.`
+                    : "Veja onde as horas estão concentradas no período selecionado."}
+
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="time-management-distribution-grid">
+
+              {usuarioSelecionado
+                ? renderDistribuicao(
+                    "Horas por projeto",
+                    horasPorProjeto
+                  )
+                : renderDistribuicao(
+                    "Horas por usuário",
+                    horasPorUsuario
+                  )}
+
+
+              {usuarioSelecionado
+                ? renderDistribuicao(
+                    "Horas por atividade",
+                    horasPorAtividade
+                  )
+                : renderDistribuicao(
+                    "Horas por projeto",
+                    horasPorProjeto
+                  )}
 
             </div>
 
