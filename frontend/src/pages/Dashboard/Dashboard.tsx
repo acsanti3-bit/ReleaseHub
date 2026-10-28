@@ -12,7 +12,9 @@ const RedmineProjectsMonitor = lazy(
   () => import("../../components/RedmineProjectsMonitor/RedmineProjectsMonitor")
 );
 
-import type { ReleaseEnvironment } from "../../types/releaseEnvironment";
+import type {
+  ReleaseEnvironment,
+} from "../../types/releaseEnvironment";
 
 import {
   listarAmbientes,
@@ -24,7 +26,9 @@ import {
   sincronizarProjetosComRedmine,
 } from "../../services/ReleaseProjectService";
 
-import { buscarSessao } from "../../services/AuthService";
+import {
+  buscarSessao,
+} from "../../services/AuthService";
 
 
 const STORAGE_KEY =
@@ -322,23 +326,55 @@ function Dashboard() {
   return (
     <Layout>
       <div className="dashboard">
-        <div className="dashboard-header">
-          <div className="dashboard-title">
+        <section className="dashboard-hero">
+          <div className="dashboard-hero-copy">
+            <span className="dashboard-eyebrow">
+              Central do Redmine
+            </span>
+
             <h1>
               Painel da Qualidade
             </h1>
 
-            <span>
-              Consulte todos os projetos e tarefas do Redmine em um só lugar
-            </span>
+            <p>
+              Consulte projetos, tarefas abertas e acompanhe tudo o que está ativo no Redmine.
+            </p>
           </div>
 
-          <div className="dashboard-release-control">
-            <div className="dashboard-release-selector">
-              <label>
-                Release em acompanhamento
-              </label>
+          <div className="dashboard-release-card">
+            <div className="dashboard-release-card-header">
+              <div>
+                <span>
+                  Release em acompanhamento
+                </span>
 
+                <strong>
+                  {
+                    ambienteSelecionado?.nome ||
+                    "Nenhuma release selecionada"
+                  }
+                </strong>
+              </div>
+
+              {ambienteSelecionado && (
+                <small>
+                  IntelliCash{" "}
+                  {
+                    ambienteSelecionado
+                      .versoes
+                      .intellicash
+                  }
+                  {
+                    ambienteSelecionado
+                      .concluido
+                      ? " • Concluída"
+                      : ""
+                  }
+                </small>
+              )}
+            </div>
+
+            <div className="dashboard-release-actions">
               <select
                 value={
                   ambienteSelecionadoId ??
@@ -349,6 +385,7 @@ function Dashboard() {
                   ambientes.length === 0 ||
                   sincronizandoRedmine
                 }
+                aria-label="Selecionar release em acompanhamento"
                 onChange={
                   event =>
                     alterarAmbiente(
@@ -380,45 +417,28 @@ function Dashboard() {
                 )}
               </select>
 
-              {ambienteSelecionado && (
-                <small>
-                  Intellicash{" "}
-                  {
-                    ambienteSelecionado
-                      .versoes
-                      .intellicash
+              {podeEditar && (
+                <button
+                  type="button"
+                  className="dashboard-redmine-sync"
+                  disabled={
+                    ambienteSelecionadoId ===
+                      null ||
+                    sincronizandoRedmine ||
+                    carregandoAmbientes
                   }
-                  {
-                    ambienteSelecionado
-                      .concluido
-                      ? " • Release concluída"
-                      : ""
+                  onClick={
+                    sincronizarRedmine
                   }
-                </small>
+                >
+                  {
+                    sincronizandoRedmine
+                      ? "Sincronizando..."
+                      : "Sincronizar release"
+                  }
+                </button>
               )}
             </div>
-
-            {podeEditar && (
-              <button
-                type="button"
-                className="dashboard-redmine-sync"
-                disabled={
-                  ambienteSelecionadoId ===
-                    null ||
-                  sincronizandoRedmine ||
-                  carregandoAmbientes
-                }
-                onClick={
-                  sincronizarRedmine
-                }
-              >
-                {
-                  sincronizandoRedmine
-                    ? "Sincronizando Redmine..."
-                    : "Sincronizar com o Redmine"
-                }
-              </button>
-            )}
 
             {mensagemRedmine && (
               <span
@@ -433,7 +453,7 @@ function Dashboard() {
               </span>
             )}
           </div>
-        </div>
+        </section>
 
 
         <Suspense

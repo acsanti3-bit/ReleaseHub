@@ -193,7 +193,7 @@ function RedmineProjectsMonitor() {
     carregando,
     setCarregando,
   ] =
-    useState(true);
+    useState(false);
 
   const [
     atualizando,
@@ -217,7 +217,7 @@ function RedmineProjectsMonitor() {
     somenteComTarefas,
     setSomenteComTarefas,
   ] =
-    useState(true);
+    useState(false);
 
   const [
     somenteForaReleaseHub,
@@ -396,15 +396,15 @@ function RedmineProjectsMonitor() {
       <div className="redmine-monitor-header">
         <div>
           <span className="redmine-monitor-eyebrow">
-            Visão independente das releases
+            Consulta geral
           </span>
 
           <h2 id="redmine-monitor-title">
-            Monitoramento geral do Redmine
+            Projetos do Redmine
           </h2>
 
           <p>
-            Todos os projetos ativos do Redmine, inclusive os que não estão cadastrados no ReleaseHub.
+            Consulte todos os projetos ativos, acompanhe tarefas abertas e refine a visualização pelos filtros abaixo.
           </p>
         </div>
 
