@@ -72,14 +72,28 @@ function formatarHoras(
   horas: number
 ) {
 
-  return Number(horas || 0)
-    .toLocaleString(
-      "pt-BR",
-      {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }
+  const totalMinutos =
+    Math.round(
+      Number(horas || 0) * 60
     );
+
+  const horasInteiras =
+    Math.floor(
+      totalMinutos / 60
+    );
+
+  const minutos =
+    totalMinutos % 60;
+
+  if (
+    minutos === 0
+  ) {
+
+    return `${horasInteiras}h`;
+
+  }
+
+  return `${horasInteiras}h ${minutos}min`;
 
 }
 
@@ -146,46 +160,30 @@ function TimeManagement() {
   const usuarios =
     useMemo(() => {
 
-      const mapa =
-        new Map<
-          number,
-          string
-        >();
-
-      apontamentos.forEach(
-        apontamento => {
-
-          if (
-            apontamento.usuario?.id &&
-            apontamento.usuario?.nome
-          ) {
-
-            mapa.set(
-              apontamento.usuario.id,
-              apontamento.usuario.nome
-            );
-
-          }
-
-        }
-      );
-
       return Array.from(
-        mapa.entries()
-      )
-        .map(
-          ([
-            id,
-            nome,
-          ]) => ({
-            id,
-            nome,
-          })
+        new Set(
+          apontamentos
+            .map(
+              apontamento =>
+                apontamento.usuario
+                  ?.nome
+                  ?.trim()
+            )
+            .filter(
+              (
+                nome
+              ): nome is string =>
+                Boolean(nome)
+            )
         )
+      )
         .sort(
-          (a, b) =>
-            a.nome.localeCompare(
-              b.nome,
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
               "pt-BR"
             )
         );
@@ -198,46 +196,30 @@ function TimeManagement() {
   const projetos =
     useMemo(() => {
 
-      const mapa =
-        new Map<
-          number,
-          string
-        >();
-
-      apontamentos.forEach(
-        apontamento => {
-
-          if (
-            apontamento.projeto?.id &&
-            apontamento.projeto?.nome
-          ) {
-
-            mapa.set(
-              apontamento.projeto.id,
-              apontamento.projeto.nome
-            );
-
-          }
-
-        }
-      );
-
       return Array.from(
-        mapa.entries()
-      )
-        .map(
-          ([
-            id,
-            nome,
-          ]) => ({
-            id,
-            nome,
-          })
+        new Set(
+          apontamentos
+            .map(
+              apontamento =>
+                apontamento.projeto
+                  ?.nome
+                  ?.trim()
+            )
+            .filter(
+              (
+                nome
+              ): nome is string =>
+                Boolean(nome)
+            )
         )
+      )
         .sort(
-          (a, b) =>
-            a.nome.localeCompare(
-              b.nome,
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
               "pt-BR"
             )
         );
@@ -250,46 +232,30 @@ function TimeManagement() {
   const atividades =
     useMemo(() => {
 
-      const mapa =
-        new Map<
-          number,
-          string
-        >();
-
-      apontamentos.forEach(
-        apontamento => {
-
-          if (
-            apontamento.atividade?.id &&
-            apontamento.atividade?.nome
-          ) {
-
-            mapa.set(
-              apontamento.atividade.id,
-              apontamento.atividade.nome
-            );
-
-          }
-
-        }
-      );
-
       return Array.from(
-        mapa.entries()
-      )
-        .map(
-          ([
-            id,
-            nome,
-          ]) => ({
-            id,
-            nome,
-          })
+        new Set(
+          apontamentos
+            .map(
+              apontamento =>
+                apontamento.atividade
+                  ?.nome
+                  ?.trim()
+            )
+            .filter(
+              (
+                nome
+              ): nome is string =>
+                Boolean(nome)
+            )
         )
+      )
         .sort(
-          (a, b) =>
-            a.nome.localeCompare(
-              b.nome,
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
               "pt-BR"
             )
         );
@@ -305,41 +271,57 @@ function TimeManagement() {
       return apontamentos.filter(
         apontamento => {
 
+          const usuario =
+            apontamento.usuario
+              ?.nome
+              ?.trim() ||
+            "";
+
+          const projeto =
+            apontamento.projeto
+              ?.nome
+              ?.trim() ||
+            "";
+
+          const atividade =
+            apontamento.atividade
+              ?.nome
+              ?.trim() ||
+            "";
+
+
           if (
             usuarioSelecionado &&
-            String(
-              apontamento.usuario?.id ||
-              ""
-            ) !== usuarioSelecionado
+            usuario !==
+              usuarioSelecionado
           ) {
 
             return false;
 
           }
+
 
           if (
             projetoSelecionado &&
-            String(
-              apontamento.projeto?.id ||
-              ""
-            ) !== projetoSelecionado
+            projeto !==
+              projetoSelecionado
           ) {
 
             return false;
 
           }
+
 
           if (
             atividadeSelecionada &&
-            String(
-              apontamento.atividade?.id ||
-              ""
-            ) !== atividadeSelecionada
+            atividade !==
+              atividadeSelecionada
           ) {
 
             return false;
 
           }
+
 
           return true;
 
@@ -382,7 +364,9 @@ function TimeManagement() {
         apontamentosFiltrados
           .map(
             apontamento =>
-              apontamento.usuario?.id
+              apontamento.usuario
+                ?.nome
+                ?.trim()
           )
           .filter(Boolean)
       ).size;
@@ -426,6 +410,7 @@ function TimeManagement() {
 
     }
 
+
     if (
       dataInicial >
       dataFinal
@@ -439,7 +424,9 @@ function TimeManagement() {
 
     }
 
+
     setCarregando(true);
+
 
     try {
 
@@ -447,9 +434,11 @@ function TimeManagement() {
         new URLSearchParams({
           from:
             dataInicial,
+
           to:
             dataFinal,
         });
+
 
       const response =
         await fetch(
@@ -507,9 +496,11 @@ function TimeManagement() {
         error
       );
 
+
       setApontamentos([]);
 
       setConsultado(true);
+
 
       setErro(
         error instanceof Error
@@ -565,7 +556,9 @@ function TimeManagement() {
             <input
               id="time-from"
               type="date"
-              value={dataInicial}
+              value={
+                dataInicial
+              }
               onChange={
                 event =>
                   setDataInicial(
@@ -586,7 +579,9 @@ function TimeManagement() {
             <input
               id="time-to"
               type="date"
-              value={dataFinal}
+              value={
+                dataFinal
+              }
               onChange={
                 event =>
                   setDataFinal(
@@ -626,13 +621,15 @@ function TimeManagement() {
 
                   <option
                     key={
-                      usuario.id
+                      usuario
                     }
                     value={
-                      usuario.id
+                      usuario
                     }
                   >
-                    {usuario.nome}
+
+                    {usuario}
+
                   </option>
 
                 )
@@ -671,13 +668,15 @@ function TimeManagement() {
 
                   <option
                     key={
-                      projeto.id
+                      projeto
                     }
                     value={
-                      projeto.id
+                      projeto
                     }
                   >
-                    {projeto.nome}
+
+                    {projeto}
+
                   </option>
 
                 )
@@ -716,13 +715,15 @@ function TimeManagement() {
 
                   <option
                     key={
-                      atividade.id
+                      atividade
                     }
                     value={
-                      atividade.id
+                      atividade
                     }
                   >
-                    {atividade.nome}
+
+                    {atividade}
+
                   </option>
 
                 )
@@ -757,19 +758,28 @@ function TimeManagement() {
 
           <div
             style={{
-              padding: "12px 14px",
-              borderRadius: "8px",
+              padding:
+                "12px 14px",
+
+              borderRadius:
+                "8px",
+
               background:
                 "rgba(220, 38, 38, 0.08)",
+
               color:
                 "#dc2626",
+
               fontSize:
                 "12px",
+
               fontWeight:
                 600,
             }}
           >
+
             {erro}
+
           </div>
 
         )}
@@ -784,9 +794,11 @@ function TimeManagement() {
             </span>
 
             <strong>
+
               {formatarHoras(
                 totalHoras
-              )}h
+              )}
+
             </strong>
 
           </div>
@@ -944,21 +956,27 @@ function TimeManagement() {
                       >
 
                         <td>
+
                           {formatarData(
                             apontamento.data
                           )}
+
                         </td>
 
                         <td>
+
                           {apontamento.usuario
                             ?.nome ||
                             "-"}
+
                         </td>
 
                         <td>
+
                           {apontamento.projeto
                             ?.nome ||
                             "-"}
+
                         </td>
 
                         <td>
@@ -971,20 +989,26 @@ function TimeManagement() {
                         </td>
 
                         <td>
+
                           {apontamento.atividade
                             ?.nome ||
                             "-"}
+
                         </td>
 
                         <td>
+
                           {formatarHoras(
                             apontamento.horas
-                          )}h
+                          )}
+
                         </td>
 
                         <td>
+
                           {apontamento.comentario ||
                             "-"}
+
                         </td>
 
                       </tr>
