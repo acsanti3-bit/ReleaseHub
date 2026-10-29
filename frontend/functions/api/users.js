@@ -195,14 +195,20 @@ export async function onRequestPost(
       context.data.usuario;
 
 
-    if (
+    const solicitanteOperacional =
       usuarioResponsavel.role ===
-        "qualidade" &&
+        "qualidade" ||
+      usuarioResponsavel.role ===
+        "gestor";
+
+
+    if (
+      solicitanteOperacional &&
       role === "admin"
     ) {
 
       return respostaErro(
-        "O perfil Qualidade não pode cadastrar administradores.",
+        "Este perfil não pode cadastrar administradores.",
         403
       );
 
@@ -434,19 +440,21 @@ export async function onRequestPut(
     }
 
 
-    const solicitanteQualidade =
+    const solicitanteOperacional =
       usuarioAtual.role ===
-        "qualidade";
+        "qualidade" ||
+      usuarioAtual.role ===
+        "gestor";
 
 
     if (
-      solicitanteQualidade &&
+      solicitanteOperacional &&
       usuarioAnterior.role ===
         "admin"
     ) {
 
       return respostaErro(
-        "O perfil Qualidade não pode alterar usuários administradores.",
+        "Este perfil não pode alterar usuários administradores.",
         403
       );
 
@@ -454,7 +462,7 @@ export async function onRequestPut(
 
 
     if (
-      solicitanteQualidade &&
+      solicitanteOperacional &&
       (
         nome !== usuarioAnterior.nome ||
         email !== usuarioAnterior.email ||
@@ -465,7 +473,7 @@ export async function onRequestPut(
     ) {
 
       return respostaErro(
-        "O perfil Qualidade pode apenas redefinir a senha do usuário.",
+        "Este perfil pode apenas redefinir a senha do usuário.",
         403
       );
 
@@ -473,7 +481,7 @@ export async function onRequestPut(
 
 
     if (
-      solicitanteQualidade &&
+      solicitanteOperacional &&
       !novaSenha
     ) {
 
@@ -484,11 +492,6 @@ export async function onRequestPut(
 
     }
 
-
-    /*
-      Impede o administrador de
-      desativar o próprio acesso.
-    */
 
     if (
       usuarioAtual.role === "admin" &&
@@ -505,11 +508,6 @@ export async function onRequestPut(
 
     }
 
-
-    /*
-      Impede o administrador de
-      remover seu próprio perfil admin.
-    */
 
     if (
       usuarioAtual.role === "admin" &&
@@ -556,7 +554,7 @@ export async function onRequestPut(
     }
 
 
-    if (!solicitanteQualidade) {
+    if (!solicitanteOperacional) {
 
       await context.env.DB
         .prepare(
@@ -618,11 +616,6 @@ export async function onRequestPut(
         .run();
 
 
-      /*
-        Ao trocar a senha,
-        encerra as sessões antigas.
-      */
-
       await context.env.DB
         .prepare(
           `
@@ -642,22 +635,22 @@ export async function onRequestPut(
       id,
 
       nome:
-        solicitanteQualidade
+        solicitanteOperacional
           ? usuarioAnterior.nome
           : nome,
 
       email:
-        solicitanteQualidade
+        solicitanteOperacional
           ? usuarioAnterior.email
           : email,
 
       role:
-        solicitanteQualidade
+        solicitanteOperacional
           ? usuarioAnterior.role
           : role,
 
       ativo:
-        solicitanteQualidade
+        solicitanteOperacional
           ? Number(
               usuarioAnterior.ativo
             )

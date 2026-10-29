@@ -40,6 +40,7 @@ import type {
 
 import "./Settings.css";
 
+
 interface FormUsuario {
   id?: number;
   nome: string;
@@ -48,6 +49,7 @@ interface FormUsuario {
   role: UserRole;
   ativo: number;
 }
+
 
 const formularioVazio:
   FormUsuario = {
@@ -59,6 +61,7 @@ const formularioVazio:
   ativo: 1,
 
 };
+
 
 function nomePerfil(
   role: UserRole
@@ -76,7 +79,7 @@ function nomePerfil(
 
     case "gestor":
 
-      return "Gestora";
+      return "Gestor";
 
     case "visualizador":
 
@@ -89,6 +92,7 @@ function nomePerfil(
   }
 
 }
+
 
 function Settings() {
 
@@ -142,23 +146,28 @@ function Settings() {
   ] =
     useState("");
 
+
   const editando =
     Boolean(
       formulario.id
     );
 
+
   const administrador =
     usuarioLogado?.role === "admin";
+
 
   const qualidade =
     usuarioLogado?.role === "qualidade";
 
-  const gestora =
+
+  const gestor =
     usuarioLogado?.role === "gestor";
+
 
   const perfilOperacional =
     qualidade ||
-    gestora;
+    gestor;
 
 
   async function carregarUsuarioLogado() {
@@ -181,6 +190,7 @@ function Settings() {
     }
 
   }
+
 
   async function carregarUsuarios() {
 
@@ -214,12 +224,14 @@ function Settings() {
 
   }
 
+
   useEffect(() => {
 
     void carregarUsuarios();
     void carregarUsuarioLogado();
 
   }, []);
+
 
   const usuariosFiltrados =
     useMemo(() => {
@@ -253,11 +265,13 @@ function Settings() {
       pesquisa,
     ]);
 
+
   const totalAtivos =
     usuarios.filter(
       usuario =>
         usuario.ativo === 1
     ).length;
+
 
   const totalAdmins =
     usuarios.filter(
@@ -265,14 +279,16 @@ function Settings() {
         usuario.role === "admin"
     ).length;
 
+
   function abrirNovoUsuario() {
 
     setFormulario({
       ...formularioVazio,
+
       role:
         qualidade
           ? "qualidade"
-          : gestora
+          : gestor
             ? "gestor"
             : formularioVazio.role,
     });
@@ -282,6 +298,7 @@ function Settings() {
     setModalAberto(true);
 
   }
+
 
   function abrirEdicao(
     usuario: User
@@ -322,6 +339,7 @@ function Settings() {
 
   }
 
+
   function fecharModal() {
 
     if (salvando) {
@@ -340,6 +358,7 @@ function Settings() {
 
   }
 
+
   async function salvarUsuario(
     event:
       SyntheticEvent<HTMLFormElement>
@@ -357,6 +376,7 @@ function Settings() {
         .trim()
         .toLowerCase();
 
+
     if (
       !nome ||
       !email
@@ -370,6 +390,7 @@ function Settings() {
 
     }
 
+
     if (
       !editando &&
       formulario.senha.length < 12
@@ -382,6 +403,7 @@ function Settings() {
       return;
 
     }
+
 
     if (
       editando &&
@@ -397,6 +419,7 @@ function Settings() {
 
     }
 
+
     if (
       perfilOperacional &&
       editando &&
@@ -410,6 +433,7 @@ function Settings() {
       return;
 
     }
+
 
     setSalvando(true);
 
@@ -458,6 +482,7 @@ function Settings() {
 
       }
 
+
       await carregarUsuarios();
 
       setModalAberto(false);
@@ -483,6 +508,7 @@ function Settings() {
     }
 
   }
+
 
   return (
 
@@ -525,6 +551,7 @@ function Settings() {
 
         </header>
 
+
         <section className="settings-user-summary">
 
           <div className="settings-summary-item">
@@ -551,7 +578,9 @@ function Settings() {
 
           </div>
 
+
           <div className="settings-summary-divider" />
+
 
           <div className="settings-summary-item">
 
@@ -577,7 +606,9 @@ function Settings() {
 
           </div>
 
+
           <div className="settings-summary-divider" />
+
 
           <div className="settings-summary-item">
 
@@ -604,6 +635,7 @@ function Settings() {
           </div>
 
         </section>
+
 
         <section className="settings-users-card">
 
@@ -643,6 +675,7 @@ function Settings() {
 
           </div>
 
+
           {erro && !modalAberto && (
 
             <div className="settings-error">
@@ -652,6 +685,7 @@ function Settings() {
             </div>
 
           )}
+
 
           <div className="settings-table-container">
 
@@ -680,6 +714,7 @@ function Settings() {
                 </tr>
 
               </thead>
+
 
               <tbody>
 
@@ -802,6 +837,7 @@ function Settings() {
 
             </table>
 
+
             {carregando && (
 
               <div className="settings-empty">
@@ -812,25 +848,27 @@ function Settings() {
 
             )}
 
+
             {!carregando &&
-              usuariosFiltrados.length ===
-                0 && (
+              usuariosFiltrados.length === 0 && (
 
-                <div className="settings-empty">
+              <div className="settings-empty">
 
-                  Nenhum usuário encontrado.
+                Nenhum usuário encontrado.
 
-                </div>
+              </div>
 
-              )}
+            )}
 
           </div>
 
         </section>
 
+
         <AuditHistory />
 
       </div>
+
 
       {modalAberto && (
 
@@ -880,6 +918,7 @@ function Settings() {
 
             </div>
 
+
             <form
               className="settings-form"
               onSubmit={
@@ -911,6 +950,7 @@ function Settings() {
                 }
               />
 
+
               <label>
                 E-mail
               </label>
@@ -935,6 +975,7 @@ function Settings() {
                   )
                 }
               />
+
 
               <label>
                 Perfil
@@ -969,7 +1010,7 @@ function Settings() {
                 </option>
 
                 <option value="gestor">
-                  Gestora
+                  Gestor
                 </option>
 
                 {administrador && (
@@ -981,6 +1022,7 @@ function Settings() {
                 )}
 
               </select>
+
 
               {editando &&
                 administrador && (
@@ -1022,6 +1064,7 @@ function Settings() {
 
               )}
 
+
               <label>
 
                 {editando
@@ -1062,6 +1105,7 @@ function Settings() {
 
               </div>
 
+
               {editando && (
 
                 <small className="settings-password-help">
@@ -1074,6 +1118,7 @@ function Settings() {
 
               )}
 
+
               {erro && (
 
                 <div className="settings-modal-error">
@@ -1083,6 +1128,7 @@ function Settings() {
                 </div>
 
               )}
+
 
               <div className="settings-modal-actions">
 

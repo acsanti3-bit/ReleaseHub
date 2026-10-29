@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useState,
   type Dispatch,
@@ -8,7 +9,22 @@ import {
 
 import Layout from "../../components/layout";
 
+import {
+  criarGrupoHoras,
+  editarGrupoHoras,
+  excluirGrupoHoras,
+  listarGruposHoras,
+  obterPreferenciaGrupoHoras,
+  salvarPreferenciaGrupoHoras,
+} from "../../services/TimeGroupService";
+
+import type {
+  TimeGroup,
+  TimeGroupMember,
+} from "../../services/TimeGroupService";
+
 import "./TimeManagement.css";
+import "./TimeManagementGroups.css";
 
 
 interface TimeEntry {
@@ -303,6 +319,619 @@ function TimeManagement() {
     useState("");
 
 
+  const [
+    grupos,
+    setGrupos,
+  ] =
+    useState<TimeGroup[]>([]);
+
+  const [
+    grupoSelecionadoId,
+    setGrupoSelecionadoId,
+  ] =
+    useState("");
+
+  const [
+    carregandoGrupos,
+    setCarregandoGrupos,
+  ] =
+    useState(true);
+
+  const [
+    erroGrupo,
+    setErroGrupo,
+  ] =
+    useState("");
+
+  const [
+    modalGrupoAberto,
+    setModalGrupoAberto,
+  ] =
+    useState(false);
+
+  const [
+    grupoEmEdicao,
+    setGrupoEmEdicao,
+  ] =
+    useState<TimeGroup | null>(null);
+
+  const [
+    nomeGrupo,
+    setNomeGrupo,
+  ] =
+    useState("");
+
+  const [
+    membrosSelecionados,
+    setMembrosSelecionados,
+  ] =
+    useState<number[]>([]);
+
+  const [
+    salvandoGrupo,
+    setSalvandoGrupo,
+  ] =
+    useState(false);
+
+
+  async function carregarGrupos() {
+
+    try {
+
+      setCarregandoGrupos(
+        true
+      );
+
+      setErroGrupo("");
+
+      const [
+        lista,
+        ultimoGrupoId,
+      ] =
+        await Promise.all([
+          listarGruposHoras(),
+          obterPreferenciaGrupoHoras(),
+        ]);
+
+      setGrupos(
+        lista
+      );
+
+      const grupoSalvoExiste =
+        ultimoGrupoId !== null &&
+        lista.some(
+          grupo =>
+            grupo.id ===
+            ultimoGrupoId
+        );
+
+      setGrupoSelecionadoId(
+        grupoSalvoExiste
+          ? String(
+              ultimoGrupoId
+            )
+          : ""
+      );
+
+      if (
+        ultimoGrupoId !== null &&
+        !grupoSalvoExiste
+      ) {
+
+        await salvarPreferenciaGrupoHoras(
+          null
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao carregar grupos:",
+        error
+      );
+
+      setErroGrupo(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os grupos."
+      );
+
+    } finally {
+
+      setCarregandoGrupos(
+        false
+      );
+
+    }
+
+  }
+
+
+  useEffect(() => {
+
+    void carregarGrupos();
+
+  }, []);
+
+
+  const grupoSelecionado =
+    useMemo(
+      () =>
+        grupos.find(
+          grupo =>
+            String(
+              grupo.id
+            ) ===
+            grupoSelecionadoId
+        ) ||
+        null,
+      [
+        grupos,
+        grupoSelecionadoId,
+      ]
+    );
+
+
+  const usuariosRedmineDisponiveis =
+    useMemo(() => {
+
+      const mapa =
+        new Map<
+          number,
+          TimeGroupMember
+        >();
+
+      apontamentos.forEach(
+        apontamento => {
+
+          const id =
+            Number(
+              apontamento.usuario
+                ?.id
+            );
+
+          const nome =
+            apontamento.usuario
+              ?.nome
+              ?.trim() ||
+            "";
+
+          if (
+            !Number.isFinite(
+              id
+            ) ||
+            id <= 0 ||
+            !nome
+          ) {
+
+            return;
+
+          }
+
+          mapa.set(
+            id,
+            {
+              redmine_user_id:
+                id,
+
+              redmine_user_name:
+                nome,
+            }
+          );
+
+        }
+      );
+
+      grupoEmEdicao
+        ?.membros
+        .forEach(
+          membro => {
+
+            mapa.set(
+              membro.redmine_user_id,
+              {
+                redmine_user_id:
+                  membro.redmine_user_id,
+
+                redmine_user_name:
+                  membro.redmine_user_name,
+              }
+            );
+
+          }
+        );
+
+      return Array.from(
+        mapa.values()
+      )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.redmine_user_name
+              .localeCompare(
+                b.redmine_user_name,
+                "pt-BR"
+              )
+        );
+
+    }, [
+      apontamentos,
+      grupoEmEdicao,
+    ]);
+
+
+  const apontamentosDoGrupo =
+    useMemo(() => {
+
+      if (
+        !grupoSelecionado
+      ) {
+
+        return apontamentos;
+
+      }
+
+      const ids =
+        new Set(
+          grupoSelecionado
+            .membros
+            .map(
+              membro =>
+                membro.redmine_user_id
+            )
+        );
+
+      return apontamentos.filter(
+        apontamento => {
+
+          const id =
+            Number(
+              apontamento.usuario
+                ?.id
+            );
+
+          return (
+            Number.isFinite(
+              id
+            ) &&
+            ids.has(
+              id
+            )
+          );
+
+        }
+      );
+
+    }, [
+      apontamentos,
+      grupoSelecionado,
+    ]);
+
+
+  async function alterarGrupo(
+    valor: string
+  ) {
+
+    setGrupoSelecionadoId(
+      valor
+    );
+
+    setUsuarioSelecionado(
+      ""
+    );
+
+    setProjetoSelecionado(
+      ""
+    );
+
+    setAtividadeSelecionada(
+      ""
+    );
+
+    try {
+
+      await salvarPreferenciaGrupoHoras(
+        valor
+          ? Number(valor)
+          : null
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao salvar grupo selecionado:",
+        error
+      );
+
+      setErroGrupo(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar o grupo selecionado."
+      );
+
+    }
+
+  }
+
+
+  function abrirNovoGrupo() {
+
+    setGrupoEmEdicao(
+      null
+    );
+
+    setNomeGrupo(
+      ""
+    );
+
+    setMembrosSelecionados(
+      []
+    );
+
+    setErroGrupo("");
+
+    setModalGrupoAberto(
+      true
+    );
+
+  }
+
+
+  function abrirEdicaoGrupo() {
+
+    if (
+      !grupoSelecionado ||
+      !grupoSelecionado.podeEditar
+    ) {
+
+      return;
+
+    }
+
+    setGrupoEmEdicao(
+      grupoSelecionado
+    );
+
+    setNomeGrupo(
+      grupoSelecionado.nome
+    );
+
+    setMembrosSelecionados(
+      grupoSelecionado
+        .membros
+        .map(
+          membro =>
+            membro.redmine_user_id
+        )
+    );
+
+    setErroGrupo("");
+
+    setModalGrupoAberto(
+      true
+    );
+
+  }
+
+
+  function fecharModalGrupo() {
+
+    if (
+      salvandoGrupo
+    ) {
+
+      return;
+
+    }
+
+    setModalGrupoAberto(
+      false
+    );
+
+    setGrupoEmEdicao(
+      null
+    );
+
+    setNomeGrupo(
+      ""
+    );
+
+    setMembrosSelecionados(
+      []
+    );
+
+  }
+
+
+  function alternarMembroGrupo(
+    id: number
+  ) {
+
+    setMembrosSelecionados(
+      atual =>
+        atual.includes(
+          id
+        )
+          ? atual.filter(
+              item =>
+                item !== id
+            )
+          : [
+              ...atual,
+              id,
+            ]
+    );
+
+  }
+
+
+  async function salvarGrupo() {
+
+    const nome =
+      nomeGrupo.trim();
+
+    if (!nome) {
+
+      setErroGrupo(
+        "Informe o nome do grupo."
+      );
+
+      return;
+
+    }
+
+    const membros =
+      usuariosRedmineDisponiveis
+        .filter(
+          usuario =>
+            membrosSelecionados.includes(
+              usuario.redmine_user_id
+            )
+        );
+
+    if (
+      membros.length === 0
+    ) {
+
+      setErroGrupo(
+        "Selecione pelo menos um usuário."
+      );
+
+      return;
+
+    }
+
+    try {
+
+      setSalvandoGrupo(
+        true
+      );
+
+      setErroGrupo("");
+
+      if (
+        grupoEmEdicao
+      ) {
+
+        await editarGrupoHoras(
+          grupoEmEdicao.id,
+          nome,
+          membros
+        );
+
+      } else {
+
+        await criarGrupoHoras(
+          nome,
+          membros
+        );
+
+      }
+
+      const grupoAnteriorId =
+        grupoSelecionadoId;
+
+      await carregarGrupos();
+
+      if (
+        grupoAnteriorId
+      ) {
+
+        setGrupoSelecionadoId(
+          grupoAnteriorId
+        );
+
+      }
+
+      fecharModalGrupo();
+
+    } catch (error) {
+
+      setErroGrupo(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar o grupo."
+      );
+
+    } finally {
+
+      setSalvandoGrupo(
+        false
+      );
+
+    }
+
+  }
+
+
+  async function excluirGrupoSelecionado() {
+
+    if (
+      !grupoSelecionado ||
+      !grupoSelecionado.podeExcluir
+    ) {
+
+      return;
+
+    }
+
+    const confirmar =
+      window.confirm(
+        `Excluir o grupo "${grupoSelecionado.nome}"?`
+      );
+
+    if (!confirmar) {
+
+      return;
+
+    }
+
+    try {
+
+      setErroGrupo("");
+
+      await excluirGrupoHoras(
+        grupoSelecionado.id
+      );
+
+      setGrupoSelecionadoId(
+        ""
+      );
+
+      setUsuarioSelecionado(
+        ""
+      );
+
+      setProjetoSelecionado(
+        ""
+      );
+
+      setAtividadeSelecionada(
+        ""
+      );
+
+      await salvarPreferenciaGrupoHoras(
+        null
+      );
+
+      await carregarGrupos();
+
+    } catch (error) {
+
+      setErroGrupo(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível excluir o grupo."
+      );
+
+    }
+
+  }
+
+
   function preencherDataAtual(
     event:
       KeyboardEvent<HTMLInputElement>,
@@ -362,7 +991,7 @@ function TimeManagement() {
 
       return Array.from(
         new Set(
-          apontamentos
+          apontamentosDoGrupo
             .map(
               apontamento =>
                 apontamento.usuario
@@ -389,7 +1018,7 @@ function TimeManagement() {
         );
 
     }, [
-      apontamentos,
+      apontamentosDoGrupo,
     ]);
 
 
@@ -400,12 +1029,12 @@ function TimeManagement() {
         !usuarioSelecionado
       ) {
 
-        return apontamentos;
+        return apontamentosDoGrupo;
 
       }
 
 
-      return apontamentos.filter(
+      return apontamentosDoGrupo.filter(
         apontamento =>
           apontamento.usuario
             ?.nome
@@ -414,7 +1043,7 @@ function TimeManagement() {
       );
 
     }, [
-      apontamentos,
+      apontamentosDoGrupo,
       usuarioSelecionado,
     ]);
 
@@ -520,7 +1149,7 @@ function TimeManagement() {
   const apontamentosFiltrados =
     useMemo(() => {
 
-      return apontamentos.filter(
+      return apontamentosDoGrupo.filter(
         apontamento => {
 
           const usuario =
@@ -581,7 +1210,7 @@ function TimeManagement() {
       );
 
     }, [
-      apontamentos,
+      apontamentosDoGrupo,
       usuarioSelecionado,
       projetoSelecionado,
       atividadeSelecionada,
@@ -914,15 +1543,7 @@ function TimeManagement() {
 
   function limparFiltros() {
 
-    setUsuarioSelecionado(
-      ""
-    );
-
-    setProjetoSelecionado(
-      ""
-    );
-
-    setAtividadeSelecionada(
+    void alterarGrupo(
       ""
     );
 
@@ -1387,6 +2008,137 @@ function TimeManagement() {
           </div>
 
 
+          <div className="time-management-groups-bar">
+
+            <div className="time-management-field time-management-group-field">
+
+              <label htmlFor="time-group">
+                Grupo
+              </label>
+
+              <select
+                id="time-group"
+                value={
+                  grupoSelecionadoId
+                }
+                disabled={
+                  carregandoGrupos
+                }
+                onChange={
+                  event =>
+                    void alterarGrupo(
+                      event.target.value
+                    )
+                }
+              >
+
+                <option value="">
+                  Todos os usuários
+                </option>
+
+                {grupos.map(
+                  grupo => (
+
+                    <option
+                      key={
+                        grupo.id
+                      }
+                      value={
+                        grupo.id
+                      }
+                    >
+                      {grupo.nome}
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+
+            <div className="time-management-group-actions">
+
+              <button
+                type="button"
+                className="time-management-group-button primary"
+                onClick={
+                  abrirNovoGrupo
+                }
+              >
+                + Novo grupo
+              </button>
+
+              {grupoSelecionado
+                ?.podeEditar && (
+
+                <button
+                  type="button"
+                  className="time-management-group-button"
+                  onClick={
+                    abrirEdicaoGrupo
+                  }
+                >
+                  Editar grupo
+                </button>
+
+              )}
+
+              {grupoSelecionado
+                ?.podeExcluir && (
+
+                <button
+                  type="button"
+                  className="time-management-group-button danger"
+                  onClick={() =>
+                    void excluirGrupoSelecionado()
+                  }
+                >
+                  Excluir grupo
+                </button>
+
+              )}
+
+            </div>
+
+
+            {grupoSelecionado && (
+
+              <p className="time-management-group-meta">
+
+                {grupoSelecionado
+                  .membros
+                  .length}
+                {" "}
+                integrante
+                {grupoSelecionado
+                  .membros
+                  .length === 1
+                  ? ""
+                  : "s"}
+
+                {grupoSelecionado
+                  .criado_por_nome
+                  ? ` · Criado por ${grupoSelecionado.criado_por_nome}`
+                  : ""}
+
+              </p>
+
+            )}
+
+
+            {erroGrupo && !modalGrupoAberto && (
+
+              <div className="time-management-group-error">
+                {erroGrupo}
+              </div>
+
+            )}
+
+          </div>
+
+
           <div className="time-management-query-fields">
 
             <div className="time-management-field">
@@ -1536,6 +2288,7 @@ function TimeManagement() {
                     limparFiltros
                   }
                   disabled={
+                    !grupoSelecionadoId &&
                     !usuarioSelecionado &&
                     !projetoSelecionado &&
                     !atividadeSelecionada
@@ -1765,7 +2518,9 @@ function TimeManagement() {
 
                   {usuarioSelecionado
                     ? `Detalhamento das horas de ${usuarioSelecionado}.`
-                    : "Veja onde as horas estão concentradas no período selecionado."}
+                    : grupoSelecionado
+                      ? `Veja a distribuição das horas do grupo ${grupoSelecionado.nome}.`
+                      : "Veja onde as horas estão concentradas no período selecionado."}
 
                 </p>
 
@@ -1881,6 +2636,7 @@ function TimeManagement() {
                           "data"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -1908,6 +2664,7 @@ function TimeManagement() {
                           "usuario"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -1935,6 +2692,7 @@ function TimeManagement() {
                           "projeto"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -1962,6 +2720,7 @@ function TimeManagement() {
                           "tarefa"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -1989,6 +2748,7 @@ function TimeManagement() {
                           "atividade"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -2016,6 +2776,7 @@ function TimeManagement() {
                           "horas"
                         )}
                       </span>
+
                     </button>
 
                   </th>
@@ -2179,6 +2940,182 @@ function TimeManagement() {
         </section>
 
       </div>
+
+
+      {modalGrupoAberto && (
+
+        <div className="time-management-group-modal-overlay">
+
+          <div className="time-management-group-modal">
+
+            <div className="time-management-group-modal-header">
+
+              <div>
+
+                <h2>
+                  {grupoEmEdicao
+                    ? "Editar grupo"
+                    : "Novo grupo"}
+                </h2>
+
+                <p>
+                  Escolha o nome e os usuários do Redmine que fazem parte deste grupo.
+                </p>
+
+              </div>
+
+              <button
+                type="button"
+                className="time-management-group-modal-close"
+                onClick={
+                  fecharModalGrupo
+                }
+                aria-label="Fechar"
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <div className="time-management-group-modal-body">
+
+              <div className="time-management-group-name">
+
+                <label htmlFor="time-group-name">
+                  Nome do grupo
+                </label>
+
+                <input
+                  id="time-group-name"
+                  value={
+                    nomeGrupo
+                  }
+                  placeholder="Ex.: Desenvolvimento"
+                  onChange={
+                    event =>
+                      setNomeGrupo(
+                        event.target.value
+                      )
+                  }
+                />
+
+              </div>
+
+
+              <div className="time-management-group-members-title">
+
+                <strong>
+                  Usuários
+                </strong>
+
+                <span>
+                  {membrosSelecionados.length}
+                  {" "}
+                  selecionado
+                  {membrosSelecionados.length === 1
+                    ? ""
+                    : "s"}
+                </span>
+
+              </div>
+
+
+              <div className="time-management-group-members">
+
+                {usuariosRedmineDisponiveis.length === 0 && (
+
+                  <div className="time-management-group-empty">
+                    Faça primeiro uma consulta de período para carregar os usuários do Redmine.
+                  </div>
+
+                )}
+
+
+                {usuariosRedmineDisponiveis.map(
+                  usuario => (
+
+                    <label
+                      key={
+                        usuario.redmine_user_id
+                      }
+                      className="time-management-group-member"
+                    >
+
+                      <input
+                        type="checkbox"
+                        checked={
+                          membrosSelecionados.includes(
+                            usuario.redmine_user_id
+                          )
+                        }
+                        onChange={() =>
+                          alternarMembroGrupo(
+                            usuario.redmine_user_id
+                          )
+                        }
+                      />
+
+                      <span>
+                        {usuario.redmine_user_name}
+                      </span>
+
+                    </label>
+
+                  )
+                )}
+
+              </div>
+
+
+              {erroGrupo && (
+
+                <div className="time-management-group-error">
+                  {erroGrupo}
+                </div>
+
+              )}
+
+            </div>
+
+
+            <div className="time-management-group-modal-actions">
+
+              <button
+                type="button"
+                className="time-management-group-button"
+                onClick={
+                  fecharModalGrupo
+                }
+                disabled={
+                  salvandoGrupo
+                }
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="time-management-group-button primary"
+                onClick={() =>
+                  void salvarGrupo()
+                }
+                disabled={
+                  salvandoGrupo
+                }
+              >
+                {salvandoGrupo
+                  ? "Salvando..."
+                  : "Salvar grupo"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
     </Layout>
 

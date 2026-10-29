@@ -157,7 +157,7 @@ function Sidebar({
 
       case "gestor":
 
-        return "Gestora";
+        return "Gestor";
 
       case "visualizador":
 
