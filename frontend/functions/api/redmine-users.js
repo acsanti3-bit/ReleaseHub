@@ -30,6 +30,7 @@ function respostaErro(
   mensagem,
   status = 500
 ) {
+
   return Response.json(
     {
       erro:
@@ -39,12 +40,14 @@ function respostaErro(
       status,
     }
   );
+
 }
 
 
 function obterConfiguracao(
   context
 ) {
+
   const url =
     String(
       context.env.REDMINE_URL ??
@@ -68,21 +71,26 @@ function obterConfiguracao(
       ""
     );
 
+
   if (
     !url ||
     !usuario ||
     !senha
   ) {
+
     throw new Error(
       "As credenciais do Redmine não estão configuradas na Cloudflare."
     );
+
   }
+
 
   return {
     url,
     usuario,
     senha,
   };
+
 }
 
 
@@ -91,15 +99,18 @@ async function buscarJsonRedmine(
   caminho,
   parametros = {}
 ) {
+
   const configuracao =
     obterConfiguracao(
       context
     );
 
+
   const url =
     new URL(
       `${configuracao.url}${caminho}`
     );
+
 
   Object.entries(
     parametros
@@ -110,25 +121,32 @@ async function buscarJsonRedmine(
         valor,
       ]
     ) => {
+
       if (
         valor === undefined ||
         valor === null ||
         valor === ""
       ) {
+
         return;
+
       }
+
 
       url.searchParams.set(
         chave,
         String(valor)
       );
+
     }
   );
+
 
   const token =
     codificarBase64(
       `${configuracao.usuario}:${configuracao.senha}`
     );
+
 
   const response =
     await fetch(
@@ -150,180 +168,226 @@ async function buscarJsonRedmine(
       }
     );
 
+
   const texto =
     await response.text();
+
 
   if (
     response.status >= 300 &&
     response.status < 400
   ) {
+
     throw new Error(
       "O Redmine redirecionou a chamada."
     );
+
   }
+
 
   if (
     response.status === 401
   ) {
+
     throw new Error(
       "O Redmine recusou o usuário ou a senha configurados."
     );
+
   }
+
 
   if (
     response.status === 403
   ) {
+
     throw new Error(
-      "O usuário configurado no Redmine não possui permissão para listar usuários."
+      "O Redmine bloqueou a consulta dos apontamentos."
     );
+
   }
+
 
   if (
     !response.ok
   ) {
+
     throw new Error(
       `O Redmine retornou o erro ${response.status}.`
     );
+
   }
+
 
   return JSON.parse(
     texto
   );
+
 }
 
 
-async function listarUsuariosRedmine(
+async function listarUsuariosPorApontamentos(
   context
 ) {
+
   const usuarios =
-    [];
+    new Map();
+
 
   const limite =
     100;
 
+
   let offset =
     0;
+
 
   let total =
     null;
 
+
   while (
     total === null ||
-    usuarios.length < total
+    offset < total
   ) {
+
     const resultado =
       await buscarJsonRedmine(
         context,
-        "/users.json",
+        "/time_entries.json",
         {
-          status: 1,
           limit:
             limite,
+
           offset,
         }
       );
 
-    const itens =
+
+    const entradas =
       Array.isArray(
-        resultado.users
+        resultado.time_entries
       )
-        ? resultado.users
+        ? resultado.time_entries
         : [];
 
-    usuarios.push(
-      ...itens
+
+    entradas.forEach(
+      entrada => {
+
+        const id =
+          Number(
+            entrada.user?.id
+          );
+
+
+        const nome =
+          String(
+            entrada.user?.name ??
+            ""
+          ).trim();
+
+
+        if (
+          !Number.isFinite(id) ||
+          id <= 0 ||
+          !nome
+        ) {
+
+          return;
+
+        }
+
+
+        usuarios.set(
+          id,
+          {
+            id,
+            nome,
+          }
+        );
+
+      }
     );
+
 
     const totalRetornado =
       Number(
         resultado.total_count
       );
 
+
     total =
       Number.isFinite(
         totalRetornado
       )
         ? totalRetornado
-        : usuarios.length;
+        : offset +
+          entradas.length;
+
 
     if (
-      itens.length === 0 ||
-      itens.length < limite
+      entradas.length === 0 ||
+      entradas.length < limite
     ) {
+
       break;
+
     }
 
+
     offset +=
-      itens.length;
+      entradas.length;
+
   }
 
-  return usuarios;
+
+  return Array.from(
+    usuarios.values()
+  )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        a.nome.localeCompare(
+          b.nome,
+          "pt-BR"
+        )
+    );
+
 }
 
 
 export async function onRequestGet(
   context
 ) {
+
   try {
+
     const usuarios =
-      await listarUsuariosRedmine(
+      await listarUsuariosPorApontamentos(
         context
       );
 
-    const dados =
-      usuarios
-        .map(
-          usuario => ({
-            id:
-              Number(
-                usuario.id
-              ),
-
-            nome:
-              [
-                usuario.firstname,
-                usuario.lastname,
-              ]
-                .filter(Boolean)
-                .join(" ")
-                .trim() ||
-              usuario.login ||
-              `Usuário ${usuario.id}`,
-          })
-        )
-        .filter(
-          usuario =>
-            Number.isFinite(
-              usuario.id
-            ) &&
-            usuario.id > 0 &&
-            usuario.nome
-        )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            a.nome.localeCompare(
-              b.nome,
-              "pt-BR"
-            )
-        );
 
     return Response.json(
-      dados
+      usuarios
     );
 
   } catch (erro) {
+
     console.error(
-      "Erro ao listar usuários do Redmine:",
+      "Erro ao listar usuários pelos apontamentos do Redmine:",
       erro
     );
+
 
     return respostaErro(
       erro instanceof Error
         ? erro.message
         : "Não foi possível listar os usuários do Redmine."
     );
+
   }
+
 }
