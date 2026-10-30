@@ -21,6 +21,8 @@ import type {
   TimeGroupMember,
 } from "../../services/TimeGroupService";
 
+import Layout from "../../components/layout/Layout";
+
 import "./TimeManagement.css";
 import "./TimeManagementGroups.css";
 
@@ -2017,7 +2019,9 @@ function TimeManagement() {
 
   return (
 
-    <>
+    <Layout>
+
+      <>
 
       <div className="time-management-page">
 
@@ -3048,7 +3052,9 @@ function TimeManagement() {
 
       )}
 
-    </>
+      </>
+
+    </Layout>
 
   );
 
