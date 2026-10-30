@@ -7,8 +7,6 @@ import {
   type SetStateAction,
 } from "react";
 
-import Layout from "../../components/layout";
-
 import {
   criarGrupoHoras,
   editarGrupoHoras,
@@ -2019,7 +2017,7 @@ function TimeManagement() {
 
   return (
 
-    <Layout>
+    <>
 
       <div className="time-management-page">
 
@@ -3050,7 +3048,7 @@ function TimeManagement() {
 
       )}
 
-    </Layout>
+    </>
 
   );
 

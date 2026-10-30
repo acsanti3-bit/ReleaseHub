@@ -1,11 +1,10 @@
-import {
+﻿import {
   lazy,
   Suspense,
   useEffect,
   useState,
 } from "react";
 
-import Layout from "../../components/layout";
 import "./Dashboard.css";
 
 const RedmineProjectsMonitor = lazy(
@@ -181,7 +180,7 @@ function Dashboard() {
         );
       } catch (erro) {
         console.error(
-          "Erro ao carregar permissão:",
+          "Erro ao carregar permissÃ£o:",
           erro
         );
 
@@ -274,14 +273,14 @@ function Dashboard() {
         ignorados > 0
       ) {
         texto +=
-          ` ${ignorados} projetos não foram atualizados.`;
+          ` ${ignorados} projetos nÃ£o foram atualizados.`;
       }
 
       if (
         statusIgnorados > 0
       ) {
         texto +=
-          ` ${statusIgnorados} tarefas possuem situações ainda não mapeadas.`;
+          ` ${statusIgnorados} tarefas possuem situaÃ§Ãµes ainda nÃ£o mapeadas.`;
       }
 
       const detalhes = [
@@ -313,7 +312,7 @@ function Dashboard() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "Não foi possível sincronizar os dados com o Redmine.",
+            : "NÃ£o foi possÃ­vel sincronizar os dados com o Redmine.",
       });
     } finally {
       setSincronizandoRedmine(
@@ -324,7 +323,7 @@ function Dashboard() {
 
 
   return (
-    <Layout>
+    <>
       <div className="dashboard">
         <section className="dashboard-hero">
           <div className="dashboard-hero-copy">
@@ -337,7 +336,7 @@ function Dashboard() {
             </h1>
 
             <p>
-              Consulte projetos, tarefas abertas e acompanhe tudo o que está ativo no Redmine.
+              Consulte projetos, tarefas abertas e acompanhe tudo o que estÃ¡ ativo no Redmine.
             </p>
           </div>
 
@@ -367,7 +366,7 @@ function Dashboard() {
                   {
                     ambienteSelecionado
                       .concluido
-                      ? " • Concluída"
+                      ? " â€¢ ConcluÃ­da"
                       : ""
                   }
                 </small>
@@ -468,9 +467,10 @@ function Dashboard() {
           <RedmineProjectsMonitor />
         </Suspense>
       </div>
-    </Layout>
+    </>
   );
 }
 
 
 export default Dashboard;
+

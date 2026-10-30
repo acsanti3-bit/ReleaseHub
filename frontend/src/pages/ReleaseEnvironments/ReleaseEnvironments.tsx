@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import {
   MdAdd,
   MdCheckCircle,
@@ -22,7 +22,6 @@ import {
 
 import "./ReleaseEnvironments.css";
 
-import Layout from "../../components/layout/Layout";
 import ReleaseEnvironmentDrawer from "../../components/ReleaseEnvironmentDrawer/ReleaseEnvironmentDrawer";
 import EnvironmentDetailsModal from "../../components/EnvironmentDetailsModal/EnvironmentDetailsModal";
 
@@ -314,7 +313,7 @@ function ReleaseEnvironments() {
         usuario?.role === "admin"
       );
     } catch (erro) {
-      console.error("Erro ao carregar permissão:", erro);
+      console.error("Erro ao carregar permissÃ£o:", erro);
 
       setPodeEditar(false);
       setPodeExcluir(false);
@@ -458,7 +457,7 @@ function ReleaseEnvironments() {
 
       setFeedback({
         tipo: "erro",
-        texto: "Não foi possível salvar o ambiente. Tente novamente.",
+        texto: "NÃ£o foi possÃ­vel salvar o ambiente. Tente novamente.",
       });
     } finally {
       setSalvando(false);
@@ -508,7 +507,7 @@ function ReleaseEnvironments() {
 
       setFeedback({
         tipo: "sucesso",
-        texto: `Ambiente "${ambiente.nome}" excluído com sucesso.`,
+        texto: `Ambiente "${ambiente.nome}" excluÃ­do com sucesso.`,
       });
     } catch (erro) {
       console.error(
@@ -518,7 +517,7 @@ function ReleaseEnvironments() {
 
       setFeedback({
         tipo: "erro",
-        texto: `Não foi possível excluir o ambiente "${ambiente.nome}". Tente novamente.`,
+        texto: `NÃ£o foi possÃ­vel excluir o ambiente "${ambiente.nome}". Tente novamente.`,
       });
     } finally {
       setExcluindo(false);
@@ -567,7 +566,7 @@ function ReleaseEnvironments() {
       );
     } catch (erro) {
       console.error(
-        "Não foi possível copiar a linha da Wiki:",
+        "NÃ£o foi possÃ­vel copiar a linha da Wiki:",
         erro
       );
     }
@@ -650,18 +649,18 @@ function ReleaseEnvironments() {
       setFeedback({
         tipo: "sucesso",
         texto: vaiConcluir
-          ? `Ambiente "${ambienteSalvo.nome}" concluído com sucesso.`
+          ? `Ambiente "${ambienteSalvo.nome}" concluÃ­do com sucesso.`
           : `Ambiente "${ambienteSalvo.nome}" reaberto com sucesso.`,
       });
     } catch (erro) {
       console.error(
-        "Erro ao alterar situação do ambiente:",
+        "Erro ao alterar situaÃ§Ã£o do ambiente:",
         erro
       );
 
       setFeedback({
         tipo: "erro",
-        texto: "Não foi possível alterar a situação do ambiente. Tente novamente.",
+        texto: "NÃ£o foi possÃ­vel alterar a situaÃ§Ã£o do ambiente. Tente novamente.",
       });
     } finally {
       setSalvando(false);
@@ -705,7 +704,7 @@ function ReleaseEnvironments() {
       quantidade <= 0
     ) {
       window.alert(
-        "Informe uma data válida e uma quantidade de tarefas maior que zero."
+        "Informe uma data vÃ¡lida e uma quantidade de tarefas maior que zero."
       );
 
       return;
@@ -780,7 +779,7 @@ function ReleaseEnvironments() {
       setFeedback({
         tipo: "erro",
         texto:
-          "Não foi possível atualizar a remessa.",
+          "NÃ£o foi possÃ­vel atualizar a remessa.",
       });
     } finally {
       setSalvando(false);
@@ -841,7 +840,7 @@ function ReleaseEnvironments() {
       setFeedback({
         tipo: "sucesso",
         texto:
-          "Remessa excluída com sucesso.",
+          "Remessa excluÃ­da com sucesso.",
       });
     } catch (erro) {
       console.error(
@@ -852,7 +851,7 @@ function ReleaseEnvironments() {
       setFeedback({
         tipo: "erro",
         texto:
-          "Não foi possível excluir a remessa.",
+          "NÃ£o foi possÃ­vel excluir a remessa.",
       });
     } finally {
       setSalvando(false);
@@ -966,7 +965,7 @@ const versoesHistoricoRemessas =
 
 
   return (
-    <Layout>
+    <>
       <div className="release-page">
         {feedback && (
           <div
@@ -1007,8 +1006,8 @@ const versoesHistoricoRemessas =
             </h1>
 
             <p>
-              Cadastre os ambientes e as versões dos sistemas que compõem cada release.
-              {!podeEditar && " • Somente leitura"}
+              Cadastre os ambientes e as versÃµes dos sistemas que compÃµem cada release.
+              {!podeEditar && " â€¢ Somente leitura"}
             </p>
           </div>
 
@@ -1031,12 +1030,12 @@ const versoesHistoricoRemessas =
 
           <div>
             <strong>
-              Versões relacionadas
+              VersÃµes relacionadas
             </strong>
 
             <span>
-              Cada ambiente reúne as versões compatíveis de todos
-              os sistemas pertencentes à release.
+              Cada ambiente reÃºne as versÃµes compatÃ­veis de todos
+              os sistemas pertencentes Ã  release.
             </span>
           </div>
         </div>
@@ -1046,7 +1045,7 @@ const versoesHistoricoRemessas =
     <div className="release-remittance-history-header">
       <div>
         <span className="release-remittance-history-kicker">
-          Histórico
+          HistÃ³rico
         </span>
 
         <h2>
@@ -1081,7 +1080,7 @@ const versoesHistoricoRemessas =
               <div className="release-remittance-version-header">
                 <div>
                   <span>
-                    Versão do IntelliCash
+                    VersÃ£o do IntelliCash
                   </span>
 
                   <strong>
@@ -1309,7 +1308,7 @@ const versoesHistoricoRemessas =
                           }}
                         >
                           {ambiente.concluido
-                            ? "Concluído"
+                            ? "ConcluÃ­do"
                             : "Ativo"}
                         </span>
                       </div>
@@ -1593,7 +1592,7 @@ const versoesHistoricoRemessas =
                         : atual
                   );
                 }}
-                title="Pressione Espaço para preencher com a data de hoje"
+                title="Pressione EspaÃ§o para preencher com a data de hoje"
               />
             </div>
 
@@ -1678,7 +1677,7 @@ const versoesHistoricoRemessas =
             </h2>
 
             <p>
-              A remessa da versão{" "}
+              A remessa da versÃ£o{" "}
               <strong>
                 {remessaExcluindo.versao}
               </strong>{" "}
@@ -1692,7 +1691,7 @@ const versoesHistoricoRemessas =
               <strong>
                 {remessaExcluindo.quantidade} tarefas
               </strong>{" "}
-              será removida do histórico.
+              serÃ¡ removida do histÃ³rico.
             </p>
 
             <div className="release-remittance-edit-actions">
@@ -1773,7 +1772,7 @@ const versoesHistoricoRemessas =
               <div className="release-delete-badge">
                 <MdDeleteOutline size={16} />
 
-                Exclusão permanente
+                ExclusÃ£o permanente
               </div>
 
               <h2 id="release-delete-title">
@@ -1787,7 +1786,7 @@ const versoesHistoricoRemessas =
                 Tem certeza de que deseja excluir o ambiente
                 {" "}
                 <strong>
-                  “{ambienteExclusao.nome}”
+                  â€œ{ambienteExclusao.nome}â€
                 </strong>
                 ?
               </p>
@@ -1796,7 +1795,7 @@ const versoesHistoricoRemessas =
                 <MdErrorOutline size={21} />
 
                 <span>
-                  Esta ação removerá permanentemente o ambiente e não poderá ser desfeita.
+                  Esta aÃ§Ã£o removerÃ¡ permanentemente o ambiente e nÃ£o poderÃ¡ ser desfeita.
                 </span>
               </div>
 
@@ -1927,7 +1926,7 @@ const versoesHistoricoRemessas =
               >
                 {ambienteConfirmacao.concluido
                   ? "Reabrir esta release?"
-                  : "Esta release já foi para produção?"}
+                  : "Esta release jÃ¡ foi para produÃ§Ã£o?"}
               </h2>
 
               <p
@@ -1953,8 +1952,8 @@ const versoesHistoricoRemessas =
                 }}
               >
                 {ambienteConfirmacao.concluido
-                  ? "Ao reabrir, a sincronização automática com o Redmine será retomada e os dados voltarão a acompanhar as alterações da release."
-                  : "Ao concluir, a release continuará disponível no ReleaseHub e permanecerá visível no Modo TV como histórico da versão em produção. Apenas a sincronização automática com o Redmine será encerrada."}
+                  ? "Ao reabrir, a sincronizaÃ§Ã£o automÃ¡tica com o Redmine serÃ¡ retomada e os dados voltarÃ£o a acompanhar as alteraÃ§Ãµes da release."
+                  : "Ao concluir, a release continuarÃ¡ disponÃ­vel no ReleaseHub e permanecerÃ¡ visÃ­vel no Modo TV como histÃ³rico da versÃ£o em produÃ§Ã£o. Apenas a sincronizaÃ§Ã£o automÃ¡tica com o Redmine serÃ¡ encerrada."}
               </p>
 
               <div
@@ -2053,12 +2052,12 @@ const versoesHistoricoRemessas =
               </div>
 
               <h2 id="release-wiki-title">
-                Atualizar a página de versões?
+                Atualizar a pÃ¡gina de versÃµes?
               </h2>
 
               <p className="release-wiki-question">
-                A release <strong>{ambienteWiki.nome}</strong> foi concluída.
-                Copie a linha abaixo e adicione-a na página geral de atualizações da Wiki.
+                A release <strong>{ambienteWiki.nome}</strong> foi concluÃ­da.
+                Copie a linha abaixo e adicione-a na pÃ¡gina geral de atualizaÃ§Ãµes da Wiki.
               </p>
 
               <div className="release-wiki-version">
@@ -2093,7 +2092,7 @@ const versoesHistoricoRemessas =
 
               <div className="release-wiki-help">
                 <span>
-                  Depois, abra a página de Atualizações, cole a linha no ano correspondente e salve.
+                  Depois, abra a pÃ¡gina de AtualizaÃ§Ãµes, cole a linha no ano correspondente e salve.
                 </span>
               </div>
 
@@ -2106,7 +2105,7 @@ const versoesHistoricoRemessas =
                     setCopiadoWiki(false);
                   }}
                 >
-                  Agora não
+                  Agora nÃ£o
                 </button>
 
                 <button
@@ -2123,7 +2122,7 @@ const versoesHistoricoRemessas =
         </div>
       )}
 
-    </Layout>
+    </>
   );
 }
 
