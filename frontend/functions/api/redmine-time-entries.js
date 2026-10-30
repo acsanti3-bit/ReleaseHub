@@ -262,6 +262,97 @@ async function listarTimeEntries(
 }
 
 
+async function atualizarCacheUsuarios(
+  context,
+  entradas
+) {
+  try {
+    const usuarios =
+      new Map();
+
+    entradas.forEach(
+      entrada => {
+
+        const id =
+          Number(
+            entrada.user?.id
+          );
+
+        const nome =
+          String(
+            entrada.user?.name ??
+            ""
+          ).trim();
+
+        if (
+          !Number.isFinite(id) ||
+          id <= 0 ||
+          !nome
+        ) {
+          return;
+        }
+
+        usuarios.set(
+          id,
+          nome
+        );
+      }
+    );
+
+    if (
+      usuarios.size === 0
+    ) {
+      return;
+    }
+
+    const comandos =
+      Array.from(
+        usuarios.entries()
+      )
+        .map(
+          (
+            [
+              id,
+              nome,
+            ]
+          ) =>
+            context.env.DB
+              .prepare(
+                `
+                  INSERT INTO redmine_users_cache (
+                    redmine_user_id,
+                    redmine_user_name,
+                    last_seen
+                  )
+                  VALUES (?, ?, CURRENT_TIMESTAMP)
+
+                  ON CONFLICT(redmine_user_id)
+                  DO UPDATE SET
+                    redmine_user_name =
+                      excluded.redmine_user_name,
+                    last_seen =
+                      CURRENT_TIMESTAMP
+                `
+              )
+              .bind(
+                id,
+                nome
+              )
+        );
+
+    await context.env.DB.batch(
+      comandos
+    );
+
+  } catch (erro) {
+    console.error(
+      "Erro ao atualizar cache de usuários do Redmine:",
+      erro
+    );
+  }
+}
+
+
 export async function onRequestGet(
   context
 ) {
@@ -289,6 +380,13 @@ export async function onRequestGet(
           to,
         }
       );
+
+
+    await atualizarCacheUsuarios(
+      context,
+      entradas
+    );
+
 
     const dados =
       entradas.map(
@@ -352,7 +450,9 @@ export async function onRequestGet(
         dados,
       }
     );
+
   } catch (erro) {
+
     console.error(
       "Erro ao consultar apontamentos do Redmine:",
       erro
