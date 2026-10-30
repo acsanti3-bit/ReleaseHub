@@ -61,6 +61,12 @@ interface TimeEntriesResponse {
 }
 
 
+interface RedmineUser {
+  id: number;
+  nome: string;
+}
+
+
 interface DistribuicaoItem {
   nome: string;
   horas: number;
@@ -374,6 +380,92 @@ function TimeManagement() {
     useState(false);
 
 
+  const [
+    usuariosRedmine,
+    setUsuariosRedmine,
+  ] =
+    useState<RedmineUser[]>([]);
+
+  const [
+    carregandoUsuariosRedmine,
+    setCarregandoUsuariosRedmine,
+  ] =
+    useState(true);
+
+
+  async function carregarUsuariosRedmine() {
+
+    try {
+
+      setCarregandoUsuariosRedmine(
+        true
+      );
+
+      const response =
+        await fetch(
+          "/api/redmine-users",
+          {
+            method:
+              "GET",
+
+            credentials:
+              "include",
+
+            cache:
+              "no-store",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+          data.erro ||
+          "Não foi possível carregar os usuários do Redmine."
+        );
+
+      }
+
+      setUsuariosRedmine(
+        Array.isArray(
+          data
+        )
+          ? data
+          : []
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao carregar usuários do Redmine:",
+        error
+      );
+
+      setErroGrupo(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os usuários do Redmine."
+      );
+
+      setUsuariosRedmine(
+        []
+      );
+
+    } finally {
+
+      setCarregandoUsuariosRedmine(
+        false
+      );
+
+    }
+
+  }
+
+
   async function carregarGrupos() {
 
     try {
@@ -451,6 +543,7 @@ function TimeManagement() {
   useEffect(() => {
 
     void carregarGrupos();
+    void carregarUsuariosRedmine();
 
   }, []);
 
@@ -482,41 +575,17 @@ function TimeManagement() {
           TimeGroupMember
         >();
 
-      apontamentos.forEach(
-        apontamento => {
-
-          const id =
-            Number(
-              apontamento.usuario
-                ?.id
-            );
-
-          const nome =
-            apontamento.usuario
-              ?.nome
-              ?.trim() ||
-            "";
-
-          if (
-            !Number.isFinite(
-              id
-            ) ||
-            id <= 0 ||
-            !nome
-          ) {
-
-            return;
-
-          }
+      usuariosRedmine.forEach(
+        usuario => {
 
           mapa.set(
-            id,
+            usuario.id,
             {
               redmine_user_id:
-                id,
+                usuario.id,
 
               redmine_user_name:
-                nome,
+                usuario.nome,
             }
           );
 
@@ -558,7 +627,7 @@ function TimeManagement() {
         );
 
     }, [
-      apontamentos,
+      usuariosRedmine,
       grupoEmEdicao,
     ]);
 
@@ -2024,12 +2093,33 @@ function TimeManagement() {
 
           <div className="time-management-groups-bar">
 
-            <div className="time-management-group-row">
+            <div className="time-management-groups-heading">
 
-              <div className="time-management-group-field">
+              <div>
+
+                <span className="time-management-group-kicker">
+                  Equipes
+                </span>
+
+                <h3>
+                  Grupo de usuários
+                </h3>
+
+                <p>
+                  Selecione um grupo salvo ou crie um novo para facilitar suas consultas.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="time-management-group-controls">
+
+              <div className="time-management-field time-management-group-field">
 
                 <label htmlFor="time-group">
-                  Grupo de usuários
+                  Grupo
                 </label>
 
                 <select
@@ -2074,76 +2164,78 @@ function TimeManagement() {
               </div>
 
 
-              <div className="time-management-group-actions">
+              <button
+                type="button"
+                className="time-management-group-button primary"
+                onClick={
+                  abrirNovoGrupo
+                }
+              >
+                + Novo grupo
+              </button>
+
+
+              {grupoSelecionado
+                ?.podeEditar && (
 
                 <button
                   type="button"
-                  className="time-management-group-button primary"
+                  className="time-management-group-button"
                   onClick={
-                    abrirNovoGrupo
+                    abrirEdicaoGrupo
                   }
                 >
-                  + Novo grupo
+                  Editar
                 </button>
 
-
-                {grupoSelecionado
-                  ?.podeEditar && (
-
-                  <button
-                    type="button"
-                    className="time-management-group-button"
-                    onClick={
-                      abrirEdicaoGrupo
-                    }
-                  >
-                    Editar
-                  </button>
-
-                )}
+              )}
 
 
-                {grupoSelecionado
-                  ?.podeExcluir && (
+              {grupoSelecionado
+                ?.podeExcluir && (
 
-                  <button
-                    type="button"
-                    className="time-management-group-button danger"
-                    onClick={() =>
-                      void excluirGrupoSelecionado()
-                    }
-                  >
-                    Excluir
-                  </button>
+                <button
+                  type="button"
+                  className="time-management-group-button danger"
+                  onClick={() =>
+                    void excluirGrupoSelecionado()
+                  }
+                >
+                  Excluir
+                </button>
 
-                )}
-
-              </div>
+              )}
 
             </div>
 
 
             {grupoSelecionado && (
 
-              <p className="time-management-group-meta">
+              <div className="time-management-group-meta">
 
-                {grupoSelecionado
-                  .membros
-                  .length}
-                {" "}
-                integrante
-                {grupoSelecionado
-                  .membros
-                  .length === 1
-                  ? ""
-                  : "s"}
+                <strong>
+                  {grupoSelecionado.nome}
+                </strong>
 
-                {grupoSelecionado
-                  .criado_por_nome
-                  ? ` · Criado por ${grupoSelecionado.criado_por_nome}`
-                  : ""}
+                <span>
+                  {grupoSelecionado
+                    .membros
+                    .length}
+                  {" "}
+                  integrante
+                  {grupoSelecionado
+                    .membros
+                    .length === 1
+                    ? ""
+                    : "s"}
 
-              </p>
+                  {grupoSelecionado
+                    .criado_por_nome
+                    ? ` · Criado por ${grupoSelecionado.criado_por_nome}`
+                    : ""}
+                </span>
+
+              </div>
 
             )}
 
@@ -3038,10 +3130,20 @@ function TimeManagement() {
 
               <div className="time-management-group-members">
 
-                {usuariosRedmineDisponiveis.length === 0 && (
+                {carregandoUsuariosRedmine && (
 
                   <div className="time-management-group-empty">
-                    Faça primeiro uma consulta de período para carregar os usuários do Redmine.
+                    Carregando usuários do Redmine...
+                  </div>
+
+                )}
+
+
+                {!carregandoUsuariosRedmine &&
+                  usuariosRedmineDisponiveis.length === 0 && (
+
+                  <div className="time-management-group-empty">
+                    Nenhum usuário do Redmine disponível.
                   </div>
 
                 )}

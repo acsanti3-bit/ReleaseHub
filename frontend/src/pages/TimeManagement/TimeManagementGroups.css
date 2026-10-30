@@ -1,18 +1,54 @@
 .time-management-groups-bar {
   margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid #eaecf0;
+  padding: 20px;
+  border: 1px solid #e7eaf0;
+  border-radius: 14px;
+  background: #ffffff;
 }
 
-.time-management-group-row {
+.time-management-groups-heading {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.time-management-group-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #0b66b2;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.time-management-groups-heading h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+.time-management-groups-heading p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.time-management-group-controls {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1fr)
+    auto
+    auto
+    auto;
+  align-items: end;
+  gap: 10px;
 }
 
 .time-management-group-field {
-  width: min(420px, 100%);
+  min-width: 0;
 }
 
 .time-management-group-field label {
@@ -23,54 +59,48 @@
   font-weight: 700;
 }
 
+.time-management-group-field select,
+.time-management-group-button {
+  height: 42px;
+  box-sizing: border-box;
+  font: inherit;
+}
+
 .time-management-group-field select {
   width: 100%;
-  min-height: 42px;
   padding: 0 12px;
   border: 1px solid #d0d5dd;
   border-radius: 10px;
   background: #ffffff;
   color: #344054;
-  font: inherit;
   outline: none;
 }
 
 .time-management-group-field select:focus {
   border-color: #1570ef;
-  box-shadow: 0 0 0 3px rgba(21, 112, 239, 0.08);
-}
-
-.time-management-group-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  box-shadow:
+    0 0 0 3px
+    rgba(21, 112, 239, 0.08);
 }
 
 .time-management-group-button {
-  min-height: 42px;
   padding: 0 16px;
   border: 1px solid #d0d5dd;
   border-radius: 10px;
   background: #ffffff;
   color: #344054;
-  font: inherit;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
   transition:
     background 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.15s ease;
+    border-color 0.15s ease;
 }
 
 .time-management-group-button:hover {
   background: #f9fafb;
   border-color: #b8c0cc;
-}
-
-.time-management-group-button:active {
-  transform: translateY(1px);
 }
 
 .time-management-group-button.primary {
@@ -86,7 +116,6 @@
 
 .time-management-group-button.danger {
   border-color: #fecdca;
-  background: #ffffff;
   color: #b42318;
 }
 
@@ -97,11 +126,23 @@
 .time-management-group-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
 
 .time-management-group-meta {
-  margin: 9px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.time-management-group-meta strong {
+  color: #344054;
+  font-size: 13px;
+}
+
+.time-management-group-meta span {
   color: #667085;
   font-size: 12px;
 }
@@ -278,11 +319,28 @@
 body.dark-mode
 .time-management-groups-bar {
   border-color: #344054;
+  background: #1d2939;
 }
 
 body.dark-mode
-.time-management-group-field label {
-  color: #d0d5dd;
+.time-management-group-kicker {
+  color: #84caff;
+}
+
+body.dark-mode
+.time-management-groups-heading h3,
+body.dark-mode
+.time-management-group-field label,
+body.dark-mode
+.time-management-group-meta strong {
+  color: #f2f4f7;
+}
+
+body.dark-mode
+.time-management-groups-heading p,
+body.dark-mode
+.time-management-group-meta span {
+  color: #98a2b3;
 }
 
 body.dark-mode
@@ -301,7 +359,7 @@ body.dark-mode
 
 body.dark-mode
 .time-management-group-button:hover {
-  background: #1d2939;
+  background: #344054;
 }
 
 body.dark-mode
@@ -317,18 +375,8 @@ body.dark-mode
 }
 
 body.dark-mode
-.time-management-group-button.danger:hover {
-  background: rgba(
-    180,
-    35,
-    24,
-    0.12
-  );
-}
-
-body.dark-mode
 .time-management-group-meta {
-  color: #98a2b3;
+  border-color: #344054;
 }
 
 body.dark-mode
@@ -386,24 +434,41 @@ body.dark-mode
 
 
 @media (
-  max-width: 720px
+  max-width: 900px
 ) {
 
-  .time-management-group-row {
-    align-items: stretch;
+  .time-management-group-controls {
+    grid-template-columns:
+      1fr
+      auto
+      auto;
   }
 
   .time-management-group-field {
-    width: 100%;
+    grid-column:
+      1 / -1;
   }
 
-  .time-management-group-actions {
-    width: 100%;
+}
+
+
+@media (
+  max-width: 640px
+) {
+
+  .time-management-group-controls {
+    grid-template-columns:
+      1fr;
   }
 
-  .time-management-group-actions
   .time-management-group-button {
-    flex: 1;
+    width: 100%;
+  }
+
+  .time-management-group-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
   }
 
   .time-management-group-modal-overlay {
