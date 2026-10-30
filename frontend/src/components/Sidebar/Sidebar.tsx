@@ -33,6 +33,70 @@ interface Props {
 }
 
 
+const SESSION_USER_KEY =
+  "releasehub-session-user";
+
+
+function obterUsuarioSalvo():
+  AuthUser | null {
+
+  try {
+
+    const valor =
+      sessionStorage.getItem(
+        SESSION_USER_KEY
+      );
+
+    if (!valor) {
+
+      return null;
+
+    }
+
+    return JSON.parse(
+      valor
+    ) as AuthUser;
+
+  } catch {
+
+    return null;
+
+  }
+
+}
+
+
+function salvarUsuario(
+  usuario: AuthUser | null
+) {
+
+  try {
+
+    if (usuario) {
+
+      sessionStorage.setItem(
+        SESSION_USER_KEY,
+        JSON.stringify(
+          usuario
+        )
+      );
+
+    } else {
+
+      sessionStorage.removeItem(
+        SESSION_USER_KEY
+      );
+
+    }
+
+  } catch {
+
+    // sessionStorage indisponível.
+  }
+
+}
+
+
 function Sidebar({
   darkMode,
   onToggleTheme,
@@ -41,13 +105,17 @@ function Sidebar({
   const navigate =
     useNavigate();
 
+
   const [
     usuario,
     setUsuario,
   ] =
     useState<
       AuthUser | null
-    >(null);
+    >(
+      obterUsuarioSalvo
+    );
+
 
   const [
     saindo,
@@ -55,9 +123,12 @@ function Sidebar({
   ] =
     useState(false);
 
+
   useEffect(() => {
 
-    let ativo = true;
+    let ativo =
+      true;
+
 
     async function carregarUsuario() {
 
@@ -66,13 +137,22 @@ function Sidebar({
         const sessao =
           await buscarSessao();
 
-        if (ativo) {
 
-          setUsuario(
-            sessao
-          );
+        if (!ativo) {
+
+          return;
 
         }
+
+
+        setUsuario(
+          sessao
+        );
+
+
+        salvarUsuario(
+          sessao
+        );
 
       } catch (erro) {
 
@@ -85,11 +165,14 @@ function Sidebar({
 
     }
 
+
     void carregarUsuario();
+
 
     return () => {
 
-      ativo = false;
+      ativo =
+        false;
 
     };
 
@@ -104,7 +187,11 @@ function Sidebar({
 
     }
 
-    setSaindo(true);
+
+    setSaindo(
+      true
+    );
+
 
     try {
 
@@ -119,14 +206,28 @@ function Sidebar({
 
     } finally {
 
+      salvarUsuario(
+        null
+      );
+
+
+      setUsuario(
+        null
+      );
+
+
       navigate(
         "/login",
         {
-          replace: true,
+          replace:
+            true,
         }
       );
 
-      setSaindo(false);
+
+      setSaindo(
+        false
+      );
 
     }
 
@@ -151,17 +252,21 @@ function Sidebar({
 
         return "Administrador";
 
+
       case "qualidade":
 
         return "Qualidade";
+
 
       case "gestor":
 
         return "Gestor";
 
+
       case "visualizador":
 
         return "Visualizador";
+
 
       default:
 
@@ -210,6 +315,7 @@ function Sidebar({
           Monitoramento
         </NavLink>
 
+
         {podeAcessarAmbientes && (
 
           <NavLink to="/environments">
@@ -218,13 +324,16 @@ function Sidebar({
 
         )}
 
+
         <NavLink to="/compatibility">
           Compatibilidade
         </NavLink>
 
+
         <NavLink to="/isa">
           ISA
         </NavLink>
+
 
         {podeAcessarGestaoHoras && (
 
@@ -234,9 +343,11 @@ function Sidebar({
 
         )}
 
+
         <NavLink to="/tv">
           Modo TV
         </NavLink>
+
 
         {podeAcessarConfiguracoes && (
 
@@ -254,7 +365,9 @@ function Sidebar({
         <button
           type="button"
           className="sidebar-theme-toggle"
-          onClick={onToggleTheme}
+          onClick={
+            onToggleTheme
+          }
           title={
             darkMode
               ? "Ativar modo claro"
@@ -276,6 +389,7 @@ function Sidebar({
 
           )}
 
+
           <span>
 
             {darkMode
@@ -295,15 +409,21 @@ function Sidebar({
 
           </div>
 
+
           <div className="sidebar-auth-info">
 
             <strong>
+
               {usuario?.nome ||
                 "Usuário"}
+
             </strong>
 
+
             <span>
+
               {descricaoPerfil()}
+
             </span>
 
           </div>
@@ -317,12 +437,15 @@ function Sidebar({
           onClick={() =>
             void handleLogout()
           }
-          disabled={saindo}
+          disabled={
+            saindo
+          }
         >
 
           <MdLogout
             size={18}
           />
+
 
           {saindo
             ? "Saindo..."
@@ -337,5 +460,6 @@ function Sidebar({
   );
 
 }
+
 
 export default Sidebar;
