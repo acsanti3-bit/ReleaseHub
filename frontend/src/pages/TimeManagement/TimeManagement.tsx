@@ -846,7 +846,21 @@ function TimeManagement() {
 
       }
 
-      fecharModalGrupo();
+      setModalGrupoAberto(
+        false
+      );
+
+      setGrupoEmEdicao(
+        null
+      );
+
+      setNomeGrupo(
+        ""
+      );
+
+      setMembrosSelecionados(
+        []
+      );
 
     } catch (error) {
 
@@ -2010,95 +2024,101 @@ function TimeManagement() {
 
           <div className="time-management-groups-bar">
 
-            <div className="time-management-field time-management-group-field">
+            <div className="time-management-group-row">
 
-              <label htmlFor="time-group">
-                Grupo
-              </label>
+              <div className="time-management-group-field">
 
-              <select
-                id="time-group"
-                value={
-                  grupoSelecionadoId
-                }
-                disabled={
-                  carregandoGrupos
-                }
-                onChange={
-                  event =>
-                    void alterarGrupo(
-                      event.target.value
+                <label htmlFor="time-group">
+                  Grupo de usuários
+                </label>
+
+                <select
+                  id="time-group"
+                  value={
+                    grupoSelecionadoId
+                  }
+                  disabled={
+                    carregandoGrupos
+                  }
+                  onChange={
+                    event =>
+                      void alterarGrupo(
+                        event.target.value
+                      )
+                  }
+                >
+
+                  <option value="">
+                    Todos os usuários
+                  </option>
+
+                  {grupos.map(
+                    grupo => (
+
+                      <option
+                        key={
+                          grupo.id
+                        }
+                        value={
+                          grupo.id
+                        }
+                      >
+                        {grupo.nome}
+                      </option>
+
                     )
-                }
-              >
+                  )}
 
-                <option value="">
-                  Todos os usuários
-                </option>
+                </select>
 
-                {grupos.map(
-                  grupo => (
+              </div>
 
-                    <option
-                      key={
-                        grupo.id
-                      }
-                      value={
-                        grupo.id
-                      }
-                    >
-                      {grupo.nome}
-                    </option>
 
-                  )
+              <div className="time-management-group-actions">
+
+                <button
+                  type="button"
+                  className="time-management-group-button primary"
+                  onClick={
+                    abrirNovoGrupo
+                  }
+                >
+                  + Novo grupo
+                </button>
+
+
+                {grupoSelecionado
+                  ?.podeEditar && (
+
+                  <button
+                    type="button"
+                    className="time-management-group-button"
+                    onClick={
+                      abrirEdicaoGrupo
+                    }
+                  >
+                    Editar
+                  </button>
+
                 )}
 
-              </select>
 
-            </div>
+                {grupoSelecionado
+                  ?.podeExcluir && (
 
+                  <button
+                    type="button"
+                    className="time-management-group-button danger"
+                    onClick={() =>
+                      void excluirGrupoSelecionado()
+                    }
+                  >
+                    Excluir
+                  </button>
 
-            <div className="time-management-group-actions">
+                )}
 
-              <button
-                type="button"
-                className="time-management-group-button primary"
-                onClick={
-                  abrirNovoGrupo
-                }
-              >
-                + Novo grupo
-              </button>
-
-              {grupoSelecionado
-                ?.podeEditar && (
-
-                <button
-                  type="button"
-                  className="time-management-group-button"
-                  onClick={
-                    abrirEdicaoGrupo
-                  }
-                >
-                  Editar grupo
-                </button>
-
-              )}
-
-              {grupoSelecionado
-                ?.podeExcluir && (
-
-                <button
-                  type="button"
-                  className="time-management-group-button danger"
-                  onClick={() =>
-                    void excluirGrupoSelecionado()
-                  }
-                >
-                  Excluir grupo
-                </button>
-
-              )}
+              </div>
 
             </div>
 
@@ -2128,7 +2148,8 @@ function TimeManagement() {
             )}
 
 
-            {erroGrupo && !modalGrupoAberto && (
+            {erroGrupo &&
+              !modalGrupoAberto && (
 
               <div className="time-management-group-error">
                 {erroGrupo}
@@ -2636,7 +2657,6 @@ function TimeManagement() {
                           "data"
                         )}
                       </span>
-
                     </button>
 
                   </th>
@@ -2664,7 +2684,6 @@ function TimeManagement() {
                           "usuario"
                         )}
                       </span>
-
                     </button>
 
                   </th>
@@ -2692,7 +2711,6 @@ function TimeManagement() {
                           "projeto"
                         )}
                       </span>
-
                     </button>
 
                   </th>
@@ -2720,7 +2738,6 @@ function TimeManagement() {
                           "tarefa"
                         )}
                       </span>
-
                     </button>
 
                   </th>
@@ -2748,7 +2765,6 @@ function TimeManagement() {
                           "atividade"
                         )}
                       </span>
-
                     </button>
 
                   </th>
@@ -2776,7 +2792,6 @@ function TimeManagement() {
                           "horas"
                         )}
                       </span>
-
                     </button>
 
                   </th>
