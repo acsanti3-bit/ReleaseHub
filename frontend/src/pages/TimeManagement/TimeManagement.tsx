@@ -936,7 +936,7 @@ function TimeManagement() {
       setErroGrupo(
         error instanceof Error
           ? error.message
-          : "Não foi possível salvar o grupo."
+          : "Não foi possível salvar o departamento."
       );
 
     } finally {
@@ -963,7 +963,7 @@ function TimeManagement() {
 
     const confirmar =
       window.confirm(
-        `Excluir o grupo "${grupoSelecionado.nome}"?`
+        `Excluir o departamento "${grupoSelecionado.nome}"?`
       );
 
     if (!confirmar) {
@@ -1007,7 +1007,7 @@ function TimeManagement() {
       setErroGrupo(
         error instanceof Error
           ? error.message
-          : "Não foi possível excluir o grupo."
+          : "Não foi possível excluir o departamento."
       );
 
     }
@@ -1067,166 +1067,6 @@ function TimeManagement() {
     );
 
   }
-
-
-  const usuarios =
-    useMemo(() => {
-
-      return Array.from(
-        new Set(
-          apontamentosDoGrupo
-            .map(
-              apontamento =>
-                apontamento.usuario
-                  ?.nome
-                  ?.trim()
-            )
-            .filter(
-              (
-                nome
-              ): nome is string =>
-                Boolean(nome)
-            )
-        )
-      )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            a.localeCompare(
-              b,
-              "pt-BR"
-            )
-        );
-
-    }, [
-      apontamentosDoGrupo,
-    ]);
-
-
-  const apontamentosDoUsuario =
-    useMemo(() => {
-
-      if (
-        !usuarioSelecionado
-      ) {
-
-        return apontamentosDoGrupo;
-
-      }
-
-
-      return apontamentosDoGrupo.filter(
-        apontamento =>
-          apontamento.usuario
-            ?.nome
-            ?.trim() ===
-          usuarioSelecionado
-      );
-
-    }, [
-      apontamentosDoGrupo,
-      usuarioSelecionado,
-    ]);
-
-
-  const projetos =
-    useMemo(() => {
-
-      return Array.from(
-        new Set(
-          apontamentosDoUsuario
-            .map(
-              apontamento =>
-                apontamento.projeto
-                  ?.nome
-                  ?.trim()
-            )
-            .filter(
-              (
-                nome
-              ): nome is string =>
-                Boolean(nome)
-            )
-        )
-      )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            a.localeCompare(
-              b,
-              "pt-BR"
-            )
-        );
-
-    }, [
-      apontamentosDoUsuario,
-    ]);
-
-
-  const apontamentosDoProjeto =
-    useMemo(() => {
-
-      if (
-        !projetoSelecionado
-      ) {
-
-        return apontamentosDoUsuario;
-
-      }
-
-
-      return apontamentosDoUsuario.filter(
-        apontamento =>
-          apontamento.projeto
-            ?.nome
-            ?.trim() ===
-          projetoSelecionado
-      );
-
-    }, [
-      apontamentosDoUsuario,
-      projetoSelecionado,
-    ]);
-
-
-  const atividades =
-    useMemo(() => {
-
-      return Array.from(
-        new Set(
-          apontamentosDoProjeto
-            .map(
-              apontamento =>
-                apontamento.atividade
-                  ?.nome
-                  ?.trim()
-            )
-            .filter(
-              (
-                nome
-              ): nome is string =>
-                Boolean(nome)
-            )
-        )
-      )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            a.localeCompare(
-              b,
-              "pt-BR"
-            )
-        );
-
-    }, [
-      apontamentosDoProjeto,
-    ]);
 
 
   const apontamentosFiltrados =
@@ -1590,49 +1430,6 @@ function TimeManagement() {
   }
 
 
-  function alterarUsuario(
-    usuario: string
-  ) {
-
-    setUsuarioSelecionado(
-      usuario
-    );
-
-    setProjetoSelecionado(
-      ""
-    );
-
-    setAtividadeSelecionada(
-      ""
-    );
-
-  }
-
-
-  function alterarProjeto(
-    projeto: string
-  ) {
-
-    setProjetoSelecionado(
-      projeto
-    );
-
-    setAtividadeSelecionada(
-      ""
-    );
-
-  }
-
-
-  function limparFiltros() {
-
-    void alterarGrupo(
-      ""
-    );
-
-  }
-
-
   function exportarCsv() {
 
     if (
@@ -1771,13 +1568,26 @@ function TimeManagement() {
   }
 
 
-  async function consultar() {
+  async function consultar(
+    dataInicialOverride?: string,
+    dataFinalOverride?: string
+  ) {
+
+    const inicio =
+      dataInicialOverride ??
+      dataInicial;
+
+    const fim =
+      dataFinalOverride ??
+      dataFinal;
+
 
     setErro("");
 
+
     if (
-      !dataInicial ||
-      !dataFinal
+      !inicio ||
+      !fim
     ) {
 
       setErro(
@@ -1790,8 +1600,8 @@ function TimeManagement() {
 
 
     if (
-      dataInicial >
-      dataFinal
+      inicio >
+      fim
     ) {
 
       setErro(
@@ -1811,10 +1621,10 @@ function TimeManagement() {
       const parametros =
         new URLSearchParams({
           from:
-            dataInicial,
+            inicio,
 
           to:
-            dataFinal,
+            fim,
         });
 
 
@@ -1832,6 +1642,25 @@ function TimeManagement() {
               "no-store",
           }
         );
+
+
+      const contentType =
+        response.headers.get(
+          "content-type"
+        ) || "";
+
+
+      if (
+        !contentType.includes(
+          "application/json"
+        )
+      ) {
+
+        throw new Error(
+          "A API de apontamentos não respondeu corretamente."
+        );
+
+      }
 
 
       const data =
@@ -1852,6 +1681,15 @@ function TimeManagement() {
 
       const resultado =
         data as TimeEntriesResponse;
+
+
+      setDataInicial(
+        inicio
+      );
+
+      setDataFinal(
+        fim
+      );
 
 
       setApontamentos(
@@ -1920,6 +1758,146 @@ function TimeManagement() {
 
   }
 
+
+  function formatarDataInput(
+    data: Date
+  ) {
+
+    const ano =
+      data.getFullYear();
+
+    const mes =
+      String(
+        data.getMonth() + 1
+      )
+        .padStart(
+          2,
+          "0"
+        );
+
+    const dia =
+      String(
+        data.getDate()
+      )
+        .padStart(
+          2,
+          "0"
+        );
+
+
+    return `${ano}-${mes}-${dia}`;
+
+  }
+
+
+  function consultarHoje() {
+
+    const hoje =
+      formatarDataInput(
+        new Date()
+      );
+
+
+    void consultar(
+      hoje,
+      hoje
+    );
+
+  }
+
+
+  function consultarEstaSemana() {
+
+    const hoje =
+      new Date();
+
+    const inicio =
+      new Date(
+        hoje
+      );
+
+    const diaSemana =
+      hoje.getDay();
+
+    const diferencaSegunda =
+      diaSemana === 0
+        ? -6
+        : 1 - diaSemana;
+
+
+    inicio.setDate(
+      hoje.getDate() +
+      diferencaSegunda
+    );
+
+
+    void consultar(
+      formatarDataInput(
+        inicio
+      ),
+      formatarDataInput(
+        hoje
+      )
+    );
+
+  }
+
+
+  function consultarEsteMes() {
+
+    const hoje =
+      new Date();
+
+    const inicio =
+      new Date(
+        hoje.getFullYear(),
+        hoje.getMonth(),
+        1
+      );
+
+
+    void consultar(
+      formatarDataInput(
+        inicio
+      ),
+      formatarDataInput(
+        hoje
+      )
+    );
+
+  }
+
+
+  function consultarMesAnterior() {
+
+    const hoje =
+      new Date();
+
+    const inicio =
+      new Date(
+        hoje.getFullYear(),
+        hoje.getMonth() - 1,
+        1
+      );
+
+    const fim =
+      new Date(
+        hoje.getFullYear(),
+        hoje.getMonth(),
+        0
+      );
+
+
+    void consultar(
+      formatarDataInput(
+        inicio
+      ),
+      formatarDataInput(
+        fim
+      )
+    );
+
+  }
 
   function renderDistribuicao(
     titulo: string,
@@ -2079,11 +2057,11 @@ function TimeManagement() {
             <div>
 
               <h2>
-                Consultar período
+                Consultar apontamentos
               </h2>
 
               <p>
-                Primeiro escolha o período que deseja analisar.
+                Escolha o departamento e o período que deseja analisar.
               </p>
 
             </div>
@@ -2091,170 +2069,57 @@ function TimeManagement() {
           </div>
 
 
-          <div className="time-management-groups-bar">
+          <div className="time-management-search-row">
 
-            <div className="time-management-groups-heading">
+            <div className="time-management-field time-management-search-field">
 
-              <div>
+              <label htmlFor="time-group">
+                Departamento
+              </label>
 
-                <span className="time-management-group-kicker">
-                  Equipes
-                </span>
-
-                <h3>
-                  Grupo de usuários
-                </h3>
-
-                <p>
-                  Selecione um grupo salvo ou crie um novo para facilitar suas consultas.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="time-management-group-controls">
-
-              <div className="time-management-field time-management-group-field">
-
-                <label htmlFor="time-group">
-                  Grupo
-                </label>
-
-                <select
-                  id="time-group"
-                  value={
-                    grupoSelecionadoId
-                  }
-                  disabled={
-                    carregandoGrupos
-                  }
-                  onChange={
-                    event =>
-                      void alterarGrupo(
-                        event.target.value
-                      )
-                  }
-                >
-
-                  <option value="">
-                    Todos os usuários
-                  </option>
-
-                  {grupos.map(
-                    grupo => (
-
-                      <option
-                        key={
-                          grupo.id
-                        }
-                        value={
-                          grupo.id
-                        }
-                      >
-                        {grupo.nome}
-                      </option>
-
+              <select
+                id="time-group"
+                value={
+                  grupoSelecionadoId
+                }
+                disabled={
+                  carregandoGrupos
+                }
+                onChange={
+                  event =>
+                    void alterarGrupo(
+                      event.target.value
                     )
-                  )}
-
-                </select>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="time-management-group-button primary"
-                onClick={
-                  abrirNovoGrupo
                 }
               >
-                + Novo grupo
-              </button>
 
+                <option value="">
+                  Todos os departamentos
+                </option>
 
-              {grupoSelecionado
-                ?.podeEditar && (
+                {grupos.map(
+                  grupo => (
 
-                <button
-                  type="button"
-                  className="time-management-group-button"
-                  onClick={
-                    abrirEdicaoGrupo
-                  }
-                >
-                  Editar
-                </button>
+                    <option
+                      key={
+                        grupo.id
+                      }
+                      value={
+                        grupo.id
+                      }
+                    >
+                      {grupo.nome}
+                    </option>
 
-              )}
+                  )
+                )}
 
-
-              {grupoSelecionado
-                ?.podeExcluir && (
-
-                <button
-                  type="button"
-                  className="time-management-group-button danger"
-                  onClick={() =>
-                    void excluirGrupoSelecionado()
-                  }
-                >
-                  Excluir
-                </button>
-
-              )}
+              </select>
 
             </div>
 
 
-            {grupoSelecionado && (
-
-              <div className="time-management-group-meta">
-
-                <strong>
-                  {grupoSelecionado.nome}
-                </strong>
-
-                <span>
-                  {grupoSelecionado
-                    .membros
-                    .length}
-                  {" "}
-                  integrante
-                  {grupoSelecionado
-                    .membros
-                    .length === 1
-                    ? ""
-                    : "s"}
-
-                  {grupoSelecionado
-                    .criado_por_nome
-                    ? ` · Criado por ${grupoSelecionado.criado_por_nome}`
-                    : ""}
-                </span>
-
-              </div>
-
-            )}
-
-
-            {erroGrupo &&
-              !modalGrupoAberto && (
-
-              <div className="time-management-group-error">
-                {erroGrupo}
-              </div>
-
-            )}
-
-          </div>
-
-
-          <div className="time-management-query-fields">
-
-            <div className="time-management-field">
+            <div className="time-management-field time-management-search-field">
 
               <label htmlFor="time-from">
                 Data inicial
@@ -2285,7 +2150,7 @@ function TimeManagement() {
             </div>
 
 
-            <div className="time-management-field">
+            <div className="time-management-field time-management-search-field">
 
               <label htmlFor="time-to">
                 Data final
@@ -2318,7 +2183,7 @@ function TimeManagement() {
 
             <button
               type="button"
-              className="time-management-filter-button"
+              className="time-management-filter-button time-management-search-button"
               onClick={() =>
                 void consultar()
               }
@@ -2329,11 +2194,155 @@ function TimeManagement() {
 
               {carregando
                 ? "Buscando..."
-                : "Buscar apontamentos"}
+                : "Buscar"}
 
             </button>
 
           </div>
+
+
+          <div className="time-management-query-footer">
+
+            <div className="time-management-shortcuts">
+
+              <span>
+                Atalhos:
+              </span>
+
+              <button
+                type="button"
+                onClick={
+                  consultarHoje
+                }
+                disabled={
+                  carregando
+                }
+              >
+                Hoje
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  consultarEstaSemana
+                }
+                disabled={
+                  carregando
+                }
+              >
+                Esta semana
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  consultarEsteMes
+                }
+                disabled={
+                  carregando
+                }
+              >
+                Este mês
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  consultarMesAnterior
+                }
+                disabled={
+                  carregando
+                }
+              >
+                Mês anterior
+              </button>
+
+            </div>
+
+
+            <div className="time-management-department-actions">
+
+              <button
+                type="button"
+                className="time-management-department-manage"
+                onClick={
+                  abrirNovoGrupo
+                }
+              >
+                + Novo departamento
+              </button>
+
+
+              {grupoSelecionado
+                ?.podeEditar && (
+
+                <button
+                  type="button"
+                  className="time-management-department-manage"
+                  onClick={
+                    abrirEdicaoGrupo
+                  }
+                >
+                  Editar
+                </button>
+
+              )}
+
+
+              {grupoSelecionado
+                ?.podeExcluir && (
+
+                <button
+                  type="button"
+                  className="time-management-department-manage danger"
+                  onClick={() =>
+                    void excluirGrupoSelecionado()
+                  }
+                >
+                  Excluir
+                </button>
+
+              )}
+
+            </div>
+
+          </div>
+
+
+          {grupoSelecionado && (
+
+            <div className="time-management-department-meta">
+
+              <strong>
+                {grupoSelecionado.nome}
+              </strong>
+
+              <span>
+                {grupoSelecionado.membros.length}
+                {" "}
+                integrante
+                {grupoSelecionado.membros.length === 1
+                  ? ""
+                  : "s"}
+
+                {grupoSelecionado.criado_por_nome
+                  ? ` · Criado por ${grupoSelecionado.criado_por_nome}`
+                  : ""}
+              </span>
+
+            </div>
+
+          )}
+
+
+          {erroGrupo &&
+            !modalGrupoAberto && (
+
+            <div className="time-management-group-error">
+              {erroGrupo}
+            </div>
+
+          )}
 
         </section>
 
@@ -2349,217 +2358,7 @@ function TimeManagement() {
         )}
 
 
-        {consultado &&
-          apontamentos.length > 0 && (
-
-          <section className="time-management-refine-card">
-
-            <div className="time-management-refine-header">
-
-              <div className="time-management-section-heading">
-
-                <div className="time-management-step">
-                  2
-                </div>
-
-                <div>
-
-                  <h2>
-                    Refinar resultados
-                  </h2>
-
-                  <p>
-                    Use os filtros abaixo sobre os dados
-                    encontrados no período.
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <div className="time-management-refine-actions">
-
-                <button
-                  type="button"
-                  className="time-management-export-button"
-                  onClick={
-                    exportarCsv
-                  }
-                  disabled={
-                    apontamentosFiltrados.length === 0
-                  }
-                >
-                  Exportar CSV
-                </button>
-
-
-                <button
-                  type="button"
-                  className="time-management-clear-button"
-                  onClick={
-                    limparFiltros
-                  }
-                  disabled={
-                    !grupoSelecionadoId &&
-                    !usuarioSelecionado &&
-                    !projetoSelecionado &&
-                    !atividadeSelecionada
-                  }
-                >
-                  Limpar filtros
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <div className="time-management-refine-fields">
-
-
-              <div className="time-management-field">
-
-                <label htmlFor="time-user">
-                  Usuário
-                </label>
-
-                <select
-                  id="time-user"
-                  value={
-                    usuarioSelecionado
-                  }
-                  onChange={
-                    event =>
-                      alterarUsuario(
-                        event.target.value
-                      )
-                  }
-                >
-
-                  <option value="">
-                    Todos os usuários
-                  </option>
-
-                  {usuarios.map(
-                    usuario => (
-
-                      <option
-                        key={
-                          usuario
-                        }
-                        value={
-                          usuario
-                        }
-                      >
-                        {usuario}
-                      </option>
-
-                    )
-                  )}
-
-                </select>
-
-              </div>
-
-
-              <div className="time-management-field">
-
-                <label htmlFor="time-project">
-                  Projeto
-                </label>
-
-                <select
-                  id="time-project"
-                  value={
-                    projetoSelecionado
-                  }
-                  onChange={
-                    event =>
-                      alterarProjeto(
-                        event.target.value
-                      )
-                  }
-                >
-
-                  <option value="">
-                    Todos os projetos
-                  </option>
-
-                  {projetos.map(
-                    projeto => (
-
-                      <option
-                        key={
-                          projeto
-                        }
-                        value={
-                          projeto
-                        }
-                      >
-                        {projeto}
-                      </option>
-
-                    )
-                  )}
-
-                </select>
-
-              </div>
-
-
-              <div className="time-management-field">
-
-                <label htmlFor="time-activity">
-                  Atividade
-                </label>
-
-                <select
-                  id="time-activity"
-                  value={
-                    atividadeSelecionada
-                  }
-                  onChange={
-                    event =>
-                      setAtividadeSelecionada(
-                        event.target.value
-                      )
-                  }
-                >
-
-                  <option value="">
-                    Todas as atividades
-                  </option>
-
-                  {atividades.map(
-                    atividade => (
-
-                      <option
-                        key={
-                          atividade
-                        }
-                        value={
-                          atividade
-                        }
-                      >
-                        {atividade}
-                      </option>
-
-                    )
-                  )}
-
-                </select>
-
-              </div>
-
-            </div>
-
-          </section>
-
-        )}
-
-
-        {consultado && (
+                {consultado && (
 
           <section className="time-management-summary">
 
@@ -2632,7 +2431,7 @@ function TimeManagement() {
                   {usuarioSelecionado
                     ? `Detalhamento das horas de ${usuarioSelecionado}.`
                     : grupoSelecionado
-                      ? `Veja a distribuição das horas do grupo ${grupoSelecionado.nome}.`
+                      ? `Veja a distribuição das horas do departamento ${grupoSelecionado.nome}.`
                       : "Veja onde as horas estão concentradas no período selecionado."}
 
                 </p>
@@ -2710,9 +2509,26 @@ function TimeManagement() {
             {consultado &&
               apontamentos.length > 0 && (
 
-              <span className="time-management-sort-hint">
-                Clique no título da coluna para ordenar
-              </span>
+              <div className="time-management-table-actions">
+
+                <span className="time-management-sort-hint">
+                  Clique no título da coluna para ordenar
+                </span>
+
+                <button
+                  type="button"
+                  className="time-management-export-button"
+                  onClick={
+                    exportarCsv
+                  }
+                  disabled={
+                    apontamentosFiltrados.length === 0
+                  }
+                >
+                  Exportar CSV
+                </button>
+
+              </div>
 
             )}
 
@@ -3061,8 +2877,8 @@ function TimeManagement() {
 
                 <h2>
                   {grupoEmEdicao
-                    ? "Editar grupo"
-                    : "Novo grupo"}
+                    ? "Editar departamento"
+                    : "Novo departamento"}
                 </h2>
 
                 <p>
@@ -3090,7 +2906,7 @@ function TimeManagement() {
               <div className="time-management-group-name">
 
                 <label htmlFor="time-group-name">
-                  Nome do grupo
+                  Nome do departamento
                 </label>
 
                 <input
@@ -3223,7 +3039,7 @@ function TimeManagement() {
               >
                 {salvandoGrupo
                   ? "Salvando..."
-                  : "Salvar grupo"}
+                  : "Salvar departamento"}
               </button>
 
             </div>

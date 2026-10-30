@@ -78,9 +78,7 @@
 
 .time-management-group-field select:focus {
   border-color: #1570ef;
-  box-shadow:
-    0 0 0 3px
-    rgba(21, 112, 239, 0.08);
+  box-shadow: 0 0 0 3px rgba(21, 112, 239, 0.08);
 }
 
 .time-management-group-button {
@@ -170,18 +168,13 @@
 
 .time-management-group-modal {
   width: min(620px, 100%);
-  max-height: min(
-    760px,
-    calc(100vh - 48px)
-  );
+  max-height: min(760px, calc(100vh - 48px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-radius: 16px;
   background: #ffffff;
-  box-shadow:
-    0 24px 64px
-    rgba(16, 24, 40, 0.2);
+  box-shadow: 0 24px 64px rgba(16, 24, 40, 0.2);
 }
 
 .time-management-group-modal-header {
@@ -241,9 +234,7 @@
 
 .time-management-group-name input:focus {
   border-color: #1570ef;
-  box-shadow:
-    0 0 0 3px
-    rgba(21, 112, 239, 0.08);
+  box-shadow: 0 0 0 3px rgba(21, 112, 239, 0.08);
 }
 
 .time-management-group-members-title {
@@ -316,127 +307,98 @@
 
 /* DARK MODE */
 
-body.dark-mode
-.time-management-groups-bar {
+body.dark-mode .time-management-groups-bar {
   border-color: #344054;
   background: #1d2939;
 }
 
-body.dark-mode
-.time-management-group-kicker {
+body.dark-mode .time-management-group-kicker {
   color: #84caff;
 }
 
-body.dark-mode
-.time-management-groups-heading h3,
-body.dark-mode
-.time-management-group-field label,
-body.dark-mode
-.time-management-group-meta strong {
+body.dark-mode .time-management-groups-heading h3,
+body.dark-mode .time-management-group-field label,
+body.dark-mode .time-management-group-meta strong {
   color: #f2f4f7;
 }
 
-body.dark-mode
-.time-management-groups-heading p,
-body.dark-mode
-.time-management-group-meta span {
+body.dark-mode .time-management-groups-heading p,
+body.dark-mode .time-management-group-meta span {
   color: #98a2b3;
 }
 
-body.dark-mode
-.time-management-group-field select {
+body.dark-mode .time-management-group-field select {
   border-color: #475467;
   background: #101828;
   color: #f2f4f7;
 }
 
-body.dark-mode
-.time-management-group-button {
+body.dark-mode .time-management-group-button {
   border-color: #475467;
   background: #101828;
   color: #eaecf0;
 }
 
-body.dark-mode
-.time-management-group-button:hover {
+body.dark-mode .time-management-group-button:hover {
   background: #344054;
 }
 
-body.dark-mode
-.time-management-group-button.primary {
+body.dark-mode .time-management-group-button.primary {
   border-color: #0b66b2;
   background: #0b66b2;
   color: #ffffff;
 }
 
-body.dark-mode
-.time-management-group-button.danger {
+body.dark-mode .time-management-group-button.danger {
   color: #fda29b;
 }
 
-body.dark-mode
-.time-management-group-meta {
+body.dark-mode .time-management-group-meta {
   border-color: #344054;
 }
 
-body.dark-mode
-.time-management-group-modal {
+body.dark-mode .time-management-group-modal {
   background: #101828;
 }
 
-body.dark-mode
-.time-management-group-modal-header,
-body.dark-mode
-.time-management-group-modal-actions {
+body.dark-mode .time-management-group-modal-header,
+body.dark-mode .time-management-group-modal-actions {
   border-color: #344054;
 }
 
-body.dark-mode
-.time-management-group-modal-header h2,
-body.dark-mode
-.time-management-group-members-title strong,
-body.dark-mode
-.time-management-group-member span,
-body.dark-mode
-.time-management-group-name label {
+body.dark-mode .time-management-group-modal-header h2,
+body.dark-mode .time-management-group-members-title strong,
+body.dark-mode .time-management-group-member span,
+body.dark-mode .time-management-group-name label {
   color: #f2f4f7;
 }
 
-body.dark-mode
-.time-management-group-modal-header p,
-body.dark-mode
-.time-management-group-members-title span {
+body.dark-mode .time-management-group-modal-header p,
+body.dark-mode .time-management-group-members-title span {
   color: #98a2b3;
 }
 
-body.dark-mode
-.time-management-group-name input {
+body.dark-mode .time-management-group-name input {
   border-color: #475467;
   background: #1d2939;
   color: #f2f4f7;
 }
 
-body.dark-mode
-.time-management-group-member {
+body.dark-mode .time-management-group-member {
   border-color: #344054;
 }
 
-body.dark-mode
-.time-management-group-member:hover {
+body.dark-mode .time-management-group-member:hover {
   background: #1d2939;
 }
 
-body.dark-mode
-.time-management-group-empty {
+body.dark-mode .time-management-group-empty {
   border-color: #475467;
   color: #98a2b3;
 }
 
 
-@media (
-  max-width: 900px
-) {
-
+@media (max-width: 900px) {
   .time-management-group-controls {
     grid-template-columns:
       1fr
@@ -448,14 +410,10 @@ body.dark-mode
     grid-column:
       1 / -1;
   }
-
 }
 
 
-@media (
-  max-width: 640px
-) {
-
+@media (max-width: 640px) {
   .time-management-group-controls {
     grid-template-columns:
       1fr;
@@ -474,5 +432,219 @@ body.dark-mode
   .time-management-group-modal-overlay {
     padding: 12px;
   }
+}
 
+
+/* CONSULTA COMPACTA */
+
+.time-management-groups-bar,
+.time-management-groups-heading,
+.time-management-group-controls,
+.time-management-group-meta {
+  display: none;
+}
+
+.time-management-search-row {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 1.05fr)
+    minmax(170px, 0.9fr)
+    minmax(170px, 0.9fr)
+    auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.time-management-search-field {
+  min-width: 0;
+}
+
+.time-management-search-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #344054;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.time-management-search-field select,
+.time-management-search-field input,
+.time-management-search-button {
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.time-management-search-field select,
+.time-management-search-field input {
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #344054;
+  outline: none;
+}
+
+.time-management-search-field select:focus,
+.time-management-search-field input:focus {
+  border-color: #1570ef;
+  box-shadow: 0 0 0 3px rgba(21, 112, 239, 0.08);
+}
+
+.time-management-search-button {
+  min-width: 112px;
+  padding: 0 20px;
+  border-radius: 10px;
+}
+
+.time-management-query-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 13px;
+}
+
+.time-management-shortcuts,
+.time-management-department-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.time-management-shortcuts > span {
+  margin-right: 2px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.time-management-shortcuts button,
+.time-management-department-manage {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.time-management-shortcuts button:hover,
+.time-management-department-manage:hover {
+  border-color: #98a2b3;
+  background: #f9fafb;
+}
+
+.time-management-shortcuts button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.time-management-department-manage {
+  color: #0b66b2;
+}
+
+.time-management-department-manage.danger {
+  border-color: #fecdca;
+  color: #b42318;
+}
+
+.time-management-department-manage.danger:hover {
+  background: #fef3f2;
+}
+
+.time-management-department-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.time-management-department-meta strong {
+  color: #344054;
+  font-size: 12px;
+}
+
+.time-management-department-meta span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.time-management-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body.dark-mode .time-management-search-field label,
+body.dark-mode .time-management-department-meta strong {
+  color: #f2f4f7;
+}
+
+body.dark-mode .time-management-search-field select,
+body.dark-mode .time-management-search-field input,
+body.dark-mode .time-management-shortcuts button,
+body.dark-mode .time-management-department-manage {
+  border-color: #475467;
+  background: #101828;
+  color: #eaecf0;
+}
+
+body.dark-mode .time-management-shortcuts > span,
+body.dark-mode .time-management-department-meta span {
+  color: #98a2b3;
+}
+
+body.dark-mode .time-management-department-meta {
+  background: #101828;
+}
+
+@media (max-width: 1000px) {
+  .time-management-search-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .time-management-search-button {
+    width: 100%;
+  }
+
+  .time-management-query-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .time-management-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .time-management-shortcuts,
+  .time-management-department-actions {
+    width: 100%;
+  }
+
+  .time-management-shortcuts button,
+  .time-management-department-manage {
+    flex: 1 1 auto;
+  }
+
+  .time-management-department-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .time-management-table-actions {
+    align-items: flex-end;
+    flex-direction: column;
+  }
 }
