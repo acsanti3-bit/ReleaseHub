@@ -1,4 +1,4 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
@@ -24,6 +24,8 @@ import {
   MdSettings,
   MdTune,
 } from "react-icons/md";
+
+import Layout from "../../components/layout/Layout";
 
 import {
   buscarSessao,
@@ -306,7 +308,7 @@ function Compatibility() {
         );
       } catch (erro) {
         console.error(
-          "Erro ao carregar pÃ¡gina de compatibilidade:",
+          "Erro ao carregar página de compatibilidade:",
           erro
         );
 
@@ -316,7 +318,7 @@ function Compatibility() {
             texto:
               erro instanceof Error
                 ? erro.message
-                : "NÃ£o foi possÃ­vel carregar a compatibilidade.",
+                : "Não foi possível carregar a compatibilidade.",
           });
         }
       } finally {
@@ -331,7 +333,7 @@ function Compatibility() {
     return () => {
       ativo = false;
     };
-    // O ambiente da URL Ã© considerado apenas na carga inicial.
+    // O ambiente da URL é considerado apenas na carga inicial.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -374,7 +376,7 @@ function Compatibility() {
             texto:
               erro instanceof Error
                 ? erro.message
-                : "NÃ£o foi possÃ­vel carregar a compatibilidade.",
+                : "Não foi possível carregar a compatibilidade.",
           });
         }
       } finally {
@@ -472,7 +474,7 @@ function Compatibility() {
       const mensagem =
         erro instanceof Error
           ? erro.message
-          : "NÃ£o foi possÃ­vel consultar os projetos do Redmine.";
+          : "Não foi possível consultar os projetos do Redmine.";
 
       setErroRedmine(mensagem);
       return [];
@@ -517,7 +519,7 @@ function Compatibility() {
       );
     } catch (erro) {
       console.error(
-        "Erro ao consultar versÃµes do Redmine:",
+        "Erro ao consultar versões do Redmine:",
         erro
       );
 
@@ -526,7 +528,7 @@ function Compatibility() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "NÃ£o foi possÃ­vel consultar as versÃµes do Redmine.",
+            : "Não foi possível consultar as versões do Redmine.",
       });
     } finally {
       setCarregandoVersoes(
@@ -582,7 +584,7 @@ function Compatibility() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "NÃ£o foi possÃ­vel atualizar a compatibilidade.",
+            : "Não foi possível atualizar a compatibilidade.",
       });
     } finally {
       setCarregandoCompatibilidade(false);
@@ -793,7 +795,7 @@ function Compatibility() {
     ) {
       setFeedback({
         tipo: "erro",
-        texto: `"${nome}" jÃ¡ estÃ¡ no cadastro geral.`,
+        texto: `"${nome}" já está no cadastro geral.`,
       });
       return;
     }
@@ -856,7 +858,7 @@ function Compatibility() {
     if (jaVinculado) {
       setFeedback({
         tipo: "erro",
-        texto: `O projeto "${projeto.name}" jÃ¡ estÃ¡ vinculado a "${jaVinculado.displayName}".`,
+        texto: `O projeto "${projeto.name}" já está vinculado a "${jaVinculado.displayName}".`,
       });
       return;
     }
@@ -939,7 +941,7 @@ function Compatibility() {
     if (nomeVazio) {
       setFeedback({
         tipo: "erro",
-        texto: "Todos os sistemas precisam ter um nome de exibiÃ§Ã£o.",
+        texto: "Todos os sistemas precisam ter um nome de exibição.",
       });
       return;
     }
@@ -963,7 +965,7 @@ function Compatibility() {
 
       setFeedback({
         tipo: "sucesso",
-        texto: "ConfiguraÃ§Ã£o geral dos sistemas salva. Ela passa a valer para todas as releases.",
+        texto: "Configuração geral dos sistemas salva. Ela passa a valer para todas as releases.",
       });
     } catch (erro) {
       setFeedback({
@@ -971,7 +973,7 @@ function Compatibility() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "NÃ£o foi possÃ­vel salvar a configuraÃ§Ã£o geral.",
+            : "Não foi possível salvar a configuração geral.",
       });
     } finally {
       setSalvando(false);
@@ -1140,7 +1142,7 @@ function Compatibility() {
     if (!versao) {
       setFeedback({
         tipo: "erro",
-        texto: "Informe a versÃ£o que deseja adicionar.",
+        texto: "Informe a versão que deseja adicionar.",
       });
       return;
     }
@@ -1176,7 +1178,7 @@ function Compatibility() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "NÃ£o foi possÃ­vel adicionar a versÃ£o.",
+            : "Não foi possível adicionar a versão.",
       });
     }
   }
@@ -1207,7 +1209,7 @@ function Compatibility() {
 
       setFeedback({
         tipo: "sucesso",
-        texto: `VersÃµes da release "${salvo.environmentName}" salvas com sucesso.`,
+        texto: `Versões da release "${salvo.environmentName}" salvas com sucesso.`,
       });
     } catch (erro) {
       setFeedback({
@@ -1215,7 +1217,7 @@ function Compatibility() {
         texto:
           erro instanceof Error
             ? erro.message
-            : "NÃ£o foi possÃ­vel salvar as versÃµes da release.",
+            : "Não foi possível salvar as versões da release.",
       });
     } finally {
       setSalvando(false);
@@ -1224,7 +1226,7 @@ function Compatibility() {
 
 
   return (
-    <>
+    <Layout>
       <div className="compatibility-page">
         {feedback && (
           <div
@@ -1263,7 +1265,7 @@ function Compatibility() {
           <div>
             <h1>Compatibilidade</h1>
             <p>
-              Mantenha o cadastro dos sistemas uma Ãºnica vez e ajuste somente as versÃµes utilizadas em cada release.
+              Mantenha o cadastro dos sistemas uma única vez e ajuste somente as versões utilizadas em cada release.
             </p>
           </div>
 
@@ -1304,10 +1306,10 @@ function Compatibility() {
           <MdLink size={22} />
           <div>
             <strong>
-              Cadastro geral + versÃ£o por release
+              Cadastro geral + versão por release
             </strong>
             <span>
-              Nome, vÃ­nculo com o Redmine, ordem e relacionamentos sÃ£o definidos uma vez e reaproveitados em todas as releases. Em cada ambiente vocÃª informa somente a versÃ£o e se o sistema deve ser exibido.
+              Nome, vínculo com o Redmine, ordem e relacionamentos são definidos uma vez e reaproveitados em todas as releases. Em cada ambiente você informa somente a versão e se o sistema deve ser exibido.
             </span>
           </div>
         </div>
@@ -1319,10 +1321,10 @@ function Compatibility() {
 
           <div className="compatibility-global-content">
             <strong>
-              ConfiguraÃ§Ã£o geral dos sistemas
+              Configuração geral dos sistemas
             </strong>
             <span>
-              Define quem Ã© cada sistema: nome exibido, projeto correspondente no Redmine, ordem padrÃ£o e sistemas utilizados em conjunto.
+              Define quem é cada sistema: nome exibido, projeto correspondente no Redmine, ordem padrão e sistemas utilizados em conjunto.
             </span>
             <small>
               {catalogo.length} {catalogo.length === 1 ? "sistema cadastrado" : "sistemas cadastrados"}
@@ -1377,8 +1379,8 @@ function Compatibility() {
                 >
                   {ambiente.nome}
                   {ambiente.concluido
-                    ? " â€” ConcluÃ­do"
-                    : " â€” Ativo"}
+                    ? " — Concluído"
+                    : " — Ativo"}
                 </option>
               )
             )}
@@ -1394,7 +1396,7 @@ function Compatibility() {
                 }
               >
                 {ambienteSelecionado.concluido
-                  ? "ConcluÃ­do"
+                  ? "Concluído"
                   : "Ativo"}
               </span>
 
@@ -1415,7 +1417,7 @@ function Compatibility() {
                 Compatibilidade da release
               </h2>
               <p>
-                VersÃµes utilizadas em {compatibilidade?.environmentName ?? "este ambiente"}.
+                Versões utilizadas em {compatibilidade?.environmentName ?? "este ambiente"}.
               </p>
             </div>
 
@@ -1426,7 +1428,7 @@ function Compatibility() {
                 onClick={abrirEdicaoRelease}
               >
                 <MdTune size={18} />
-                Ajustar versÃµes
+                Ajustar versões
               </button>
             )}
           </div>
@@ -1441,7 +1443,7 @@ function Compatibility() {
             </div>
           ) : itensVisiveis.length === 0 ? (
             <div className="compatibility-page-empty">
-              Nenhum sistema estÃ¡ marcado para exibiÃ§Ã£o nesta release.
+              Nenhum sistema está marcado para exibição nesta release.
             </div>
           ) : (
             <div className="compatibility-view-grid">
@@ -1488,10 +1490,10 @@ function Compatibility() {
             <header className="compatibility-modal-header">
               <div>
                 <h2 id="compatibility-global-modal-title">
-                  ConfiguraÃ§Ã£o geral dos sistemas
+                  Configuração geral dos sistemas
                 </h2>
                 <p>
-                  Estas definiÃ§Ãµes sÃ£o reaproveitadas automaticamente em todas as releases.
+                  Estas definições são reaproveitadas automaticamente em todas as releases.
                 </p>
               </div>
 
@@ -1511,7 +1513,7 @@ function Compatibility() {
             <div className="compatibility-modal-guidance">
               <MdInfoOutline size={18} />
               <span>
-                O vÃ­nculo com o Redmine Ã© feito pelo ID do projeto. Alterar o nome exibido nÃ£o altera esse vÃ­nculo. VersÃµes nÃ£o sÃ£o definidas aqui: elas continuam sendo escolhidas em cada release.
+                O vínculo com o Redmine é feito pelo ID do projeto. Alterar o nome exibido não altera esse vínculo. Versões não são definidas aqui: elas continuam sendo escolhidas em cada release.
               </span>
             </div>
 
@@ -1578,7 +1580,7 @@ function Compatibility() {
                                 )
                               }
                             />
-                            Exibir por padrÃ£o em novas releases
+                            Exibir por padrão em novas releases
                           </label>
                         </div>
 
@@ -1664,7 +1666,7 @@ function Compatibility() {
                             disabled={carregandoRedmine}
                           >
                             <option value="">
-                              Sem vÃ­nculo
+                              Sem vínculo
                             </option>
                             {projetosRedmine.map(
                               projeto => (
@@ -1672,7 +1674,7 @@ function Compatibility() {
                                   key={projeto.id}
                                   value={projeto.id}
                                 >
-                                  {projeto.name} â€” ID {projeto.id}
+                                  {projeto.name} — ID {projeto.id}
                                 </option>
                               )
                             )}
@@ -1688,7 +1690,7 @@ function Compatibility() {
                         </summary>
 
                         <p>
-                          Estes relacionamentos tambÃ©m serÃ£o reaproveitados em todas as releases.
+                          Estes relacionamentos também serão reaproveitados em todas as releases.
                         </p>
 
                         <div className="compatibility-relations-grid">
@@ -1730,7 +1732,7 @@ function Compatibility() {
                     Adicionar sistema ao cadastro geral
                   </strong>
                   <span>
-                    O novo sistema passarÃ¡ a aparecer automaticamente em todas as releases. Use um projeto do Redmine ou um cadastro manual, como ECUpdater, Servidor ou EasyHub.
+                    O novo sistema passará a aparecer automaticamente em todas as releases. Use um projeto do Redmine ou um cadastro manual, como ECUpdater, Servidor ou EasyHub.
                   </span>
                 </div>
               </div>
@@ -1783,7 +1785,7 @@ function Compatibility() {
                           key={projeto.id}
                           value={projeto.id}
                         >
-                          {projeto.name} â€” ID {projeto.id}
+                          {projeto.name} — ID {projeto.id}
                         </option>
                       )
                     )}
@@ -1847,7 +1849,7 @@ function Compatibility() {
                 <MdSave size={19} />
                 {salvando
                   ? "Salvando..."
-                  : "Salvar configuraÃ§Ã£o geral"}
+                  : "Salvar configuração geral"}
               </button>
             </footer>
           </section>
@@ -1877,10 +1879,10 @@ function Compatibility() {
             <header className="compatibility-modal-header">
               <div>
                 <h2 id="compatibility-release-modal-title">
-                  Ajustar versÃµes da release
+                  Ajustar versões da release
                 </h2>
                 <p>
-                  Ambiente {compatibilidade.environmentName}. Aqui vocÃª altera somente o que Ã© especÃ­fico desta release.
+                  Ambiente {compatibilidade.environmentName}. Aqui você altera somente o que é específico desta release.
                 </p>
               </div>
 
@@ -1900,7 +1902,7 @@ function Compatibility() {
             <div className="compatibility-modal-guidance">
               <MdInfoOutline size={18} />
               <span>
-                Nome, projeto no Redmine, ordem e relacionamentos vÃªm da configuraÃ§Ã£o geral. Nesta tela vocÃª escolhe apenas a versÃ£o utilizada e se o sistema serÃ¡ exibido no Dashboard e no Modo TV.
+                Nome, projeto no Redmine, ordem e relacionamentos vêm da configuração geral. Nesta tela você escolhe apenas a versão utilizada e se o sistema será exibido no Dashboard e no Modo TV.
               </span>
             </div>
 
@@ -1947,7 +1949,7 @@ function Compatibility() {
 
                           <span className="compatibility-project-reference">
                             {item.redmineProjectId
-                              ? `${item.redmineProjectName || "Projeto no Redmine"} â€” ID ${item.redmineProjectId}`
+                              ? `${item.redmineProjectName || "Projeto no Redmine"} — ID ${item.redmineProjectId}`
                               : "Sem projeto vinculado no Redmine"}
                           </span>
                         </div>
@@ -1972,7 +1974,7 @@ function Compatibility() {
 
                       <label className="compatibility-release-version-field">
                         <span>
-                          VersÃ£o nesta release
+                          Versão nesta release
                         </span>
 
                         <select
@@ -1990,7 +1992,7 @@ function Compatibility() {
                           }
                         >
                           <option value="">
-                            Sem versÃ£o
+                            Sem versão
                           </option>
                           {opcoesVersao(item).map(
                             ([versao, origem]) => (
@@ -1998,7 +2000,7 @@ function Compatibility() {
                                 key={`${versao}-${origem}`}
                                 value={versao}
                               >
-                                {versao} â€” {origem}
+                                {versao} — {origem}
                               </option>
                             )
                           )}
@@ -2007,7 +2009,7 @@ function Compatibility() {
                         <div className="compatibility-version-actions">
                           {projetoCarregando && (
                             <small>
-                              Carregando versÃµes do Redmine...
+                              Carregando versões do Redmine...
                             </small>
                           )}
 
@@ -2021,7 +2023,7 @@ function Compatibility() {
                               setNovaVersao("");
                             }}
                           >
-                            + Adicionar versÃ£o
+                            + Adicionar versão
                           </button>
                         </div>
 
@@ -2094,15 +2096,14 @@ function Compatibility() {
                 <MdSave size={19} />
                 {salvando
                   ? "Salvando..."
-                  : "Salvar versÃµes da release"}
+                  : "Salvar versões da release"}
               </button>
             </footer>
           </section>
         </div>
       )}
-    </>
+    </Layout>
   );
 }
 
 export default Compatibility;
-

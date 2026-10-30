@@ -1,17 +1,21 @@
 import {
     useEffect,
-    useState
+    useState,
+    type ReactNode
 } from "react";
-
-import {
-    Outlet
-} from "react-router-dom";
 
 import Sidebar from "../Sidebar";
 import "./Layout.css";
 
 
-function Layout() {
+interface Props {
+    children: ReactNode;
+}
+
+
+function Layout({
+    children
+}: Props) {
 
     const [darkMode, setDarkMode] =
         useState(() => {
@@ -55,9 +59,7 @@ function Layout() {
             />
 
             <main className="content">
-
-                <Outlet />
-
+                {children}
             </main>
 
         </div>

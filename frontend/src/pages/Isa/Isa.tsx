@@ -1,4 +1,4 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
@@ -16,6 +16,8 @@ import {
   MdRefresh,
   MdSave,
 } from "react-icons/md";
+
+import Layout from "../../components/layout/Layout";
 
 import {
   buscarSessao,
@@ -194,12 +196,12 @@ function Isa() {
 
 
   /*
-    A versÃ£o do ISA Servidor
+    A versão do ISA Servidor
     continua sendo controlada
     pela Compatibilidade.
 
-    NÃ£o existe uma segunda versÃ£o
-    salva no mÃ³dulo ISA.
+    Não existe uma segunda versão
+    salva no módulo ISA.
   */
 
   const isaServidor =
@@ -262,7 +264,7 @@ function Isa() {
 
 
   /*
-    Carrega releases e usuÃ¡rio.
+    Carrega releases e usuário.
   */
 
   useEffect(
@@ -356,7 +358,7 @@ function Isa() {
         } catch (erro) {
 
           console.error(
-            "Erro ao carregar pÃ¡gina ISA:",
+            "Erro ao carregar página ISA:",
             erro
           );
 
@@ -371,7 +373,7 @@ function Isa() {
                 texto:
                   erro instanceof Error
                     ? erro.message
-                    : "NÃ£o foi possÃ­vel carregar a pÃ¡gina ISA.",
+                    : "Não foi possível carregar a página ISA.",
               }
             );
 
@@ -552,7 +554,7 @@ function Isa() {
                 texto:
                   erro instanceof Error
                     ? erro.message
-                    : "NÃ£o foi possÃ­vel carregar as versÃµes ISA.",
+                    : "Não foi possível carregar as versões ISA.",
               }
             );
 
@@ -694,7 +696,7 @@ function Isa() {
             "erro",
 
           texto:
-            `Informe a versÃ£o do ${aplicativo.name}.`,
+            `Informe a versão do ${aplicativo.name}.`,
         }
       );
 
@@ -755,14 +757,14 @@ function Isa() {
             "sucesso",
 
           texto:
-            `VersÃ£o do ${aplicativo.name} atualizada com sucesso.`,
+            `Versão do ${aplicativo.name} atualizada com sucesso.`,
         }
       );
 
     } catch (erro) {
 
       console.error(
-        "Erro ao atualizar versÃ£o ISA:",
+        "Erro ao atualizar versão ISA:",
         erro
       );
 
@@ -775,7 +777,7 @@ function Isa() {
           texto:
             erro instanceof Error
               ? erro.message
-              : `NÃ£o foi possÃ­vel atualizar o ${aplicativo.name}.`,
+              : `Não foi possível atualizar o ${aplicativo.name}.`,
         }
       );
 
@@ -875,7 +877,7 @@ function Isa() {
           texto:
             erro instanceof Error
               ? erro.message
-              : "NÃ£o foi possÃ­vel atualizar os dados ISA.",
+              : "Não foi possível atualizar os dados ISA.",
         }
       );
 
@@ -892,7 +894,7 @@ function Isa() {
 
   return (
 
-    <>
+    <Layout>
 
       <main className="isa-page">
 
@@ -905,14 +907,14 @@ function Isa() {
             </span>
 
             <h1>
-              Controle de versÃµes ISA
+              Controle de versões ISA
             </h1>
 
             <p>
               Consulte o ISA Servidor
-              utilizado em cada versÃ£o
+              utilizado em cada versão
               do IntelliCash e gerencie
-              individualmente as versÃµes
+              individualmente as versões
               dos aplicativos Android.
             </p>
 
@@ -992,7 +994,7 @@ function Isa() {
           <label className="isa-environment-field">
 
             <span>
-              VersÃ£o do IntelliCash
+              Versão do IntelliCash
             </span>
 
             <select
@@ -1036,7 +1038,7 @@ function Isa() {
 
                     {
                       ambiente.nome
-                        ? ` â€” ${ambiente.nome}`
+                        ? ` — ${ambiente.nome}`
                         : ""
                     }
                   </option>
@@ -1056,7 +1058,7 @@ function Isa() {
 
           <section className="isa-loading">
 
-            Carregando versÃµes ISA...
+            Carregando versões ISA...
 
           </section>
 
@@ -1097,22 +1099,22 @@ function Isa() {
                 <div className="isa-server-content">
 
                   <span>
-                    VersÃ£o compatÃ­vel
+                    Versão compatível
                     com o IntelliCash
                   </span>
 
                   <strong>
                     {
                       versaoIsaServidor ||
-                      "VersÃ£o nÃ£o informada"
+                      "Versão não informada"
                     }
                   </strong>
 
                   <small>
-                    Esta versÃ£o Ã©
+                    Esta versão é
                     definida pela
                     Compatibilidade da
-                    release e nÃ£o Ã©
+                    release e não é
                     alterada nesta tela.
                   </small>
 
@@ -1157,7 +1159,7 @@ function Isa() {
 
                   <p>
                     Cada aplicativo possui
-                    uma Ãºnica versÃ£o definida
+                    uma única versão definida
                     para a release selecionada.
                   </p>
 
@@ -1256,11 +1258,11 @@ function Isa() {
                               <div>
 
                                 <span>
-                                  VersÃ£o
+                                  Versão
                                 </span>
 
                                 <small>
-                                  VersÃ£o utilizada
+                                  Versão utilizada
                                   nesta release
                                 </small>
 
@@ -1335,7 +1337,7 @@ function Isa() {
 
                               <span className="isa-readonly">
 
-                                Somente visualizaÃ§Ã£o
+                                Somente visualização
 
                               </span>
 
@@ -1361,7 +1363,7 @@ function Isa() {
 
                                 {salvando
                                   ? "Salvando..."
-                                  : "Salvar versÃ£o"}
+                                  : "Salvar versão"}
 
                               </button>
 
@@ -1388,7 +1390,7 @@ function Isa() {
 
       </main>
 
-    </>
+    </Layout>
 
   );
 

@@ -1,4 +1,4 @@
-﻿import {
+import {
   useEffect,
   useMemo,
   useState,
@@ -16,6 +16,7 @@ import {
   MdSearch,
 } from "react-icons/md";
 
+import Layout from "../../components/layout";
 import AuditHistory from "./AuditHistory";
 
 import {
@@ -180,7 +181,7 @@ function Settings() {
     } catch (error) {
 
       console.error(
-        "Erro ao carregar usuÃ¡rio logado:",
+        "Erro ao carregar usuário logado:",
         error
       );
 
@@ -205,14 +206,14 @@ function Settings() {
     } catch (error) {
 
       console.error(
-        "Erro ao carregar usuÃ¡rios:",
+        "Erro ao carregar usuários:",
         error
       );
 
       setErro(
         error instanceof Error
           ? error.message
-          : "NÃ£o foi possÃ­vel carregar os usuÃ¡rios."
+          : "Não foi possível carregar os usuários."
       );
 
     } finally {
@@ -309,7 +310,7 @@ function Settings() {
     ) {
 
       setErro(
-        "Este perfil nÃ£o pode alterar usuÃ¡rios administradores."
+        "Este perfil não pode alterar usuários administradores."
       );
 
       return;
@@ -426,7 +427,7 @@ function Settings() {
     ) {
 
       setErro(
-        "Informe a nova senha do usuÃ¡rio."
+        "Informe a nova senha do usuário."
       );
 
       return;
@@ -497,7 +498,7 @@ function Settings() {
       setErro(
         error instanceof Error
           ? error.message
-          : "NÃ£o foi possÃ­vel salvar o usuÃ¡rio."
+          : "Não foi possível salvar o usuário."
       );
 
     } finally {
@@ -511,7 +512,7 @@ function Settings() {
 
   return (
 
-    <>
+    <Layout>
 
       <div className="settings-page">
 
@@ -520,15 +521,15 @@ function Settings() {
           <div>
 
             <span className="settings-eyebrow">
-              AdministraÃ§Ã£o
+              Administração
             </span>
 
             <h1>
-              ConfiguraÃ§Ãµes
+              Configurações
             </h1>
 
             <p>
-              Gerencie usuÃ¡rios e acessos
+              Gerencie usuários e acessos
               ao IWS ReleaseHub.
             </p>
 
@@ -544,7 +545,7 @@ function Settings() {
 
             <MdAdd size={20} />
 
-            Novo UsuÃ¡rio
+            Novo Usuário
 
           </button>
 
@@ -566,7 +567,7 @@ function Settings() {
             <div>
 
               <small>
-                UsuÃ¡rios
+                Usuários
               </small>
 
               <strong>
@@ -643,7 +644,7 @@ function Settings() {
             <div>
 
               <h2>
-                UsuÃ¡rios e acessos
+                Usuários e acessos
               </h2>
 
               <p>
@@ -662,7 +663,7 @@ function Settings() {
 
               <input
                 value={pesquisa}
-                placeholder="Pesquisar usuÃ¡rio..."
+                placeholder="Pesquisar usuário..."
                 onChange={event =>
                   setPesquisa(
                     event.target.value
@@ -695,7 +696,7 @@ function Settings() {
                 <tr>
 
                   <th>
-                    UsuÃ¡rio
+                    Usuário
                   </th>
 
                   <th>
@@ -707,7 +708,7 @@ function Settings() {
                   </th>
 
                   <th className="settings-actions-title">
-                    AÃ§Ãµes
+                    Ações
                   </th>
 
                 </tr>
@@ -801,9 +802,9 @@ function Settings() {
                             title={
                               perfilOperacional &&
                               usuario.role === "admin"
-                                ? "Somente administradores podem alterar este usuÃ¡rio"
+                                ? "Somente administradores podem alterar este usuário"
                                 : administrador
-                                  ? "Editar usuÃ¡rio"
+                                  ? "Editar usuário"
                                   : "Redefinir senha"
                             }
                             disabled={
@@ -841,7 +842,7 @@ function Settings() {
 
               <div className="settings-empty">
 
-                Carregando usuÃ¡rios...
+                Carregando usuários...
 
               </div>
 
@@ -853,7 +854,7 @@ function Settings() {
 
               <div className="settings-empty">
 
-                Nenhum usuÃ¡rio encontrado.
+                Nenhum usuário encontrado.
 
               </div>
 
@@ -883,9 +884,9 @@ function Settings() {
 
                   {editando
                     ? administrador
-                      ? "Editar UsuÃ¡rio"
+                      ? "Editar Usuário"
                       : "Redefinir Senha"
-                    : "Novo UsuÃ¡rio"}
+                    : "Novo Usuário"}
 
                 </h2>
 
@@ -893,8 +894,8 @@ function Settings() {
 
                   {editando
                     ? administrador
-                      ? "Atualize os dados e permissÃµes do usuÃ¡rio."
-                      : "Defina uma nova senha para o usuÃ¡rio selecionado."
+                      ? "Atualize os dados e permissões do usuário."
+                      : "Defina uma nova senha para o usuário selecionado."
                     : "Cadastre um novo acesso ao ReleaseHub."}
 
                 </p>
@@ -933,7 +934,7 @@ function Settings() {
                 value={
                   formulario.nome
                 }
-                placeholder="Nome do usuÃ¡rio"
+                placeholder="Nome do usuário"
                 disabled={
                   perfilOperacional &&
                   editando
@@ -1087,9 +1088,9 @@ function Settings() {
                   placeholder={
                     editando
                       ? perfilOperacional
-                        ? "MÃ­nimo 12 caracteres"
+                        ? "Mínimo 12 caracteres"
                         : "Deixe em branco para manter"
-                      : "MÃ­nimo 12 caracteres"
+                      : "Mínimo 12 caracteres"
                   }
                   onChange={event =>
                     setFormulario(
@@ -1110,7 +1111,7 @@ function Settings() {
                 <small className="settings-password-help">
 
                   {perfilOperacional
-                    ? "Informe a nova senha para concluir a redefiniÃ§Ã£o."
+                    ? "Informe a nova senha para concluir a redefinição."
                     : "Preencha somente caso queira redefinir a senha."}
 
                 </small>
@@ -1172,7 +1173,7 @@ function Settings() {
 
       )}
 
-    </>
+    </Layout>
 
   );
 
