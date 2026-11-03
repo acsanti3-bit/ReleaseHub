@@ -1002,6 +1002,10 @@ const versoesHistoricoRemessas =
 
         <div className="release-page-header">
           <div>
+            <span className="release-page-eyebrow">
+              Releases
+            </span>
+
             <h1>
               Ambientes da Release
             </h1>

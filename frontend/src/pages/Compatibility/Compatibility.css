@@ -7,21 +7,34 @@
 
 .compatibility-page-header {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e1e7ec;
+}
+
+.compatibility-page-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #f58220;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .compatibility-page-header h1 {
   margin: 0;
-  color: #1f2937;
-  font-size: 28px;
+  color: #005aa9;
+  font-size: 36px;
+  font-weight: 750;
 }
 
 .compatibility-page-header p {
   margin: 7px 0 0;
-  color: #667085;
-  font-size: 14px;
+  color: #7a8793;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -38,8 +51,8 @@
 .compatibility-edit-button,
 .compatibility-save-button,
 .compatibility-cancel-button {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 9px;
   padding: 0 14px;
   font-size: 13px;
   font-weight: 700;
@@ -63,9 +76,14 @@
 }
 
 .compatibility-refresh-button {
-  border: 1px solid #d0d5dd;
-  background: #ffffff;
-  color: #344054;
+  border: 1px solid #f58220;
+  background: #f58220;
+  color: #ffffff;
+}
+
+.compatibility-refresh-button:hover:not(:disabled) {
+  border-color: #d96e11;
+  background: #d96e11;
 }
 
 .compatibility-edit-button,
@@ -1047,6 +1065,14 @@
    MODO NOTURNO
    ========================= */
 
+html.dark .compatibility-page-header {
+  border-bottom-color: #26384c;
+}
+
+html.dark .compatibility-page-eyebrow {
+  color: #f58220;
+}
+
 html.dark .compatibility-page-header h1 {
   color: #F1F5F9;
 }
@@ -1059,11 +1085,21 @@ html.dark .compatibility-page-header p {
 /* BOTÕES */
 
 html.dark .compatibility-wiki-button,
-html.dark .compatibility-refresh-button,
 html.dark .compatibility-cancel-button {
   background: #1E293B;
   color: #CBD5E1;
   border-color: #334155;
+}
+
+html.dark .compatibility-refresh-button {
+  background: #F58220;
+  color: #FFFFFF;
+  border-color: #F58220;
+}
+
+html.dark .compatibility-refresh-button:hover:not(:disabled) {
+  background: #D96E11;
+  border-color: #D96E11;
 }
 
 html.dark .compatibility-wiki-button {

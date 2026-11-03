@@ -1263,7 +1263,12 @@ function Compatibility() {
 
         <div className="compatibility-page-header">
           <div>
+            <span className="compatibility-page-eyebrow">
+              Sistemas
+            </span>
+
             <h1>Compatibilidade</h1>
+
             <p>
               Mantenha o cadastro dos sistemas uma única vez e ajuste somente as versões utilizadas em cada release.
             </p>

@@ -6,31 +6,33 @@
 
 .time-management-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  align-items: flex-end;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e1e7ec;
 }
 
 .time-management-kicker {
   display: block;
   margin-bottom: 5px;
-  color: #8a98a8;
-  font-size: 10px;
-  font-weight: 700;
+  color: #f58220;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.7px;
+  letter-spacing: 0.8px;
 }
 
 .time-management-header h1 {
   margin: 0;
-  color: #17212b;
-  font-size: 26px;
-  font-weight: 800;
+  color: #005aa9;
+  font-size: 36px;
+  font-weight: 750;
 }
 
 .time-management-header p {
-  margin: 6px 0 0;
-  color: #667085;
+  margin: 7px 0 0;
+  color: #7a8793;
   font-size: 13px;
 }
 
@@ -662,6 +664,14 @@
 
 
 /* DARK MODE */
+
+html.dark .time-management-header {
+  border-bottom-color: #26384c;
+}
+
+html.dark .time-management-kicker {
+  color: #f58220;
+}
 
 html.dark .time-management-header h1,
 html.dark .time-management-section-heading h2,

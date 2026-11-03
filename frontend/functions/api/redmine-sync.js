@@ -74,6 +74,20 @@ function normalizarTexto(
 }
 
 
+function numero(
+  valor
+) {
+  const convertido =
+    Number(valor);
+
+  return Number.isFinite(
+    convertido
+  )
+    ? convertido
+    : 0;
+}
+
+
 function criarContagens() {
   return {
     qualidade: 0,
@@ -609,7 +623,6 @@ function somarContagens(
   );
 }
 
-
 function obterUltimaMovimentacao(
   issues
 ) {
@@ -652,6 +665,895 @@ function obterUltimaMovimentacao(
   return ultima;
 }
 
+
+function campoStatusIssue(
+  issue
+) {
+  const nomeStatus =
+    String(
+      issue?.status?.name ??
+      ""
+    );
+
+  const chaveStatus =
+    normalizarTexto(
+      nomeStatus
+    );
+
+  return {
+    nomeStatus,
+    campo:
+      STATUS_PARA_CAMPO[
+        chaveStatus
+      ] ??
+      null,
+  };
+}
+
+
+function dataComMargem(
+  valor,
+  minutos = 2
+) {
+  const timestamp =
+    Date.parse(
+      String(valor ?? "")
+    );
+
+  if (
+    Number.isNaN(
+      timestamp
+    )
+  ) {
+    return null;
+  }
+
+  return new Date(
+    timestamp -
+    minutos * 60 * 1000
+  ).toISOString();
+}
+
+
+async function executarBatchEmLotes(
+  context,
+  comandos,
+  tamanho = 80
+) {
+  for (
+    let inicio = 0;
+    inicio < comandos.length;
+    inicio += tamanho
+  ) {
+    const lote =
+      comandos.slice(
+        inicio,
+        inicio + tamanho
+      );
+
+    if (
+      lote.length > 0
+    ) {
+      await context.env.DB.batch(
+        lote
+      );
+    }
+  }
+}
+
+
+async function buscarEstadoSync(
+  context,
+  environmentId,
+  projectId
+) {
+  return await context.env.DB
+    .prepare(
+      `
+        SELECT
+          environment_id,
+          project_id,
+          redmine_version_id,
+          last_synced_at
+
+        FROM redmine_sync_state
+
+        WHERE
+          environment_id = ?
+          AND project_id = ?
+
+        LIMIT 1
+      `
+    )
+    .bind(
+      environmentId,
+      projectId
+    )
+    .first();
+}
+
+
+async function salvarEstadoSync(
+  context,
+  environmentId,
+  projectId,
+  redmineVersionId,
+  sincronizadoEm
+) {
+  await context.env.DB
+    .prepare(
+      `
+        INSERT INTO redmine_sync_state (
+          environment_id,
+          project_id,
+          redmine_version_id,
+          last_synced_at,
+          updated_at
+        )
+
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+
+        ON CONFLICT(
+          environment_id,
+          project_id
+        )
+
+        DO UPDATE SET
+          redmine_version_id =
+            excluded.redmine_version_id,
+
+          last_synced_at =
+            excluded.last_synced_at,
+
+          updated_at =
+            CURRENT_TIMESTAMP
+      `
+    )
+    .bind(
+      environmentId,
+      projectId,
+      redmineVersionId,
+      sincronizadoEm
+    )
+    .run();
+}
+
+
+async function limparEstadoProjeto(
+  context,
+  environmentId,
+  projectId
+) {
+  await context.env.DB.batch([
+    context.env.DB
+      .prepare(
+        `
+          DELETE FROM redmine_issue_cache
+
+          WHERE
+            environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        environmentId,
+        projectId
+      ),
+
+    context.env.DB
+      .prepare(
+        `
+          DELETE FROM redmine_sync_state
+
+          WHERE
+            environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        environmentId,
+        projectId
+      ),
+  ]);
+}
+
+
+async function salvarCacheIssues(
+  context,
+  environmentId,
+  projectId,
+  redmineVersionId,
+  issues
+) {
+  const comandos = [];
+
+  for (
+    const issue
+    of issues
+  ) {
+    const {
+      campo,
+    } =
+      campoStatusIssue(
+        issue
+      );
+
+    if (
+      !campo
+    ) {
+      continue;
+    }
+
+    const issueId =
+      Number(
+        issue.id
+      );
+
+    if (
+      !issueId
+    ) {
+      continue;
+    }
+
+    comandos.push(
+      context.env.DB
+        .prepare(
+          `
+            INSERT INTO redmine_issue_cache (
+              environment_id,
+              project_id,
+              issue_id,
+              redmine_version_id,
+              status_field,
+              updated_on,
+              updated_at
+            )
+
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+
+            ON CONFLICT(
+              environment_id,
+              project_id,
+              issue_id
+            )
+
+            DO UPDATE SET
+              redmine_version_id =
+                excluded.redmine_version_id,
+
+              status_field =
+                excluded.status_field,
+
+              updated_on =
+                excluded.updated_on,
+
+              updated_at =
+                CURRENT_TIMESTAMP
+          `
+        )
+        .bind(
+          environmentId,
+          projectId,
+          issueId,
+          redmineVersionId,
+          campo,
+          issue.updated_on ??
+            issue.created_on ??
+            null
+        )
+    );
+  }
+
+  await executarBatchEmLotes(
+    context,
+    comandos
+  );
+}
+
+
+async function reconstruirCacheProjeto(
+  context,
+  environmentId,
+  projectId,
+  redmineVersionId,
+  issues,
+  sincronizadoEm
+) {
+  await context.env.DB
+    .prepare(
+      `
+        DELETE FROM redmine_issue_cache
+
+        WHERE
+          environment_id = ?
+          AND project_id = ?
+      `
+    )
+    .bind(
+      environmentId,
+      projectId
+    )
+    .run();
+
+  await salvarCacheIssues(
+    context,
+    environmentId,
+    projectId,
+    redmineVersionId,
+    issues
+  );
+
+  await salvarEstadoSync(
+    context,
+    environmentId,
+    projectId,
+    redmineVersionId,
+    sincronizadoEm
+  );
+}
+
+
+async function listarIssuesAtualizadas(
+  context,
+  redmineProjectId,
+  desde
+) {
+  const issues = [];
+  const limite = 100;
+  let offset = 0;
+  let total = null;
+  let pagina = 0;
+
+  while (
+    total === null ||
+    issues.length < total
+  ) {
+    const resultado =
+      await buscarJsonRedmine(
+        context,
+        "/issues.json",
+        {
+          project_id:
+            redmineProjectId,
+
+          subproject_id:
+            "!*",
+
+          status_id:
+            "*",
+
+          updated_on:
+            `>=${desde}`,
+
+          limit:
+            limite,
+
+          offset,
+
+          sort:
+            "updated_on:asc,id:asc",
+        }
+      );
+
+    const itens =
+      Array.isArray(
+        resultado.issues
+      )
+        ? resultado.issues
+        : [];
+
+    issues.push(
+      ...itens
+    );
+
+    const totalRetornado =
+      Number(
+        resultado.total_count
+      );
+
+    total =
+      Number.isFinite(
+        totalRetornado
+      )
+        ? totalRetornado
+        : issues.length;
+
+    if (
+      itens.length === 0 ||
+      itens.length < limite
+    ) {
+      break;
+    }
+
+    offset +=
+      itens.length;
+
+    pagina += 1;
+
+    if (
+      pagina > 200
+    ) {
+      throw new Error(
+        `A sincronização incremental do projeto ${redmineProjectId} ultrapassou o limite de segurança.`
+      );
+    }
+  }
+
+  return issues;
+}
+
+
+async function sincronizarIncrementalProjeto(
+  context,
+  {
+    ambiente,
+    environmentId,
+    projetoRelease,
+    projetoRedmine,
+    versaoRedmine,
+    estadoSync,
+    projetoInfo,
+    projectOffset,
+    nextProjectOffset,
+    totalProjetos,
+    hasMoreProjects,
+  }
+) {
+  const sincronizadoEm =
+    new Date()
+      .toISOString();
+
+  const desde =
+    dataComMargem(
+      estadoSync.last_synced_at,
+      2
+    ) ??
+    estadoSync.last_synced_at;
+
+  const issues =
+    await listarIssuesAtualizadas(
+      context,
+      projetoRedmine.id,
+      desde
+    );
+
+  const ids =
+    Array.from(
+      new Set(
+        issues
+          .map(
+            issue =>
+              Number(
+                issue.id
+              )
+          )
+          .filter(
+            id =>
+              Number.isFinite(id) &&
+              id > 0
+          )
+      )
+    );
+
+  const cachePorIssue =
+    new Map();
+
+  if (
+    ids.length > 0
+  ) {
+    const placeholders =
+      ids
+        .map(
+          () => "?"
+        )
+        .join(", ");
+
+    const resultadoCache =
+      await context.env.DB
+        .prepare(
+          `
+            SELECT
+              issue_id,
+              status_field,
+              updated_on
+
+            FROM redmine_issue_cache
+
+            WHERE
+              environment_id = ?
+              AND project_id = ?
+              AND issue_id IN (${placeholders})
+          `
+        )
+        .bind(
+          environmentId,
+          projetoRelease.project_id,
+          ...ids
+        )
+        .all();
+
+    for (
+      const item
+      of resultadoCache.results ?? []
+    ) {
+      cachePorIssue.set(
+        Number(
+          item.issue_id
+        ),
+        item
+      );
+    }
+  }
+
+  const deltas =
+    criarContagens();
+
+  const comandosCache = [];
+  const statusIgnoradosMap =
+    new Map();
+
+  let tarefasSincronizadas = 0;
+  let ultimaMovimentacao = null;
+  let ultimoTimestamp = -1;
+    for (
+    const issue
+    of issues
+  ) {
+    const issueId =
+      Number(
+        issue.id
+      );
+
+    if (
+      !issueId
+    ) {
+      continue;
+    }
+
+    const anterior =
+      cachePorIssue.get(
+        issueId
+      ) ??
+      null;
+
+    const versaoAtualIssue =
+      Number(
+        issue.fixed_version?.id ??
+        0
+      );
+
+    const pertenceVersao =
+      versaoAtualIssue ===
+      Number(
+        versaoRedmine.id
+      );
+
+    const {
+      nomeStatus,
+      campo: campoNovo,
+    } =
+      campoStatusIssue(
+        issue
+      );
+
+    const campoAnterior =
+      anterior?.status_field ??
+      null;
+
+    const deveManterNoCache =
+      pertenceVersao &&
+      Boolean(
+        campoNovo
+      );
+
+    if (
+      campoAnterior &&
+      (
+        !deveManterNoCache ||
+        campoAnterior !== campoNovo
+      )
+    ) {
+      deltas[
+        campoAnterior
+      ] -= 1;
+    }
+
+    if (
+      deveManterNoCache &&
+      campoNovo &&
+      campoAnterior !== campoNovo
+    ) {
+      deltas[
+        campoNovo
+      ] += 1;
+    }
+
+    if (
+      pertenceVersao &&
+      !campoNovo
+    ) {
+      const chave =
+        nomeStatus ||
+        "Sem situação";
+
+      statusIgnoradosMap.set(
+        chave,
+        (
+          statusIgnoradosMap.get(
+            chave
+          ) ??
+          0
+        ) + 1
+      );
+    }
+
+    if (
+      deveManterNoCache
+    ) {
+      comandosCache.push(
+        context.env.DB
+          .prepare(
+            `
+              INSERT INTO redmine_issue_cache (
+                environment_id,
+                project_id,
+                issue_id,
+                redmine_version_id,
+                status_field,
+                updated_on,
+                updated_at
+              )
+
+              VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+
+              ON CONFLICT(
+                environment_id,
+                project_id,
+                issue_id
+              )
+
+              DO UPDATE SET
+                redmine_version_id =
+                  excluded.redmine_version_id,
+
+                status_field =
+                  excluded.status_field,
+
+                updated_on =
+                  excluded.updated_on,
+
+                updated_at =
+                  CURRENT_TIMESTAMP
+            `
+          )
+          .bind(
+            environmentId,
+            projetoRelease.project_id,
+            issueId,
+            versaoRedmine.id,
+            campoNovo,
+            issue.updated_on ??
+              issue.created_on ??
+              null
+          )
+      );
+    } else if (
+      anterior
+    ) {
+      comandosCache.push(
+        context.env.DB
+          .prepare(
+            `
+              DELETE FROM redmine_issue_cache
+
+              WHERE
+                environment_id = ?
+                AND project_id = ?
+                AND issue_id = ?
+            `
+          )
+          .bind(
+            environmentId,
+            projetoRelease.project_id,
+            issueId
+          )
+      );
+    }
+
+    if (
+      pertenceVersao ||
+      anterior
+    ) {
+      const movimentacao =
+        issue.updated_on ??
+        issue.created_on ??
+        null;
+
+      if (
+        movimentacao
+      ) {
+        const timestamp =
+          Date.parse(
+            String(
+              movimentacao
+            )
+          );
+
+        if (
+          !Number.isNaN(
+            timestamp
+          ) &&
+          timestamp > ultimoTimestamp
+        ) {
+          ultimoTimestamp =
+            timestamp;
+
+          ultimaMovimentacao =
+            new Date(
+              timestamp
+            ).toISOString();
+        }
+      }
+    }
+
+    if (
+      campoAnterior !== campoNovo ||
+      anterior ||
+      pertenceVersao
+    ) {
+      tarefasSincronizadas += 1;
+    }
+  }
+
+  const atualizarProjeto =
+    context.env.DB
+      .prepare(
+        `
+          UPDATE release_projects
+
+          SET
+            qualidade = MAX(0, qualidade + ?),
+            testes = MAX(0, testes + ?),
+            desenvolvido = MAX(0, desenvolvido + ?),
+            aguardando_compilacao = MAX(0, aguardando_compilacao + ?),
+            em_progresso = MAX(0, em_progresso + ?),
+            nova = MAX(0, nova + ?),
+            reaberta = MAX(0, reaberta + ?),
+            validacao_cliente = MAX(0, validacao_cliente + ?),
+            resolvidas = MAX(0, resolvidas + ?),
+            rejeitada = MAX(0, rejeitada + ?),
+            interrompida = MAX(0, interrompida + ?),
+
+            updated_at =
+              CASE
+                WHEN ? IS NULL
+                  THEN updated_at
+
+                WHEN updated_at IS NULL
+                  THEN ?
+
+                WHEN datetime(?) > datetime(updated_at)
+                  THEN ?
+
+                ELSE updated_at
+              END
+
+          WHERE
+            environment_id = ?
+            AND project_id = ?
+        `
+      )
+      .bind(
+        deltas.qualidade,
+        deltas.testes,
+        deltas.desenvolvido,
+        deltas.aguardando_compilacao,
+        deltas.em_progresso,
+        deltas.nova,
+        deltas.reaberta,
+        deltas.validacao_cliente,
+        deltas.resolvidas,
+        deltas.rejeitada,
+        deltas.interrompida,
+        ultimaMovimentacao,
+        ultimaMovimentacao,
+        ultimaMovimentacao,
+        ultimaMovimentacao,
+        environmentId,
+        projetoRelease.project_id
+      );
+
+  await executarBatchEmLotes(
+    context,
+    [
+      atualizarProjeto,
+      ...comandosCache,
+    ]
+  );
+
+  await salvarEstadoSync(
+    context,
+    environmentId,
+    projetoRelease.project_id,
+    versaoRedmine.id,
+    sincronizadoEm
+  );
+
+  const statusIgnorados =
+    Array.from(
+      statusIgnoradosMap.entries()
+    ).map(
+      (
+        [
+          status,
+          quantidade,
+        ]
+      ) => ({
+        status,
+        quantidade,
+      })
+    );
+
+  return Response.json({
+    sucesso:
+      true,
+
+    ambiente: {
+      id:
+        ambiente.id,
+
+      nome:
+        ambiente.nome,
+    },
+
+    projetosAtualizados:
+      1,
+
+    tarefasEncontradas:
+      issues.length,
+
+    tarefasSincronizadas,
+
+    projetosIgnorados:
+      [],
+
+    statusIgnorados,
+
+    sincronizadoEm,
+
+    incremental:
+      true,
+
+    desde,
+
+    schedulerMode:
+      true,
+
+    projeto:
+      projetoInfo,
+
+    projectOffset,
+
+    issueOffset:
+      0,
+
+    nextProjectOffset,
+
+    nextIssueOffset:
+      0,
+
+    totalProjetos,
+
+    totalIssuesProjeto:
+      issues.length,
+
+    projectDone:
+      true,
+
+    hasMore:
+      hasMoreProjects,
+  });
+}
 
 
 async function buscarPaginaIssues(
@@ -743,11 +1645,13 @@ async function sincronizarProjetoScheduler(
       )
       .first();
 
+
   const totalProjetos =
     Number(
       totalRow?.total ??
       0
     );
+
 
   const resultadoProjeto =
     await context.env.DB
@@ -777,12 +1681,15 @@ async function sincronizarProjetoScheduler(
       )
       .first();
 
+
   const nextProjectOffset =
     projectOffset + 1;
+
 
   const hasMoreProjects =
     nextProjectOffset <
     totalProjetos;
+
 
   if (
     !resultadoProjeto
@@ -840,14 +1747,17 @@ async function sincronizarProjetoScheduler(
     });
   }
 
+
   const projetoRelease =
     resultadoProjeto;
+
 
   const versaoProjeto =
     String(
       projetoRelease.versao ??
       ""
     ).trim();
+
 
   const projetoInfo = {
     projectId:
@@ -860,83 +1770,116 @@ async function sincronizarProjetoScheduler(
       versaoProjeto,
   };
 
-  const respostaIgnorado = (
-    motivo
-  ) =>
-    Response.json({
-      sucesso:
-        true,
 
-      ambiente: {
-        id:
-          ambiente.id,
+  const limparAcumuladorProjeto =
+    async () => {
 
-        nome:
-          ambiente.nome,
-      },
+      await context.env.DB
+        .prepare(
+          `
+            DELETE FROM redmine_sync_accumulator
 
-      projetosAtualizados:
-        0,
+            WHERE
+              environment_id = ?
+              AND project_id = ?
+          `
+        )
+        .bind(
+          environmentId,
+          projetoRelease.project_id
+        )
+        .run();
 
-      tarefasEncontradas:
-        0,
+    };
 
-      tarefasSincronizadas:
-        0,
 
-      projetosIgnorados: [
-        {
-          projeto:
-            projetoRelease.nome,
+  const respostaIgnorado =
+    async (
+      motivo
+    ) => {
 
-          motivo,
+      await limparAcumuladorProjeto();
+
+
+      return Response.json({
+        sucesso:
+          true,
+
+        ambiente: {
+          id:
+            ambiente.id,
+
+          nome:
+            ambiente.nome,
         },
-      ],
 
-      statusIgnorados:
-        [],
+        projetosAtualizados:
+          0,
 
-      sincronizadoEm:
-        new Date()
-          .toISOString(),
+        tarefasEncontradas:
+          0,
 
-      schedulerMode:
-        true,
+        tarefasSincronizadas:
+          0,
 
-      projeto:
-        projetoInfo,
+        projetosIgnorados: [
+          {
+            projeto:
+              projetoRelease.nome,
 
-      projectOffset,
+            motivo,
+          },
+        ],
 
-      issueOffset,
+        statusIgnorados:
+          [],
 
-      nextProjectOffset,
+        sincronizadoEm:
+          new Date()
+            .toISOString(),
 
-      nextIssueOffset:
-        0,
+        schedulerMode:
+          true,
 
-      totalProjetos,
+        projeto:
+          projetoInfo,
 
-      projectDone:
-        true,
+        projectOffset,
 
-      hasMore:
-        hasMoreProjects,
-    });
+        issueOffset,
+
+        nextProjectOffset,
+
+        nextIssueOffset:
+          0,
+
+        totalProjetos,
+
+        projectDone:
+          true,
+
+        hasMore:
+          hasMoreProjects,
+      });
+
+    };
+
 
   if (
     !versaoProjeto ||
     versaoProjeto === "-"
   ) {
-    return respostaIgnorado(
+    return await respostaIgnorado(
       "O projeto não possui versão informada neste ambiente."
     );
   }
+
 
   const projetosRedmine =
     await listarProjetosRedmine(
       context
     );
+
 
   const projetoRedmine =
     encontrarProjetoRedmine(
@@ -944,13 +1887,15 @@ async function sincronizarProjetoScheduler(
       projetosRedmine
     );
 
+
   if (
     !projetoRedmine
   ) {
-    return respostaIgnorado(
+    return await respostaIgnorado(
       "Não foi localizado um projeto correspondente no Redmine."
     );
   }
+
 
   const versoesRedmine =
     await listarVersoesProjeto(
@@ -958,21 +1903,79 @@ async function sincronizarProjetoScheduler(
       projetoRedmine.id
     );
 
+
   const versaoRedmine =
     encontrarVersaoRedmine(
       versaoProjeto,
       versoesRedmine
     );
 
+
   if (
     !versaoRedmine
   ) {
-    return respostaIgnorado(
+    return await respostaIgnorado(
       `A versão ${versaoProjeto} não foi localizada no Redmine.`
     );
   }
 
-  const pagina =
+
+  if (
+    issueOffset === 0
+  ) {
+    const estadoSync =
+      await buscarEstadoSync(
+        context,
+        environmentId,
+        projetoRelease.project_id
+      );
+
+    if (
+      estadoSync &&
+      Number(
+        estadoSync.redmine_version_id
+      ) ===
+      Number(
+        versaoRedmine.id
+      ) &&
+      estadoSync.last_synced_at
+    ) {
+      return await sincronizarIncrementalProjeto(
+        context,
+        {
+          ambiente,
+          environmentId,
+          projetoRelease,
+          projetoRedmine,
+          versaoRedmine,
+          estadoSync,
+          projetoInfo,
+          projectOffset,
+          nextProjectOffset,
+          totalProjetos,
+          hasMoreProjects,
+        }
+      );
+    }
+
+    if (
+      estadoSync &&
+      Number(
+        estadoSync.redmine_version_id
+      ) !==
+      Number(
+        versaoRedmine.id
+      )
+    ) {
+      await limparEstadoProjeto(
+        context,
+        environmentId,
+        projetoRelease.project_id
+      );
+    }
+  }
+
+    const pagina =
     await buscarPaginaIssues(
       context,
       projetoRedmine.id,
@@ -980,14 +1983,18 @@ async function sincronizarProjetoScheduler(
       issueOffset
     );
 
+
   const contagens =
     criarContagens();
+
 
   const statusIgnoradosMap =
     new Map();
 
+
   let tarefasSincronizadas =
     0;
+
 
   for (
     const issue
@@ -999,15 +2006,18 @@ async function sincronizarProjetoScheduler(
         ""
       );
 
+
     const chaveStatus =
       normalizarTexto(
         nomeStatus
       );
 
+
     const campo =
       STATUS_PARA_CAMPO[
         chaveStatus
       ];
+
 
     if (
       !campo
@@ -1015,6 +2025,7 @@ async function sincronizarProjetoScheduler(
       const chave =
         nomeStatus ||
         "Sem situação";
+
 
       statusIgnoradosMap.set(
         chave,
@@ -1027,17 +2038,21 @@ async function sincronizarProjetoScheduler(
         1
       );
 
+
       continue;
     }
+
 
     contagens[
       campo
     ] +=
       1;
 
+
     tarefasSincronizadas +=
       1;
   }
+
 
   const statusIgnorados =
     Array.from(
@@ -1054,10 +2069,34 @@ async function sincronizarProjetoScheduler(
       })
     );
 
+
   const ultimaMovimentacaoPagina =
     obterUltimaMovimentacao(
       pagina.issues
     );
+
+
+  await salvarCacheIssues(
+    context,
+    environmentId,
+    projetoRelease.project_id,
+    versaoRedmine.id,
+    pagina.issues
+  );
+
+
+  /*
+    IMPORTANTE:
+
+    O scheduler processa as tarefas em páginas.
+    Enquanto todas as páginas do projeto não forem
+    concluídas, os valores ficam somente nesta
+    tabela acumuladora.
+
+    Assim o Modo TV continua exibindo o último
+    resultado completo e nunca enxerga uma
+    sincronização pela metade.
+  */
 
   if (
     issueOffset === 0
@@ -1065,31 +2104,83 @@ async function sincronizarProjetoScheduler(
     await context.env.DB
       .prepare(
         `
-          UPDATE release_projects
+          INSERT INTO redmine_sync_accumulator (
+            environment_id,
+            project_id,
+            qualidade,
+            testes,
+            desenvolvido,
+            aguardando_compilacao,
+            em_progresso,
+            nova,
+            reaberta,
+            validacao_cliente,
+            resolvidas,
+            rejeitada,
+            interrompida,
+            ultima_movimentacao,
+            updated_at
+          )
 
-          SET
-            qualidade = ?,
-            testes = ?,
-            desenvolvido = ?,
-            aguardando_compilacao = ?,
-            em_progresso = ?,
-            nova = ?,
-            reaberta = ?,
-            validacao_cliente = ?,
-            resolvidas = ?,
-            rejeitada = ?,
-            interrompida = ?,
-            updated_at = CASE
-              WHEN ? IS NULL THEN updated_at
-              ELSE ?
-            END
+          VALUES (
+            ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
 
-          WHERE
-            environment_id = ?
-            AND project_id = ?
+          ON CONFLICT(
+            environment_id,
+            project_id
+          )
+
+          DO UPDATE SET
+
+            qualidade =
+              excluded.qualidade,
+
+            testes =
+              excluded.testes,
+
+            desenvolvido =
+              excluded.desenvolvido,
+
+            aguardando_compilacao =
+              excluded.aguardando_compilacao,
+
+            em_progresso =
+              excluded.em_progresso,
+
+            nova =
+              excluded.nova,
+
+            reaberta =
+              excluded.reaberta,
+
+            validacao_cliente =
+              excluded.validacao_cliente,
+
+            resolvidas =
+              excluded.resolvidas,
+
+            rejeitada =
+              excluded.rejeitada,
+
+            interrompida =
+              excluded.interrompida,
+
+            ultima_movimentacao =
+              excluded.ultima_movimentacao,
+
+            updated_at =
+              CURRENT_TIMESTAMP
         `
       )
       .bind(
+        environmentId,
+        projetoRelease.project_id,
+
         contagens.qualidade,
         contagens.testes,
         contagens.desenvolvido,
@@ -1101,43 +2192,116 @@ async function sincronizarProjetoScheduler(
         contagens.resolvidas,
         contagens.rejeitada,
         contagens.interrompida,
-        ultimaMovimentacaoPagina,
-        ultimaMovimentacaoPagina,
-        environmentId,
-        projetoRelease.project_id
+
+        ultimaMovimentacaoPagina
       )
       .run();
+
   } else {
+
     await context.env.DB
       .prepare(
         `
-          UPDATE release_projects
+          INSERT INTO redmine_sync_accumulator (
+            environment_id,
+            project_id,
+            qualidade,
+            testes,
+            desenvolvido,
+            aguardando_compilacao,
+            em_progresso,
+            nova,
+            reaberta,
+            validacao_cliente,
+            resolvidas,
+            rejeitada,
+            interrompida,
+            ultima_movimentacao,
+            updated_at
+          )
 
-          SET
-            qualidade = qualidade + ?,
-            testes = testes + ?,
-            desenvolvido = desenvolvido + ?,
-            aguardando_compilacao = aguardando_compilacao + ?,
-            em_progresso = em_progresso + ?,
-            nova = nova + ?,
-            reaberta = reaberta + ?,
-            validacao_cliente = validacao_cliente + ?,
-            resolvidas = resolvidas + ?,
-            rejeitada = rejeitada + ?,
-            interrompida = interrompida + ?,
-            updated_at = CASE
-              WHEN ? IS NULL THEN updated_at
-              WHEN updated_at IS NULL THEN ?
-              WHEN datetime(?) > datetime(updated_at) THEN ?
-              ELSE updated_at
-            END
+          VALUES (
+            ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
 
-          WHERE
-            environment_id = ?
-            AND project_id = ?
+          ON CONFLICT(
+            environment_id,
+            project_id
+          )
+
+          DO UPDATE SET
+
+            qualidade =
+              redmine_sync_accumulator.qualidade +
+              excluded.qualidade,
+
+            testes =
+              redmine_sync_accumulator.testes +
+              excluded.testes,
+
+            desenvolvido =
+              redmine_sync_accumulator.desenvolvido +
+              excluded.desenvolvido,
+
+            aguardando_compilacao =
+              redmine_sync_accumulator.aguardando_compilacao +
+              excluded.aguardando_compilacao,
+
+            em_progresso =
+              redmine_sync_accumulator.em_progresso +
+              excluded.em_progresso,
+
+            nova =
+              redmine_sync_accumulator.nova +
+              excluded.nova,
+
+            reaberta =
+              redmine_sync_accumulator.reaberta +
+              excluded.reaberta,
+
+            validacao_cliente =
+              redmine_sync_accumulator.validacao_cliente +
+              excluded.validacao_cliente,
+
+            resolvidas =
+              redmine_sync_accumulator.resolvidas +
+              excluded.resolvidas,
+
+            rejeitada =
+              redmine_sync_accumulator.rejeitada +
+              excluded.rejeitada,
+
+            interrompida =
+              redmine_sync_accumulator.interrompida +
+              excluded.interrompida,
+
+            ultima_movimentacao =
+              CASE
+                WHEN excluded.ultima_movimentacao IS NULL
+                  THEN redmine_sync_accumulator.ultima_movimentacao
+
+                WHEN redmine_sync_accumulator.ultima_movimentacao IS NULL
+                  THEN excluded.ultima_movimentacao
+
+                WHEN datetime(excluded.ultima_movimentacao) >
+                     datetime(redmine_sync_accumulator.ultima_movimentacao)
+                  THEN excluded.ultima_movimentacao
+
+                ELSE redmine_sync_accumulator.ultima_movimentacao
+              END,
+
+            updated_at =
+              CURRENT_TIMESTAMP
         `
       )
       .bind(
+        environmentId,
+        projetoRelease.project_id,
+
         contagens.qualidade,
         contagens.testes,
         contagens.desenvolvido,
@@ -1149,25 +2313,200 @@ async function sincronizarProjetoScheduler(
         contagens.resolvidas,
         contagens.rejeitada,
         contagens.interrompida,
-        ultimaMovimentacaoPagina,
-        ultimaMovimentacaoPagina,
-        ultimaMovimentacaoPagina,
-        ultimaMovimentacaoPagina,
-        environmentId,
-        projetoRelease.project_id
+
+        ultimaMovimentacaoPagina
       )
       .run();
+
   }
+
 
   const nextIssueOffset =
     issueOffset +
     pagina.issues.length;
+
 
   const projectDone =
     nextIssueOffset >=
       pagina.total ||
     pagina.issues.length ===
       0;
+
+
+  /*
+    Somente quando TODAS as páginas do projeto
+    terminaram, publica o resultado completo
+    na tabela usada pelo Modo TV.
+  */
+
+  if (
+    projectDone
+  ) {
+    const acumulado =
+      await context.env.DB
+        .prepare(
+          `
+            SELECT
+              qualidade,
+              testes,
+              desenvolvido,
+              aguardando_compilacao,
+              em_progresso,
+              nova,
+              reaberta,
+              validacao_cliente,
+              resolvidas,
+              rejeitada,
+              interrompida,
+              ultima_movimentacao
+
+            FROM redmine_sync_accumulator
+
+            WHERE
+              environment_id = ?
+              AND project_id = ?
+
+            LIMIT 1
+          `
+        )
+        .bind(
+          environmentId,
+          projetoRelease.project_id
+        )
+        .first();
+
+
+    if (
+      acumulado
+    ) {
+      const atualizarProjeto =
+        context.env.DB
+          .prepare(
+            `
+              UPDATE release_projects
+
+              SET
+                qualidade = ?,
+                testes = ?,
+                desenvolvido = ?,
+                aguardando_compilacao = ?,
+                em_progresso = ?,
+                nova = ?,
+                reaberta = ?,
+                validacao_cliente = ?,
+                resolvidas = ?,
+                rejeitada = ?,
+                interrompida = ?,
+
+                updated_at =
+                  CASE
+                    WHEN ? IS NULL
+                      THEN updated_at
+
+                    WHEN updated_at IS NULL
+                      THEN ?
+
+                    WHEN datetime(?) >
+                         datetime(updated_at)
+                      THEN ?
+
+                    ELSE updated_at
+                  END
+
+              WHERE
+                environment_id = ?
+                AND project_id = ?
+            `
+          )
+          .bind(
+            numero(
+              acumulado.qualidade
+            ),
+
+            numero(
+              acumulado.testes
+            ),
+
+            numero(
+              acumulado.desenvolvido
+            ),
+
+            numero(
+              acumulado.aguardando_compilacao
+            ),
+
+            numero(
+              acumulado.em_progresso
+            ),
+
+            numero(
+              acumulado.nova
+            ),
+
+            numero(
+              acumulado.reaberta
+            ),
+
+            numero(
+              acumulado.validacao_cliente
+            ),
+
+            numero(
+              acumulado.resolvidas
+            ),
+
+            numero(
+              acumulado.rejeitada
+            ),
+
+            numero(
+              acumulado.interrompida
+            ),
+
+            acumulado.ultima_movimentacao,
+            acumulado.ultima_movimentacao,
+            acumulado.ultima_movimentacao,
+            acumulado.ultima_movimentacao,
+
+            environmentId,
+            projetoRelease.project_id
+          );
+
+
+      const limparAcumulador =
+        context.env.DB
+          .prepare(
+            `
+              DELETE FROM redmine_sync_accumulator
+
+              WHERE
+                environment_id = ?
+                AND project_id = ?
+            `
+          )
+          .bind(
+            environmentId,
+            projetoRelease.project_id
+          );
+
+
+      await context.env.DB.batch([
+        atualizarProjeto,
+        limparAcumulador,
+      ]);
+
+
+      await salvarEstadoSync(
+        context,
+        environmentId,
+        projetoRelease.project_id,
+        versaoRedmine.id,
+        new Date()
+          .toISOString()
+      );
+    }
+  }
+
 
   return Response.json({
     sucesso:
@@ -1200,6 +2539,9 @@ async function sincronizarProjetoScheduler(
       new Date()
         .toISOString(),
 
+    incremental:
+      false,
+
     schedulerMode:
       true,
 
@@ -1210,7 +2552,10 @@ async function sincronizarProjetoScheduler(
 
     issueOffset,
 
-    nextProjectOffset,
+    nextProjectOffset:
+      projectDone
+        ? nextProjectOffset
+        : projectOffset,
 
     nextIssueOffset:
       projectDone
@@ -1230,7 +2575,6 @@ async function sincronizarProjetoScheduler(
         : true,
   });
 }
-
 
 export async function onRequestPost(
   context
@@ -1525,6 +2869,11 @@ export async function onRequestPost(
         contagens,
 
         ultimaMovimentacao,
+
+        redmineVersionId:
+          versaoRedmine.id,
+
+        issues,
       });
     }
 
@@ -1622,6 +2971,24 @@ export async function onRequestPost(
       await context.env.DB.batch(
         comandos
       );
+
+      const sincronizadoEm =
+        new Date()
+          .toISOString();
+
+      for (
+        const atualizacao
+        of atualizacoes
+      ) {
+        await reconstruirCacheProjeto(
+          context,
+          environmentId,
+          atualizacao.projectId,
+          atualizacao.redmineVersionId,
+          atualizacao.issues,
+          sincronizadoEm
+        );
+      }
     }
 
     const statusIgnoradosLista =

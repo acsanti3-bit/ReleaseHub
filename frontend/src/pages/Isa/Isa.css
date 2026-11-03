@@ -14,27 +14,13 @@
 
 .isa-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  align-items: flex-end;
+  gap: 20px;
 
-  padding: 26px 28px;
+  padding-bottom: 18px;
 
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #f8fbff 100%
-    );
-
-  box-shadow:
-    0
-    8px
-    28px
-    rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid #E1E7EC;
 }
 
 
@@ -46,104 +32,83 @@
 .isa-eyebrow {
   display: block;
 
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 
-  font-size: 12px;
-  font-weight: 700;
+  color: #F58220;
 
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 800;
+
   text-transform: uppercase;
-
-  color: #2563eb;
+  letter-spacing: .8px;
 }
 
 
 .isa-header h1 {
   margin: 0;
 
-  font-size: 28px;
-  line-height: 1.2;
+  color: #005AA9;
 
-  color:
-    var(--text-primary, #0f172a);
+  font-size: 36px;
+  line-height: 1.15;
+
+  font-weight: 750;
 }
 
 
 .isa-header p {
-  max-width: 720px;
+  max-width: 760px;
 
-  margin:
-    10px
-    0
-    0;
+  margin: 7px 0 0;
 
-  font-size: 14px;
-  line-height: 1.6;
+  color: #7A8793;
 
-  color:
-    var(--text-secondary, #64748b);
+  font-size: 13px;
+  line-height: 1.5;
 }
-
 
 /*
   Botão atualizar
 */
 
 .isa-refresh-button {
+  height: 44px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
 
-  min-height: 42px;
+  padding: 0 18px;
 
-  padding:
-    0
-    16px;
+  border: 1px solid #DCE3E8;
+  border-radius: 9px;
 
-  border: 1px solid #bfdbfe;
-  border-radius: 10px;
+  background: #FFFFFF;
+  color: #005AA9;
 
-  background:
-    #eff6ff;
-
-  color:
-    #1d4ed8;
-
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 
   cursor: pointer;
 
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    background .2s,
+    border-color .2s,
+    color .2s;
 }
 
 
 .isa-refresh-button:hover:not(:disabled) {
-  background:
-    #dbeafe;
-
-  transform:
-    translateY(-1px);
-
-  box-shadow:
-    0
-    6px
-    16px
-    rgba(37, 99, 235, 0.12);
+  border-color: #005AA9;
+  background: #EEF6FD;
 }
 
 
 .isa-refresh-button:disabled {
-  opacity: 0.55;
-
+  opacity: .55;
   cursor: not-allowed;
 }
-
 
 /*
   Feedback
@@ -1055,6 +1020,7 @@
 ) {
 
   .isa-header {
+    align-items: flex-start;
     flex-direction: column;
   }
 
@@ -1120,13 +1086,8 @@
   max-width: 620px
 ) {
 
-  .isa-header {
-    padding: 20px;
-  }
-
-
   .isa-header h1 {
-    font-size: 23px;
+    font-size: 30px;
   }
 
 
@@ -1206,28 +1167,15 @@ html.dark .isa-page {
 /* CABEÇALHO */
 
 html.dark .isa-header {
-  border-color: #263548;
-
-  background:
-    linear-gradient(
-      135deg,
-      #162131 0%,
-      #111C2B 100%
-    );
-
-  box-shadow:
-    0
-    8px
-    28px
-    rgba(0, 0, 0, .18);
+  border-bottom-color: #263548;
 }
 
 html.dark .isa-eyebrow {
-  color: #60A5FA;
+  color: #F58220;
 }
 
 html.dark .isa-header h1 {
-  color: #F1F5F9;
+  color: #60A5FA;
 }
 
 html.dark .isa-header p {
@@ -1239,20 +1187,14 @@ html.dark .isa-header p {
 
 html.dark .isa-refresh-button {
   border-color: #334155;
-  background: #1E293B;
+  background: #162131;
   color: #60A5FA;
 }
 
 html.dark .isa-refresh-button:hover:not(:disabled) {
-  background: #223249;
-
-  box-shadow:
-    0
-    6px
-    16px
-    rgba(59, 130, 246, .14);
+  border-color: #60A5FA;
+  background: #1E293B;
 }
-
 
 /* FEEDBACK */
 
