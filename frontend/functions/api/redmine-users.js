@@ -86,34 +86,6 @@ function obterConfiguracao(
 }
 
 
-function formatarDataIso(
-  data
-) {
-  const ano =
-    data.getUTCFullYear();
-
-  const mes =
-    String(
-      data.getUTCMonth() + 1
-    )
-      .padStart(
-        2,
-        "0"
-      );
-
-  const dia =
-    String(
-      data.getUTCDate()
-    )
-      .padStart(
-        2,
-        "0"
-      );
-
-  return `${ano}-${mes}-${dia}`;
-}
-
-
 async function buscarJsonRedmine(
   context,
   caminho,
@@ -181,6 +153,7 @@ async function buscarJsonRedmine(
   const texto =
     await response.text();
 
+
   if (
     response.status >= 300 &&
     response.status < 400
@@ -190,6 +163,7 @@ async function buscarJsonRedmine(
     );
   }
 
+
   if (
     response.status === 401
   ) {
@@ -198,13 +172,15 @@ async function buscarJsonRedmine(
     );
   }
 
+
   if (
     response.status === 403
   ) {
     throw new Error(
-      "O Redmine bloqueou a consulta dos apontamentos."
+      "O usuário configurado no Redmine não possui permissão para listar os usuários."
     );
   }
+
 
   if (
     !response.ok
@@ -214,75 +190,28 @@ async function buscarJsonRedmine(
     );
   }
 
-  return JSON.parse(
-    texto
-  );
+
+  try {
+
+    return JSON.parse(
+      texto
+    );
+
+  } catch {
+
+    throw new Error(
+      "O Redmine não retornou um JSON válido."
+    );
+
+  }
 }
 
 
-async function buscarUsuariosCache(
+async function listarTodosUsuariosRedmine(
   context
 ) {
-  const resultado =
-    await context.env.DB
-      .prepare(
-        `
-          SELECT
-            redmine_user_id,
-            redmine_user_name
-          FROM redmine_users_cache
-          ORDER BY
-            redmine_user_name
-            COLLATE NOCASE
-        `
-      )
-      .all();
-
-  return (
-    resultado.results ||
-    []
-  )
-    .map(
-      usuario => ({
-        id:
-          Number(
-            usuario.redmine_user_id
-          ),
-
-        nome:
-          String(
-            usuario.redmine_user_name ||
-            ""
-          ),
-      })
-    );
-}
-
-
-async function popularCacheInicial(
-  context
-) {
-  const hoje =
-    new Date();
-
-  const inicio =
-    new Date();
-
-  inicio.setUTCDate(
-    inicio.getUTCDate() - 90
-  );
-
-
-  const from =
-    formatarDataIso(
-      inicio
-    );
-
-  const to =
-    formatarDataIso(
-      hoje
-    );
-
+  const usuarios =
+    [];
 
   const limite =
     100;
@@ -293,62 +222,38 @@ async function popularCacheInicial(
   let total =
     null;
 
-  const usuarios =
-    new Map();
-
 
   while (
     total === null ||
-    offset < total
+    usuarios.length < total
   ) {
+
     const resultado =
       await buscarJsonRedmine(
         context,
-        "/time_entries.json",
+        "/users.json",
         {
-          from,
-          to,
+          status:
+            1,
+
           limit:
             limite,
+
           offset,
         }
       );
 
-    const entradas =
+
+    const itens =
       Array.isArray(
-        resultado.time_entries
+        resultado.users
       )
-        ? resultado.time_entries
+        ? resultado.users
         : [];
 
 
-    entradas.forEach(
-      entrada => {
-
-        const id =
-          Number(
-            entrada.user?.id
-          );
-
-        const nome =
-          String(
-            entrada.user?.name ??
-            ""
-          ).trim();
-
-        if (
-          !Number.isFinite(id) ||
-          id <= 0 ||
-          !nome
-        ) {
-          return;
-        }
-
-        usuarios.set(
-          id,
-          nome
-        );
-      }
+    usuarios.push(
+      ...itens
     );
 
 
@@ -357,47 +262,108 @@ async function popularCacheInicial(
         resultado.total_count
       );
 
+
     total =
       Number.isFinite(
         totalRetornado
       )
         ? totalRetornado
-        : offset +
-          entradas.length;
+        : usuarios.length;
 
 
     if (
-      entradas.length === 0 ||
-      entradas.length < limite
+      itens.length === 0 ||
+      itens.length < limite
     ) {
       break;
     }
 
 
     offset +=
-      entradas.length;
+      itens.length;
   }
 
 
+  return usuarios;
+}
+
+
+function montarNomeUsuario(
+  usuario
+) {
+  const primeiroNome =
+    String(
+      usuario.firstname ??
+      ""
+    ).trim();
+
+  const ultimoNome =
+    String(
+      usuario.lastname ??
+      ""
+    ).trim();
+
+  const nomeCompleto =
+    `${primeiroNome} ${ultimoNome}`
+      .trim();
+
+
   if (
-    usuarios.size === 0
+    nomeCompleto
   ) {
-    return [];
+    return nomeCompleto;
+  }
+
+
+  return String(
+    usuario.login ??
+    ""
+  ).trim();
+}
+
+
+async function atualizarCacheUsuarios(
+  context,
+  usuarios
+) {
+  if (
+    !Array.isArray(
+      usuarios
+    ) ||
+    usuarios.length === 0
+  ) {
+    return;
   }
 
 
   const comandos =
-    Array.from(
-      usuarios.entries()
-    )
+    usuarios
       .map(
-        (
-          [
-            id,
-            nome,
-          ]
-        ) =>
-          context.env.DB
+        usuario => {
+
+          const id =
+            Number(
+              usuario.id
+            );
+
+          const nome =
+            montarNomeUsuario(
+              usuario
+            );
+
+
+          if (
+            !Number.isFinite(
+              id
+            ) ||
+            id <= 0 ||
+            !nome
+          ) {
+            return null;
+          }
+
+
+          return context.env.DB
             .prepare(
               `
                 INSERT INTO redmine_users_cache (
@@ -405,12 +371,19 @@ async function popularCacheInicial(
                   redmine_user_name,
                   last_seen
                 )
-                VALUES (?, ?, CURRENT_TIMESTAMP)
+
+                VALUES (
+                  ?,
+                  ?,
+                  CURRENT_TIMESTAMP
+                )
 
                 ON CONFLICT(redmine_user_id)
+
                 DO UPDATE SET
                   redmine_user_name =
                     excluded.redmine_user_name,
+
                   last_seen =
                     CURRENT_TIMESTAMP
               `
@@ -418,39 +391,37 @@ async function popularCacheInicial(
             .bind(
               id,
               nome
-            )
+            );
+        }
+      )
+      .filter(Boolean);
+
+
+  const tamanhoLote =
+    70;
+
+
+  for (
+    let inicio = 0;
+    inicio < comandos.length;
+    inicio += tamanhoLote
+  ) {
+
+    const lote =
+      comandos.slice(
+        inicio,
+        inicio + tamanhoLote
       );
 
 
-  await context.env.DB.batch(
-    comandos
-  );
-
-
-  return Array.from(
-    usuarios.entries()
-  )
-    .map(
-      (
-        [
-          id,
-          nome,
-        ]
-      ) => ({
-        id,
-        nome,
-      })
-    )
-    .sort(
-      (
-        a,
-        b
-      ) =>
-        a.nome.localeCompare(
-          b.nome,
-          "pt-BR"
-        )
-    );
+    if (
+      lote.length > 0
+    ) {
+      await context.env.DB.batch(
+        lote
+      );
+    }
+  }
 }
 
 
@@ -459,27 +430,61 @@ export async function onRequestGet(
 ) {
   try {
 
-    const usuariosCache =
-      await buscarUsuariosCache(
+    /*
+      Aqui buscamos diretamente todos os usuários
+      ativos cadastrados no Redmine.
+
+      Não dependemos mais de apontamentos de horas
+      para descobrir quem existe.
+    */
+
+    const usuariosRedmine =
+      await listarTodosUsuariosRedmine(
         context
       );
 
 
-    if (
-      usuariosCache.length > 0
-    ) {
-
-      return Response.json(
-        usuariosCache
-      );
-
-    }
+    await atualizarCacheUsuarios(
+      context,
+      usuariosRedmine
+    );
 
 
     const usuarios =
-      await popularCacheInicial(
-        context
-      );
+      usuariosRedmine
+        .map(
+          usuario => ({
+
+            id:
+              Number(
+                usuario.id
+              ),
+
+            nome:
+              montarNomeUsuario(
+                usuario
+              ),
+
+          })
+        )
+        .filter(
+          usuario =>
+            Number.isFinite(
+              usuario.id
+            ) &&
+            usuario.id > 0 &&
+            usuario.nome
+        )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.nome.localeCompare(
+              b.nome,
+              "pt-BR"
+            )
+        );
 
 
     return Response.json(

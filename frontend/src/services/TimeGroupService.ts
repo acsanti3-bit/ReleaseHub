@@ -22,6 +22,10 @@ interface PreferenceResponse {
 }
 
 
+const API_BASE_URL =
+  "https://releasehub.pages.dev";
+
+
 async function obterErro(
   response: Response
 ): Promise<string> {
@@ -50,7 +54,7 @@ export async function listarGruposHoras():
 
   const response =
     await fetch(
-      "/api/time-groups",
+      `${API_BASE_URL}/api/time-groups`,
       {
         method:
           "GET",
@@ -85,7 +89,7 @@ export async function criarGrupoHoras(
 
   const response =
     await fetch(
-      "/api/time-groups",
+      `${API_BASE_URL}/api/time-groups`,
       {
         method:
           "POST",
@@ -127,7 +131,7 @@ export async function editarGrupoHoras(
 
   const response =
     await fetch(
-      "/api/time-groups",
+      `${API_BASE_URL}/api/time-groups`,
       {
         method:
           "PUT",
@@ -174,7 +178,7 @@ export async function excluirGrupoHoras(
 
   const response =
     await fetch(
-      `/api/time-groups?${parametros.toString()}`,
+      `${API_BASE_URL}/api/time-groups?${parametros.toString()}`,
       {
         method:
           "DELETE",
@@ -202,7 +206,7 @@ export async function obterPreferenciaGrupoHoras():
 
   const response =
     await fetch(
-      "/api/time-group-preference",
+      `${API_BASE_URL}/api/time-group-preference`,
       {
         method:
           "GET",
@@ -245,7 +249,7 @@ export async function salvarPreferenciaGrupoHoras(
 
   const response =
     await fetch(
-      "/api/time-group-preference",
+      `${API_BASE_URL}/api/time-group-preference`,
       {
         method:
           "PUT",
