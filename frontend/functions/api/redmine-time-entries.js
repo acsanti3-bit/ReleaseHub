@@ -582,223 +582,11 @@ async function salvarTimeEntriesCache(
 }
 
 
-async function obterUltimaSincronizacao(
-  context
-) {
-  const estado =
-    await context.env.DB
-      .prepare(
-        `
-          SELECT
-            last_synced_at
-
-          FROM redmine_time_entries_sync
-
-          WHERE id = 1
-
-          LIMIT 1
-        `
-      )
-      .first();
-
-  return estado?.last_synced_at ??
-    null;
-}
-
-
-async function salvarUltimaSincronizacao(
-  context,
-  valor
-) {
-  await context.env.DB
-    .prepare(
-      `
-        INSERT INTO redmine_time_entries_sync (
-          id,
-          last_synced_at
-        )
-
-        VALUES (
-          1,
-          ?
-        )
-
-        ON CONFLICT(id)
-
-        DO UPDATE SET
-          last_synced_at =
-            excluded.last_synced_at
-      `
-    )
-    .bind(
-      valor
-    )
-    .run();
-}
-
-
-function dataComMargem(
-  valor,
-  minutos = 2
-) {
-  const timestamp =
-    Date.parse(
-      String(
-        valor ??
-        ""
-      )
-    );
-
-  if (
-    Number.isNaN(
-      timestamp
-    )
-  ) {
-    return null;
-  }
-
-  return new Date(
-    timestamp -
-    minutos * 60 * 1000
-  ).toISOString();
-}
-
-
-async function sincronizarIncremental(
-  context,
-  ultimaSincronizacao,
-  sincronizacaoIniciadaEm
-) {
-  if (
-    !ultimaSincronizacao
-  ) {
-    return {
-      executado:
-        false,
-
-      entradas:
-        [],
-    };
-  }
-
-  const desde =
-    dataComMargem(
-      ultimaSincronizacao,
-      2
-    ) ??
-    ultimaSincronizacao;
-
-  const entradas =
-    await listarTimeEntries(
-      context,
-      {
-        updated_on:
-          `>=${desde}`,
-      }
-    );
-
-  await salvarTimeEntriesCache(
-    context,
-    entradas
-  );
-
-  await atualizarCacheUsuarios(
-    context,
-    entradas
-  );
-
-  await salvarUltimaSincronizacao(
-    context,
-    sincronizacaoIniciadaEm
-  );
-
-  return {
-    executado:
-      true,
-
-    desde,
-
-    entradas,
-  };
-}
-
-
 function criarChavePeriodo(
   from,
   to
 ) {
   return `${from}|${to}`;
-}
-
-
-async function obterPeriodoCache(
-  context,
-  from,
-  to
-) {
-  const chave =
-    criarChavePeriodo(
-      from,
-      to
-    );
-
-  return await context.env.DB
-    .prepare(
-      `
-        SELECT
-          range_key,
-          from_date,
-          to_date,
-          loaded_at
-
-        FROM redmine_time_entries_ranges
-
-        WHERE range_key = ?
-
-        LIMIT 1
-      `
-    )
-    .bind(
-      chave
-    )
-    .first();
-}
-
-
-function periodoPrecisaCargaCompleta(
-  periodo
-) {
-  if (
-    !periodo?.loaded_at
-  ) {
-    return true;
-  }
-
-  const timestamp =
-    Date.parse(
-      String(
-        periodo.loaded_at
-      )
-    );
-
-  if (
-    Number.isNaN(
-      timestamp
-    )
-  ) {
-    return true;
-  }
-
-  const vinteQuatroHoras =
-    24 *
-    60 *
-    60 *
-    1000;
-
-  return (
-    Date.now() -
-    timestamp
-  ) >= vinteQuatroHoras;
 }
 
 
@@ -851,7 +639,7 @@ async function salvarPeriodoCache(
 }
 
 
-async function carregarPeriodoCompleto(
+async function atualizarPeriodo(
   context,
   from,
   to
@@ -866,11 +654,11 @@ async function carregarPeriodoCompleto(
     );
 
   /*
-    Como esta é uma carga completa do período,
-    removemos primeiro os itens daquele intervalo.
+    Como a consulta já é limitada pelo período,
+    removemos somente o cache daquele intervalo.
 
-    Isso também corrige um eventual apontamento
-    que tenha sido excluído do Redmine.
+    Isso mantém o cache fiel ao Redmine e também
+    remove apontamentos que tenham sido excluídos.
   */
 
   await context.env.DB
@@ -1040,98 +828,20 @@ export async function onRequestGet(
 
 
     /*
-      Guardamos o horário em que a sincronização começou.
+      A Gestão de Horas consulta somente o intervalo
+      solicitado pela tela.
 
-      A próxima consulta parte daqui, com uma margem
-      de 2 minutos, evitando perder uma alteração
-      que tenha acontecido durante esta execução.
+      Não usamos updated_on aqui porque o endpoint
+      de time_entries do Redmine trabalha melhor
+      com filtros de período.
     */
 
-    const sincronizacaoIniciadaEm =
-      new Date()
-        .toISOString();
-
-
-    const ultimaSincronizacao =
-      await obterUltimaSincronizacao(
-        context
-      );
-
-
-    /*
-      Se já existe uma sincronização anterior,
-      buscamos APENAS registros criados/alterados
-      depois dela usando updated_on.
-    */
-
-    const incremental =
-      await sincronizarIncremental(
-        context,
-        ultimaSincronizacao,
-        sincronizacaoIniciadaEm
-      );
-
-
-    /*
-      Cada período consultado recebe uma carga completa
-      apenas na primeira vez.
-
-      Depois disso, as consultas usam o cache atualizado
-      incrementalmente.
-
-      A cada 24 horas fazemos novamente uma carga completa
-      daquele período para corrigir inclusive exclusões.
-    */
-
-    const periodo =
-      await obterPeriodoCache(
+    const entradasAtualizadas =
+      await atualizarPeriodo(
         context,
         from,
         to
       );
-
-
-    const precisaCargaCompleta =
-      periodoPrecisaCargaCompleta(
-        periodo
-      );
-
-
-    let quantidadeCargaCompleta =
-      0;
-
-
-    if (
-      precisaCargaCompleta
-    ) {
-      const entradasPeriodo =
-        await carregarPeriodoCompleto(
-          context,
-          from,
-          to
-        );
-
-      quantidadeCargaCompleta =
-        entradasPeriodo.length;
-    }
-
-
-    /*
-      Se esta foi a primeira utilização do cache,
-      ainda não existia last_synced_at.
-
-      Após a carga inicial salvamos o ponto de partida
-      para que as próximas chamadas sejam incrementais.
-    */
-
-    if (
-      !ultimaSincronizacao
-    ) {
-      await salvarUltimaSincronizacao(
-        context,
-        sincronizacaoIniciadaEm
-      );
-    }
 
 
     const entradasCache =
@@ -1208,20 +918,19 @@ export async function onRequestGet(
         dados,
 
         sincronizacao: {
-          incremental:
-            incremental.executado,
+          modo:
+            "periodo",
 
-          alteracoesEncontradas:
-            incremental.entradas.length,
+          from,
 
-          cargaCompleta:
-            precisaCargaCompleta,
+          to,
 
-          registrosCargaCompleta:
-            quantidadeCargaCompleta,
+          encontradosRedmine:
+            entradasAtualizadas.length,
 
-          ultimaSincronizacao:
-            sincronizacaoIniciadaEm,
+          atualizadoEm:
+            new Date()
+              .toISOString(),
         },
       }
     );
