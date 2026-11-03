@@ -86,6 +86,34 @@ function obterConfiguracao(
 }
 
 
+function formatarDataIso(
+  data
+) {
+  const ano =
+    data.getUTCFullYear();
+
+  const mes =
+    String(
+      data.getUTCMonth() + 1
+    )
+      .padStart(
+        2,
+        "0"
+      );
+
+  const dia =
+    String(
+      data.getUTCDate()
+    )
+      .padStart(
+        2,
+        "0"
+      );
+
+  return `${ano}-${mes}-${dia}`;
+}
+
+
 async function buscarJsonRedmine(
   context,
   caminho,
@@ -153,7 +181,6 @@ async function buscarJsonRedmine(
   const texto =
     await response.text();
 
-
   if (
     response.status >= 300 &&
     response.status < 400
@@ -163,7 +190,6 @@ async function buscarJsonRedmine(
     );
   }
 
-
   if (
     response.status === 401
   ) {
@@ -172,15 +198,13 @@ async function buscarJsonRedmine(
     );
   }
 
-
   if (
     response.status === 403
   ) {
     throw new Error(
-      "O usuário configurado no Redmine não possui permissão para listar os usuários."
+      "O Redmine bloqueou a consulta dos apontamentos."
     );
   }
-
 
   if (
     !response.ok
@@ -190,28 +214,89 @@ async function buscarJsonRedmine(
     );
   }
 
-
   try {
-
     return JSON.parse(
       texto
     );
-
   } catch {
-
     throw new Error(
       "O Redmine não retornou um JSON válido."
     );
-
   }
 }
 
 
-async function listarTodosUsuariosRedmine(
+async function buscarUsuariosCache(
   context
 ) {
-  const usuarios =
-    [];
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            redmine_user_id,
+            redmine_user_name
+
+          FROM redmine_users_cache
+
+          ORDER BY
+            redmine_user_name
+            COLLATE NOCASE
+        `
+      )
+      .all();
+
+  return (
+    resultado.results ||
+    []
+  )
+    .map(
+      usuario => ({
+        id:
+          Number(
+            usuario.redmine_user_id
+          ),
+
+        nome:
+          String(
+            usuario.redmine_user_name ||
+            ""
+          ),
+      })
+    );
+}
+
+
+async function atualizarCacheUsuarios(
+  context
+) {
+  const hoje =
+    new Date();
+
+  const inicio =
+    new Date();
+
+
+  /*
+    Busca usuários que tiveram apontamentos
+    nos últimos 365 dias.
+  */
+
+  inicio.setUTCDate(
+    inicio.getUTCDate() - 365
+  );
+
+
+  const from =
+    formatarDataIso(
+      inicio
+    );
+
+  const to =
+    formatarDataIso(
+      hoje
+    );
+
 
   const limite =
     100;
@@ -222,19 +307,21 @@ async function listarTodosUsuariosRedmine(
   let total =
     null;
 
+  const usuarios =
+    new Map();
+
 
   while (
     total === null ||
-    usuarios.length < total
+    offset < total
   ) {
-
     const resultado =
       await buscarJsonRedmine(
         context,
-        "/users.json",
+        "/time_entries.json",
         {
-          status:
-            1,
+          from,
+          to,
 
           limit:
             limite,
@@ -244,16 +331,45 @@ async function listarTodosUsuariosRedmine(
       );
 
 
-    const itens =
+    const entradas =
       Array.isArray(
-        resultado.users
+        resultado.time_entries
       )
-        ? resultado.users
+        ? resultado.time_entries
         : [];
 
 
-    usuarios.push(
-      ...itens
+    entradas.forEach(
+      entrada => {
+
+        const id =
+          Number(
+            entrada.user?.id
+          );
+
+        const nome =
+          String(
+            entrada.user?.name ??
+            ""
+          ).trim();
+
+
+        if (
+          !Number.isFinite(
+            id
+          ) ||
+          id <= 0 ||
+          !nome
+        ) {
+          return;
+        }
+
+
+        usuarios.set(
+          id,
+          nome
+        );
+      }
     );
 
 
@@ -268,102 +384,42 @@ async function listarTodosUsuariosRedmine(
         totalRetornado
       )
         ? totalRetornado
-        : usuarios.length;
+        : offset +
+          entradas.length;
 
 
     if (
-      itens.length === 0 ||
-      itens.length < limite
+      entradas.length === 0 ||
+      entradas.length < limite
     ) {
       break;
     }
 
 
     offset +=
-      itens.length;
+      entradas.length;
   }
 
 
-  return usuarios;
-}
-
-
-function montarNomeUsuario(
-  usuario
-) {
-  const primeiroNome =
-    String(
-      usuario.firstname ??
-      ""
-    ).trim();
-
-  const ultimoNome =
-    String(
-      usuario.lastname ??
-      ""
-    ).trim();
-
-  const nomeCompleto =
-    `${primeiroNome} ${ultimoNome}`
-      .trim();
-
-
   if (
-    nomeCompleto
-  ) {
-    return nomeCompleto;
-  }
-
-
-  return String(
-    usuario.login ??
-    ""
-  ).trim();
-}
-
-
-async function atualizarCacheUsuarios(
-  context,
-  usuarios
-) {
-  if (
-    !Array.isArray(
-      usuarios
-    ) ||
-    usuarios.length === 0
+    usuarios.size === 0
   ) {
     return;
   }
 
 
   const comandos =
-    usuarios
+    Array.from(
+      usuarios.entries()
+    )
       .map(
-        usuario => {
-
-          const id =
-            Number(
-              usuario.id
-            );
-
-          const nome =
-            montarNomeUsuario(
-              usuario
-            );
-
-
-          if (
-            !Number.isFinite(
-              id
-            ) ||
-            id <= 0 ||
-            !nome
-          ) {
-            return null;
-          }
-
-
-          return context.env.DB
+        (
+          [
+            id,
+            nome,
+          ]
+        ) =>
+          context.env.DB
             .prepare(
               `
                 INSERT INTO redmine_users_cache (
@@ -391,10 +447,8 @@ async function atualizarCacheUsuarios(
             .bind(
               id,
               nome
-            );
-        }
-      )
-      .filter(Boolean);
+            )
+      );
 
 
   const tamanhoLote =
@@ -402,17 +456,15 @@ async function atualizarCacheUsuarios(
 
 
   for (
-    let inicio = 0;
-    inicio < comandos.length;
-    inicio += tamanhoLote
+    let inicioLote = 0;
+    inicioLote < comandos.length;
+    inicioLote += tamanhoLote
   ) {
-
     const lote =
       comandos.slice(
-        inicio,
-        inicio + tamanhoLote
+        inicioLote,
+        inicioLote + tamanhoLote
       );
-
 
     if (
       lote.length > 0
@@ -431,60 +483,22 @@ export async function onRequestGet(
   try {
 
     /*
-      Aqui buscamos diretamente todos os usuários
-      ativos cadastrados no Redmine.
+      Atualizamos primeiro o cache usando
+      os apontamentos dos últimos 365 dias.
 
-      Não dependemos mais de apontamentos de horas
-      para descobrir quem existe.
+      Assim, usuários novos encontrados
+      também entram na lista.
     */
 
-    const usuariosRedmine =
-      await listarTodosUsuariosRedmine(
-        context
-      );
-
-
     await atualizarCacheUsuarios(
-      context,
-      usuariosRedmine
+      context
     );
 
 
     const usuarios =
-      usuariosRedmine
-        .map(
-          usuario => ({
-
-            id:
-              Number(
-                usuario.id
-              ),
-
-            nome:
-              montarNomeUsuario(
-                usuario
-              ),
-
-          })
-        )
-        .filter(
-          usuario =>
-            Number.isFinite(
-              usuario.id
-            ) &&
-            usuario.id > 0 &&
-            usuario.nome
-        )
-        .sort(
-          (
-            a,
-            b
-          ) =>
-            a.nome.localeCompare(
-              b.nome,
-              "pt-BR"
-            )
-        );
+      await buscarUsuariosCache(
+        context
+      );
 
 
     return Response.json(
