@@ -403,7 +403,7 @@ function TimeManagement() {
 
       const response =
         await fetch(
-          "/api/redmine-users",
+          "https://releasehub.pages.dev/api/redmine-users",
           {
             method:
               "GET",
@@ -1630,7 +1630,7 @@ function TimeManagement() {
 
       const response =
         await fetch(
-          `/api/redmine-time-entries?${parametros.toString()}`,
+          `https://releasehub.pages.dev/api/redmine-time-entries?${parametros.toString()}`,
           {
             method:
               "GET",
