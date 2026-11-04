@@ -279,11 +279,11 @@ async function atualizarCacheUsuarios(
 
   /*
     Busca usuários que tiveram apontamentos
-    nos últimos 730 dias.
+    nos últimos 365 dias.
   */
 
   inicio.setUTCDate(
-    inicio.getUTCDate() - 730
+    inicio.getUTCDate() - 365
   );
 
 
