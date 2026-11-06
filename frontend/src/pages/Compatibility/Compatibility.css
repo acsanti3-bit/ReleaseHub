@@ -2409,3 +2409,54 @@ html.dark
 
   color: #94a3b8;
 }
+
+/* AUMENTA A LEITURA DO LEIA-ME */
+
+.compatibility-readme-modal-title h2 {
+  font-size: 19px;
+}
+
+.compatibility-readme-modal-eyebrow {
+  font-size: 9.5px;
+}
+
+.compatibility-readme-modal-versions small {
+  font-size: 9px;
+}
+
+.compatibility-readme-modal-versions strong {
+  font-size: 11px;
+}
+
+.compatibility-readme-modal-version-text {
+  font-size: 10px;
+}
+
+.compatibility-readme-modal-body
+.compatibility-readme-alert {
+  font-size: 10.5px;
+}
+
+.compatibility-readme-modal-body
+.compatibility-readme-section h3 {
+  font-size: 9.5px;
+}
+
+.compatibility-readme-modal-body
+.compatibility-readme-app strong {
+  font-size: 10.5px;
+}
+
+.compatibility-readme-modal-body
+.compatibility-readme-app span {
+  font-size: 10.5px;
+}
+
+.compatibility-readme-modal-body
+.compatibility-readme-path {
+  font-size: 10px;
+}
+
+.compatibility-readme-modal-footer button {
+  font-size: 11px;
+}
