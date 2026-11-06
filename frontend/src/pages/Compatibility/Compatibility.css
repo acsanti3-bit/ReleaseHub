@@ -1811,3 +1811,335 @@ html.dark .compatibility-readme-editor textarea {
 html.dark .compatibility-modal-footer {
   background: #151f2e;
 }
+
+/* =========================================================
+   MODAL LEIA-ME
+   ========================================================= */
+
+.compatibility-readme-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(15, 23, 42, 0.58);
+
+  backdrop-filter: blur(3px);
+}
+
+
+.compatibility-readme-modal {
+  width: min(900px, 94vw);
+  max-height: 86vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe6ed;
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 28px 80px
+    rgba(15, 23, 42, 0.28);
+}
+
+
+.compatibility-readme-modal-header {
+  padding: 18px 20px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  border-bottom: 1px solid #e7edf2;
+
+  background: #fbfcfe;
+}
+
+
+.compatibility-readme-modal-title {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.compatibility-readme-modal-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eef6fd;
+
+  color: #005aa9;
+}
+
+
+.compatibility-readme-modal-title > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.compatibility-readme-modal-title span {
+  margin-bottom: 2px;
+
+  color: #7b8794;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: .07em;
+}
+
+
+.compatibility-readme-modal-title h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+
+.compatibility-readme-modal-title p {
+  margin: 3px 0 0;
+
+  color: #7b8794;
+
+  font-size: 10px;
+}
+
+
+.compatibility-readme-modal-close {
+  width: 34px;
+  height: 34px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #667085;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.compatibility-readme-modal-close:hover {
+  background: #eef2f6;
+
+  color: #1f2937;
+}
+
+
+.compatibility-readme-modal-body {
+  flex: 1;
+
+  min-height: 0;
+
+  overflow-y: auto;
+
+  padding: 18px 20px;
+
+  scrollbar-width: thin;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-alerts {
+  margin-bottom: 18px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-alert {
+  border-radius: 7px;
+
+  border-left: 3px solid #f58220;
+
+  background: #fff8f1;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-section h3 {
+  margin-bottom: 8px;
+
+  color: #667085;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: .07em;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-table {
+  border-radius: 9px;
+
+  overflow: hidden;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-row {
+  grid-template-columns:
+    minmax(220px, 300px)
+    minmax(0, 1fr);
+
+  min-height: 38px;
+}
+
+
+.compatibility-readme-modal-footer {
+  padding: 12px 20px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  border-top: 1px solid #e7edf2;
+
+  background: #fbfcfe;
+}
+
+
+.compatibility-readme-modal-footer button {
+  min-height: 38px;
+
+  border: 1px solid #cbd5df;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #475467;
+
+  padding: 0 16px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.compatibility-readme-modal-footer button:hover {
+  border-color: #9fb3c7;
+
+  background: #f6f8fa;
+}
+
+
+/* DARK MODE */
+
+html.dark
+.compatibility-readme-modal {
+  background: #162131;
+
+  border-color: #263548;
+}
+
+
+html.dark
+.compatibility-readme-modal-header,
+html.dark
+.compatibility-readme-modal-footer {
+  background: #151f2e;
+
+  border-color: #263548;
+}
+
+
+html.dark
+.compatibility-readme-modal-icon {
+  background: rgba(59, 130, 246, .12);
+
+  color: #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-modal-title h2 {
+  color: #f1f5f9;
+}
+
+
+html.dark
+.compatibility-readme-modal-title span,
+html.dark
+.compatibility-readme-modal-title p {
+  color: #94a3b8;
+}
+
+
+html.dark
+.compatibility-readme-modal-close {
+  color: #94a3b8;
+}
+
+
+html.dark
+.compatibility-readme-modal-close:hover {
+  background: #263548;
+
+  color: #f1f5f9;
+}
+
+
+html.dark
+.compatibility-readme-modal-footer button {
+  background: #1e293b;
+
+  border-color: #334155;
+
+  color: #cbd5e1;
+}
+
+
+@media (max-width: 700px) {
+
+  .compatibility-readme-modal-backdrop {
+    padding: 10px;
+  }
+
+
+  .compatibility-readme-modal {
+    width: 100%;
+
+    max-height: 92vh;
+  }
+
+
+  .compatibility-readme-modal-body
+  .compatibility-readme-row {
+    grid-template-columns: 1fr;
+  }
+
+}

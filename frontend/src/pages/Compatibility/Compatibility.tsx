@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 
 import {
-  MdAdd,
   MdCheckCircle,
   MdClose,
   MdDeleteOutline,
@@ -73,11 +72,6 @@ type Feedback = {
 };
 
 
-type AddSource =
-  | "redmine"
-  | "manual";
-
-
 type ReadmeAplicacao = {
   nome: string;
   versao: string;
@@ -101,21 +95,6 @@ function normalizarTexto(
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-}
-
-
-function criarChaveManual(
-  nome: string
-) {
-  const slug =
-    nome
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-  return `manual:${slug || "sistema"}`;
 }
 
 
@@ -492,29 +471,6 @@ function Compatibility() {
   const [
     novaVersao,
     setNovaVersao,
-  ] =
-    useState("");
-
-
-  const [
-    addSource,
-    setAddSource,
-  ] =
-    useState<AddSource>(
-      "redmine"
-    );
-
-
-  const [
-    novoProjetoRedmineId,
-    setNovoProjetoRedmineId,
-  ] =
-    useState("");
-
-
-  const [
-    novoSistemaManual,
-    setNovoSistemaManual,
   ] =
     useState("");
 
@@ -1257,17 +1213,6 @@ function Compatibility() {
       itens
     );
 
-    setNovoProjetoRedmineId(
-      ""
-    );
-
-    setNovoSistemaManual(
-      ""
-    );
-
-    setAddSource(
-      "redmine"
-    );
 
     setConfigurandoGeral(
       true
@@ -1445,258 +1390,6 @@ function Compatibility() {
   }
 
 
-  function alternarRelacionamentoGlobal(
-    itemKey:
-      string,
-
-    relacionadoKey:
-      string
-  ) {
-    setCatalogoEdicao(
-      atual =>
-        atual.map(
-          item => {
-
-            if (
-              item.key !==
-              itemKey
-            ) {
-              return item;
-            }
-
-
-            const existe =
-              item.relatedTo.includes(
-                relacionadoKey
-              );
-
-
-            return {
-              ...item,
-
-              relatedTo:
-                existe
-                  ? item.relatedTo.filter(
-                      key =>
-                        key !==
-                        relacionadoKey
-                    )
-                  : [
-                      ...item.relatedTo,
-                      relacionadoKey,
-                    ],
-            };
-          }
-        )
-    );
-  }
-
-
-  function adicionarSistemaManualGlobal() {
-    const nome =
-      novoSistemaManual
-        .trim();
-
-
-    if (
-      !nome
-    ) {
-      setFeedback(
-        {
-          tipo:
-            "erro",
-
-          texto:
-            "Informe o nome do sistema ou componente.",
-        }
-      );
-
-      return;
-    }
-
-
-    const key =
-      criarChaveManual(
-        nome
-      );
-
-
-    if (
-      catalogoEdicao.some(
-        item =>
-          item.key ===
-          key
-      )
-    ) {
-      setFeedback(
-        {
-          tipo:
-            "erro",
-
-          texto:
-            `"${nome}" já está no cadastro geral.`,
-        }
-      );
-
-      return;
-    }
-
-
-    const proximaOrdem =
-      Math.max(
-        0,
-        ...catalogoEdicao.map(
-          item =>
-            item.order
-        )
-      ) +
-      1;
-
-
-    setCatalogoEdicao(
-      atual => [
-        ...atual,
-        {
-          key,
-          source:
-            "manual",
-          originalName:
-            nome,
-          displayName:
-            nome,
-          redmineProjectId:
-            null,
-          redmineProjectName:
-            "",
-          defaultVisible:
-            true,
-          order:
-            proximaOrdem,
-          relatedTo:
-            [],
-        },
-      ]
-    );
-
-
-    setNovoSistemaManual(
-      ""
-    );
-  }
-
-
-  function adicionarSistemaRedmineGlobal() {
-    const projectId =
-      Number(
-        novoProjetoRedmineId
-      );
-
-
-    const projeto =
-      projetosRedmine.find(
-        item =>
-          item.id ===
-          projectId
-      );
-
-
-    if (
-      !projeto
-    ) {
-      setFeedback(
-        {
-          tipo:
-            "erro",
-
-          texto:
-            "Selecione um projeto do Redmine.",
-        }
-      );
-
-      return;
-    }
-
-
-    const jaVinculado =
-      catalogoEdicao.find(
-        item =>
-          item.redmineProjectId ===
-          projeto.id
-      );
-
-
-    if (
-      jaVinculado
-    ) {
-      setFeedback(
-        {
-          tipo:
-            "erro",
-
-          texto:
-            `O projeto "${projeto.name}" já está vinculado a "${jaVinculado.displayName}".`,
-        }
-      );
-
-      return;
-    }
-
-
-    const key =
-      `redmine:${projeto.id}`;
-
-
-    const proximaOrdem =
-      Math.max(
-        0,
-        ...catalogoEdicao.map(
-          item =>
-            item.order
-        )
-      ) +
-      1;
-
-
-    setCatalogoEdicao(
-      atual => [
-        ...atual,
-        {
-          key,
-
-          source:
-            "redmine",
-
-          originalName:
-            projeto.name,
-
-          displayName:
-            projeto.name,
-
-          redmineProjectId:
-            projeto.id,
-
-          redmineProjectName:
-            projeto.name,
-
-          defaultVisible:
-            true,
-
-          order:
-            proximaOrdem,
-
-          relatedTo:
-            [],
-        },
-      ]
-    );
-
-
-    setNovoProjetoRedmineId(
-      ""
-    );
-  }
-
-
   function removerSistemaGlobal(
     item:
       CompatibilitySystemDefinition
@@ -1806,7 +1499,7 @@ function Compatibility() {
             "sucesso",
 
           texto:
-            "Configuração geral dos sistemas salva. Ela passa a valer para todas as releases.",
+            "Configuração geral dos sistemas salva.",
         }
       );
 
@@ -2237,47 +1930,30 @@ function Compatibility() {
         {feedback && (
           <div
             className={`compatibility-feedback compatibility-feedback-${feedback.tipo}`}
-            role={
-              feedback.tipo ===
-                "erro"
-                ? "alert"
-                : "status"
-            }
           >
             <div>
-
               {feedback.tipo ===
                 "sucesso" ? (
-                <MdCheckCircle
-                  size={21}
-                />
+                <MdCheckCircle size={21} />
               ) : (
-                <MdErrorOutline
-                  size={21}
-                />
+                <MdErrorOutline size={21} />
               )}
 
               <span>
                 {feedback.texto}
               </span>
-
             </div>
-
 
             <button
               type="button"
-              aria-label="Fechar mensagem"
               onClick={() =>
                 setFeedback(
                   null
                 )
               }
             >
-              <MdClose
-                size={18}
-              />
+              <MdClose size={18} />
             </button>
-
           </div>
         )}
 
@@ -2285,7 +1961,6 @@ function Compatibility() {
         <div className="compatibility-page-header">
 
           <div>
-
             <span className="compatibility-page-eyebrow">
               Sistemas
             </span>
@@ -2297,7 +1972,6 @@ function Compatibility() {
             <p>
               Consulte as versões utilizadas em cada release e as orientações necessárias para atualização.
             </p>
-
           </div>
 
 
@@ -2311,10 +1985,7 @@ function Compatibility() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <MdMenuBook
-                size={19}
-              />
-
+              <MdMenuBook size={19} />
               Abrir Wiki do IntelliCash
             </a>
 
@@ -2330,10 +2001,7 @@ function Compatibility() {
                 carregandoCompatibilidade
               }
             >
-              <MdRefresh
-                size={19}
-              />
-
+              <MdRefresh size={19} />
               Atualizar
             </button>
 
@@ -2344,12 +2012,9 @@ function Compatibility() {
 
         <div className="compatibility-info">
 
-          <MdLink
-            size={22}
-          />
+          <MdLink size={22} />
 
           <div>
-
             <strong>
               Cadastro geral + versão por release
             </strong>
@@ -2357,7 +2022,6 @@ function Compatibility() {
             <span>
               A ordem, os relacionamentos e os sistemas continuam definidos no cadastro geral.
             </span>
-
           </div>
 
         </div>
@@ -2366,9 +2030,7 @@ function Compatibility() {
         <section className="compatibility-global-card">
 
           <div className="compatibility-global-icon">
-            <MdSettings
-              size={24}
-            />
+            <MdSettings size={24} />
           </div>
 
 
@@ -2400,14 +2062,8 @@ function Compatibility() {
               onClick={() =>
                 void abrirConfiguracaoGeral()
               }
-              disabled={
-                carregando
-              }
             >
-              <MdSettings
-                size={18}
-              />
-
+              <MdSettings size={18} />
               Configurar sistemas
             </button>
           )}
@@ -2456,7 +2112,6 @@ function Compatibility() {
 
 
             {ambienteSelecionado && (
-
               <div className="compatibility-release-context-details">
 
                 <span>
@@ -2470,7 +2125,7 @@ function Compatibility() {
                     "-"}
                 </strong>
 
-                <span className="compatibility-release-context-dot">
+                <span>
                   •
                 </span>
 
@@ -2479,7 +2134,6 @@ function Compatibility() {
                 </span>
 
               </div>
-
             )}
 
           </div>
@@ -2487,13 +2141,11 @@ function Compatibility() {
 
           <div className="compatibility-release-switcher">
 
-            <label htmlFor="compatibility-environment">
+            <label>
               Trocar release
             </label>
 
-
             <select
-              id="compatibility-environment"
               value={
                 environmentId ??
                 ""
@@ -2507,28 +2159,12 @@ function Compatibility() {
                     null
                   )
               }
-              disabled={
-                carregando
-              }
             >
-
-              {ambientes.length ===
-                0 && (
-                <option value="">
-                  Nenhum ambiente cadastrado
-                </option>
-              )}
-
-
               {ambientes.map(
                 ambiente => (
                   <option
-                    key={
-                      ambiente.id
-                    }
-                    value={
-                      ambiente.id
-                    }
+                    key={ambiente.id}
+                    value={ambiente.id}
                   >
                     {ambiente.nome}
                     {ambiente.concluido
@@ -2537,7 +2173,6 @@ function Compatibility() {
                   </option>
                 )
               )}
-
             </select>
 
           </div>
@@ -2550,7 +2185,6 @@ function Compatibility() {
           <div className="compatibility-view-heading-row">
 
             <div className="compatibility-view-title">
-
               <h2>
                 Compatibilidade da release
               </h2>
@@ -2561,7 +2195,6 @@ function Compatibility() {
                   ?.environmentName ??
                   "este ambiente"}.
               </p>
-
             </div>
 
 
@@ -2572,25 +2205,15 @@ function Compatibility() {
                 ?.trim() && (
                 <button
                   type="button"
-                  className={`compatibility-readme-button ${
-                    readmeAberto
-                      ? "compatibility-readme-button-active"
-                      : ""
-                  }`}
+                  className="compatibility-readme-button"
                   onClick={() =>
                     setReadmeAberto(
-                      atual =>
-                        !atual
+                      true
                     )
                   }
                 >
-                  <MdMenuBook
-                    size={18}
-                  />
-
-                  {readmeAberto
-                    ? "Fechar LEIA-ME"
-                    : "LEIA-ME"}
+                  <MdMenuBook size={18} />
+                  LEIA-ME
                 </button>
               )}
 
@@ -2604,10 +2227,7 @@ function Compatibility() {
                     abrirEdicaoRelease
                   }
                 >
-                  <MdTune
-                    size={18}
-                  />
-
+                  <MdTune size={18} />
                   Ajustar versões
                 </button>
               )}
@@ -2617,200 +2237,11 @@ function Compatibility() {
           </div>
 
 
-          {compatibilidade &&
-            readmeAberto &&
-            compatibilidade
-              .readme
-              ?.trim() && (
-
-              <div className="compatibility-readme-wrapper">
-
-                <div className="compatibility-readme-modern">
-
-                  <div className="compatibility-readme-top">
-
-                    <div className="compatibility-readme-title">
-
-                      <MdMenuBook
-                        size={20}
-                      />
-
-                      <div>
-
-                        <strong>
-                          LEIA-ME
-                        </strong>
-
-                        <span>
-                          Orientações importantes desta release
-                        </span>
-
-                      </div>
-
-                    </div>
-
-
-                    {readmeInterpretado
-                      .titulo && (
-                      <span className="compatibility-readme-release-label">
-                        {readmeInterpretado
-                          .titulo}
-                      </span>
-                    )}
-
-                  </div>
-
-
-                  {readmeInterpretado
-                    .avisos
-                    .length >
-                    0 && (
-
-                    <div className="compatibility-readme-alerts">
-
-                      {readmeInterpretado
-                        .avisos
-                        .map(
-                          (
-                            aviso,
-                            indice
-                          ) => (
-                            <div
-                              key={`${aviso}-${indice}`}
-                              className="compatibility-readme-alert"
-                            >
-                              <MdErrorOutline
-                                size={18}
-                              />
-
-                              <span>
-                                {aviso}
-                              </span>
-                            </div>
-                          )
-                        )}
-
-                    </div>
-                  )}
-
-
-                  {readmeInterpretado
-                    .aplicacoes
-                    .length >
-                    0 && (
-
-                    <div className="compatibility-readme-section">
-
-                      <h3>
-                        Versões e caminhos
-                      </h3>
-
-
-                      <div className="compatibility-readme-table">
-
-                        {readmeInterpretado
-                          .aplicacoes
-                          .map(
-                            (
-                              aplicacao,
-                              indice
-                            ) => (
-                              <div
-                                className="compatibility-readme-row"
-                                key={`${aplicacao.nome}-${indice}`}
-                              >
-
-                                <div className="compatibility-readme-app">
-
-                                  <strong>
-                                    {aplicacao.nome}
-                                  </strong>
-
-                                  {aplicacao
-                                    .versao && (
-                                    <span>
-                                      {aplicacao
-                                        .versao}
-                                    </span>
-                                  )}
-
-                                </div>
-
-
-                                <div className="compatibility-readme-path">
-                                  {aplicacao
-                                    .caminho ||
-                                    "Sem caminho informado"}
-                                </div>
-
-                              </div>
-                            )
-                          )}
-
-                      </div>
-
-                    </div>
-                  )}
-
-
-                  {readmeInterpretado
-                    .outros
-                    .length >
-                    0 && (
-
-                    <div className="compatibility-readme-section">
-
-                      <h3>
-                        Observações
-                      </h3>
-
-
-                      <div className="compatibility-readme-notes">
-
-                        {readmeInterpretado
-                          .outros
-                          .map(
-                            (
-                              texto,
-                              indice
-                            ) => (
-                              <p
-                                key={`${texto}-${indice}`}
-                              >
-                                {texto}
-                              </p>
-                            )
-                          )}
-
-                      </div>
-
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-            )}
-
-
           {carregando ||
           carregandoCompatibilidade ? (
 
             <div className="compatibility-page-empty">
               Carregando compatibilidade...
-            </div>
-
-          ) : !compatibilidade ? (
-
-            <div className="compatibility-page-empty">
-              Selecione um ambiente para consultar a compatibilidade.
-            </div>
-
-          ) : itensVisiveis.length ===
-            0 ? (
-
-            <div className="compatibility-page-empty">
-              Nenhum sistema está marcado para exibição nesta release.
             </div>
 
           ) : (
@@ -2819,14 +2250,10 @@ function Compatibility() {
 
               {itensVisiveis.map(
                 item => (
-
                   <div
-                    key={
-                      item.key
-                    }
+                    key={item.key}
                     className="compatibility-view-item"
                   >
-
                     <strong>
                       {item.displayName}
                     </strong>
@@ -2835,9 +2262,7 @@ function Compatibility() {
                       {item.selectedVersion ||
                         "Não informado"}
                     </span>
-
                   </div>
-
                 )
               )}
 
@@ -2850,66 +2275,243 @@ function Compatibility() {
       </div>
 
 
+      {readmeAberto &&
+        compatibilidade && (
+
+          <div
+            className="compatibility-readme-modal-backdrop"
+            onMouseDown={
+              evento => {
+                if (
+                  evento.target ===
+                  evento.currentTarget
+                ) {
+                  setReadmeAberto(
+                    false
+                  );
+                }
+              }
+            }
+          >
+
+            <section className="compatibility-readme-modal">
+
+              <header className="compatibility-readme-modal-header">
+
+                <div className="compatibility-readme-modal-title">
+
+                  <div className="compatibility-readme-modal-icon">
+                    <MdMenuBook size={22} />
+                  </div>
+
+                  <div>
+                    <span>
+                      LEIA-ME DA RELEASE
+                    </span>
+
+                    <h2>
+                      {compatibilidade.environmentName}
+                    </h2>
+
+                    <p>
+                      Orientações importantes para atualização
+                    </p>
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="compatibility-readme-modal-close"
+                  onClick={() =>
+                    setReadmeAberto(
+                      false
+                    )
+                  }
+                >
+                  <MdClose size={22} />
+                </button>
+
+              </header>
+
+
+              <div className="compatibility-readme-modal-body">
+
+                {readmeInterpretado
+                  .titulo && (
+                  <div className="compatibility-readme-release-label">
+                    {readmeInterpretado.titulo}
+                  </div>
+                )}
+
+
+                {readmeInterpretado
+                  .avisos
+                  .length >
+                  0 && (
+
+                  <div className="compatibility-readme-alerts">
+
+                    {readmeInterpretado
+                      .avisos
+                      .map(
+                        (
+                          aviso,
+                          indice
+                        ) => (
+                          <div
+                            key={indice}
+                            className="compatibility-readme-alert"
+                          >
+                            <MdErrorOutline size={18} />
+
+                            <span>
+                              {aviso}
+                            </span>
+                          </div>
+                        )
+                      )}
+
+                  </div>
+                )}
+
+
+                <div className="compatibility-readme-section">
+
+                  <h3>
+                    Versões e caminhos
+                  </h3>
+
+
+                  <div className="compatibility-readme-table">
+
+                    {readmeInterpretado
+                      .aplicacoes
+                      .map(
+                        (
+                          aplicacao,
+                          indice
+                        ) => (
+                          <div
+                            className="compatibility-readme-row"
+                            key={indice}
+                          >
+
+                            <div className="compatibility-readme-app">
+
+                              <strong>
+                                {aplicacao.nome}
+                              </strong>
+
+                              {aplicacao
+                                .versao && (
+                                <span>
+                                  {aplicacao.versao}
+                                </span>
+                              )}
+
+                            </div>
+
+
+                            <div className="compatibility-readme-path">
+                              {aplicacao.caminho ||
+                                "Sem caminho informado"}
+                            </div>
+
+                          </div>
+                        )
+                      )}
+
+                  </div>
+
+                </div>
+
+
+                {readmeInterpretado
+                  .outros
+                  .length >
+                  0 && (
+                  <div className="compatibility-readme-section">
+
+                    <h3>
+                      Observações
+                    </h3>
+
+                    <div className="compatibility-readme-notes">
+
+                      {readmeInterpretado
+                        .outros
+                        .map(
+                          (
+                            texto,
+                            indice
+                          ) => (
+                            <p key={indice}>
+                              {texto}
+                            </p>
+                          )
+                        )}
+
+                    </div>
+
+                  </div>
+                )}
+
+              </div>
+
+
+              <footer className="compatibility-readme-modal-footer">
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReadmeAberto(
+                      false
+                    )
+                  }
+                >
+                  Fechar
+                </button>
+
+              </footer>
+
+            </section>
+
+          </div>
+
+        )}
+
+
       {configurandoGeral && (
 
-        <div
-          className="compatibility-modal-backdrop"
-          role="presentation"
-          onMouseDown={
-            evento => {
+        <div className="compatibility-modal-backdrop">
 
-              if (
-                evento.target ===
-                  evento.currentTarget &&
-                !salvando
-              ) {
-                setConfigurandoGeral(
-                  false
-                );
-              }
-
-            }
-          }
-        >
-
-          <section
-            className="compatibility-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="compatibility-global-modal-title"
-          >
+          <section className="compatibility-modal">
 
             <header className="compatibility-modal-header">
 
               <div>
-
-                <h2 id="compatibility-global-modal-title">
+                <h2>
                   Configuração geral dos sistemas
                 </h2>
 
                 <p>
                   Estas definições são reaproveitadas automaticamente em todas as releases.
                 </p>
-
               </div>
 
 
               <button
                 type="button"
                 className="compatibility-modal-close"
-                aria-label="Fechar"
                 onClick={() =>
                   setConfigurandoGeral(
                     false
                   )
                 }
-                disabled={
-                  salvando
-                }
               >
-                <MdClose
-                  size={22}
-                />
+                <MdClose size={22} />
               </button>
 
             </header>
@@ -2917,31 +2519,25 @@ function Compatibility() {
 
             <div className="compatibility-modal-guidance">
 
-              <MdInfoOutline
-                size={18}
-              />
+              <MdInfoOutline size={18} />
 
               <span>
-                O vínculo com o Redmine é feito pelo ID do projeto. Alterar o nome exibido não altera esse vínculo. Versões não são definidas aqui.
+                O vínculo com o Redmine é feito pelo ID do projeto.
               </span>
 
             </div>
 
 
             {erroRedmine && (
-
               <div className="compatibility-redmine-warning">
 
-                <MdErrorOutline
-                  size={19}
-                />
+                <MdErrorOutline size={19} />
 
                 <span>
                   {erroRedmine}
                 </span>
 
               </div>
-
             )}
 
 
@@ -2962,480 +2558,170 @@ function Compatibility() {
                     item,
                     indice,
                     lista
-                  ) => {
+                  ) => (
 
-                    const podeSubir =
-                      indice >
-                      0;
+                    <article
+                      key={item.key}
+                      className="compatibility-editor-item"
+                    >
 
+                      <div className="compatibility-editor-item-top">
 
-                    const podeDescer =
-                      indice <
-                      lista.length -
-                        1;
+                        <div className="compatibility-editor-heading">
 
-
-                    const outrasOpcoes =
-                      lista.filter(
-                        outro =>
-                          outro.key !==
-                          item.key
-                      );
+                          <strong className="compatibility-editor-title">
+                            {item.displayName}
+                          </strong>
 
 
-                    return (
-
-                      <article
-                        key={
-                          item.key
-                        }
-                        className="compatibility-editor-item"
-                      >
-
-                        <div className="compatibility-editor-item-top">
-
-                          <div className="compatibility-editor-heading">
-
-                            <div className="compatibility-editor-title-line">
-
-                              <strong className="compatibility-editor-title">
-                                {item.displayName ||
-                                  item.originalName ||
-                                  "Sem nome"}
-                              </strong>
-
-
-                              <span className="compatibility-source-badge">
-                                {item.source ===
-                                "environment"
-                                  ? "Ambiente"
-                                  : item.source ===
-                                      "redmine"
-                                    ? "Redmine"
-                                    : "Manual"}
-                              </span>
-
-                            </div>
-
-
-                            <label className="compatibility-visibility-toggle">
-
-                              <input
-                                type="checkbox"
-                                checked={
-                                  item.defaultVisible
-                                }
-                                onChange={
-                                  evento =>
-                                    atualizarCatalogoItem(
-                                      item.key,
-                                      {
-                                        defaultVisible:
-                                          evento
-                                            .target
-                                            .checked,
-                                      }
-                                    )
-                                }
-                              />
-
-                              Exibir por padrão em novas releases
-
-                            </label>
-
-                          </div>
-
-
-                          <div className="compatibility-order-actions">
-
-                            <button
-                              type="button"
-                              title="Subir na ordem"
-                              disabled={
-                                !podeSubir
-                              }
-                              onClick={() =>
-                                moverCatalogoItem(
-                                  item.key,
-                                  "up"
-                                )
-                              }
-                            >
-                              <MdKeyboardArrowUp
-                                size={20}
-                              />
-                            </button>
-
-
-                            <button
-                              type="button"
-                              title="Descer na ordem"
-                              disabled={
-                                !podeDescer
-                              }
-                              onClick={() =>
-                                moverCatalogoItem(
-                                  item.key,
-                                  "down"
-                                )
-                              }
-                            >
-                              <MdKeyboardArrowDown
-                                size={20}
-                              />
-                            </button>
-
-
-                            {item.source !==
-                              "environment" && (
-
-                              <button
-                                type="button"
-                                className="compatibility-remove-item"
-                                title="Remover do cadastro geral"
-                                onClick={() =>
-                                  removerSistemaGlobal(
-                                    item
-                                  )
-                                }
-                              >
-                                <MdDeleteOutline
-                                  size={19}
-                                />
-                              </button>
-
-                            )}
-
-                          </div>
-
-                        </div>
-
-
-                        <div className="compatibility-editor-fields">
-
-                          <label>
-
-                            <span>
-                              Nome exibido
-                            </span>
+                          <label className="compatibility-visibility-toggle">
 
                             <input
-                              value={
-                                item.displayName
+                              type="checkbox"
+                              checked={
+                                item.defaultVisible
                               }
                               onChange={
                                 evento =>
                                   atualizarCatalogoItem(
                                     item.key,
                                     {
-                                      displayName:
-                                        evento
-                                          .target
-                                          .value,
+                                      defaultVisible:
+                                        evento.target.checked,
                                     }
                                   )
                               }
                             />
 
-                          </label>
-
-
-                          <label>
-
-                            <span>
-                              Projeto no Redmine
-                            </span>
-
-                            <select
-                              value={
-                                item.redmineProjectId ??
-                                ""
-                              }
-                              onChange={
-                                evento =>
-                                  alterarProjetoGlobal(
-                                    item,
-                                    evento
-                                      .target
-                                      .value
-                                  )
-                              }
-                              disabled={
-                                carregandoRedmine
-                              }
-                            >
-
-                              <option value="">
-                                Sem vínculo
-                              </option>
-
-
-                              {projetosRedmine.map(
-                                projeto => (
-
-                                  <option
-                                    key={
-                                      projeto.id
-                                    }
-                                    value={
-                                      projeto.id
-                                    }
-                                  >
-                                    {projeto.name} — ID{" "}
-                                    {projeto.id}
-                                  </option>
-
-                                )
-                              )}
-
-                            </select>
+                            Exibir por padrão
 
                           </label>
 
                         </div>
 
 
-                        <details className="compatibility-relations">
+                        <div className="compatibility-order-actions">
 
-                          <summary>
-                            Utilizado em conjunto com
-                            {item.relatedTo.length >
-                              0 &&
-                              ` (${item.relatedTo.length})`}
-                          </summary>
+                          <button
+                            type="button"
+                            disabled={
+                              indice === 0
+                            }
+                            onClick={() =>
+                              moverCatalogoItem(
+                                item.key,
+                                "up"
+                              )
+                            }
+                          >
+                            <MdKeyboardArrowUp />
+                          </button>
 
 
-                          <p>
-                            Estes relacionamentos também serão reaproveitados em todas as releases.
-                          </p>
+                          <button
+                            type="button"
+                            disabled={
+                              indice ===
+                              lista.length - 1
+                            }
+                            onClick={() =>
+                              moverCatalogoItem(
+                                item.key,
+                                "down"
+                              )
+                            }
+                          >
+                            <MdKeyboardArrowDown />
+                          </button>
 
 
-                          <div className="compatibility-relations-grid">
+                          {item.source !==
+                            "environment" && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removerSistemaGlobal(
+                                  item
+                                )
+                              }
+                            >
+                              <MdDeleteOutline />
+                            </button>
+                          )}
 
-                            {outrasOpcoes.map(
-                              outro => (
+                        </div>
 
-                                <label
-                                  key={
-                                    outro.key
+                      </div>
+
+
+                      <div className="compatibility-editor-fields">
+
+                        <label>
+                          <span>
+                            Nome exibido
+                          </span>
+
+                          <input
+                            value={item.displayName}
+                            onChange={
+                              evento =>
+                                atualizarCatalogoItem(
+                                  item.key,
+                                  {
+                                    displayName:
+                                      evento.target.value,
                                   }
+                                )
+                            }
+                          />
+                        </label>
+
+
+                        <label>
+                          <span>
+                            Projeto no Redmine
+                          </span>
+
+                          <select
+                            value={
+                              item.redmineProjectId ??
+                              ""
+                            }
+                            onChange={
+                              evento =>
+                                alterarProjetoGlobal(
+                                  item,
+                                  evento.target.value
+                                )
+                            }
+                          >
+                            <option value="">
+                              Sem vínculo
+                            </option>
+
+                            {projetosRedmine.map(
+                              projeto => (
+                                <option
+                                  key={projeto.id}
+                                  value={projeto.id}
                                 >
-
-                                  <input
-                                    type="checkbox"
-                                    checked={
-                                      item.relatedTo.includes(
-                                        outro.key
-                                      )
-                                    }
-                                    onChange={() =>
-                                      alternarRelacionamentoGlobal(
-                                        item.key,
-                                        outro.key
-                                      )
-                                    }
-                                  />
-
-                                  <span>
-                                    {outro.displayName}
-                                  </span>
-
-                                </label>
-
+                                  {projeto.name}
+                                </option>
                               )
                             )}
 
-                          </div>
+                          </select>
 
-                        </details>
+                        </label>
 
-                      </article>
+                      </div>
 
-                    );
-                  }
+                    </article>
+
+                  )
                 )}
 
             </div>
-
-
-            <section className="compatibility-add-system">
-
-              <div className="compatibility-add-system-title">
-
-                <MdAdd
-                  size={20}
-                />
-
-                <div>
-
-                  <strong>
-                    Adicionar sistema ao cadastro geral
-                  </strong>
-
-                  <span>
-                    O novo sistema passará a aparecer automaticamente em todas as releases.
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <div className="compatibility-add-source">
-
-                <label>
-
-                  <input
-                    type="radio"
-                    name="compatibility-add-source"
-                    checked={
-                      addSource ===
-                      "redmine"
-                    }
-                    onChange={() =>
-                      setAddSource(
-                        "redmine"
-                      )
-                    }
-                  />
-
-                  Projeto do Redmine
-
-                </label>
-
-
-                <label>
-
-                  <input
-                    type="radio"
-                    name="compatibility-add-source"
-                    checked={
-                      addSource ===
-                      "manual"
-                    }
-                    onChange={() =>
-                      setAddSource(
-                        "manual"
-                      )
-                    }
-                  />
-
-                  Cadastro manual
-
-                </label>
-
-              </div>
-
-
-              {addSource ===
-              "redmine" ? (
-
-                <div className="compatibility-add-row">
-
-                  <select
-                    value={
-                      novoProjetoRedmineId
-                    }
-                    onChange={
-                      evento =>
-                        setNovoProjetoRedmineId(
-                          evento
-                            .target
-                            .value
-                        )
-                    }
-                    disabled={
-                      carregandoRedmine
-                    }
-                  >
-
-                    <option value="">
-                      {carregandoRedmine
-                        ? "Carregando projetos..."
-                        : "Selecione o projeto do Redmine"}
-                    </option>
-
-
-                    {projetosRedmine.map(
-                      projeto => (
-
-                        <option
-                          key={
-                            projeto.id
-                          }
-                          value={
-                            projeto.id
-                          }
-                        >
-                          {projeto.name} — ID{" "}
-                          {projeto.id}
-                        </option>
-
-                      )
-                    )}
-
-                  </select>
-
-
-                  <button
-                    type="button"
-                    onClick={
-                      adicionarSistemaRedmineGlobal
-                    }
-                  >
-                    Adicionar
-                  </button>
-
-                </div>
-
-              ) : (
-
-                <div className="compatibility-add-row">
-
-                  <input
-                    value={
-                      novoSistemaManual
-                    }
-                    placeholder="Nome do sistema ou componente"
-                    onChange={
-                      evento =>
-                        setNovoSistemaManual(
-                          evento
-                            .target
-                            .value
-                        )
-                    }
-                    onKeyDown={
-                      evento => {
-
-                        if (
-                          evento.key ===
-                          "Enter"
-                        ) {
-                          evento.preventDefault();
-
-                          adicionarSistemaManualGlobal();
-                        }
-
-                      }
-                    }
-                  />
-
-
-                  <button
-                    type="button"
-                    onClick={
-                      adicionarSistemaManualGlobal
-                    }
-                  >
-                    Adicionar
-                  </button>
-
-                </div>
-
-              )}
-
-            </section>
 
 
             <footer className="compatibility-modal-footer">
@@ -3448,9 +2734,6 @@ function Compatibility() {
                     false
                   )
                 }
-                disabled={
-                  salvando
-                }
               >
                 Cancelar
               </button>
@@ -3462,19 +2745,9 @@ function Compatibility() {
                 onClick={() =>
                   void salvarConfiguracaoGeral()
                 }
-                disabled={
-                  salvando
-                }
               >
-
-                <MdSave
-                  size={19}
-                />
-
-                {salvando
-                  ? "Salvando..."
-                  : "Salvar configuração geral"}
-
+                <MdSave />
+                Salvar
               </button>
 
             </footer>
@@ -3482,125 +2755,71 @@ function Compatibility() {
           </section>
 
         </div>
-
       )}
 
 
       {editandoRelease &&
         compatibilidade && (
 
-          <div
-            className="compatibility-modal-backdrop"
-            role="presentation"
-            onMouseDown={
-              evento => {
+          <div className="compatibility-modal-backdrop">
 
-                if (
-                  evento.target ===
-                    evento.currentTarget &&
-                  !salvando
-                ) {
-                  setEditandoRelease(
-                    false
-                  );
-                }
-
-              }
-            }
-          >
-
-            <section
-              className="compatibility-modal compatibility-release-modal"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="compatibility-release-modal-title"
-            >
+            <section className="compatibility-modal compatibility-release-modal">
 
               <header className="compatibility-modal-header">
 
                 <div>
-
-                  <h2 id="compatibility-release-modal-title">
+                  <h2>
                     Ajustar versões da release
                   </h2>
 
                   <p>
-                    Ambiente{" "}
-                    {compatibilidade.environmentName}.
+                    {compatibilidade.environmentName}
                   </p>
-
                 </div>
 
 
                 <button
                   type="button"
                   className="compatibility-modal-close"
-                  aria-label="Fechar"
                   onClick={() =>
                     setEditandoRelease(
                       false
                     )
                   }
-                  disabled={
-                    salvando
-                  }
                 >
-                  <MdClose
-                    size={22}
-                  />
+                  <MdClose size={22} />
                 </button>
 
               </header>
 
 
-              <div className="compatibility-modal-guidance">
-
-                <MdInfoOutline
-                  size={18}
-                />
-
-                <span>
-                  Nesta tela você escolhe a versão utilizada e se o sistema será exibido nesta release.
-                </span>
-
-              </div>
-
-
               <div className="compatibility-readme-editor">
 
-                <label htmlFor="compatibility-readme">
+                <label>
 
                   <span>
                     LEIA-ME desta release
                   </span>
 
-                  <small>
-                    Cole aqui as instruções que o suporte precisa consultar antes da atualização.
-                  </small>
+
+                  <textarea
+                    value={
+                      readmeEdicao
+                    }
+                    onChange={
+                      evento =>
+                        setReadmeEdicao(
+                          evento.target.value
+                        )
+                    }
+                  />
 
                 </label>
-
-
-                <textarea
-                  id="compatibility-readme"
-                  value={
-                    readmeEdicao
-                  }
-                  onChange={
-                    evento =>
-                      setReadmeEdicao(
-                        evento
-                          .target
-                          .value
-                      )
-                  }
-                  placeholder="Cole aqui o conteúdo do LEIA-ME desta release..."
-                />
 
               </div>
 
 
-              <div className="compatibility-editor-list compatibility-release-editor-list">
+              <div className="compatibility-editor-list">
 
                 {itensReleaseEdicao
                   .slice()
@@ -3613,258 +2832,150 @@ function Compatibility() {
                       b.order
                   )
                   .map(
-                    item => {
+                    item => (
 
-                      const projetoCarregando =
-                        Boolean(
-                          item.redmineProjectId &&
-                          carregandoVersoes[
-                            item.redmineProjectId
-                          ]
-                        );
+                      <article
+                        key={item.key}
+                        className="compatibility-editor-item"
+                      >
 
+                        <div className="compatibility-release-item-top">
 
-                      return (
-
-                        <article
-                          key={
-                            item.key
-                          }
-                          className={`compatibility-editor-item compatibility-release-item ${
-                            item.visible
-                              ? ""
-                              : "compatibility-editor-item-hidden"
-                          }`}
-                        >
-
-                          <div className="compatibility-release-item-top">
-
-                            <div>
-
-                              <div className="compatibility-editor-title-line">
-
-                                <strong className="compatibility-editor-title">
-                                  {item.displayName}
-                                </strong>
+                          <strong className="compatibility-editor-title">
+                            {item.displayName}
+                          </strong>
 
 
-                                <span className="compatibility-source-badge">
-                                  {item.source ===
-                                  "environment"
-                                    ? "Ambiente"
-                                    : item.source ===
-                                        "redmine"
-                                      ? "Redmine"
-                                      : "Manual"}
-                                </span>
+                          <label className="compatibility-visibility-toggle">
 
-                              </div>
+                            <input
+                              type="checkbox"
+                              checked={
+                                item.visible
+                              }
+                              onChange={
+                                evento =>
+                                  atualizarItemRelease(
+                                    item.key,
+                                    {
+                                      visible:
+                                        evento.target.checked,
+                                    }
+                                  )
+                              }
+                            />
+
+                            Exibir
+
+                          </label>
+
+                        </div>
 
 
-                              <span className="compatibility-project-reference">
-                                {item.redmineProjectId
-                                  ? `${item.redmineProjectName || "Projeto no Redmine"} — ID ${item.redmineProjectId}`
-                                  : "Sem projeto vinculado no Redmine"}
-                              </span>
+                        <label className="compatibility-release-version-field">
 
-                            </div>
+                          <span>
+                            Versão
+                          </span>
 
 
-                            <label className="compatibility-visibility-toggle compatibility-release-visibility">
+                          <select
+                            value={
+                              item.selectedVersion
+                            }
+                            onFocus={() =>
+                              void garantirVersoesProjeto(
+                                item.redmineProjectId
+                              )
+                            }
+                            onChange={
+                              evento =>
+                                alterarVersaoRelease(
+                                  item,
+                                  evento.target.value
+                                )
+                            }
+                          >
+
+                            <option value="">
+                              Sem versão
+                            </option>
+
+
+                            {opcoesVersao(
+                              item
+                            ).map(
+                              ([
+                                versao,
+                                origem,
+                              ]) => (
+                                <option
+                                  key={`${versao}-${origem}`}
+                                  value={versao}
+                                >
+                                  {versao} — {origem}
+                                </option>
+                              )
+                            )}
+
+                          </select>
+
+
+                          <button
+                            type="button"
+                            className="compatibility-add-version-link"
+                            onClick={() => {
+                              setAdicionandoVersaoPara(
+                                item.key
+                              );
+
+                              setNovaVersao(
+                                ""
+                              );
+                            }}
+                          >
+                            + Adicionar versão
+                          </button>
+
+
+                          {adicionandoVersaoPara ===
+                            item.key && (
+
+                            <div className="compatibility-new-version">
 
                               <input
-                                type="checkbox"
-                                checked={
-                                  item.visible
+                                value={
+                                  novaVersao
                                 }
                                 onChange={
                                   evento =>
-                                    atualizarItemRelease(
-                                      item.key,
-                                      {
-                                        visible:
-                                          evento
-                                            .target
-                                            .checked,
-                                      }
+                                    setNovaVersao(
+                                      evento.target.value
                                     )
                                 }
                               />
 
-                              Exibir nesta release
-
-                            </label>
-
-                          </div>
-
-
-                          <label className="compatibility-release-version-field">
-
-                            <span>
-                              Versão nesta release
-                            </span>
-
-
-                            <select
-                              value={
-                                item.selectedVersion
-                              }
-                              onFocus={() =>
-                                void garantirVersoesProjeto(
-                                  item.redmineProjectId
-                                )
-                              }
-                              onChange={
-                                evento =>
-                                  alterarVersaoRelease(
-                                    item,
-                                    evento
-                                      .target
-                                      .value
-                                  )
-                              }
-                            >
-
-                              <option value="">
-                                Sem versão
-                              </option>
-
-
-                              {opcoesVersao(
-                                item
-                              )
-                                .map(
-                                  ([
-                                    versao,
-                                    origem,
-                                  ]) => (
-
-                                    <option
-                                      key={`${versao}-${origem}`}
-                                      value={
-                                        versao
-                                      }
-                                    >
-                                      {versao} —{" "}
-                                      {origem}
-                                    </option>
-
-                                  )
-                                )}
-
-                            </select>
-
-
-                            <div className="compatibility-version-actions">
-
-                              {projetoCarregando && (
-
-                                <small>
-                                  Carregando versões do Redmine...
-                                </small>
-
-                              )}
-
 
                               <button
                                 type="button"
-                                className="compatibility-add-version-link"
-                                onClick={() => {
-
-                                  setAdicionandoVersaoPara(
-                                    item.key
-                                  );
-
-                                  setNovaVersao(
-                                    ""
-                                  );
-
-                                }}
+                                onClick={() =>
+                                  void salvarNovaVersao(
+                                    item
+                                  )
+                                }
                               >
-                                + Adicionar versão
+                                Adicionar
                               </button>
 
                             </div>
 
+                          )}
 
-                            {adicionandoVersaoPara ===
-                              item.key && (
+                        </label>
 
-                              <div className="compatibility-new-version">
+                      </article>
 
-                                <input
-                                  autoFocus
-                                  value={
-                                    novaVersao
-                                  }
-                                  placeholder="Ex.: 1.5.006.000"
-                                  onChange={
-                                    evento =>
-                                      setNovaVersao(
-                                        evento
-                                          .target
-                                          .value
-                                      )
-                                  }
-                                  onKeyDown={
-                                    evento => {
-
-                                      if (
-                                        evento.key ===
-                                        "Enter"
-                                      ) {
-                                        evento.preventDefault();
-
-                                        void salvarNovaVersao(
-                                          item
-                                        );
-                                      }
-
-                                    }
-                                  }
-                                />
-
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    void salvarNovaVersao(
-                                      item
-                                    )
-                                  }
-                                >
-                                  Adicionar
-                                </button>
-
-
-                                <button
-                                  type="button"
-                                  className="compatibility-new-version-cancel"
-                                  onClick={() => {
-
-                                    setAdicionandoVersaoPara(
-                                      null
-                                    );
-
-                                    setNovaVersao(
-                                      ""
-                                    );
-
-                                  }}
-                                >
-                                  Cancelar
-                                </button>
-
-                              </div>
-
-                            )}
-
-                          </label>
-
-                        </article>
-
-                      );
-                    }
+                    )
                   )}
 
               </div>
@@ -3880,9 +2991,6 @@ function Compatibility() {
                       false
                     )
                   }
-                  disabled={
-                    salvando
-                  }
                 >
                   Cancelar
                 </button>
@@ -3894,19 +3002,9 @@ function Compatibility() {
                   onClick={() =>
                     void salvarRelease()
                   }
-                  disabled={
-                    salvando
-                  }
                 >
-
-                  <MdSave
-                    size={19}
-                  />
-
-                  {salvando
-                    ? "Salvando..."
-                    : "Salvar versões da release"}
-
+                  <MdSave />
+                  Salvar
                 </button>
 
               </footer>
