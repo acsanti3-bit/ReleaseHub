@@ -2143,3 +2143,269 @@ html.dark
   }
 
 }
+
+/* =========================================================
+   REFINAMENTO FINAL DO LEIA-ME
+   ========================================================= */
+
+.compatibility-readme-modal {
+  width: min(820px, 92vw);
+  max-height: 76vh;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 24px 70px
+    rgba(15, 23, 42, .25);
+}
+
+
+/* CABEÇALHO */
+
+.compatibility-readme-modal-header {
+  padding: 14px 17px;
+
+  align-items: center;
+
+  background: #ffffff;
+}
+
+
+.compatibility-readme-modal-title {
+  gap: 10px;
+}
+
+
+.compatibility-readme-modal-icon {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 9px;
+}
+
+
+.compatibility-readme-modal-heading {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.compatibility-readme-modal-eyebrow {
+  margin: 0;
+
+  color: #7b8794;
+
+  font-size: 8.5px;
+  font-weight: 800;
+
+  letter-spacing: .075em;
+}
+
+
+.compatibility-readme-modal-title h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 17px;
+  line-height: 1.15;
+
+  font-weight: 800;
+}
+
+
+.compatibility-readme-modal-versions {
+  margin-top: 3px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  flex-wrap: wrap;
+}
+
+
+.compatibility-readme-modal-versions > span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+
+.compatibility-readme-modal-versions small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 18px;
+
+  padding: 0 5px;
+
+  border-radius: 5px;
+
+  background: #eaf3fb;
+
+  color: #005aa9;
+
+  font-size: 8px;
+  font-weight: 850;
+}
+
+
+.compatibility-readme-modal-versions strong {
+  color: #005aa9;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+
+.compatibility-readme-modal-version-text {
+  padding-left: 7px;
+
+  border-left: 1px solid #dfe5eb;
+
+  color: #748091;
+
+  font-size: 9px;
+}
+
+
+/* BOTÃO X */
+
+.compatibility-readme-modal-close {
+  width: 32px;
+  height: 32px;
+}
+
+
+/* CONTEÚDO */
+
+.compatibility-readme-modal-body {
+  padding: 15px 17px 16px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-alerts {
+  gap: 5px;
+
+  margin-bottom: 14px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-alert {
+  min-height: 29px;
+
+  padding: 6px 9px;
+
+  font-size: 9.5px;
+}
+
+
+/* TÍTULO DA TABELA */
+
+.compatibility-readme-modal-body
+.compatibility-readme-section h3 {
+  margin-bottom: 7px;
+
+  font-size: 8.5px;
+}
+
+
+/* TABELA */
+
+.compatibility-readme-modal-body
+.compatibility-readme-row {
+  grid-template-columns:
+    minmax(180px, 260px)
+    minmax(0, 1fr);
+
+  min-height: 35px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-app {
+  padding: 6px 9px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-app strong {
+  font-size: 9.5px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-app span {
+  font-size: 9.5px;
+}
+
+
+.compatibility-readme-modal-body
+.compatibility-readme-path {
+  padding: 6px 9px;
+
+  font-size: 9px;
+}
+
+
+/* RODAPÉ */
+
+.compatibility-readme-modal-footer {
+  padding: 9px 16px;
+}
+
+
+.compatibility-readme-modal-footer button {
+  min-height: 34px;
+
+  padding: 0 14px;
+
+  font-size: 10px;
+}
+
+
+/* DARK */
+
+html.dark
+.compatibility-readme-modal-header {
+  background: #162131;
+}
+
+
+html.dark
+.compatibility-readme-modal-heading h2 {
+  color: #f1f5f9;
+}
+
+
+html.dark
+.compatibility-readme-modal-versions small {
+  background: rgba(59, 130, 246, .14);
+
+  color: #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-modal-versions strong {
+  color: #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-modal-version-text {
+  border-color: #334155;
+
+  color: #94a3b8;
+}

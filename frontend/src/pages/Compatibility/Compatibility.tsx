@@ -2298,42 +2298,74 @@ function Compatibility() {
 
               <header className="compatibility-readme-modal-header">
 
-                <div className="compatibility-readme-modal-title">
+  <div className="compatibility-readme-modal-title">
 
-                  <div className="compatibility-readme-modal-icon">
-                    <MdMenuBook size={22} />
-                  </div>
-
-                  <div>
-                    <span>
-                      LEIA-ME DA RELEASE
-                    </span>
-
-                    <h2>
-                      {compatibilidade.environmentName}
-                    </h2>
-
-                    <p>
-                      Orientações importantes para atualização
-                    </p>
-                  </div>
-
-                </div>
+    <div className="compatibility-readme-modal-icon">
+      <MdMenuBook size={21} />
+    </div>
 
 
-                <button
-                  type="button"
-                  className="compatibility-readme-modal-close"
-                  onClick={() =>
-                    setReadmeAberto(
-                      false
-                    )
-                  }
-                >
-                  <MdClose size={22} />
-                </button>
+    <div className="compatibility-readme-modal-heading">
 
-              </header>
+      <span className="compatibility-readme-modal-eyebrow">
+        LEIA-ME DA RELEASE
+      </span>
+
+
+      <h2>
+        {compatibilidade.environmentName}
+      </h2>
+
+
+      <div className="compatibility-readme-modal-versions">
+
+        {ambienteSelecionado
+          ?.versoes
+          .intellicash && (
+
+          <span>
+            <small>IC</small>
+
+            <strong>
+              {ambienteSelecionado
+                .versoes
+                .intellicash}
+            </strong>
+          </span>
+
+        )}
+
+
+        {readmeInterpretado
+          .titulo && (
+
+          <span className="compatibility-readme-modal-version-text">
+            {readmeInterpretado.titulo}
+          </span>
+
+        )}
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <button
+    type="button"
+    className="compatibility-readme-modal-close"
+    aria-label="Fechar LEIA-ME"
+    onClick={() =>
+      setReadmeAberto(
+        false
+      )
+    }
+  >
+    <MdClose size={21} />
+  </button>
+
+</header>
 
 
               <div className="compatibility-readme-modal-body">
