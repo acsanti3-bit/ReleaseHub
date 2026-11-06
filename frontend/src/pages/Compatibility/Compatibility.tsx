@@ -1279,21 +1279,17 @@ function Compatibility() {
       itens
     );
 
-
     setNovoProjetoRedmineId(
       ""
     );
-
 
     setNovoSistemaManual(
       ""
     );
 
-
     setAddSource(
       "redmine"
     );
-
 
     setConfigurandoGeral(
       true
@@ -2381,7 +2377,7 @@ function Compatibility() {
             </strong>
 
             <span>
-              A ordem, os relacionamentos e os sistemas continuam definidos no cadastro geral. Aqui você consulta apenas o ambiente selecionado.
+              A ordem, os relacionamentos e os sistemas continuam definidos no cadastro geral.
             </span>
 
           </div>
@@ -2441,23 +2437,81 @@ function Compatibility() {
         </section>
 
 
-        <section className="compatibility-release-picker">
+        <section className="compatibility-release-context">
 
-          <div className="compatibility-release-picker-main">
+          <div className="compatibility-release-accent" />
 
-            <div className="compatibility-release-picker-heading">
 
-              <span>
-                Ambiente da release
-              </span>
+          <div className="compatibility-release-context-main">
 
-              <strong>
+            <span className="compatibility-release-context-eyebrow">
+              Ambiente da release
+            </span>
+
+
+            <div className="compatibility-release-context-title-row">
+
+              <h2>
                 {ambienteSelecionado
                   ?.nome ??
-                  "Selecione uma release"}
-              </strong>
+                  "Nenhuma release selecionada"}
+              </h2>
+
+
+              {ambienteSelecionado && (
+                <span
+                  className={
+                    ambienteSelecionado
+                      .concluido
+                      ? "compatibility-status compatibility-status-closed"
+                      : "compatibility-status compatibility-status-active"
+                  }
+                >
+                  {ambienteSelecionado
+                    .concluido
+                    ? "Concluído"
+                    : "Ativo"}
+                </span>
+              )}
 
             </div>
+
+
+            {ambienteSelecionado && (
+
+              <div className="compatibility-release-context-details">
+
+                <span>
+                  IntelliCash
+                </span>
+
+                <strong>
+                  {ambienteSelecionado
+                    .versoes
+                    .intellicash ||
+                    "-"}
+                </strong>
+
+                <span className="compatibility-release-context-dot">
+                  •
+                </span>
+
+                <span>
+                  {itensVisiveis.length} sistemas exibidos
+                </span>
+
+              </div>
+
+            )}
+
+          </div>
+
+
+          <div className="compatibility-release-switcher">
+
+            <label htmlFor="compatibility-environment">
+              Trocar release
+            </label>
 
 
             <select
@@ -2510,53 +2564,6 @@ function Compatibility() {
 
           </div>
 
-
-          {ambienteSelecionado && (
-
-            <div className="compatibility-release-summary">
-
-              <div className="compatibility-release-summary-status">
-
-                <span>
-                  Status
-                </span>
-
-                <strong
-                  className={
-                    ambienteSelecionado
-                      .concluido
-                      ? "compatibility-status compatibility-status-closed"
-                      : "compatibility-status compatibility-status-active"
-                  }
-                >
-                  {ambienteSelecionado
-                    .concluido
-                    ? "Concluído"
-                    : "Ativo"}
-                </strong>
-
-              </div>
-
-
-              <div className="compatibility-release-summary-version">
-
-                <span>
-                  IntelliCash
-                </span>
-
-                <strong>
-                  {ambienteSelecionado
-                    .versoes
-                    .intellicash ||
-                    "-"}
-                </strong>
-
-              </div>
-
-            </div>
-
-          )}
-
         </section>
 
 
@@ -2571,9 +2578,10 @@ function Compatibility() {
               </h2>
 
               <p>
+                Versões utilizadas em{" "}
                 {compatibilidade
                   ?.environmentName ??
-                  "Selecione uma release para visualizar as versões."}
+                  "este ambiente"}.
               </p>
 
             </div>
@@ -2827,6 +2835,7 @@ function Compatibility() {
                       Observações
                     </h3>
 
+
                     <div className="compatibility-readme-notes">
 
                       {readmeInterpretado
@@ -2982,7 +2991,7 @@ function Compatibility() {
               />
 
               <span>
-                O vínculo com o Redmine é feito pelo ID do projeto. Alterar o nome exibido não altera esse vínculo. Versões não são definidas aqui: elas continuam sendo escolhidas em cada release.
+                O vínculo com o Redmine é feito pelo ID do projeto. Alterar o nome exibido não altera esse vínculo. Versões não são definidas aqui.
               </span>
 
             </div>
@@ -3586,7 +3595,7 @@ function Compatibility() {
 
                   <p>
                     Ambiente{" "}
-                    {compatibilidade.environmentName}. Aqui você altera somente o que é específico desta release.
+                    {compatibilidade.environmentName}.
                   </p>
 
                 </div>
@@ -3620,7 +3629,7 @@ function Compatibility() {
                 />
 
                 <span>
-                  Nome, projeto no Redmine, ordem e relacionamentos vêm da configuração geral. Nesta tela você escolhe apenas a versão utilizada e se o sistema será exibido.
+                  Nesta tela você escolhe a versão utilizada e se o sistema será exibido nesta release.
                 </span>
 
               </div>

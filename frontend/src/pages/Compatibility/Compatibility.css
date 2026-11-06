@@ -5,6 +5,9 @@
   padding: 28px 32px 40px;
 }
 
+
+/* HEADER */
+
 .compatibility-page-header {
   display: flex;
   align-items: flex-end;
@@ -21,7 +24,7 @@
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: .8px;
 }
 
 .compatibility-page-header h1 {
@@ -45,6 +48,9 @@
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+
+
+/* BOTÕES */
 
 .compatibility-refresh-button,
 .compatibility-wiki-button,
@@ -78,7 +84,7 @@
 .compatibility-refresh-button {
   border: 1px solid #f58220;
   background: #f58220;
-  color: #ffffff;
+  color: #fff;
 }
 
 .compatibility-refresh-button:hover:not(:disabled) {
@@ -90,16 +96,19 @@
 .compatibility-save-button {
   border: 1px solid #005aa9;
   background: #005aa9;
-  color: #ffffff;
+  color: #fff;
 }
 
 .compatibility-refresh-button:disabled,
 .compatibility-edit-button:disabled,
 .compatibility-save-button:disabled,
 .compatibility-cancel-button:disabled {
-  opacity: 0.6;
+  opacity: .6;
   cursor: not-allowed;
 }
+
+
+/* FEEDBACK */
 
 .compatibility-feedback {
   display: flex;
@@ -138,6 +147,9 @@
   color: #a2372a;
 }
 
+
+/* INFO */
+
 .compatibility-info {
   display: flex;
   align-items: flex-start;
@@ -165,713 +177,9 @@
   line-height: 1.45;
 }
 
-.compatibility-environment-selector {
-  display: grid;
-  grid-template-columns: minmax(240px, 420px) 1fr;
-  align-items: end;
-  gap: 12px 20px;
-  padding: 18px;
-  border: 1px solid #e4e7ec;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
-}
 
-.compatibility-environment-selector > label {
-  grid-column: 1;
-  color: #344054;
-  font-size: 12px;
-  font-weight: 700;
-}
+/* CONFIGURAÇÃO GERAL */
 
-.compatibility-environment-selector > select {
-  grid-column: 1;
-  min-height: 42px;
-  border: 1px solid #d0d5dd;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 0 11px;
-  font-size: 13px;
-  outline: none;
-}
-
-.compatibility-environment-selector > select:focus {
-  border-color: #005aa9;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.1);
-}
-
-.compatibility-environment-meta {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  justify-content: flex-end;
-  color: #667085;
-  font-size: 12px;
-}
-
-.compatibility-environment-meta strong {
-  color: #344054;
-}
-
-.compatibility-status {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.compatibility-status-active {
-  background: #eaf7ee;
-  color: #2e7d32;
-}
-
-.compatibility-status-closed {
-  background: #e8edf2;
-  color: #5f6b76;
-}
-
-.compatibility-view-card {
-  overflow: hidden;
-  border: 1px solid #e4e7ec;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
-}
-
-.compatibility-view-title {
-  padding: 16px 18px;
-  border-bottom: 1px solid #eef0f3;
-  background: #fbfcfd;
-}
-
-.compatibility-view-title h2 {
-  margin: 0;
-  color: #1f2937;
-  font-size: 16px;
-}
-
-.compatibility-view-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0;
-  padding: 10px;
-}
-
-.compatibility-view-item {
-  min-height: 65px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 8px;
-  border-right: 1px solid #edf0f3;
-  border-bottom: 1px solid #edf0f3;
-  text-align: center;
-}
-
-.compatibility-view-item strong {
-  color: #344054;
-  font-size: 12px;
-  line-height: 1.25;
-}
-
-.compatibility-view-item span {
-  color: #005aa9;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.compatibility-page-empty {
-  padding: 42px 20px;
-  text-align: center;
-  color: #667085;
-  font-size: 13px;
-}
-
-.compatibility-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1200;
-  background: rgba(16, 24, 40, 0.56);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.compatibility-modal {
-  width: min(1180px, 96vw);
-  max-height: 92vh;
-  display: flex;
-  flex-direction: column;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 22px 70px rgba(16, 24, 40, 0.24);
-  overflow: hidden;
-}
-
-.compatibility-modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 20px 22px;
-  border-bottom: 1px solid #e4e7ec;
-}
-
-.compatibility-modal-header h2 {
-  margin: 0;
-  color: #1f2937;
-  font-size: 20px;
-}
-
-.compatibility-modal-header p {
-  margin: 5px 0 0;
-  color: #667085;
-  font-size: 12px;
-}
-
-.compatibility-modal-guidance {
-  margin: 12px 20px 0;
-  padding: 10px 12px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  border: 1px solid #dbe8f5;
-  border-radius: 9px;
-  background: #f7fbff;
-  color: #526579;
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.compatibility-modal-guidance svg {
-  flex: 0 0 auto;
-  color: #005aa9;
-  margin-top: 1px;
-}
-
-.compatibility-modal-close {
-  border: 0;
-  background: transparent;
-  color: #667085;
-  cursor: pointer;
-  padding: 4px;
-  display: inline-flex;
-}
-
-.compatibility-redmine-warning {
-  margin: 14px 20px 0;
-  padding: 11px 13px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  border: 1px solid #f4d28f;
-  border-radius: 9px;
-  background: #fff9eb;
-  color: #775b18;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.compatibility-editor-list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.compatibility-editor-item {
-  border: 1px solid #dfe4ea;
-  border-radius: 11px;
-  padding: 14px;
-  background: #ffffff;
-}
-
-.compatibility-editor-item-hidden {
-  background: #f8f9fb;
-  opacity: 0.78;
-}
-
-.compatibility-editor-item-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.compatibility-editor-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  min-width: 0;
-}
-
-.compatibility-editor-title-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-.compatibility-editor-title {
-  color: #1f2937;
-  font-size: 15px;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.compatibility-visibility-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  width: fit-content;
-  color: #667085;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.compatibility-visibility-toggle input,
-.compatibility-relations-grid input,
-.compatibility-add-source input {
-  accent-color: #005aa9;
-}
-
-.compatibility-source-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  background: #eef4fb;
-  color: #005aa9;
-  padding: 3px 7px;
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.compatibility-order-actions {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-}
-
-.compatibility-order-actions button {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #d0d5dd;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #475467;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.compatibility-order-actions button:hover:not(:disabled) {
-  border-color: #005aa9;
-  color: #005aa9;
-  background: #f4f9fe;
-}
-
-.compatibility-order-actions button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.compatibility-order-actions .compatibility-remove-item {
-  margin-left: 2px;
-  border-color: transparent;
-  background: transparent;
-  color: #c0392b;
-}
-
-.compatibility-order-actions .compatibility-remove-item:hover:not(:disabled) {
-  border-color: #f0c7c2;
-  background: #fff7f6;
-  color: #b42318;
-}
-
-.compatibility-editor-fields {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 14px;
-}
-
-.compatibility-editor-fields > label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.compatibility-editor-fields > label > span {
-  color: #475467;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.compatibility-editor-fields input,
-.compatibility-editor-fields select,
-.compatibility-add-row input,
-.compatibility-add-row select,
-.compatibility-new-version input {
-  width: 100%;
-  min-height: 39px;
-  border: 1px solid #d0d5dd;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 0 10px;
-  font-size: 12px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.compatibility-editor-fields input:focus,
-.compatibility-editor-fields select:focus,
-.compatibility-add-row input:focus,
-.compatibility-add-row select:focus,
-.compatibility-new-version input:focus {
-  border-color: #005aa9;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.09);
-}
-
-.compatibility-editor-fields small {
-  color: #7b8794;
-  font-size: 10px;
-  line-height: 1.35;
-}
-
-/* Edição discreta do nome diretamente no título do card. */
-.compatibility-title-edit {
-  width: 24px;
-  height: 24px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #005aa9;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-
-.compatibility-title-edit:hover {
-  background: #eef6fd;
-}
-
-.compatibility-title-editor {
-  display: grid;
-  grid-template-columns: minmax(150px, 280px) 28px 28px;
-  gap: 5px;
-  align-items: center;
-  min-width: 0;
-}
-
-.compatibility-title-editor input {
-  width: 100%;
-  min-height: 32px;
-  border: 1px solid #005aa9;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 0 9px;
-  font-size: 14px;
-  font-weight: 700;
-  outline: none;
-  box-sizing: border-box;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.08);
-}
-
-.compatibility-title-editor button {
-  width: 28px;
-  height: 28px;
-  border: 1px solid #d0d5dd;
-  border-radius: 7px;
-  background: #ffffff;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.compatibility-title-editor-confirm {
-  color: #08783f;
-}
-
-.compatibility-title-editor-confirm:hover {
-  background: #edf9f2;
-  border-color: #a7d8bc;
-}
-
-.compatibility-title-editor-cancel {
-  color: #667085;
-}
-
-.compatibility-title-editor-cancel:hover {
-  background: #f5f6f7;
-}
-
-.compatibility-version-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  min-height: 22px;
-}
-
-.compatibility-add-version-link {
-  border: 0;
-  background: transparent;
-  color: #005aa9;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.compatibility-new-version {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 6px;
-  align-items: center;
-  margin-top: 2px;
-}
-
-.compatibility-new-version button,
-.compatibility-add-row button {
-  min-height: 39px;
-  border: 1px solid #005aa9;
-  border-radius: 7px;
-  background: #005aa9;
-  color: #ffffff;
-  padding: 0 11px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.compatibility-new-version .compatibility-new-version-cancel {
-  border-color: #d0d5dd;
-  background: #ffffff;
-  color: #475467;
-}
-
-.compatibility-relations {
-  margin-top: 12px;
-  border-top: 1px solid #eef0f3;
-  padding-top: 10px;
-}
-
-.compatibility-relations summary {
-  width: fit-content;
-  cursor: pointer;
-  color: #667085;
-  font-size: 10px;
-  font-weight: 650;
-}
-
-.compatibility-relations summary:hover {
-  color: #005aa9;
-}
-
-.compatibility-relations p {
-  margin: 8px 0 10px;
-  color: #7b8794;
-  font-size: 10px;
-}
-
-.compatibility-relations-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px 12px;
-}
-
-.compatibility-relations-grid label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #475467;
-  font-size: 11px;
-  min-width: 0;
-}
-
-.compatibility-relations-grid span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.compatibility-add-system {
-  margin: 8px 20px 18px;
-  padding: 16px;
-  border: 1px dashed #b9c5d2;
-  border-radius: 11px;
-  background: #f9fbfd;
-  box-shadow: 0 -8px 18px rgba(16, 24, 40, 0.025);
-}
-
-.compatibility-add-system-title {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  color: #005aa9;
-}
-
-.compatibility-add-system-title > div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.compatibility-add-system-title strong {
-  font-size: 12px;
-}
-
-.compatibility-add-system-title span {
-  color: #667085;
-  font-size: 10px;
-  line-height: 1.4;
-}
-
-.compatibility-add-source {
-  display: flex;
-  gap: 18px;
-  margin: 13px 0 10px;
-}
-
-.compatibility-add-source label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #475467;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.compatibility-add-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-}
-
-.compatibility-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 15px 20px;
-  border-top: 1px solid #e4e7ec;
-  background: #fbfcfd;
-}
-
-.compatibility-cancel-button {
-  border: 1px solid #d0d5dd;
-  background: #ffffff;
-  color: #475467;
-}
-
-@media (max-width: 1000px) {
-  .compatibility-editor-fields {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .compatibility-relations-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 760px) {
-  .compatibility-page {
-    padding: 20px 16px 32px;
-  }
-
-  .compatibility-page-header,
-  .compatibility-header-actions {
-    width: 100%;
-  }
-
-  .compatibility-page-header {
-    flex-direction: column;
-  }
-
-  .compatibility-header-actions {
-    justify-content: stretch;
-  }
-
-  .compatibility-header-actions button,
-  .compatibility-header-actions a {
-    flex: 1;
-  }
-
-  .compatibility-environment-selector {
-    grid-template-columns: 1fr;
-  }
-
-  .compatibility-environment-selector > label,
-  .compatibility-environment-selector > select,
-  .compatibility-environment-meta {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .compatibility-environment-meta {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .compatibility-modal-backdrop {
-    padding: 0;
-  }
-
-  .compatibility-modal {
-    width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-
-  .compatibility-editor-item-top {
-    align-items: flex-start;
-  }
-
-  .compatibility-editor-fields {
-    grid-template-columns: 1fr;
-  }
-
-  .compatibility-title-editor {
-    width: 100%;
-    grid-template-columns: minmax(0, 1fr) 28px 28px;
-  }
-
-  .compatibility-relations-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .compatibility-new-version {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Modelo novo: cadastro geral dos sistemas + versão específica por release. */
 .compatibility-global-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -880,8 +188,8 @@
   padding: 17px 18px;
   border: 1px solid #dbe4ec;
   border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, .04);
 }
 
 .compatibility-global-icon {
@@ -936,604 +244,177 @@
   cursor: pointer;
 }
 
-.compatibility-global-action:hover:not(:disabled) {
-  border-color: #005aa9;
-  background: #eef6fd;
+
+/* ======================================================
+   AMBIENTE DA RELEASE
+   ====================================================== */
+
+.compatibility-release-context {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+  min-height: 138px;
+  overflow: hidden;
+  border: 1px solid #d9e3ec;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(16, 24, 40, .055);
 }
 
-.compatibility-global-action:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+.compatibility-release-accent {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: #005aa9;
+}
+
+.compatibility-release-context-main {
+  min-width: 0;
+  padding: 22px 24px 22px 29px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.compatibility-release-context-eyebrow {
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.compatibility-release-context-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.compatibility-release-context-title-row h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.compatibility-release-context-details {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  color: #667085;
+  font-size: 11px;
+}
+
+.compatibility-release-context-details strong {
+  color: #005aa9;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.compatibility-release-context-dot {
+  color: #c4ccd5;
+}
+
+.compatibility-release-switcher {
+  padding: 21px 22px;
+  border-left: 1px solid #edf0f3;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.compatibility-release-switcher label {
+  color: #667085;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .055em;
+}
+
+.compatibility-release-switcher select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #c9d4df;
+  border-radius: 9px;
+  background: #fff;
+  color: #1f2937;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 650;
+  outline: none;
+  cursor: pointer;
+}
+
+.compatibility-release-switcher select:hover {
+  border-color: #9db5cb;
+}
+
+.compatibility-release-switcher select:focus {
+  border-color: #005aa9;
+  box-shadow: 0 0 0 3px rgba(0, 90, 169, .09);
+}
+
+.compatibility-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.compatibility-status-active {
+  background: #eaf7ee;
+  color: #2e7d32;
+}
+
+.compatibility-status-closed {
+  background: #edf1f5;
+  color: #5f6b76;
+}
+
+
+/* ======================================================
+   COMPATIBILIDADE
+   ====================================================== */
+
+.compatibility-view-card {
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, .04);
 }
 
 .compatibility-view-heading-row {
-  min-height: 64px;
-  padding: 14px 18px;
+  min-height: 70px;
+  padding: 15px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid #eef0f3;
-  background: #fbfcfd;
+  gap: 18px;
+  border-bottom: 1px solid #edf0f3;
+  background: #fff;
 }
 
-.compatibility-view-heading-row .compatibility-view-title {
-  padding: 0;
-  border: 0;
-  background: transparent;
+.compatibility-view-title h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 16px;
 }
 
 .compatibility-view-title p {
-  margin: 4px 0 0;
+  margin: 5px 0 0;
   color: #7b8794;
   font-size: 11px;
-}
-
-.compatibility-release-modal {
-  width: min(920px, 96vw);
-}
-
-.compatibility-release-editor-list {
-  gap: 10px;
-}
-
-.compatibility-release-item {
-  padding: 13px 14px;
-}
-
-.compatibility-release-item-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 11px;
-}
-
-.compatibility-project-reference {
-  display: block;
-  margin-top: 5px;
-  color: #7b8794;
-  font-size: 10px;
-  line-height: 1.35;
-}
-
-.compatibility-release-visibility {
-  flex: 0 0 auto;
-  margin-top: 1px;
-}
-
-.compatibility-release-version-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.compatibility-release-version-field > span {
-  color: #475467;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.compatibility-release-version-field > select,
-.compatibility-release-version-field .compatibility-new-version input {
-  width: 100%;
-  min-height: 39px;
-  border: 1px solid #d0d5dd;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #1f2937;
-  padding: 0 10px;
-  font-size: 12px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.compatibility-release-version-field > select:focus,
-.compatibility-release-version-field .compatibility-new-version input:focus {
-  border-color: #005aa9;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, 0.09);
-}
-
-.compatibility-release-version-field small {
-  color: #7b8794;
-  font-size: 10px;
-}
-
-@media (max-width: 760px) {
-  .compatibility-global-card {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .compatibility-global-action {
-    grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  .compatibility-view-heading-row,
-  .compatibility-release-item-top {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .compatibility-view-heading-row .compatibility-edit-button,
-  .compatibility-release-visibility {
-    width: 100%;
-  }
-}
-
-/* =========================
-   MODO NOTURNO
-   ========================= */
-
-html.dark .compatibility-page-header {
-  border-bottom-color: #26384c;
-}
-
-html.dark .compatibility-page-eyebrow {
-  color: #f58220;
-}
-
-html.dark .compatibility-page-header h1 {
-  color: #F1F5F9;
-}
-
-html.dark .compatibility-page-header p {
-  color: #94A3B8;
-}
-
-
-/* BOTÕES */
-
-html.dark .compatibility-wiki-button,
-html.dark .compatibility-cancel-button {
-  background: #1E293B;
-  color: #CBD5E1;
-  border-color: #334155;
-}
-
-html.dark .compatibility-refresh-button {
-  background: #F58220;
-  color: #FFFFFF;
-  border-color: #F58220;
-}
-
-html.dark .compatibility-refresh-button:hover:not(:disabled) {
-  background: #D96E11;
-  border-color: #D96E11;
-}
-
-html.dark .compatibility-wiki-button {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-wiki-button:hover,
-html.dark .compatibility-refresh-button:hover,
-html.dark .compatibility-cancel-button:hover {
-  background: #263548;
-}
-
-html.dark .compatibility-wiki-button:hover {
-  border-color: #60A5FA;
-}
-
-
-/* FEEDBACK */
-
-html.dark .compatibility-feedback-sucesso {
-  background: rgba(34, 197, 94, .10);
-  border-color: rgba(34, 197, 94, .28);
-  color: #86EFAC;
-}
-
-html.dark .compatibility-feedback-erro {
-  background: rgba(239, 68, 68, .10);
-  border-color: rgba(239, 68, 68, .28);
-  color: #FCA5A5;
-}
-
-
-/* AVISO */
-
-html.dark .compatibility-info {
-  background: #142235;
-  border-color: #29415B;
-  color: #60A5FA;
-}
-
-html.dark .compatibility-info span {
-  color: #A3B0BF;
-}
-
-
-/* SELETOR DE AMBIENTE */
-
-html.dark .compatibility-environment-selector {
-  background: #162131;
-  border-color: #263548;
-
-  box-shadow:
-    0 2px 8px
-    rgba(0, 0, 0, .16);
-}
-
-html.dark .compatibility-environment-selector > label {
-  color: #CBD5E1;
-}
-
-html.dark .compatibility-environment-selector > select {
-  background: #1E293B;
-  border-color: #334155;
-  color: #F1F5F9;
-}
-
-html.dark .compatibility-environment-selector > select:focus {
-  border-color: #60A5FA;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(96, 165, 250, .10);
-}
-
-html.dark .compatibility-environment-meta {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-environment-meta strong {
-  color: #E2E8F0;
-}
-
-
-/* STATUS */
-
-html.dark .compatibility-status-active {
-  background: rgba(34, 197, 94, .12);
-  color: #86EFAC;
-}
-
-html.dark .compatibility-status-closed {
-  background: #263548;
-  color: #AAB6C4;
-}
-
-
-/* CARD DE VISUALIZAÇÃO */
-
-html.dark .compatibility-view-card {
-  background: #162131;
-  border-color: #263548;
-
-  box-shadow:
-    0 2px 8px
-    rgba(0, 0, 0, .16);
-}
-
-html.dark .compatibility-view-title,
-html.dark .compatibility-view-heading-row {
-  background: #151F2E;
-  border-bottom-color: #263548;
-}
-
-html.dark .compatibility-view-title h2 {
-  color: #F1F5F9;
-}
-
-html.dark .compatibility-view-title p {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-view-item {
-  border-right-color: #263548;
-  border-bottom-color: #263548;
-}
-
-html.dark .compatibility-view-item strong {
-  color: #CBD5E1;
-}
-
-html.dark .compatibility-view-item span {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-page-empty {
-  color: #94A3B8;
-}
-
-
-/* MODAL */
-
-html.dark .compatibility-modal {
-  background: #162131;
-
-  box-shadow:
-    0 22px 70px
-    rgba(0, 0, 0, .42);
-}
-
-html.dark .compatibility-modal-header {
-  border-bottom-color: #263548;
-}
-
-html.dark .compatibility-modal-header h2 {
-  color: #F1F5F9;
-}
-
-html.dark .compatibility-modal-header p {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-modal-guidance {
-  background: #142235;
-  border-color: #29415B;
-  color: #A3B0BF;
-}
-
-html.dark .compatibility-modal-guidance svg {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-modal-close {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-modal-close:hover {
-  color: #F1F5F9;
-}
-
-
-/* AVISO REDMINE */
-
-html.dark .compatibility-redmine-warning {
-  background: rgba(245, 158, 11, .08);
-  border-color: rgba(245, 158, 11, .28);
-  color: #FBBF24;
-}
-
-
-/* EDITOR */
-
-html.dark .compatibility-editor-item {
-  background: #1B2737;
-  border-color: #2C3B4E;
-}
-
-html.dark .compatibility-editor-item-hidden {
-  background: #151F2E;
-}
-
-html.dark .compatibility-editor-title {
-  color: #E2E8F0;
-}
-
-html.dark .compatibility-visibility-toggle {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-source-badge {
-  background: rgba(59, 130, 246, .12);
-  color: #60A5FA;
-}
-
-
-/* BOTÕES DE ORDEM */
-
-html.dark .compatibility-order-actions button {
-  background: #1E293B;
-  border-color: #334155;
-  color: #CBD5E1;
-}
-
-html.dark .compatibility-order-actions button:hover:not(:disabled) {
-  background: #223249;
-  border-color: #60A5FA;
-  color: #60A5FA;
-}
-
-html.dark .compatibility-order-actions
-.compatibility-remove-item {
-  background: transparent;
-  border-color: transparent;
-  color: #F87171;
-}
-
-html.dark .compatibility-order-actions
-.compatibility-remove-item:hover:not(:disabled) {
-  background: rgba(239, 68, 68, .10);
-  border-color: rgba(239, 68, 68, .28);
-  color: #FCA5A5;
-}
-
-
-/* CAMPOS */
-
-html.dark .compatibility-editor-fields > label > span,
-html.dark .compatibility-release-version-field > span {
-  color: #CBD5E1;
-}
-
-html.dark .compatibility-editor-fields input,
-html.dark .compatibility-editor-fields select,
-html.dark .compatibility-add-row input,
-html.dark .compatibility-add-row select,
-html.dark .compatibility-new-version input,
-html.dark .compatibility-release-version-field > select,
-html.dark .compatibility-release-version-field
-.compatibility-new-version input {
-  background: #1E293B;
-  border-color: #334155;
-  color: #F1F5F9;
-}
-
-html.dark .compatibility-editor-fields input:focus,
-html.dark .compatibility-editor-fields select:focus,
-html.dark .compatibility-add-row input:focus,
-html.dark .compatibility-add-row select:focus,
-html.dark .compatibility-new-version input:focus,
-html.dark .compatibility-release-version-field > select:focus,
-html.dark .compatibility-release-version-field
-.compatibility-new-version input:focus {
-  border-color: #60A5FA;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(96, 165, 250, .10);
-}
-
-html.dark .compatibility-editor-fields small,
-html.dark .compatibility-release-version-field small,
-html.dark .compatibility-project-reference {
-  color: #7C8CA1;
-}
-
-
-/* EDIÇÃO DO TÍTULO */
-
-html.dark .compatibility-title-edit {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-title-edit:hover {
-  background: rgba(59, 130, 246, .12);
-}
-
-html.dark .compatibility-title-editor input {
-  background: #1E293B;
-  color: #F1F5F9;
-  border-color: #60A5FA;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(96, 165, 250, .10);
-}
-
-html.dark .compatibility-title-editor button {
-  background: #1E293B;
-  border-color: #334155;
-}
-
-html.dark .compatibility-title-editor-confirm {
-  color: #4ADE80;
-}
-
-html.dark .compatibility-title-editor-confirm:hover {
-  background: rgba(34, 197, 94, .10);
-  border-color: rgba(34, 197, 94, .28);
-}
-
-html.dark .compatibility-title-editor-cancel {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-title-editor-cancel:hover {
-  background: #263548;
-}
-
-
-/* VERSÕES */
-
-html.dark .compatibility-add-version-link {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-new-version
-.compatibility-new-version-cancel {
-  background: #1E293B;
-  border-color: #334155;
-  color: #CBD5E1;
-}
-
-
-/* RELAÇÕES */
-
-html.dark .compatibility-relations {
-  border-top-color: #263548;
-}
-
-html.dark .compatibility-relations summary {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-relations summary:hover {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-relations p {
-  color: #7C8CA1;
-}
-
-html.dark .compatibility-relations-grid label {
-  color: #CBD5E1;
-}
-
-
-/* ADICIONAR SISTEMA */
-
-html.dark .compatibility-add-system {
-  background: #151F2E;
-  border-color: #334155;
-
-  box-shadow:
-    0 -8px 18px
-    rgba(0, 0, 0, .10);
-}
-
-html.dark .compatibility-add-system-title {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-add-system-title span {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-add-source label {
-  color: #CBD5E1;
-}
-
-
-/* RODAPÉ DO MODAL */
-
-html.dark .compatibility-modal-footer {
-  background: #151F2E;
-  border-top-color: #263548;
-}
-
-
-/* CARD GLOBAL */
-
-html.dark .compatibility-global-card {
-  background: #162131;
-  border-color: #263548;
-
-  box-shadow:
-    0 2px 8px
-    rgba(0, 0, 0, .16);
-}
-
-html.dark .compatibility-global-icon {
-  background: rgba(59, 130, 246, .12);
-  color: #60A5FA;
-}
-
-html.dark .compatibility-global-content > strong {
-  color: #E2E8F0;
-}
-
-html.dark .compatibility-global-content > span {
-  color: #94A3B8;
-}
-
-html.dark .compatibility-global-content > small {
-  color: #60A5FA;
-}
-
-html.dark .compatibility-global-action {
-  background: #1E293B;
-  border-color: #334155;
-  color: #60A5FA;
-}
-
-html.dark .compatibility-global-action:hover:not(:disabled) {
-  background: #223249;
-  border-color: #60A5FA;
 }
 
 .compatibility-view-actions {
@@ -1543,59 +424,574 @@ html.dark .compatibility-global-action:hover:not(:disabled) {
 }
 
 .compatibility-readme-button {
-  min-height: 44px;
+  min-height: 42px;
   border: 1px solid #c8dced;
   border-radius: 9px;
-  background: #f7fbff;
+  background: #fff;
   color: #005aa9;
   padding: 0 14px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
 
-  font-size: 13px;
+.compatibility-readme-button:hover,
+.compatibility-readme-button-active {
+  background: #eef6fd;
+  border-color: #9bc2e3;
+}
+
+
+/* GRID */
+
+.compatibility-view-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 0;
+  padding: 0;
+}
+
+.compatibility-view-item {
+  min-height: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 9px;
+  border-right: 1px solid #edf0f3;
+  border-bottom: 1px solid #edf0f3;
+  text-align: center;
+  background: #fff;
+}
+
+.compatibility-view-item:hover {
+  background: #f8fbfe;
+}
+
+.compatibility-view-item strong {
+  color: #475467;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.compatibility-view-item span {
+  color: #005aa9;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+
+/* ======================================================
+   LEIA-ME
+   ====================================================== */
+
+.compatibility-readme-modern {
+  padding: 20px;
+  border-bottom: 1px solid #e7edf2;
+  background: #fafcfe;
+}
+
+.compatibility-readme-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.compatibility-readme-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #005aa9;
+}
+
+.compatibility-readme-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compatibility-readme-title strong {
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.compatibility-readme-title span {
+  color: #7b8794;
+  font-size: 10px;
+}
+
+.compatibility-readme-release-label {
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #edf4fa;
+  color: #375a78;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.compatibility-readme-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+.compatibility-readme-alert {
+  min-height: 38px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border-left: 3px solid #f58220;
+  background: #fff8f1;
+  color: #74421b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.compatibility-readme-alert svg {
+  color: #f58220;
+  flex: 0 0 auto;
+}
+
+.compatibility-readme-section +
+.compatibility-readme-section {
+  margin-top: 20px;
+}
+
+.compatibility-readme-section h3 {
+  margin: 0 0 8px;
+  color: #475467;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.compatibility-readme-table {
+  border: 1px solid #e1e7ec;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.compatibility-readme-row {
+  display: grid;
+  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.compatibility-readme-row:last-child {
+  border-bottom: 0;
+}
+
+.compatibility-readme-app {
+  padding: 8px 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.compatibility-readme-app strong {
+  color: #344054;
+  font-size: 11px;
+}
+
+.compatibility-readme-app span {
+  color: #005aa9;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.compatibility-readme-path {
+  padding: 8px 12px;
+  border-left: 1px solid #edf0f3;
+  color: #667085;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.compatibility-readme-notes {
+  padding: 10px 12px;
+  border: 1px solid #e1e7ec;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.compatibility-readme-notes p {
+  margin: 0;
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+
+/* ======================================================
+   MODAL
+   ====================================================== */
+
+.compatibility-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(16, 24, 40, .56);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.compatibility-modal {
+  width: min(1180px, 96vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 22px 70px rgba(16, 24, 40, .24);
+  overflow: hidden;
+}
+
+.compatibility-release-modal {
+  width: min(920px, 96vw);
+}
+
+.compatibility-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #e4e7ec;
+}
+
+.compatibility-modal-header h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+}
+
+.compatibility-modal-header p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+.compatibility-modal-close {
+  border: 0;
+  background: transparent;
+  color: #667085;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.compatibility-modal-guidance,
+.compatibility-redmine-warning {
+  margin: 12px 20px 0;
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.compatibility-modal-guidance {
+  border: 1px solid #dbe8f5;
+  background: #f7fbff;
+  color: #526579;
+}
+
+.compatibility-redmine-warning {
+  border: 1px solid #f4d28f;
+  background: #fff9eb;
+  color: #775b18;
+}
+
+.compatibility-editor-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.compatibility-editor-item {
+  border: 1px solid #dfe4ea;
+  border-radius: 11px;
+  padding: 14px;
+  background: #fff;
+}
+
+.compatibility-editor-item-hidden {
+  background: #f8f9fb;
+  opacity: .78;
+}
+
+.compatibility-editor-item-top,
+.compatibility-release-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.compatibility-editor-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.compatibility-editor-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compatibility-editor-title {
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.compatibility-source-badge {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #eef4fb;
+  color: #005aa9;
+  padding: 3px 7px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.compatibility-visibility-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.compatibility-visibility-toggle input,
+.compatibility-relations-grid input,
+.compatibility-add-source input {
+  accent-color: #005aa9;
+}
+
+.compatibility-order-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.compatibility-order-actions button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  background: #fff;
+  color: #475467;
+  cursor: pointer;
+}
+
+.compatibility-order-actions .compatibility-remove-item {
+  color: #c0392b;
+}
+
+.compatibility-editor-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.compatibility-editor-fields > label,
+.compatibility-release-version-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compatibility-editor-fields > label > span,
+.compatibility-release-version-field > span {
+  color: #475467;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.compatibility-editor-fields input,
+.compatibility-editor-fields select,
+.compatibility-add-row input,
+.compatibility-add-row select,
+.compatibility-new-version input,
+.compatibility-release-version-field > select {
+  width: 100%;
+  min-height: 39px;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  background: #fff;
+  color: #1f2937;
+  padding: 0 10px;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.compatibility-project-reference {
+  display: block;
+  margin-top: 5px;
+  color: #7b8794;
+  font-size: 10px;
+}
+
+.compatibility-version-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compatibility-add-version-link {
+  border: 0;
+  background: transparent;
+  color: #005aa9;
+  padding: 0;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.compatibility-readme-button:hover {
-  border-color: #005aa9;
-  background: #eef6fd;
+.compatibility-new-version {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
 }
 
-
-.compatibility-readme {
-  padding: 18px 20px;
-  border-bottom: 1px solid #e4e7ec;
-  background: #fafcff;
+.compatibility-new-version button,
+.compatibility-add-row button {
+  min-height: 39px;
+  border: 1px solid #005aa9;
+  border-radius: 7px;
+  background: #005aa9;
+  color: #fff;
+  padding: 0 11px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.compatibility-readme-header {
+.compatibility-new-version .compatibility-new-version-cancel,
+.compatibility-cancel-button {
+  border-color: #d0d5dd;
+  background: #fff;
+  color: #475467;
+}
+
+.compatibility-relations {
+  margin-top: 12px;
+  border-top: 1px solid #eef0f3;
+  padding-top: 10px;
+}
+
+.compatibility-relations summary {
+  cursor: pointer;
+  color: #667085;
+  font-size: 10px;
+}
+
+.compatibility-relations p {
+  color: #7b8794;
+  font-size: 10px;
+}
+
+.compatibility-relations-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px 12px;
+}
+
+.compatibility-relations-grid label {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  color: #475467;
+  font-size: 11px;
+}
 
-  margin-bottom: 12px;
+.compatibility-add-system {
+  margin: 8px 20px 18px;
+  padding: 16px;
+  border: 1px dashed #b9c5d2;
+  border-radius: 11px;
+  background: #f9fbfd;
+}
 
+.compatibility-add-system-title {
+  display: flex;
+  gap: 9px;
   color: #005aa9;
-  font-size: 13px;
 }
 
-.compatibility-readme pre {
-  margin: 0;
+.compatibility-add-system-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
 
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-
-  color: #344054;
-
-  font-family: inherit;
+.compatibility-add-system-title strong {
   font-size: 12px;
-  line-height: 1.65;
 }
 
+.compatibility-add-system-title span {
+  color: #667085;
+  font-size: 10px;
+}
+
+.compatibility-add-source {
+  display: flex;
+  gap: 18px;
+  margin: 13px 0 10px;
+}
+
+.compatibility-add-source label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475467;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.compatibility-add-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.compatibility-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #e4e7ec;
+  background: #fbfcfd;
+}
+
+
+/* LEIA-ME EDITOR */
 
 .compatibility-readme-editor {
   margin: 16px 20px 0;
@@ -1625,29 +1021,197 @@ html.dark .compatibility-global-action:hover:not(:disabled) {
   width: 100%;
   min-height: 180px;
   resize: vertical;
-
   box-sizing: border-box;
-
   border: 1px solid #d0d5dd;
   border-radius: 8px;
-
-  background: #ffffff;
+  background: #fff;
   color: #1f2937;
-
   padding: 12px;
-
   font-family: inherit;
   font-size: 12px;
   line-height: 1.55;
-
   outline: none;
 }
 
 .compatibility-readme-editor textarea:focus {
   border-color: #005aa9;
-  box-shadow:
-    0 0 0 3px
-    rgba(0, 90, 169, 0.09);
+  box-shadow: 0 0 0 3px rgba(0, 90, 169, .09);
+}
+
+
+/* EMPTY */
+
+.compatibility-page-empty {
+  padding: 42px 20px;
+  text-align: center;
+  color: #667085;
+  font-size: 13px;
+}
+
+
+/* RESPONSIVO */
+
+@media (max-width: 950px) {
+  .compatibility-release-context {
+    grid-template-columns: 1fr;
+  }
+
+  .compatibility-release-switcher {
+    border-left: 0;
+    border-top: 1px solid #edf0f3;
+  }
+}
+
+@media (max-width: 760px) {
+  .compatibility-page {
+    padding: 20px 16px 32px;
+  }
+
+  .compatibility-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compatibility-header-actions {
+    justify-content: stretch;
+  }
+
+  .compatibility-header-actions > * {
+    flex: 1;
+  }
+
+  .compatibility-global-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .compatibility-global-action {
+    grid-column: 1 / -1;
+  }
+
+  .compatibility-release-context-title-row h2 {
+    font-size: 20px;
+  }
+
+  .compatibility-view-heading-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compatibility-view-actions {
+    width: 100%;
+  }
+
+  .compatibility-view-actions button {
+    flex: 1;
+  }
+
+  .compatibility-readme-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .compatibility-readme-row {
+    grid-template-columns: 1fr;
+  }
+
+  .compatibility-readme-path {
+    border-left: 0;
+    border-top: 1px solid #edf0f3;
+  }
+
+  .compatibility-modal-backdrop {
+    padding: 0;
+  }
+
+  .compatibility-modal {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .compatibility-editor-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .compatibility-relations-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compatibility-new-version {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ======================================================
+   DARK MODE
+   ====================================================== */
+
+html.dark .compatibility-page-header {
+  border-bottom-color: #26384c;
+}
+
+html.dark .compatibility-page-header h1 {
+  color: #f1f5f9;
+}
+
+html.dark .compatibility-page-header p {
+  color: #94a3b8;
+}
+
+html.dark .compatibility-info {
+  background: #142235;
+  border-color: #29415b;
+}
+
+html.dark .compatibility-info span {
+  color: #a3b0bf;
+}
+
+html.dark .compatibility-global-card,
+html.dark .compatibility-view-card,
+html.dark .compatibility-release-context {
+  background: #162131;
+  border-color: #263548;
+}
+
+html.dark .compatibility-global-content > strong,
+html.dark .compatibility-release-context-title-row h2,
+html.dark .compatibility-view-title h2,
+html.dark .compatibility-readme-title strong {
+  color: #f1f5f9;
+}
+
+html.dark .compatibility-global-content > span,
+html.dark .compatibility-release-context-eyebrow,
+html.dark .compatibility-release-context-details,
+html.dark .compatibility-view-title p {
+  color: #94a3b8;
+}
+
+html.dark .compatibility-release-context-details strong {
+  color: #60a5fa;
+}
+
+html.dark .compatibility-release-switcher {
+  background: #151f2e;
+  border-color: #263548;
+}
+
+html.dark .compatibility-release-switcher label {
+  color: #94a3b8;
+}
+
+html.dark .compatibility-release-switcher select {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+html.dark .compatibility-view-heading-row {
+  background: #162131;
+  border-bottom-color: #263548;
 }
 
 html.dark .compatibility-readme-button {
@@ -1656,1388 +1220,98 @@ html.dark .compatibility-readme-button {
   color: #60a5fa;
 }
 
-html.dark .compatibility-readme-button:hover {
-  background: #263548;
-  border-color: #60a5fa;
-}
-
-html.dark .compatibility-readme {
+html.dark .compatibility-readme-modern {
   background: #151f2e;
-  border-bottom-color: #263548;
+  border-color: #263548;
 }
 
-html.dark .compatibility-readme-header {
-  color: #60a5fa;
-}
-
-html.dark .compatibility-readme pre {
+html.dark .compatibility-readme-release-label {
+  background: #263548;
   color: #cbd5e1;
 }
 
-html.dark .compatibility-readme-editor label span {
+html.dark .compatibility-readme-alert {
+  background: rgba(245, 130, 32, .08);
+  color: #f5c795;
+}
+
+html.dark .compatibility-readme-table,
+html.dark .compatibility-readme-notes {
+  background: #1b2737;
+  border-color: #2c3b4e;
+}
+
+html.dark .compatibility-readme-row {
+  border-color: #2c3b4e;
+}
+
+html.dark .compatibility-readme-app strong {
   color: #e2e8f0;
 }
 
+html.dark .compatibility-readme-app span,
+html.dark .compatibility-view-item span {
+  color: #60a5fa;
+}
+
+html.dark .compatibility-readme-path {
+  color: #a3b0bf;
+  border-color: #2c3b4e;
+}
+
+html.dark .compatibility-view-item {
+  background: #162131;
+  border-color: #263548;
+}
+
+html.dark .compatibility-view-item:hover {
+  background: #1b293b;
+}
+
+html.dark .compatibility-view-item strong {
+  color: #cbd5e1;
+}
+
+html.dark .compatibility-modal {
+  background: #162131;
+}
+
+html.dark .compatibility-modal-header,
+html.dark .compatibility-modal-footer {
+  border-color: #263548;
+}
+
+html.dark .compatibility-modal-header h2,
+html.dark .compatibility-editor-title,
+html.dark .compatibility-readme-editor label span {
+  color: #f1f5f9;
+}
+
+html.dark .compatibility-modal-header p,
+html.dark .compatibility-project-reference,
 html.dark .compatibility-readme-editor label small {
   color: #94a3b8;
 }
 
+html.dark .compatibility-editor-item {
+  background: #1b2737;
+  border-color: #2c3b4e;
+}
+
+html.dark .compatibility-editor-item-hidden {
+  background: #151f2e;
+}
+
+html.dark .compatibility-editor-fields input,
+html.dark .compatibility-editor-fields select,
+html.dark .compatibility-release-version-field > select,
+html.dark .compatibility-new-version input,
 html.dark .compatibility-readme-editor textarea {
   background: #1e293b;
   border-color: #334155;
   color: #f1f5f9;
 }
 
-/* =========================================================
-   COMPATIBILIDADE
-   MELHORIA VISUAL RELEASE + LEIA-ME
-   ========================================================= */
-
-
-/* =========================
-   SELETOR DE RELEASE
-   ========================= */
-
-.compatibility-release-picker {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    auto;
-
-  align-items: stretch;
-
-  border:
-    1px solid
-    #dfe6ed;
-
-  border-radius:
-    14px;
-
-  background:
-    #ffffff;
-
-  box-shadow:
-    0 2px 8px
-    rgba(16, 24, 40, 0.04);
-
-  overflow:
-    hidden;
-}
-
-
-.compatibility-release-picker-main {
-  padding:
-    18px 20px;
-
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  justify-content:
-    center;
-
-  gap:
-    11px;
-
-  min-width:
-    0;
-}
-
-
-.compatibility-release-picker-heading {
-  display:
-    flex;
-
-  align-items:
-    baseline;
-
-  gap:
-    10px;
-
-  flex-wrap:
-    wrap;
-}
-
-
-.compatibility-release-picker-heading > span {
-  color:
-    #667085;
-
-  font-size:
-    11px;
-
-  font-weight:
-    700;
-
-  text-transform:
-    uppercase;
-
-  letter-spacing:
-    0.04em;
-}
-
-
-.compatibility-release-picker-heading > strong {
-  color:
-    #1f2937;
-
-  font-size:
-    16px;
-
-  font-weight:
-    750;
-}
-
-
-.compatibility-release-picker-main > select {
-  width:
-    min(
-      100%,
-      520px
-    );
-
-  min-height:
-    46px;
-
-  border:
-    1px solid
-    #cbd5df;
-
-  border-radius:
-    9px;
-
-  background:
-    #ffffff;
-
-  color:
-    #1f2937;
-
-  padding:
-    0 13px;
-
-  font-size:
-    13px;
-
-  font-weight:
-    600;
-
-  outline:
-    none;
-
-  cursor:
-    pointer;
-
-  transition:
-    border-color .15s ease,
-    box-shadow .15s ease;
-}
-
-
-.compatibility-release-picker-main > select:hover {
-  border-color:
-    #9bb8d2;
-}
-
-
-.compatibility-release-picker-main > select:focus {
-  border-color:
-    #005aa9;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(0, 90, 169, .09);
-}
-
-
-.compatibility-release-summary {
-  min-width:
-    285px;
-
-  padding:
-    18px 22px;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    flex-end;
-
-  gap:
-    30px;
-
-  border-left:
-    1px solid
-    #edf0f3;
-
-  background:
-    #fbfcfd;
-}
-
-
-.compatibility-release-summary-status,
-.compatibility-release-summary-version {
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  gap:
-    6px;
-}
-
-
-.compatibility-release-summary-status > span,
-.compatibility-release-summary-version > span {
-  color:
-    #7b8794;
-
-  font-size:
-    10px;
-
-  font-weight:
-    700;
-
-  text-transform:
-    uppercase;
-
-  letter-spacing:
-    .04em;
-}
-
-
-.compatibility-release-summary-version {
-  min-width:
-    115px;
-}
-
-
-.compatibility-release-summary-version > strong {
-  color:
-    #005aa9;
-
-  font-size:
-    16px;
-
-  font-weight:
-    800;
-
-  letter-spacing:
-    -.01em;
-}
-
-
-/* =========================
-   CABEÇALHO COMPATIBILIDADE
-   ========================= */
-
-.compatibility-view-heading-row {
-  min-height:
-    70px;
-
-  padding:
-    15px 18px;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-  gap:
-    18px;
-
-  border-bottom:
-    1px solid
-    #edf0f3;
-
-  background:
-    #ffffff;
-}
-
-
-.compatibility-view-heading-row
-.compatibility-view-title {
-  padding:
-    0;
-
-  border:
-    0;
-
-  background:
-    transparent;
-}
-
-
-.compatibility-view-title h2 {
-  font-size:
-    16px;
-
-  color:
-    #172033;
-}
-
-
-.compatibility-view-title p {
-  margin:
-    5px 0 0;
-
-  color:
-    #7b8794;
-
-  font-size:
-    11px;
-}
-
-
-.compatibility-view-actions {
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    8px;
-
-  flex-wrap:
-    wrap;
-}
-
-
-/* =========================
-   BOTÃO LEIA-ME
-   ========================= */
-
-.compatibility-readme-button {
-  min-height:
-    42px;
-
-  border:
-    1px solid
-    #c8dced;
-
-  border-radius:
-    9px;
-
-  background:
-    #ffffff;
-
-  color:
-    #005aa9;
-
-  padding:
-    0 14px;
-
-  display:
-    inline-flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  gap:
-    7px;
-
-  font-size:
-    12px;
-
-  font-weight:
-    750;
-
-  cursor:
-    pointer;
-
-  transition:
-    .15s ease;
-}
-
-
-.compatibility-readme-button:hover {
-  background:
-    #f2f8fd;
-
-  border-color:
-    #8eb8dc;
-}
-
-
-.compatibility-readme-button-active {
-  background:
-    #eef6fd;
-
-  border-color:
-    #9bc2e3;
-}
-
-
-/* =========================
-   LEIA-ME
-   ========================= */
-
-.compatibility-readme-modern {
-  padding:
-    20px;
-
-  border-bottom:
-    1px solid
-    #e7edf2;
-
-  background:
-    #fafcfe;
-}
-
-
-.compatibility-readme-top {
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    space-between;
-
-  gap:
-    16px;
-
-  margin-bottom:
-    16px;
-}
-
-
-.compatibility-readme-title {
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    10px;
-
-  color:
-    #005aa9;
-}
-
-
-.compatibility-readme-title > div {
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  gap:
-    2px;
-}
-
-
-.compatibility-readme-title strong {
-  color:
-    #1f2937;
-
-  font-size:
-    14px;
-}
-
-
-.compatibility-readme-title span {
-  color:
-    #7b8794;
-
-  font-size:
-    10px;
-}
-
-
-.compatibility-readme-release-label {
-  padding:
-    5px 9px;
-
-  border-radius:
-    6px;
-
-  background:
-    #edf4fa;
-
-  color:
-    #375a78;
-
-  font-size:
-    10px;
-
-  font-weight:
-    700;
-}
-
-
-/* =========================
-   AVISOS LEIA-ME
-   ========================= */
-
-.compatibility-readme-alerts {
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  gap:
-    7px;
-
-  margin-bottom:
-    20px;
-}
-
-
-.compatibility-readme-alert {
-  min-height:
-    38px;
-
-  padding:
-    9px 11px;
-
-  display:
-    flex;
-
-  align-items:
-    flex-start;
-
-  gap:
-    9px;
-
-  border-left:
-    3px solid
-    #f58220;
-
-  background:
-    #fff8f1;
-
-  color:
-    #74421b;
-
-  font-size:
-    11px;
-
-  line-height:
-    1.45;
-}
-
-
-.compatibility-readme-alert svg {
-  color:
-    #f58220;
-
-  flex:
-    0 0 auto;
-
-  margin-top:
-    1px;
-}
-
-
-/* =========================
-   SEÇÕES DO LEIA-ME
-   ========================= */
-
-.compatibility-readme-section +
-.compatibility-readme-section {
-  margin-top:
-    20px;
-}
-
-
-.compatibility-readme-section h3 {
-  margin:
-    0 0 8px;
-
-  color:
-    #475467;
-
-  font-size:
-    10px;
-
-  font-weight:
-    800;
-
-  text-transform:
-    uppercase;
-
-  letter-spacing:
-    .05em;
-}
-
-
-/* =========================
-   TABELA LEIA-ME
-   ========================= */
-
-.compatibility-readme-table {
-  border:
-    1px solid
-    #e1e7ec;
-
-  border-radius:
-    9px;
-
-  overflow:
-    hidden;
-
-  background:
-    #ffffff;
-}
-
-
-.compatibility-readme-row {
-  display:
-    grid;
-
-  grid-template-columns:
-    minmax(
-      220px,
-      .7fr
-    )
-    minmax(
-      0,
-      1.3fr
-    );
-
-  align-items:
-    center;
-
-  min-height:
-    42px;
-
-  border-bottom:
-    1px solid
-    #edf0f3;
-}
-
-
-.compatibility-readme-row:last-child {
-  border-bottom:
-    0;
-}
-
-
-.compatibility-readme-app {
-  padding:
-    8px 12px;
-
-  display:
-    flex;
-
-  align-items:
-    baseline;
-
-  gap:
-    8px;
-
-  min-width:
-    0;
-}
-
-
-.compatibility-readme-app strong {
-  color:
-    #344054;
-
-  font-size:
-    11px;
-
-  font-weight:
-    700;
-}
-
-
-.compatibility-readme-app span {
-  color:
-    #005aa9;
-
-  font-size:
-    11px;
-
-  font-weight:
-    800;
-}
-
-
-.compatibility-readme-path {
-  min-width:
-    0;
-
-  padding:
-    8px 12px;
-
-  border-left:
-    1px solid
-    #edf0f3;
-
-  color:
-    #667085;
-
-  font-size:
-    10px;
-
-  line-height:
-    1.4;
-
-  overflow-wrap:
-    anywhere;
-}
-
-
-.compatibility-readme-notes {
-  padding:
-    10px 12px;
-
-  border:
-    1px solid
-    #e1e7ec;
-
-  border-radius:
-    8px;
-
-  background:
-    #ffffff;
-}
-
-
-.compatibility-readme-notes p {
-  margin:
-    0;
-
-  color:
-    #667085;
-
-  font-size:
-    11px;
-
-  line-height:
-    1.55;
-}
-
-
-.compatibility-readme-notes p +
-.compatibility-readme-notes p {
-  margin-top:
-    5px;
-}
-
-
-/* =========================
-   GRID DAS VERSÕES
-   ========================= */
-
-.compatibility-view-grid {
-  display:
-    grid;
-
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(
-        145px,
-        1fr
-      )
-    );
-
-  gap:
-    0;
-
-  padding:
-    0;
-}
-
-
-.compatibility-view-item {
-  min-height:
-    76px;
-
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  gap:
-    7px;
-
-  padding:
-    12px 9px;
-
-  border-right:
-    1px solid
-    #edf0f3;
-
-  border-bottom:
-    1px solid
-    #edf0f3;
-
-  text-align:
-    center;
-
-  background:
-    #ffffff;
-
-  transition:
-    background .15s ease;
-}
-
-
-.compatibility-view-item:hover {
-  background:
-    #f8fbfe;
-}
-
-
-.compatibility-view-item strong {
-  color:
-    #475467;
-
-  font-size:
-    11px;
-
-  font-weight:
-    650;
-
-  line-height:
-    1.25;
-}
-
-
-.compatibility-view-item span {
-  color:
-    #005aa9;
-
-  font-size:
-    14px;
-
-  font-weight:
-    850;
-
-  letter-spacing:
-    -.01em;
-}
-
-
-/* =========================
-   EDITOR DO LEIA-ME
-   ========================= */
-
-.compatibility-readme-editor {
-  margin:
-    16px 20px 0;
-
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  gap:
-    8px;
-}
-
-
-.compatibility-readme-editor label {
-  display:
-    flex;
-
-  flex-direction:
-    column;
-
-  gap:
-    3px;
-}
-
-
-.compatibility-readme-editor label span {
-  color:
-    #344054;
-
-  font-size:
-    12px;
-
-  font-weight:
-    700;
-}
-
-
-.compatibility-readme-editor label small {
-  color:
-    #7b8794;
-
-  font-size:
-    10px;
-}
-
-
-.compatibility-readme-editor textarea {
-  width:
-    100%;
-
-  min-height:
-    180px;
-
-  resize:
-    vertical;
-
-  box-sizing:
-    border-box;
-
-  border:
-    1px solid
-    #d0d5dd;
-
-  border-radius:
-    8px;
-
-  background:
-    #ffffff;
-
-  color:
-    #1f2937;
-
-  padding:
-    12px;
-
-  font-family:
-    inherit;
-
-  font-size:
-    12px;
-
-  line-height:
-    1.55;
-
-  outline:
-    none;
-}
-
-
-.compatibility-readme-editor textarea:focus {
-  border-color:
-    #005aa9;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(0, 90, 169, .09);
-}
-
-
-/* =========================
-   RESPONSIVO
-   ========================= */
-
-@media (
-  max-width:
-  900px
-) {
-
-  .compatibility-release-picker {
-    grid-template-columns:
-      1fr;
-  }
-
-
-  .compatibility-release-summary {
-    min-width:
-      0;
-
-    justify-content:
-      flex-start;
-
-    border-left:
-      0;
-
-    border-top:
-      1px solid
-      #edf0f3;
-  }
-
-
-  .compatibility-readme-row {
-    grid-template-columns:
-      1fr;
-  }
-
-
-  .compatibility-readme-path {
-    border-left:
-      0;
-
-    border-top:
-      1px solid
-      #edf0f3;
-  }
-
-}
-
-
-@media (
-  max-width:
-  760px
-) {
-
-  .compatibility-release-picker-main,
-  .compatibility-release-summary {
-    padding:
-      15px;
-  }
-
-
-  .compatibility-release-picker-heading {
-    flex-direction:
-      column;
-
-    align-items:
-      flex-start;
-
-    gap:
-      4px;
-  }
-
-
-  .compatibility-release-picker-main > select {
-    width:
-      100%;
-  }
-
-
-  .compatibility-release-summary {
-    gap:
-      22px;
-
-    flex-wrap:
-      wrap;
-  }
-
-
-  .compatibility-view-heading-row {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-  }
-
-
-  .compatibility-view-actions {
-    width:
-      100%;
-  }
-
-
-  .compatibility-view-actions button {
-    flex:
-      1;
-  }
-
-
-  .compatibility-readme-top {
-    align-items:
-      flex-start;
-
-    flex-direction:
-      column;
-  }
-
-}
-
-
-/* =========================================================
-   MODO NOTURNO
-   ========================================================= */
-
-html.dark
-.compatibility-release-picker {
-  background:
-    #162131;
-
-  border-color:
-    #263548;
-
-  box-shadow:
-    0 2px 8px
-    rgba(0, 0, 0, .16);
-}
-
-
-html.dark
-.compatibility-release-picker-heading > span {
-  color:
-    #94a3b8;
-}
-
-
-html.dark
-.compatibility-release-picker-heading > strong {
-  color:
-    #f1f5f9;
-}
-
-
-html.dark
-.compatibility-release-picker-main > select {
-  background:
-    #1e293b;
-
-  border-color:
-    #334155;
-
-  color:
-    #f1f5f9;
-}
-
-
-html.dark
-.compatibility-release-picker-main > select:focus {
-  border-color:
-    #60a5fa;
-}
-
-
-html.dark
-.compatibility-release-summary {
-  background:
-    #151f2e;
-
-  border-color:
-    #263548;
-}
-
-
-html.dark
-.compatibility-release-summary-status > span,
-html.dark
-.compatibility-release-summary-version > span {
-  color:
-    #94a3b8;
-}
-
-
-html.dark
-.compatibility-release-summary-version > strong {
-  color:
-    #60a5fa;
-}
-
-
-html.dark
-.compatibility-view-heading-row {
-  background:
-    #162131;
-
-  border-bottom-color:
-    #263548;
-}
-
-
-html.dark
-.compatibility-readme-button {
-  background:
-    #1e293b;
-
-  border-color:
-    #334155;
-
-  color:
-    #60a5fa;
-}
-
-
-html.dark
-.compatibility-readme-button:hover,
-html.dark
-.compatibility-readme-button-active {
-  background:
-    #263548;
-
-  border-color:
-    #47749b;
-}
-
-
-html.dark
-.compatibility-readme-modern {
-  background:
-    #151f2e;
-
-  border-bottom-color:
-    #263548;
-}
-
-
-html.dark
-.compatibility-readme-title strong {
-  color:
-    #f1f5f9;
-}
-
-
-html.dark
-.compatibility-readme-title span {
-  color:
-    #94a3b8;
-}
-
-
-html.dark
-.compatibility-readme-release-label {
-  background:
-    #263548;
-
-  color:
-    #cbd5e1;
-}
-
-
-html.dark
-.compatibility-readme-alert {
-  background:
-    rgba(
-      245,
-      130,
-      32,
-      .08
-    );
-
-  color:
-    #f5c795;
-
-  border-left-color:
-    #f58220;
-}
-
-
-html.dark
-.compatibility-readme-section h3 {
-  color:
-    #94a3b8;
-}
-
-
-html.dark
-.compatibility-readme-table,
-html.dark
-.compatibility-readme-notes {
-  background:
-    #1b2737;
-
-  border-color:
-    #2c3b4e;
-}
-
-
-html.dark
-.compatibility-readme-row {
-  border-bottom-color:
-    #2c3b4e;
-}
-
-
-html.dark
-.compatibility-readme-app strong {
-  color:
-    #e2e8f0;
-}
-
-
-html.dark
-.compatibility-readme-app span {
-  color:
-    #60a5fa;
-}
-
-
-html.dark
-.compatibility-readme-path {
-  border-color:
-    #2c3b4e;
-
-  color:
-    #a3b0bf;
-}
-
-
-html.dark
-.compatibility-readme-notes p {
-  color:
-    #a3b0bf;
-}
-
-
-html.dark
-.compatibility-view-item {
-  background:
-    #162131;
-
-  border-color:
-    #263548;
-}
-
-
-html.dark
-.compatibility-view-item:hover {
-  background:
-    #1b293b;
-}
-
-
-html.dark
-.compatibility-view-item strong {
-  color:
-    #cbd5e1;
-}
-
-
-html.dark
-.compatibility-view-item span {
-  color:
-    #60a5fa;
-}
-
-
-html.dark
-.compatibility-readme-editor label span {
-  color:
-    #e2e8f0;
-}
-
-
-html.dark
-.compatibility-readme-editor label small {
-  color:
-    #94a3b8;
-}
-
-
-html.dark
-.compatibility-readme-editor textarea {
-  background:
-    #1e293b;
-
-  border-color:
-    #334155;
-
-  color:
-    #f1f5f9;
+html.dark .compatibility-modal-footer {
+  background: #151f2e;
 }
