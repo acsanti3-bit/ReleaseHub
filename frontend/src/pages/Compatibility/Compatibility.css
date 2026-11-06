@@ -1687,3 +1687,1357 @@ html.dark .compatibility-readme-editor textarea {
   border-color: #334155;
   color: #f1f5f9;
 }
+
+/* =========================================================
+   COMPATIBILIDADE
+   MELHORIA VISUAL RELEASE + LEIA-ME
+   ========================================================= */
+
+
+/* =========================
+   SELETOR DE RELEASE
+   ========================= */
+
+.compatibility-release-picker {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items: stretch;
+
+  border:
+    1px solid
+    #dfe6ed;
+
+  border-radius:
+    14px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 2px 8px
+    rgba(16, 24, 40, 0.04);
+
+  overflow:
+    hidden;
+}
+
+
+.compatibility-release-picker-main {
+  padding:
+    18px 20px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  gap:
+    11px;
+
+  min-width:
+    0;
+}
+
+
+.compatibility-release-picker-heading {
+  display:
+    flex;
+
+  align-items:
+    baseline;
+
+  gap:
+    10px;
+
+  flex-wrap:
+    wrap;
+}
+
+
+.compatibility-release-picker-heading > span {
+  color:
+    #667085;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    0.04em;
+}
+
+
+.compatibility-release-picker-heading > strong {
+  color:
+    #1f2937;
+
+  font-size:
+    16px;
+
+  font-weight:
+    750;
+}
+
+
+.compatibility-release-picker-main > select {
+  width:
+    min(
+      100%,
+      520px
+    );
+
+  min-height:
+    46px;
+
+  border:
+    1px solid
+    #cbd5df;
+
+  border-radius:
+    9px;
+
+  background:
+    #ffffff;
+
+  color:
+    #1f2937;
+
+  padding:
+    0 13px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    600;
+
+  outline:
+    none;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+}
+
+
+.compatibility-release-picker-main > select:hover {
+  border-color:
+    #9bb8d2;
+}
+
+
+.compatibility-release-picker-main > select:focus {
+  border-color:
+    #005aa9;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, .09);
+}
+
+
+.compatibility-release-summary {
+  min-width:
+    285px;
+
+  padding:
+    18px 22px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    30px;
+
+  border-left:
+    1px solid
+    #edf0f3;
+
+  background:
+    #fbfcfd;
+}
+
+
+.compatibility-release-summary-status,
+.compatibility-release-summary-version {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    6px;
+}
+
+
+.compatibility-release-summary-status > span,
+.compatibility-release-summary-version > span {
+  color:
+    #7b8794;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .04em;
+}
+
+
+.compatibility-release-summary-version {
+  min-width:
+    115px;
+}
+
+
+.compatibility-release-summary-version > strong {
+  color:
+    #005aa9;
+
+  font-size:
+    16px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    -.01em;
+}
+
+
+/* =========================
+   CABEÇALHO COMPATIBILIDADE
+   ========================= */
+
+.compatibility-view-heading-row {
+  min-height:
+    70px;
+
+  padding:
+    15px 18px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    18px;
+
+  border-bottom:
+    1px solid
+    #edf0f3;
+
+  background:
+    #ffffff;
+}
+
+
+.compatibility-view-heading-row
+.compatibility-view-title {
+  padding:
+    0;
+
+  border:
+    0;
+
+  background:
+    transparent;
+}
+
+
+.compatibility-view-title h2 {
+  font-size:
+    16px;
+
+  color:
+    #172033;
+}
+
+
+.compatibility-view-title p {
+  margin:
+    5px 0 0;
+
+  color:
+    #7b8794;
+
+  font-size:
+    11px;
+}
+
+
+.compatibility-view-actions {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    8px;
+
+  flex-wrap:
+    wrap;
+}
+
+
+/* =========================
+   BOTÃO LEIA-ME
+   ========================= */
+
+.compatibility-readme-button {
+  min-height:
+    42px;
+
+  border:
+    1px solid
+    #c8dced;
+
+  border-radius:
+    9px;
+
+  background:
+    #ffffff;
+
+  color:
+    #005aa9;
+
+  padding:
+    0 14px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    750;
+
+  cursor:
+    pointer;
+
+  transition:
+    .15s ease;
+}
+
+
+.compatibility-readme-button:hover {
+  background:
+    #f2f8fd;
+
+  border-color:
+    #8eb8dc;
+}
+
+
+.compatibility-readme-button-active {
+  background:
+    #eef6fd;
+
+  border-color:
+    #9bc2e3;
+}
+
+
+/* =========================
+   LEIA-ME
+   ========================= */
+
+.compatibility-readme-modern {
+  padding:
+    20px;
+
+  border-bottom:
+    1px solid
+    #e7edf2;
+
+  background:
+    #fafcfe;
+}
+
+
+.compatibility-readme-top {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    16px;
+
+  margin-bottom:
+    16px;
+}
+
+
+.compatibility-readme-title {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  color:
+    #005aa9;
+}
+
+
+.compatibility-readme-title > div {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+}
+
+
+.compatibility-readme-title strong {
+  color:
+    #1f2937;
+
+  font-size:
+    14px;
+}
+
+
+.compatibility-readme-title span {
+  color:
+    #7b8794;
+
+  font-size:
+    10px;
+}
+
+
+.compatibility-readme-release-label {
+  padding:
+    5px 9px;
+
+  border-radius:
+    6px;
+
+  background:
+    #edf4fa;
+
+  color:
+    #375a78;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+}
+
+
+/* =========================
+   AVISOS LEIA-ME
+   ========================= */
+
+.compatibility-readme-alerts {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    7px;
+
+  margin-bottom:
+    20px;
+}
+
+
+.compatibility-readme-alert {
+  min-height:
+    38px;
+
+  padding:
+    9px 11px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    9px;
+
+  border-left:
+    3px solid
+    #f58220;
+
+  background:
+    #fff8f1;
+
+  color:
+    #74421b;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.45;
+}
+
+
+.compatibility-readme-alert svg {
+  color:
+    #f58220;
+
+  flex:
+    0 0 auto;
+
+  margin-top:
+    1px;
+}
+
+
+/* =========================
+   SEÇÕES DO LEIA-ME
+   ========================= */
+
+.compatibility-readme-section +
+.compatibility-readme-section {
+  margin-top:
+    20px;
+}
+
+
+.compatibility-readme-section h3 {
+  margin:
+    0 0 8px;
+
+  color:
+    #475467;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .05em;
+}
+
+
+/* =========================
+   TABELA LEIA-ME
+   ========================= */
+
+.compatibility-readme-table {
+  border:
+    1px solid
+    #e1e7ec;
+
+  border-radius:
+    9px;
+
+  overflow:
+    hidden;
+
+  background:
+    #ffffff;
+}
+
+
+.compatibility-readme-row {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(
+      220px,
+      .7fr
+    )
+    minmax(
+      0,
+      1.3fr
+    );
+
+  align-items:
+    center;
+
+  min-height:
+    42px;
+
+  border-bottom:
+    1px solid
+    #edf0f3;
+}
+
+
+.compatibility-readme-row:last-child {
+  border-bottom:
+    0;
+}
+
+
+.compatibility-readme-app {
+  padding:
+    8px 12px;
+
+  display:
+    flex;
+
+  align-items:
+    baseline;
+
+  gap:
+    8px;
+
+  min-width:
+    0;
+}
+
+
+.compatibility-readme-app strong {
+  color:
+    #344054;
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+}
+
+
+.compatibility-readme-app span {
+  color:
+    #005aa9;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+}
+
+
+.compatibility-readme-path {
+  min-width:
+    0;
+
+  padding:
+    8px 12px;
+
+  border-left:
+    1px solid
+    #edf0f3;
+
+  color:
+    #667085;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.4;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.compatibility-readme-notes {
+  padding:
+    10px 12px;
+
+  border:
+    1px solid
+    #e1e7ec;
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+}
+
+
+.compatibility-readme-notes p {
+  margin:
+    0;
+
+  color:
+    #667085;
+
+  font-size:
+    11px;
+
+  line-height:
+    1.55;
+}
+
+
+.compatibility-readme-notes p +
+.compatibility-readme-notes p {
+  margin-top:
+    5px;
+}
+
+
+/* =========================
+   GRID DAS VERSÕES
+   ========================= */
+
+.compatibility-view-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        145px,
+        1fr
+      )
+    );
+
+  gap:
+    0;
+
+  padding:
+    0;
+}
+
+
+.compatibility-view-item {
+  min-height:
+    76px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    7px;
+
+  padding:
+    12px 9px;
+
+  border-right:
+    1px solid
+    #edf0f3;
+
+  border-bottom:
+    1px solid
+    #edf0f3;
+
+  text-align:
+    center;
+
+  background:
+    #ffffff;
+
+  transition:
+    background .15s ease;
+}
+
+
+.compatibility-view-item:hover {
+  background:
+    #f8fbfe;
+}
+
+
+.compatibility-view-item strong {
+  color:
+    #475467;
+
+  font-size:
+    11px;
+
+  font-weight:
+    650;
+
+  line-height:
+    1.25;
+}
+
+
+.compatibility-view-item span {
+  color:
+    #005aa9;
+
+  font-size:
+    14px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    -.01em;
+}
+
+
+/* =========================
+   EDITOR DO LEIA-ME
+   ========================= */
+
+.compatibility-readme-editor {
+  margin:
+    16px 20px 0;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    8px;
+}
+
+
+.compatibility-readme-editor label {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    3px;
+}
+
+
+.compatibility-readme-editor label span {
+  color:
+    #344054;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+}
+
+
+.compatibility-readme-editor label small {
+  color:
+    #7b8794;
+
+  font-size:
+    10px;
+}
+
+
+.compatibility-readme-editor textarea {
+  width:
+    100%;
+
+  min-height:
+    180px;
+
+  resize:
+    vertical;
+
+  box-sizing:
+    border-box;
+
+  border:
+    1px solid
+    #d0d5dd;
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    #1f2937;
+
+  padding:
+    12px;
+
+  font-family:
+    inherit;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.55;
+
+  outline:
+    none;
+}
+
+
+.compatibility-readme-editor textarea:focus {
+  border-color:
+    #005aa9;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, .09);
+}
+
+
+/* =========================
+   RESPONSIVO
+   ========================= */
+
+@media (
+  max-width:
+  900px
+) {
+
+  .compatibility-release-picker {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .compatibility-release-summary {
+    min-width:
+      0;
+
+    justify-content:
+      flex-start;
+
+    border-left:
+      0;
+
+    border-top:
+      1px solid
+      #edf0f3;
+  }
+
+
+  .compatibility-readme-row {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .compatibility-readme-path {
+    border-left:
+      0;
+
+    border-top:
+      1px solid
+      #edf0f3;
+  }
+
+}
+
+
+@media (
+  max-width:
+  760px
+) {
+
+  .compatibility-release-picker-main,
+  .compatibility-release-summary {
+    padding:
+      15px;
+  }
+
+
+  .compatibility-release-picker-heading {
+    flex-direction:
+      column;
+
+    align-items:
+      flex-start;
+
+    gap:
+      4px;
+  }
+
+
+  .compatibility-release-picker-main > select {
+    width:
+      100%;
+  }
+
+
+  .compatibility-release-summary {
+    gap:
+      22px;
+
+    flex-wrap:
+      wrap;
+  }
+
+
+  .compatibility-view-heading-row {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .compatibility-view-actions {
+    width:
+      100%;
+  }
+
+
+  .compatibility-view-actions button {
+    flex:
+      1;
+  }
+
+
+  .compatibility-readme-top {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+}
+
+
+/* =========================================================
+   MODO NOTURNO
+   ========================================================= */
+
+html.dark
+.compatibility-release-picker {
+  background:
+    #162131;
+
+  border-color:
+    #263548;
+
+  box-shadow:
+    0 2px 8px
+    rgba(0, 0, 0, .16);
+}
+
+
+html.dark
+.compatibility-release-picker-heading > span {
+  color:
+    #94a3b8;
+}
+
+
+html.dark
+.compatibility-release-picker-heading > strong {
+  color:
+    #f1f5f9;
+}
+
+
+html.dark
+.compatibility-release-picker-main > select {
+  background:
+    #1e293b;
+
+  border-color:
+    #334155;
+
+  color:
+    #f1f5f9;
+}
+
+
+html.dark
+.compatibility-release-picker-main > select:focus {
+  border-color:
+    #60a5fa;
+}
+
+
+html.dark
+.compatibility-release-summary {
+  background:
+    #151f2e;
+
+  border-color:
+    #263548;
+}
+
+
+html.dark
+.compatibility-release-summary-status > span,
+html.dark
+.compatibility-release-summary-version > span {
+  color:
+    #94a3b8;
+}
+
+
+html.dark
+.compatibility-release-summary-version > strong {
+  color:
+    #60a5fa;
+}
+
+
+html.dark
+.compatibility-view-heading-row {
+  background:
+    #162131;
+
+  border-bottom-color:
+    #263548;
+}
+
+
+html.dark
+.compatibility-readme-button {
+  background:
+    #1e293b;
+
+  border-color:
+    #334155;
+
+  color:
+    #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-button:hover,
+html.dark
+.compatibility-readme-button-active {
+  background:
+    #263548;
+
+  border-color:
+    #47749b;
+}
+
+
+html.dark
+.compatibility-readme-modern {
+  background:
+    #151f2e;
+
+  border-bottom-color:
+    #263548;
+}
+
+
+html.dark
+.compatibility-readme-title strong {
+  color:
+    #f1f5f9;
+}
+
+
+html.dark
+.compatibility-readme-title span {
+  color:
+    #94a3b8;
+}
+
+
+html.dark
+.compatibility-readme-release-label {
+  background:
+    #263548;
+
+  color:
+    #cbd5e1;
+}
+
+
+html.dark
+.compatibility-readme-alert {
+  background:
+    rgba(
+      245,
+      130,
+      32,
+      .08
+    );
+
+  color:
+    #f5c795;
+
+  border-left-color:
+    #f58220;
+}
+
+
+html.dark
+.compatibility-readme-section h3 {
+  color:
+    #94a3b8;
+}
+
+
+html.dark
+.compatibility-readme-table,
+html.dark
+.compatibility-readme-notes {
+  background:
+    #1b2737;
+
+  border-color:
+    #2c3b4e;
+}
+
+
+html.dark
+.compatibility-readme-row {
+  border-bottom-color:
+    #2c3b4e;
+}
+
+
+html.dark
+.compatibility-readme-app strong {
+  color:
+    #e2e8f0;
+}
+
+
+html.dark
+.compatibility-readme-app span {
+  color:
+    #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-path {
+  border-color:
+    #2c3b4e;
+
+  color:
+    #a3b0bf;
+}
+
+
+html.dark
+.compatibility-readme-notes p {
+  color:
+    #a3b0bf;
+}
+
+
+html.dark
+.compatibility-view-item {
+  background:
+    #162131;
+
+  border-color:
+    #263548;
+}
+
+
+html.dark
+.compatibility-view-item:hover {
+  background:
+    #1b293b;
+}
+
+
+html.dark
+.compatibility-view-item strong {
+  color:
+    #cbd5e1;
+}
+
+
+html.dark
+.compatibility-view-item span {
+  color:
+    #60a5fa;
+}
+
+
+html.dark
+.compatibility-readme-editor label span {
+  color:
+    #e2e8f0;
+}
+
+
+html.dark
+.compatibility-readme-editor label small {
+  color:
+    #94a3b8;
+}
+
+
+html.dark
+.compatibility-readme-editor textarea {
+  background:
+    #1e293b;
+
+  border-color:
+    #334155;
+
+  color:
+    #f1f5f9;
+}
