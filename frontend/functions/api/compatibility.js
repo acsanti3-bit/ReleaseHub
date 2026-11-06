@@ -7,31 +7,80 @@ import {
   listarCatalogoGlobal,
 } from "./compatibility-systems.js";
 
+
 function respostaErro(
   mensagem,
   status = 500
 ) {
   return Response.json(
-    { erro: mensagem },
-    { status }
+    {
+      erro:
+        mensagem,
+    },
+    {
+      status,
+    }
   );
 }
 
-function normalizarTexto(valor) {
-  return String(valor ?? "")
+
+function normalizarTexto(
+  valor
+) {
+  return String(
+    valor ?? ""
+  )
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+    .replace(
+      /[^a-z0-9]/g,
+      ""
+    );
 }
 
-function normalizarChave(valor) {
-  return String(valor ?? "")
+
+function normalizarChave(
+  valor
+) {
+  return String(
+    valor ?? ""
+  )
     .trim()
-    .replace(/[^a-zA-Z0-9:_-]/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 160);
+    .replace(
+      /[^a-zA-Z0-9:_-]/g,
+      "-"
+    )
+    .replace(
+      /-+/g,
+      "-"
+    )
+    .slice(
+      0,
+      160
+    );
 }
+
+
+function sanitizarReadme(
+  valor
+) {
+  return String(
+    valor ?? ""
+  )
+    .replace(
+      /\r\n/g,
+      "\n"
+    )
+    .slice(
+      0,
+      30000
+    );
+}
+
 
 async function garantirEstrutura(
   context
@@ -48,6 +97,7 @@ async function garantirEstrutura(
     )
     .run();
 
+
   await context.env.DB
     .prepare(
       `
@@ -62,10 +112,25 @@ async function garantirEstrutura(
     )
     .run();
 
+
+  await context.env.DB
+    .prepare(
+      `
+        CREATE TABLE IF NOT EXISTS release_compatibility_readme (
+          environment_id INTEGER PRIMARY KEY,
+          content TEXT NOT NULL DEFAULT '',
+          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `
+    )
+    .run();
+
+
   await garantirCatalogoGlobal(
     context
   );
 }
+
 
 async function buscarAmbiente(
   context,
@@ -88,11 +153,15 @@ async function buscarAmbiente(
           WHERE id = ?
         `
       )
-      .bind(environmentId)
+      .bind(
+        environmentId
+      )
       .first();
+
 
   return row ?? null;
 }
+
 
 function obterVersaoLegada(
   ambiente,
@@ -100,23 +169,37 @@ function obterVersaoLegada(
 ) {
   const mapa = {
     intellicash:
-      ambiente?.intellicash ?? "",
+      ambiente?.intellicash ??
+      "",
+
     easycash:
-      ambiente?.easycash ?? "",
+      ambiente?.easycash ??
+      "",
+
     easycheckout:
-      ambiente?.easycheckout ?? "",
+      ambiente?.easycheckout ??
+      "",
+
     easypdv:
-      ambiente?.easypdv ?? "",
+      ambiente?.easypdv ??
+      "",
+
     intellistock:
-      ambiente?.intellistock ?? "",
+      ambiente?.intellistock ??
+      "",
+
     iwbserver:
-      ambiente?.iwbserver ?? "",
+      ambiente?.iwbserver ??
+      "",
   };
 
+
   return String(
-    mapa[chave] ?? ""
+    mapa[chave] ??
+    ""
   ).trim();
 }
+
 
 async function listarVersoesAmbiente(
   context,
@@ -136,33 +219,46 @@ async function listarVersoesAmbiente(
           ORDER BY ordem, nome
         `
       )
-      .bind(ambiente.id)
+      .bind(
+        ambiente.id
+      )
       .all();
 
-  const mapa = new Map();
+
+  const mapa =
+    new Map();
+
 
   for (
     const sistema of
-    resultado.results ?? []
+    resultado.results ??
+    []
   ) {
     const porChave =
       normalizarTexto(
         sistema.chave
       );
 
+
     const porNome =
       normalizarTexto(
         sistema.nome
       );
 
-    if (porChave) {
+
+    if (
+      porChave
+    ) {
       mapa.set(
         porChave,
         sistema
       );
     }
 
-    if (porNome) {
+
+    if (
+      porNome
+    ) {
       mapa.set(
         porNome,
         sistema
@@ -170,8 +266,10 @@ async function listarVersoesAmbiente(
     }
   }
 
+
   return mapa;
 }
+
 
 function obterVersaoDoAmbiente(
   definicao,
@@ -185,33 +283,50 @@ function obterVersaoDoAmbiente(
     return "";
   }
 
+
   const chaveSemPrefixo =
     definicao.key.startsWith(
       "env:"
     )
-      ? definicao.key.slice(4)
+      ? definicao.key.slice(
+          4
+        )
       : definicao.key;
+
 
   const candidatos = [
     chaveSemPrefixo,
     definicao.originalName,
     definicao.displayName,
   ]
-    .map(normalizarTexto)
-    .filter(Boolean);
+    .map(
+      normalizarTexto
+    )
+    .filter(
+      Boolean
+    );
 
-  for (const candidato of candidatos) {
+
+  for (
+    const candidato of
+    candidatos
+  ) {
     const sistema =
       mapaAmbiente.get(
         candidato
       );
 
-    if (sistema) {
+
+    if (
+      sistema
+    ) {
       return String(
-        sistema.versao ?? ""
+        sistema.versao ??
+        ""
       ).trim();
     }
   }
+
 
   return obterVersaoLegada(
     ambiente,
@@ -219,22 +334,37 @@ function obterVersaoDoAmbiente(
   );
 }
 
-function parseItens(valor) {
-  if (!valor) {
+
+function parseItens(
+  valor
+) {
+  if (
+    !valor
+  ) {
     return [];
   }
+
 
   try {
     const itens =
-      JSON.parse(valor);
+      JSON.parse(
+        valor
+      );
 
-    return Array.isArray(itens)
+
+    return Array.isArray(
+      itens
+    )
       ? itens
       : [];
+
   } catch {
+
     return [];
+
   }
 }
+
 
 function sanitizarOverride(
   item
@@ -244,48 +374,74 @@ function sanitizarOverride(
       item?.key
     );
 
-  if (!key) {
+
+  if (
+    !key
+  ) {
     return null;
   }
+
 
   const versionSource = [
     "environment",
     "redmine",
     "manual",
-  ].includes(item?.versionSource)
+  ].includes(
+    item?.versionSource
+  )
     ? item.versionSource
     : "manual";
 
+
   return {
     key,
+
     selectedVersion:
       String(
-        item?.selectedVersion ?? ""
+        item?.selectedVersion ??
+        ""
       )
         .trim()
-        .slice(0, 120),
+        .slice(
+          0,
+          120
+        ),
+
     versionSource,
+
     visible:
-      item?.visible !== false,
+      item?.visible !==
+      false,
   };
 }
+
 
 function sanitizarOverrides(
   itens,
   chavesPermitidas = null
 ) {
-  const resultado = [];
-  const chaves = new Set();
+  const resultado =
+    [];
 
-  for (const recebido of itens) {
+  const chaves =
+    new Set();
+
+
+  for (
+    const recebido of
+    itens
+  ) {
     const item =
       sanitizarOverride(
         recebido
       );
 
+
     if (
       !item ||
-      chaves.has(item.key) ||
+      chaves.has(
+        item.key
+      ) ||
       (
         chavesPermitidas &&
         !chavesPermitidas.has(
@@ -296,12 +452,21 @@ function sanitizarOverrides(
       continue;
     }
 
-    chaves.add(item.key);
-    resultado.push(item);
+
+    chaves.add(
+      item.key
+    );
+
+
+    resultado.push(
+      item
+    );
   }
+
 
   return resultado;
 }
+
 
 async function buscarConfiguracaoSalva(
   context,
@@ -311,13 +476,17 @@ async function buscarConfiguracaoSalva(
     await context.env.DB
       .prepare(
         `
-          SELECT items_json
+          SELECT
+            items_json
           FROM release_compatibility
           WHERE environment_id = ?
         `
       )
-      .bind(environmentId)
+      .bind(
+        environmentId
+      )
       .first();
+
 
   const itens =
     sanitizarOverrides(
@@ -326,11 +495,45 @@ async function buscarConfiguracaoSalva(
       )
     );
 
+
   return {
-    configured: Boolean(row),
-    items: itens,
+    configured:
+      Boolean(
+        row
+      ),
+
+    items:
+      itens,
   };
 }
+
+
+async function buscarReadme(
+  context,
+  environmentId
+) {
+  const row =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            content
+          FROM release_compatibility_readme
+          WHERE environment_id = ?
+        `
+      )
+      .bind(
+        environmentId
+      )
+      .first();
+
+
+  return String(
+    row?.content ??
+    ""
+  );
+}
+
 
 async function listarVersoesManuais(
   context
@@ -343,34 +546,51 @@ async function listarVersoesManuais(
             system_key,
             version
           FROM compatibility_manual_versions
-          ORDER BY created_at DESC, version DESC
+          ORDER BY
+            created_at DESC,
+            version DESC
         `
       )
       .all();
 
-  const mapa = {};
+
+  const mapa =
+    {};
+
 
   for (
     const row of
-    resultado.results ?? []
+    resultado.results ??
+    []
   ) {
     const chave =
       String(
-        row.system_key ?? ""
+        row.system_key ??
+        ""
       );
 
-    if (!chave) {
+
+    if (
+      !chave
+    ) {
       continue;
     }
 
-    if (!mapa[chave]) {
-      mapa[chave] = [];
+
+    if (
+      !mapa[chave]
+    ) {
+      mapa[chave] =
+        [];
     }
+
 
     const versao =
       String(
-        row.version ?? ""
+        row.version ??
+        ""
       );
+
 
     if (
       versao &&
@@ -384,8 +604,10 @@ async function listarVersoesManuais(
     }
   }
 
+
   return mapa;
 }
+
 
 async function montarResposta(
   context,
@@ -397,31 +619,46 @@ async function montarResposta(
       environmentId
     );
 
-  if (!ambiente) {
+
+  if (
+    !ambiente
+  ) {
     return null;
   }
+
 
   const [
     catalogo,
     mapaAmbiente,
     configuracao,
     manualVersions,
-  ] = await Promise.all([
-    listarCatalogoGlobal(
-      context
-    ),
-    listarVersoesAmbiente(
-      context,
-      ambiente
-    ),
-    buscarConfiguracaoSalva(
-      context,
-      environmentId
-    ),
-    listarVersoesManuais(
-      context
-    ),
-  ]);
+    readme,
+  ] =
+    await Promise.all([
+      listarCatalogoGlobal(
+        context
+      ),
+
+      listarVersoesAmbiente(
+        context,
+        ambiente
+      ),
+
+      buscarConfiguracaoSalva(
+        context,
+        environmentId
+      ),
+
+      listarVersoesManuais(
+        context
+      ),
+
+      buscarReadme(
+        context,
+        environmentId
+      ),
+    ]);
+
 
   const overrides =
     new Map(
@@ -433,98 +670,153 @@ async function montarResposta(
       )
     );
 
+
   const items =
     catalogo
-      .map(definicao => {
-        const ambienteVersao =
-          obterVersaoDoAmbiente(
-            definicao,
-            mapaAmbiente,
-            ambiente
-          );
+      .map(
+        definicao => {
 
-        const override =
-          overrides.get(
-            definicao.key
-          );
+          const ambienteVersao =
+            obterVersaoDoAmbiente(
+              definicao,
+              mapaAmbiente,
+              ambiente
+            );
 
-        const versionSource =
-          override?.versionSource ??
-          (
-            definicao.source ===
+
+          const override =
+            overrides.get(
+              definicao.key
+            );
+
+
+          const versionSource =
+            override?.versionSource ??
+            (
+              definicao.source ===
+                "environment"
+                ? "environment"
+                : definicao.source
+            );
+
+
+          const selectedVersion =
+            versionSource ===
               "environment"
-              ? "environment"
-              : definicao.source
-          );
+              ? ambienteVersao
+              : String(
+                  override
+                    ?.selectedVersion ??
+                  ""
+                ).trim();
 
-        const selectedVersion =
-          versionSource ===
-            "environment"
-            ? ambienteVersao
-            : String(
-                override?.selectedVersion ??
-                ""
-              ).trim();
 
-        return {
-          key:
-            definicao.key,
-          source:
-            definicao.source,
-          originalName:
-            definicao.originalName,
-          displayName:
-            definicao.displayName,
-          environmentVersion:
-            ambienteVersao,
-          selectedVersion,
-          versionSource,
-          redmineProjectId:
-            definicao.redmineProjectId,
-          redmineProjectName:
-            definicao.redmineProjectName,
-          visible:
-            override
-              ? override.visible
-              : definicao.defaultVisible,
-          order:
-            definicao.order,
-          relatedTo: [
-            ...definicao.relatedTo,
-          ],
-        };
-      })
+          return {
+            key:
+              definicao.key,
+
+            source:
+              definicao.source,
+
+            originalName:
+              definicao.originalName,
+
+            displayName:
+              definicao.displayName,
+
+            environmentVersion:
+              ambienteVersao,
+
+            selectedVersion,
+
+            versionSource,
+
+            redmineProjectId:
+              definicao
+                .redmineProjectId,
+
+            redmineProjectName:
+              definicao
+                .redmineProjectName,
+
+            visible:
+              override
+                ? override.visible
+                : definicao
+                    .defaultVisible,
+
+            order:
+              definicao.order,
+
+            relatedTo: [
+              ...definicao
+                .relatedTo,
+            ],
+          };
+        }
+      )
       .sort(
-        (a, b) =>
-          a.order - b.order ||
-          a.displayName.localeCompare(
-            b.displayName,
-            "pt-BR",
-            { sensitivity: "base" }
-          )
+        (
+          a,
+          b
+        ) =>
+          a.order -
+            b.order ||
+          a.displayName
+            .localeCompare(
+              b.displayName,
+              "pt-BR",
+              {
+                sensitivity:
+                  "base",
+              }
+            )
       );
+
 
   return {
     environmentId:
-      Number(ambiente.id),
+      Number(
+        ambiente.id
+      ),
+
     environmentName:
       String(
-        ambiente.nome ?? ""
+        ambiente.nome ??
+        ""
       ),
+
     configured:
-      configuracao.configured,
+      configuracao
+        .configured,
+
     items,
+
     manualVersions,
+
+    readme,
   };
 }
 
+
 const COLUNAS_LEGADAS_AMBIENTE = {
-  intellicash: "intellicash",
-  easycash: "easycash",
-  easycheckout: "easycheckout",
-  easypdv: "easypdv",
-  intellistock: "intellistock",
-  iwbserver: "iwbserver",
+  intellicash:
+    "intellicash",
+
+  easycash:
+    "easycash",
+
+  easycheckout:
+    "easycheckout",
+
+  easypdv:
+    "easypdv",
+
+  intellistock:
+    "intellistock",
+
+  iwbserver:
+    "iwbserver",
 };
 
 
@@ -538,11 +830,15 @@ function chaveAmbienteDaDefinicao(
     return null;
   }
 
-  return definicao.key.startsWith(
-    "env:"
-  )
-    ? definicao.key.slice(4)
-    : definicao.key;
+
+  return definicao.key
+    .startsWith(
+      "env:"
+    )
+      ? definicao.key.slice(
+          4
+        )
+      : definicao.key;
 }
 
 
@@ -554,23 +850,37 @@ function termosProjetoPorChave(
       "intellicash",
       "intelicash",
     ],
-    easycash: ["easycash"],
+
+    easycash: [
+      "easycash",
+    ],
+
     easycheckout: [
       "easycheckout",
     ],
-    easypdv: ["easypdv"],
+
+    easypdv: [
+      "easypdv",
+    ],
+
     intellistock: [
       "intellistock",
       "isa",
     ],
+
     iwbserver: [
       "iwbserver",
       "iwb",
     ],
   };
 
-  return conhecidos[chave] ?? [
-    normalizarTexto(chave),
+
+  return conhecidos[
+    chave
+  ] ?? [
+    normalizarTexto(
+      chave
+    ),
   ];
 }
 
@@ -586,20 +896,32 @@ async function atualizarVersaoNoAmbiente(
       definicao
     );
 
-  if (!chave) {
+
+  if (
+    !chave
+  ) {
     return;
   }
 
+
   const versaoNormalizada =
-    String(versao ?? "")
+    String(
+      versao ??
+      ""
+    )
       .trim()
-      .slice(0, 120);
+      .slice(
+        0,
+        120
+      );
+
 
   await context.env.DB
     .prepare(
       `
         UPDATE release_environment_versions
-        SET versao = ?
+        SET
+          versao = ?
         WHERE environment_id = ?
           AND chave = ?
       `
@@ -611,17 +933,22 @@ async function atualizarVersaoNoAmbiente(
     )
     .run();
 
+
   const colunaLegada =
     COLUNAS_LEGADAS_AMBIENTE[
       chave
     ];
 
-  if (colunaLegada) {
+
+  if (
+    colunaLegada
+  ) {
     await context.env.DB
       .prepare(
         `
           UPDATE release_environments
-          SET ${colunaLegada} = ?
+          SET
+            ${colunaLegada} = ?
           WHERE id = ?
         `
       )
@@ -632,63 +959,83 @@ async function atualizarVersaoNoAmbiente(
       .run();
   }
 
+
   const projetos =
     await context.env.DB
       .prepare(
         `
-          SELECT id, nome
+          SELECT
+            id,
+            nome
           FROM projects
         `
       )
       .all();
+
 
   const termos =
     termosProjetoPorChave(
       chave
     );
 
+
   for (
     const projeto of
-    projetos.results ?? []
+    projetos.results ??
+    []
   ) {
     const nomeProjeto =
       normalizarTexto(
         projeto.nome
       );
 
+
     const corresponde =
-      termos.some(termo => {
-        const normalizado =
-          normalizarTexto(termo);
+      termos.some(
+        termo => {
 
-        if (
-          !normalizado ||
-          !nomeProjeto
-        ) {
-          return false;
-        }
+          const normalizado =
+            normalizarTexto(
+              termo
+            );
 
-        if (
-          normalizado.length <= 3
-        ) {
+
+          if (
+            !normalizado ||
+            !nomeProjeto
+          ) {
+            return false;
+          }
+
+
+          if (
+            normalizado.length <=
+            3
+          ) {
+            return (
+              nomeProjeto ===
+              normalizado
+            );
+          }
+
+
           return (
             nomeProjeto ===
-            normalizado
+              normalizado ||
+            nomeProjeto.includes(
+              normalizado
+            )
           );
         }
+      );
 
-        return (
-          nomeProjeto ===
-            normalizado ||
-          nomeProjeto.includes(
-            normalizado
-          )
-        );
-      });
 
-    if (!corresponde) {
+    if (
+      !corresponde
+    ) {
       continue;
     }
+
 
     await context.env.DB
       .prepare(
@@ -696,7 +1043,8 @@ async function atualizarVersaoNoAmbiente(
           UPDATE release_projects
           SET
             versao = ?,
-            updated_at = CURRENT_TIMESTAMP
+            updated_at =
+              CURRENT_TIMESTAMP
           WHERE environment_id = ?
             AND project_id = ?
         `
@@ -727,11 +1075,16 @@ async function aplicarVersoesDaCompatibilidade(
       )
     );
 
-  for (const override of overrides) {
+
+  for (
+    const override of
+    overrides
+  ) {
     const definicao =
       porChave.get(
         override.key
       );
+
 
     if (
       definicao?.source !==
@@ -739,6 +1092,7 @@ async function aplicarVersoesDaCompatibilidade(
     ) {
       continue;
     }
+
 
     await atualizarVersaoNoAmbiente(
       context,
@@ -757,22 +1111,28 @@ function usuarioPodeEditar(
     "admin",
     "qualidade",
   ].includes(
-    context.data?.usuario?.role
+    context.data
+      ?.usuario
+      ?.role
   );
 }
+
 
 export async function onRequestGet(
   context
 ) {
   try {
+
     await garantirEstrutura(
       context
     );
+
 
     const url =
       new URL(
         context.request.url
       );
+
 
     const environmentId =
       Number(
@@ -781,12 +1141,16 @@ export async function onRequestGet(
         )
       );
 
-    if (!environmentId) {
+
+    if (
+      !environmentId
+    ) {
       return respostaErro(
         "O ambiente é obrigatório.",
         400
       );
     }
+
 
     const resposta =
       await montarResposta(
@@ -794,64 +1158,93 @@ export async function onRequestGet(
         environmentId
       );
 
-    if (!resposta) {
+
+    if (
+      !resposta
+    ) {
       return respostaErro(
         "Ambiente da release não encontrado.",
         404
       );
     }
 
+
     return Response.json(
       resposta
     );
-  } catch (erro) {
+
+  } catch (
+    erro
+  ) {
+
     console.error(
       "Erro ao carregar compatibilidade:",
       erro
     );
 
+
     return respostaErro(
       "Não foi possível carregar a compatibilidade."
     );
+
   }
 }
+
 
 export async function onRequestPut(
   context
 ) {
   try {
-    if (!usuarioPodeEditar(context)) {
+
+    if (
+      !usuarioPodeEditar(
+        context
+      )
+    ) {
       return respostaErro(
         "Seu perfil possui acesso somente para visualização.",
         403
       );
     }
 
+
     await garantirEstrutura(
       context
     );
 
+
     const body =
-      await context.request.json();
+      await context.request
+        .json();
+
 
     const environmentId =
       Number(
         body.environmentId
       );
 
-    if (!environmentId) {
+
+    if (
+      !environmentId
+    ) {
       return respostaErro(
         "O ambiente é obrigatório.",
         400
       );
     }
 
-    if (!Array.isArray(body.items)) {
+
+    if (
+      !Array.isArray(
+        body.items
+      )
+    ) {
       return respostaErro(
         "A lista de compatibilidade é inválida.",
         400
       );
     }
+
 
     const ambiente =
       await buscarAmbiente(
@@ -859,12 +1252,16 @@ export async function onRequestPut(
         environmentId
       );
 
-    if (!ambiente) {
+
+    if (
+      !ambiente
+    ) {
       return respostaErro(
         "Ambiente da release não encontrado.",
         404
       );
     }
+
 
     const anterior =
       await montarResposta(
@@ -872,17 +1269,21 @@ export async function onRequestPut(
         environmentId
       );
 
+
     const catalogo =
       await listarCatalogoGlobal(
         context
       );
 
+
     const chavesPermitidas =
       new Set(
         catalogo.map(
-          item => item.key
+          item =>
+            item.key
         )
       );
+
 
     const overrides =
       sanitizarOverrides(
@@ -890,12 +1291,20 @@ export async function onRequestPut(
         chavesPermitidas
       );
 
+
+    const readme =
+      sanitizarReadme(
+        body.readme
+      );
+
+
     await aplicarVersoesDaCompatibilidade(
       context,
       environmentId,
       catalogo,
       overrides
     );
+
 
     await context.env.DB
       .prepare(
@@ -905,18 +1314,63 @@ export async function onRequestPut(
             items_json,
             updated_at
           )
-          VALUES (?, ?, CURRENT_TIMESTAMP)
+
+          VALUES (
+            ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
+
           ON CONFLICT(environment_id)
+
           DO UPDATE SET
-            items_json = excluded.items_json,
-            updated_at = CURRENT_TIMESTAMP
+            items_json =
+              excluded.items_json,
+
+            updated_at =
+              CURRENT_TIMESTAMP
         `
       )
       .bind(
         environmentId,
-        JSON.stringify(overrides)
+        JSON.stringify(
+          overrides
+        )
       )
       .run();
+
+
+    await context.env.DB
+      .prepare(
+        `
+          INSERT INTO release_compatibility_readme (
+            environment_id,
+            content,
+            updated_at
+          )
+
+          VALUES (
+            ?,
+            ?,
+            CURRENT_TIMESTAMP
+          )
+
+          ON CONFLICT(environment_id)
+
+          DO UPDATE SET
+            content =
+              excluded.content,
+
+            updated_at =
+              CURRENT_TIMESTAMP
+        `
+      )
+      .bind(
+        environmentId,
+        readme
+      )
+      .run();
+
 
     const atual =
       await montarResposta(
@@ -924,57 +1378,82 @@ export async function onRequestPut(
         environmentId
       );
 
+
     await registrarAuditoria(
       context,
       {
-        acao: "EDITAR",
+        acao:
+          "EDITAR",
+
         entidade:
           "compatibilidade",
+
         entidadeId:
           environmentId,
+
         entidadeNome:
           String(
-            ambiente.nome ?? ""
+            ambiente.nome ??
+            ""
           ),
+
         dadosAnteriores:
           anterior,
+
         dadosNovos:
           atual,
       }
     );
 
+
     return Response.json(
       atual
     );
-  } catch (erro) {
+
+  } catch (
+    erro
+  ) {
+
     console.error(
       "Erro ao salvar compatibilidade:",
       erro
     );
 
+
     return respostaErro(
       "Não foi possível salvar a compatibilidade."
     );
+
   }
 }
+
 
 export async function onRequestPost(
   context
 ) {
   try {
-    if (!usuarioPodeEditar(context)) {
+
+    if (
+      !usuarioPodeEditar(
+        context
+      )
+    ) {
       return respostaErro(
         "Seu perfil possui acesso somente para visualização.",
         403
       );
     }
 
+
     await garantirEstrutura(
       context
     );
 
+
     const body =
-      await context.request.json();
+      await context.request
+        .json();
+
 
     if (
       body.action !==
@@ -986,24 +1465,36 @@ export async function onRequestPost(
       );
     }
 
+
     const systemKey =
       normalizarChave(
         body.systemKey
       );
 
+
     const systemName =
       String(
-        body.systemName ?? ""
+        body.systemName ??
+        ""
       )
         .trim()
-        .slice(0, 120);
+        .slice(
+          0,
+          120
+        );
+
 
     const version =
       String(
-        body.version ?? ""
+        body.version ??
+        ""
       )
         .trim()
-        .slice(0, 120);
+        .slice(
+          0,
+          120
+        );
+
 
     if (
       !systemKey ||
@@ -1016,15 +1507,18 @@ export async function onRequestPost(
       );
     }
 
+
     const catalogo =
       await listarCatalogoGlobal(
         context
       );
 
+
     if (
       !catalogo.some(
         item =>
-          item.key === systemKey
+          item.key ===
+          systemKey
       )
     ) {
       return respostaErro(
@@ -1032,6 +1526,7 @@ export async function onRequestPost(
         404
       );
     }
+
 
     await context.env.DB
       .prepare(
@@ -1041,7 +1536,12 @@ export async function onRequestPost(
             system_name,
             version
           )
-          VALUES (?, ?, ?)
+
+          VALUES (
+            ?,
+            ?,
+            ?
+          )
         `
       )
       .bind(
@@ -1051,21 +1551,28 @@ export async function onRequestPost(
       )
       .run();
 
+
     const manualVersions =
       await listarVersoesManuais(
         context
       );
 
+
     await registrarAuditoria(
       context,
       {
-        acao: "CRIAR",
+        acao:
+          "CRIAR",
+
         entidade:
           "versao_compatibilidade",
+
         entidadeId:
           systemKey,
+
         entidadeNome:
           `${systemName} ${version}`,
+
         dadosNovos: {
           systemKey,
           systemName,
@@ -1074,20 +1581,31 @@ export async function onRequestPost(
       }
     );
 
-    return Response.json({
-      versions:
-        manualVersions[
-          systemKey
-        ] ?? [version],
-    });
-  } catch (erro) {
+
+    return Response.json(
+      {
+        versions:
+          manualVersions[
+            systemKey
+          ] ?? [
+            version,
+          ],
+      }
+    );
+
+  } catch (
+    erro
+  ) {
+
     console.error(
       "Erro ao adicionar versão manual:",
       erro
     );
 
+
     return respostaErro(
       "Não foi possível adicionar a versão."
     );
+
   }
 }

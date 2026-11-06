@@ -59,3 +59,12 @@ export interface RedmineVersionOption {
   name: string;
   status?: string;
 }
+
+export interface EnvironmentCompatibility {
+  environmentId: number;
+  environmentName: string;
+  configured: boolean;
+  items: CompatibilityItem[];
+  manualVersions: Record<string, string[]>;
+  readme: string;
+}

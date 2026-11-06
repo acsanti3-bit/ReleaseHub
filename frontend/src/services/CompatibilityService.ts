@@ -10,6 +10,7 @@ import type {
 const API_URL =
   apiUrl("/api/compatibility");
 
+
 async function obterMensagemErro(
   response: Response
 ): Promise<string> {
@@ -27,6 +28,7 @@ async function obterMensagemErro(
     return "Não foi possível concluir a operação.";
   }
 }
+
 
 export async function buscarCompatibilidade(
   environmentId: number
@@ -51,9 +53,11 @@ export async function buscarCompatibilidade(
   return response.json();
 }
 
+
 export async function salvarCompatibilidade(
   environmentId: number,
-  items: CompatibilityItem[]
+  items: CompatibilityItem[],
+  readme: string
 ): Promise<EnvironmentCompatibility> {
   const response =
     await fetch(
@@ -67,6 +71,7 @@ export async function salvarCompatibilidade(
         body: JSON.stringify({
           environmentId,
           items,
+          readme,
         }),
       }
     );
@@ -81,6 +86,7 @@ export async function salvarCompatibilidade(
 
   return response.json();
 }
+
 
 export async function adicionarVersaoManual(
   systemKey: string,
