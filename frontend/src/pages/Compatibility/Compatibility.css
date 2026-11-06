@@ -245,20 +245,27 @@
 }
 
 
-/* ======================================================
-   AMBIENTE DA RELEASE
-   ====================================================== */
+/* AMBIENTE DA RELEASE */
 
 .compatibility-release-context {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(300px, 420px);
+
   min-height: 138px;
+
   overflow: hidden;
+
   border: 1px solid #d9e3ec;
   border-radius: 14px;
+
   background: #fff;
-  box-shadow: 0 4px 14px rgba(16, 24, 40, .055);
+
+  box-shadow:
+    0 4px 14px
+    rgba(16, 24, 40, .055);
 }
 
 .compatibility-release-accent {
@@ -271,6 +278,7 @@
 .compatibility-release-context-main {
   min-width: 0;
   padding: 22px 24px 22px 29px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -278,9 +286,12 @@
 
 .compatibility-release-context-eyebrow {
   margin-bottom: 7px;
+
   color: #667085;
+
   font-size: 10px;
   font-weight: 800;
+
   text-transform: uppercase;
   letter-spacing: .08em;
 }
@@ -294,25 +305,33 @@
 
 .compatibility-release-context-title-row h2 {
   margin: 0;
+
   color: #172033;
+
   font-size: 24px;
   line-height: 1.1;
+
   font-weight: 800;
   letter-spacing: -.025em;
 }
 
 .compatibility-release-context-details {
   margin-top: 10px;
+
   display: flex;
   align-items: center;
+
   gap: 7px;
+
   flex-wrap: wrap;
+
   color: #667085;
   font-size: 11px;
 }
 
 .compatibility-release-context-details strong {
   color: #005aa9;
+
   font-size: 13px;
   font-weight: 800;
 }
@@ -323,33 +342,47 @@
 
 .compatibility-release-switcher {
   padding: 21px 22px;
+
   border-left: 1px solid #edf0f3;
+
   background: #f8fafc;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   gap: 8px;
 }
 
 .compatibility-release-switcher label {
   color: #667085;
+
   font-size: 10px;
   font-weight: 800;
+
   text-transform: uppercase;
+
   letter-spacing: .055em;
 }
 
 .compatibility-release-switcher select {
   width: 100%;
   min-height: 46px;
+
   border: 1px solid #c9d4df;
   border-radius: 9px;
+
   background: #fff;
+
   color: #1f2937;
+
   padding: 0 12px;
+
   font-size: 12px;
   font-weight: 650;
+
   outline: none;
+
   cursor: pointer;
 }
 
@@ -359,14 +392,20 @@
 
 .compatibility-release-switcher select:focus {
   border-color: #005aa9;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, .09);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, .09);
 }
 
 .compatibility-status {
   display: inline-flex;
   align-items: center;
+
   border-radius: 999px;
+
   padding: 5px 10px;
+
   font-size: 10px;
   font-weight: 750;
 }
@@ -382,60 +421,81 @@
 }
 
 
-/* ======================================================
-   COMPATIBILIDADE
-   ====================================================== */
+/* COMPATIBILIDADE */
 
 .compatibility-view-card {
   overflow: hidden;
+
   border: 1px solid #e4e7ec;
   border-radius: 12px;
+
   background: #fff;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, .04);
+
+  box-shadow:
+    0 2px 8px
+    rgba(16, 24, 40, .04);
 }
 
 .compatibility-view-heading-row {
   min-height: 70px;
+
   padding: 15px 18px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 18px;
+
   border-bottom: 1px solid #edf0f3;
+
   background: #fff;
 }
 
 .compatibility-view-title h2 {
   margin: 0;
+
   color: #172033;
+
   font-size: 16px;
 }
 
 .compatibility-view-title p {
   margin: 5px 0 0;
+
   color: #7b8794;
+
   font-size: 11px;
 }
 
 .compatibility-view-actions {
   display: flex;
   align-items: center;
+
   gap: 8px;
 }
 
 .compatibility-readme-button {
   min-height: 42px;
+
   border: 1px solid #c8dced;
   border-radius: 9px;
+
   background: #fff;
+
   color: #005aa9;
+
   padding: 0 14px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 7px;
+
   font-size: 12px;
   font-weight: 750;
+
   cursor: pointer;
 }
 
@@ -446,26 +506,40 @@
 }
 
 
-/* GRID */
+/* GRID DAS VERSÕES */
 
 .compatibility-view-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(145px, 1fr)
+    );
+
   gap: 0;
+
   padding: 0;
 }
 
 .compatibility-view-item {
   min-height: 78px;
+
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
+
   gap: 7px;
+
   padding: 12px 9px;
+
   border-right: 1px solid #edf0f3;
   border-bottom: 1px solid #edf0f3;
+
   text-align: center;
+
   background: #fff;
 }
 
@@ -475,315 +549,528 @@
 
 .compatibility-view-item strong {
   color: #475467;
+
   font-size: 11px;
   font-weight: 650;
+
   line-height: 1.25;
 }
 
 .compatibility-view-item span {
   color: #005aa9;
+
   font-size: 14px;
   font-weight: 850;
 }
 
 
-/* ======================================================
-   LEIA-ME
-   ====================================================== */
+/* LEIA-ME */
+
+.compatibility-readme-wrapper {
+  padding: 16px 20px;
+
+  border-bottom:
+    1px solid #e7edf2;
+
+  background:
+    #f7f9fb;
+
+  display: flex;
+
+  justify-content: center;
+}
+
 
 .compatibility-readme-modern {
-  padding: 20px;
-  border-bottom: 1px solid #e7edf2;
-  background: #fafcfe;
+  width: 100%;
+
+  max-width: 980px;
+
+  max-height: 430px;
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+
+  padding: 15px 17px;
+
+  border:
+    1px solid #e1e7ec;
+
+  border-radius: 10px;
+
+  background: #fff;
+
+  scrollbar-width: thin;
 }
+
 
 .compatibility-readme-top {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+
+  gap: 14px;
+
+  margin-bottom: 12px;
 }
+
 
 .compatibility-readme-title {
   display: flex;
+
   align-items: center;
-  gap: 10px;
+
+  gap: 9px;
+
   color: #005aa9;
 }
 
+
 .compatibility-readme-title > div {
   display: flex;
+
   flex-direction: column;
-  gap: 2px;
+
+  gap: 1px;
 }
+
 
 .compatibility-readme-title strong {
   color: #1f2937;
-  font-size: 14px;
+
+  font-size: 13px;
 }
+
 
 .compatibility-readme-title span {
   color: #7b8794;
-  font-size: 10px;
+
+  font-size: 9.5px;
 }
 
+
 .compatibility-readme-release-label {
-  padding: 5px 9px;
+  padding: 4px 8px;
+
   border-radius: 6px;
+
   background: #edf4fa;
+
   color: #375a78;
-  font-size: 10px;
+
+  font-size: 9.5px;
+
   font-weight: 700;
 }
 
+
 .compatibility-readme-alerts {
   display: flex;
+
   flex-direction: column;
-  gap: 7px;
-  margin-bottom: 20px;
+
+  gap: 5px;
+
+  margin-bottom: 13px;
 }
 
+
 .compatibility-readme-alert {
-  min-height: 38px;
-  padding: 9px 11px;
+  min-height: 30px;
+
+  padding: 7px 9px;
+
   display: flex;
+
   align-items: flex-start;
-  gap: 9px;
-  border-left: 3px solid #f58220;
+
+  gap: 8px;
+
+  border-left:
+    3px solid #f58220;
+
   background: #fff8f1;
+
   color: #74421b;
-  font-size: 11px;
-  line-height: 1.45;
+
+  font-size: 10px;
+
+  line-height: 1.4;
 }
+
 
 .compatibility-readme-alert svg {
   color: #f58220;
+
   flex: 0 0 auto;
+
+  margin-top: 1px;
 }
+
 
 .compatibility-readme-section +
 .compatibility-readme-section {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
+
 .compatibility-readme-section h3 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
+
   color: #475467;
-  font-size: 10px;
+
+  font-size: 9.5px;
+
   font-weight: 800;
+
   text-transform: uppercase;
+
   letter-spacing: .05em;
 }
 
+
 .compatibility-readme-table {
-  border: 1px solid #e1e7ec;
-  border-radius: 9px;
+  width: 100%;
+
+  border:
+    1px solid #e1e7ec;
+
+  border-radius: 8px;
+
   overflow: hidden;
+
   background: #fff;
 }
 
+
 .compatibility-readme-row {
   display: grid;
-  grid-template-columns: minmax(220px, .7fr) minmax(0, 1.3fr);
+
+  grid-template-columns:
+    minmax(210px, 300px)
+    minmax(280px, 1fr);
+
   align-items: center;
-  min-height: 42px;
-  border-bottom: 1px solid #edf0f3;
+
+  min-height: 34px;
+
+  border-bottom:
+    1px solid #edf0f3;
 }
+
 
 .compatibility-readme-row:last-child {
   border-bottom: 0;
 }
 
+
 .compatibility-readme-app {
-  padding: 8px 12px;
+  min-width: 0;
+
+  padding: 6px 9px;
+
   display: flex;
+
   align-items: baseline;
-  gap: 8px;
+
+  gap: 7px;
 }
+
 
 .compatibility-readme-app strong {
   color: #344054;
-  font-size: 11px;
+
+  font-size: 10px;
+
+  font-weight: 700;
 }
+
 
 .compatibility-readme-app span {
   color: #005aa9;
-  font-size: 11px;
+
+  font-size: 10px;
+
   font-weight: 800;
 }
 
+
 .compatibility-readme-path {
-  padding: 8px 12px;
-  border-left: 1px solid #edf0f3;
+  min-width: 0;
+
+  padding: 6px 9px;
+
+  border-left:
+    1px solid #edf0f3;
+
   color: #667085;
-  font-size: 10px;
+
+  font-size: 9.5px;
+
+  line-height: 1.35;
+
   overflow-wrap: anywhere;
 }
 
+
 .compatibility-readme-notes {
-  padding: 10px 12px;
-  border: 1px solid #e1e7ec;
+  padding: 8px 10px;
+
+  border:
+    1px solid #e1e7ec;
+
   border-radius: 8px;
+
   background: #fff;
 }
 
+
 .compatibility-readme-notes p {
   margin: 0;
+
   color: #667085;
-  font-size: 11px;
-  line-height: 1.55;
+
+  font-size: 10px;
+
+  line-height: 1.5;
 }
 
 
-/* ======================================================
-   MODAL
-   ====================================================== */
+.compatibility-readme-notes p +
+.compatibility-readme-notes p {
+  margin-top: 4px;
+}
+
+
+/* MODAL */
 
 .compatibility-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1200;
-  background: rgba(16, 24, 40, .56);
+
+  background:
+    rgba(16, 24, 40, .56);
+
   display: flex;
+
   align-items: center;
   justify-content: center;
+
   padding: 24px;
 }
 
 .compatibility-modal {
-  width: min(1180px, 96vw);
+  width:
+    min(
+      1180px,
+      96vw
+    );
+
   max-height: 92vh;
+
   display: flex;
   flex-direction: column;
+
   border-radius: 14px;
+
   background: #fff;
-  box-shadow: 0 22px 70px rgba(16, 24, 40, .24);
+
+  box-shadow:
+    0 22px 70px
+    rgba(16, 24, 40, .24);
+
   overflow: hidden;
 }
 
 .compatibility-release-modal {
-  width: min(920px, 96vw);
+  width:
+    min(
+      920px,
+      96vw
+    );
 }
 
 .compatibility-modal-header {
   display: flex;
+
   align-items: flex-start;
+
   justify-content: space-between;
+
   gap: 20px;
+
   padding: 20px 22px;
-  border-bottom: 1px solid #e4e7ec;
+
+  border-bottom:
+    1px solid #e4e7ec;
 }
 
 .compatibility-modal-header h2 {
   margin: 0;
+
   color: #1f2937;
+
   font-size: 20px;
 }
 
 .compatibility-modal-header p {
   margin: 5px 0 0;
+
   color: #667085;
+
   font-size: 12px;
 }
 
 .compatibility-modal-close {
   border: 0;
+
   background: transparent;
+
   color: #667085;
+
   cursor: pointer;
+
   padding: 4px;
 }
 
 .compatibility-modal-guidance,
 .compatibility-redmine-warning {
   margin: 12px 20px 0;
+
   padding: 10px 12px;
+
   display: flex;
+
   align-items: flex-start;
+
   gap: 8px;
+
   border-radius: 9px;
+
   font-size: 11px;
+
   line-height: 1.4;
 }
 
 .compatibility-modal-guidance {
-  border: 1px solid #dbe8f5;
+  border:
+    1px solid #dbe8f5;
+
   background: #f7fbff;
+
   color: #526579;
 }
 
 .compatibility-redmine-warning {
-  border: 1px solid #f4d28f;
+  border:
+    1px solid #f4d28f;
+
   background: #fff9eb;
+
   color: #775b18;
 }
 
 .compatibility-editor-list {
   flex: 1;
+
   min-height: 0;
+
   overflow-y: auto;
+
   padding: 18px 20px;
+
   display: flex;
+
   flex-direction: column;
+
   gap: 12px;
 }
 
 .compatibility-editor-item {
-  border: 1px solid #dfe4ea;
+  border:
+    1px solid #dfe4ea;
+
   border-radius: 11px;
+
   padding: 14px;
+
   background: #fff;
 }
 
 .compatibility-editor-item-hidden {
   background: #f8f9fb;
+
   opacity: .78;
 }
 
 .compatibility-editor-item-top,
 .compatibility-release-item-top {
   display: flex;
+
   align-items: flex-start;
+
   justify-content: space-between;
+
   gap: 16px;
+
   margin-bottom: 14px;
 }
 
 .compatibility-editor-heading {
   display: flex;
+
   flex-direction: column;
+
   gap: 7px;
 }
 
 .compatibility-editor-title-line {
   display: flex;
+
   align-items: center;
+
   gap: 8px;
 }
 
 .compatibility-editor-title {
   color: #1f2937;
+
   font-size: 15px;
 }
 
 .compatibility-source-badge {
   display: inline-flex;
+
   border-radius: 999px;
+
   background: #eef4fb;
+
   color: #005aa9;
+
   padding: 3px 7px;
+
   font-size: 9px;
+
   font-weight: 800;
+
   text-transform: uppercase;
 }
 
 .compatibility-visibility-toggle {
   display: inline-flex;
+
   align-items: center;
+
   gap: 7px;
+
   color: #667085;
+
   font-size: 11px;
+
   font-weight: 600;
 }
 
@@ -795,17 +1082,26 @@
 
 .compatibility-order-actions {
   margin-left: auto;
+
   display: flex;
+
   gap: 4px;
 }
 
 .compatibility-order-actions button {
   width: 30px;
+
   height: 30px;
-  border: 1px solid #d0d5dd;
+
+  border:
+    1px solid #d0d5dd;
+
   border-radius: 7px;
+
   background: #fff;
+
   color: #475467;
+
   cursor: pointer;
 }
 
@@ -815,21 +1111,29 @@
 
 .compatibility-editor-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(0, 1fr);
+
   gap: 14px;
 }
 
 .compatibility-editor-fields > label,
 .compatibility-release-version-field {
   display: flex;
+
   flex-direction: column;
+
   gap: 6px;
 }
 
 .compatibility-editor-fields > label > span,
 .compatibility-release-version-field > span {
   color: #475467;
+
   font-size: 11px;
+
   font-weight: 700;
 }
 
@@ -840,114 +1144,175 @@
 .compatibility-new-version input,
 .compatibility-release-version-field > select {
   width: 100%;
+
   min-height: 39px;
-  border: 1px solid #d0d5dd;
+
+  border:
+    1px solid #d0d5dd;
+
   border-radius: 7px;
+
   background: #fff;
+
   color: #1f2937;
+
   padding: 0 10px;
+
   font-size: 12px;
+
   outline: none;
+
   box-sizing: border-box;
 }
 
 .compatibility-project-reference {
   display: block;
+
   margin-top: 5px;
+
   color: #7b8794;
+
   font-size: 10px;
 }
 
 .compatibility-version-actions {
   display: flex;
+
   align-items: center;
+
   gap: 12px;
 }
 
 .compatibility-add-version-link {
   border: 0;
+
   background: transparent;
+
   color: #005aa9;
+
   padding: 0;
+
   font-size: 11px;
+
   font-weight: 700;
+
   cursor: pointer;
 }
 
 .compatibility-new-version {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+
+  grid-template-columns:
+    1fr auto auto;
+
   gap: 6px;
 }
 
 .compatibility-new-version button,
 .compatibility-add-row button {
   min-height: 39px;
-  border: 1px solid #005aa9;
+
+  border:
+    1px solid #005aa9;
+
   border-radius: 7px;
+
   background: #005aa9;
+
   color: #fff;
+
   padding: 0 11px;
+
   font-size: 11px;
+
   font-weight: 700;
+
   cursor: pointer;
 }
 
-.compatibility-new-version .compatibility-new-version-cancel,
+.compatibility-new-version
+.compatibility-new-version-cancel,
 .compatibility-cancel-button {
   border-color: #d0d5dd;
+
   background: #fff;
+
   color: #475467;
 }
 
 .compatibility-relations {
   margin-top: 12px;
-  border-top: 1px solid #eef0f3;
+
+  border-top:
+    1px solid #eef0f3;
+
   padding-top: 10px;
 }
 
 .compatibility-relations summary {
   cursor: pointer;
+
   color: #667085;
+
   font-size: 10px;
 }
 
 .compatibility-relations p {
   color: #7b8794;
+
   font-size: 10px;
 }
 
 .compatibility-relations-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
   gap: 7px 12px;
 }
 
 .compatibility-relations-grid label {
   display: flex;
+
   align-items: center;
+
   gap: 6px;
+
   color: #475467;
+
   font-size: 11px;
 }
 
 .compatibility-add-system {
   margin: 8px 20px 18px;
+
   padding: 16px;
-  border: 1px dashed #b9c5d2;
+
+  border:
+    1px dashed #b9c5d2;
+
   border-radius: 11px;
+
   background: #f9fbfd;
 }
 
 .compatibility-add-system-title {
   display: flex;
+
   gap: 9px;
+
   color: #005aa9;
 }
 
 .compatibility-add-system-title > div {
   display: flex;
+
   flex-direction: column;
+
   gap: 3px;
 }
 
@@ -957,36 +1322,53 @@
 
 .compatibility-add-system-title span {
   color: #667085;
+
   font-size: 10px;
 }
 
 .compatibility-add-source {
   display: flex;
+
   gap: 18px;
+
   margin: 13px 0 10px;
 }
 
 .compatibility-add-source label {
   display: flex;
+
   align-items: center;
+
   gap: 6px;
+
   color: #475467;
+
   font-size: 11px;
+
   font-weight: 700;
 }
 
 .compatibility-add-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+
+  grid-template-columns:
+    1fr auto;
+
   gap: 8px;
 }
 
 .compatibility-modal-footer {
   display: flex;
+
   justify-content: flex-end;
+
   gap: 10px;
+
   padding: 15px 20px;
-  border-top: 1px solid #e4e7ec;
+
+  border-top:
+    1px solid #e4e7ec;
+
   background: #fbfcfd;
 }
 
@@ -995,47 +1377,71 @@
 
 .compatibility-readme-editor {
   margin: 16px 20px 0;
+
   display: flex;
+
   flex-direction: column;
+
   gap: 8px;
 }
 
 .compatibility-readme-editor label {
   display: flex;
+
   flex-direction: column;
+
   gap: 3px;
 }
 
 .compatibility-readme-editor label span {
   color: #344054;
+
   font-size: 12px;
+
   font-weight: 700;
 }
 
 .compatibility-readme-editor label small {
   color: #7b8794;
+
   font-size: 10px;
 }
 
 .compatibility-readme-editor textarea {
   width: 100%;
+
   min-height: 180px;
+
   resize: vertical;
+
   box-sizing: border-box;
-  border: 1px solid #d0d5dd;
+
+  border:
+    1px solid #d0d5dd;
+
   border-radius: 8px;
+
   background: #fff;
+
   color: #1f2937;
+
   padding: 12px;
+
   font-family: inherit;
+
   font-size: 12px;
+
   line-height: 1.55;
+
   outline: none;
 }
 
 .compatibility-readme-editor textarea:focus {
   border-color: #005aa9;
-  box-shadow: 0 0 0 3px rgba(0, 90, 169, .09);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, .09);
 }
 
 
@@ -1043,8 +1449,11 @@
 
 .compatibility-page-empty {
   padding: 42px 20px;
+
   text-align: center;
+
   color: #667085;
+
   font-size: 13px;
 }
 
@@ -1052,101 +1461,151 @@
 /* RESPONSIVO */
 
 @media (max-width: 950px) {
+
   .compatibility-release-context {
     grid-template-columns: 1fr;
   }
 
+
   .compatibility-release-switcher {
     border-left: 0;
-    border-top: 1px solid #edf0f3;
+
+    border-top:
+      1px solid #edf0f3;
   }
+
 }
 
+
 @media (max-width: 760px) {
+
   .compatibility-page {
-    padding: 20px 16px 32px;
+    padding:
+      20px 16px 32px;
   }
+
 
   .compatibility-page-header {
     flex-direction: column;
+
     align-items: stretch;
   }
+
 
   .compatibility-header-actions {
     justify-content: stretch;
   }
 
+
   .compatibility-header-actions > * {
     flex: 1;
   }
 
+
   .compatibility-global-card {
-    grid-template-columns: auto 1fr;
+    grid-template-columns:
+      auto 1fr;
   }
 
+
   .compatibility-global-action {
-    grid-column: 1 / -1;
+    grid-column:
+      1 / -1;
   }
+
 
   .compatibility-release-context-title-row h2 {
     font-size: 20px;
   }
 
+
   .compatibility-view-heading-row {
     flex-direction: column;
+
     align-items: stretch;
   }
+
 
   .compatibility-view-actions {
     width: 100%;
   }
 
+
   .compatibility-view-actions button {
     flex: 1;
   }
 
+
+  .compatibility-readme-wrapper {
+    padding: 12px;
+  }
+
+
+  .compatibility-readme-modern {
+    max-height: 390px;
+
+    padding: 13px;
+  }
+
+
   .compatibility-readme-top {
     flex-direction: column;
+
     align-items: flex-start;
   }
+
 
   .compatibility-readme-row {
     grid-template-columns: 1fr;
   }
 
+
   .compatibility-readme-path {
     border-left: 0;
-    border-top: 1px solid #edf0f3;
+
+    border-top:
+      1px solid #edf0f3;
   }
+
 
   .compatibility-modal-backdrop {
     padding: 0;
   }
 
+
   .compatibility-modal {
     width: 100vw;
+
     height: 100vh;
+
     max-height: 100vh;
+
     border-radius: 0;
   }
+
 
   .compatibility-editor-fields {
     grid-template-columns: 1fr;
   }
 
+
   .compatibility-relations-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
   }
+
 
   .compatibility-new-version {
     grid-template-columns: 1fr;
   }
+
 }
 
 
-/* ======================================================
-   DARK MODE
-   ====================================================== */
+/* DARK MODE */
 
 html.dark .compatibility-page-header {
   border-bottom-color: #26384c;
@@ -1162,6 +1621,7 @@ html.dark .compatibility-page-header p {
 
 html.dark .compatibility-info {
   background: #142235;
+
   border-color: #29415b;
 }
 
@@ -1173,6 +1633,7 @@ html.dark .compatibility-global-card,
 html.dark .compatibility-view-card,
 html.dark .compatibility-release-context {
   background: #162131;
+
   border-color: #263548;
 }
 
@@ -1196,6 +1657,7 @@ html.dark .compatibility-release-context-details strong {
 
 html.dark .compatibility-release-switcher {
   background: #151f2e;
+
   border-color: #263548;
 }
 
@@ -1205,39 +1667,64 @@ html.dark .compatibility-release-switcher label {
 
 html.dark .compatibility-release-switcher select {
   background: #1e293b;
+
   border-color: #334155;
+
   color: #f1f5f9;
 }
 
 html.dark .compatibility-view-heading-row {
   background: #162131;
+
   border-bottom-color: #263548;
 }
 
 html.dark .compatibility-readme-button {
   background: #1e293b;
+
   border-color: #334155;
+
   color: #60a5fa;
+}
+
+html.dark .compatibility-readme-wrapper {
+  background: #111b28;
+
+  border-color: #263548;
 }
 
 html.dark .compatibility-readme-modern {
   background: #151f2e;
+
   border-color: #263548;
 }
 
 html.dark .compatibility-readme-release-label {
   background: #263548;
+
   color: #cbd5e1;
 }
 
 html.dark .compatibility-readme-alert {
-  background: rgba(245, 130, 32, .08);
+  background:
+    rgba(
+      245,
+      130,
+      32,
+      .08
+    );
+
   color: #f5c795;
+}
+
+html.dark .compatibility-readme-section h3 {
+  color: #94a3b8;
 }
 
 html.dark .compatibility-readme-table,
 html.dark .compatibility-readme-notes {
   background: #1b2737;
+
   border-color: #2c3b4e;
 }
 
@@ -1256,11 +1743,17 @@ html.dark .compatibility-view-item span {
 
 html.dark .compatibility-readme-path {
   color: #a3b0bf;
+
   border-color: #2c3b4e;
+}
+
+html.dark .compatibility-readme-notes p {
+  color: #a3b0bf;
 }
 
 html.dark .compatibility-view-item {
   background: #162131;
+
   border-color: #263548;
 }
 
@@ -1295,6 +1788,7 @@ html.dark .compatibility-readme-editor label small {
 
 html.dark .compatibility-editor-item {
   background: #1b2737;
+
   border-color: #2c3b4e;
 }
 
@@ -1308,7 +1802,9 @@ html.dark .compatibility-release-version-field > select,
 html.dark .compatibility-new-version input,
 html.dark .compatibility-readme-editor textarea {
   background: #1e293b;
+
   border-color: #334155;
+
   color: #f1f5f9;
 }
 

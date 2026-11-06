@@ -89,7 +89,6 @@ type ReadmeInterpretado = {
   titulo: string;
   avisos: string[];
   aplicacoes: ReadmeAplicacao[];
-  sincronizadores: ReadmeAplicacao[];
   outros: string[];
 };
 
@@ -177,9 +176,6 @@ function interpretarReadme(
     [];
 
   const aplicacoes: ReadmeAplicacao[] =
-    [];
-
-  const sincronizadores: ReadmeAplicacao[] =
     [];
 
   const outros: string[] =
@@ -294,28 +290,11 @@ function interpretarReadme(
       }
 
 
-      const registro: ReadmeAplicacao = {
+      aplicacoes.push({
         nome,
         versao,
         caminho,
-      };
-
-
-      if (
-        /sinc(?:r|ro)nizador/i.test(
-          nome
-        )
-      ) {
-        sincronizadores.push(
-          registro
-        );
-
-      } else {
-        aplicacoes.push(
-          registro
-        );
-      }
-
+      });
 
       continue;
     }
@@ -331,7 +310,6 @@ function interpretarReadme(
     titulo,
     avisos,
     aplicacoes,
-    sincronizadores,
     outros,
   };
 }
@@ -2645,218 +2623,171 @@ function Compatibility() {
               .readme
               ?.trim() && (
 
-              <div className="compatibility-readme-modern">
+              <div className="compatibility-readme-wrapper">
 
-                <div className="compatibility-readme-top">
+                <div className="compatibility-readme-modern">
 
-                  <div className="compatibility-readme-title">
+                  <div className="compatibility-readme-top">
 
-                    <MdMenuBook
-                      size={20}
-                    />
+                    <div className="compatibility-readme-title">
 
-                    <div>
+                      <MdMenuBook
+                        size={20}
+                      />
 
-                      <strong>
-                        LEIA-ME
-                      </strong>
+                      <div>
 
-                      <span>
-                        Orientações importantes desta release
-                      </span>
+                        <strong>
+                          LEIA-ME
+                        </strong>
+
+                        <span>
+                          Orientações importantes desta release
+                        </span>
+
+                      </div>
 
                     </div>
+
+
+                    {readmeInterpretado
+                      .titulo && (
+                      <span className="compatibility-readme-release-label">
+                        {readmeInterpretado
+                          .titulo}
+                      </span>
+                    )}
 
                   </div>
 
 
                   {readmeInterpretado
-                    .titulo && (
-                    <span className="compatibility-readme-release-label">
+                    .avisos
+                    .length >
+                    0 && (
+
+                    <div className="compatibility-readme-alerts">
+
                       {readmeInterpretado
-                        .titulo}
-                    </span>
+                        .avisos
+                        .map(
+                          (
+                            aviso,
+                            indice
+                          ) => (
+                            <div
+                              key={`${aviso}-${indice}`}
+                              className="compatibility-readme-alert"
+                            >
+                              <MdErrorOutline
+                                size={18}
+                              />
+
+                              <span>
+                                {aviso}
+                              </span>
+                            </div>
+                          )
+                        )}
+
+                    </div>
+                  )}
+
+
+                  {readmeInterpretado
+                    .aplicacoes
+                    .length >
+                    0 && (
+
+                    <div className="compatibility-readme-section">
+
+                      <h3>
+                        Versões e caminhos
+                      </h3>
+
+
+                      <div className="compatibility-readme-table">
+
+                        {readmeInterpretado
+                          .aplicacoes
+                          .map(
+                            (
+                              aplicacao,
+                              indice
+                            ) => (
+                              <div
+                                className="compatibility-readme-row"
+                                key={`${aplicacao.nome}-${indice}`}
+                              >
+
+                                <div className="compatibility-readme-app">
+
+                                  <strong>
+                                    {aplicacao.nome}
+                                  </strong>
+
+                                  {aplicacao
+                                    .versao && (
+                                    <span>
+                                      {aplicacao
+                                        .versao}
+                                    </span>
+                                  )}
+
+                                </div>
+
+
+                                <div className="compatibility-readme-path">
+                                  {aplicacao
+                                    .caminho ||
+                                    "Sem caminho informado"}
+                                </div>
+
+                              </div>
+                            )
+                          )}
+
+                      </div>
+
+                    </div>
+                  )}
+
+
+                  {readmeInterpretado
+                    .outros
+                    .length >
+                    0 && (
+
+                    <div className="compatibility-readme-section">
+
+                      <h3>
+                        Observações
+                      </h3>
+
+
+                      <div className="compatibility-readme-notes">
+
+                        {readmeInterpretado
+                          .outros
+                          .map(
+                            (
+                              texto,
+                              indice
+                            ) => (
+                              <p
+                                key={`${texto}-${indice}`}
+                              >
+                                {texto}
+                              </p>
+                            )
+                          )}
+
+                      </div>
+
+                    </div>
                   )}
 
                 </div>
-
-
-                {readmeInterpretado
-                  .avisos
-                  .length >
-                  0 && (
-
-                  <div className="compatibility-readme-alerts">
-
-                    {readmeInterpretado
-                      .avisos
-                      .map(
-                        (
-                          aviso,
-                          indice
-                        ) => (
-                          <div
-                            key={`${aviso}-${indice}`}
-                            className="compatibility-readme-alert"
-                          >
-                            <MdErrorOutline
-                              size={18}
-                            />
-
-                            <span>
-                              {aviso}
-                            </span>
-                          </div>
-                        )
-                      )}
-
-                  </div>
-                )}
-
-
-                {readmeInterpretado
-                  .aplicacoes
-                  .length >
-                  0 && (
-
-                  <div className="compatibility-readme-section">
-
-                    <h3>
-                      Versões e caminhos
-                    </h3>
-
-
-                    <div className="compatibility-readme-table">
-
-                      {readmeInterpretado
-                        .aplicacoes
-                        .map(
-                          (
-                            aplicacao,
-                            indice
-                          ) => (
-                            <div
-                              className="compatibility-readme-row"
-                              key={`${aplicacao.nome}-${indice}`}
-                            >
-
-                              <div className="compatibility-readme-app">
-
-                                <strong>
-                                  {aplicacao.nome}
-                                </strong>
-
-                                {aplicacao
-                                  .versao && (
-                                  <span>
-                                    {aplicacao
-                                      .versao}
-                                  </span>
-                                )}
-
-                              </div>
-
-
-                              <div className="compatibility-readme-path">
-                                {aplicacao
-                                  .caminho ||
-                                  "Sem caminho informado"}
-                              </div>
-
-                            </div>
-                          )
-                        )}
-
-                    </div>
-
-                  </div>
-                )}
-
-
-                {readmeInterpretado
-                  .sincronizadores
-                  .length >
-                  0 && (
-
-                  <div className="compatibility-readme-section">
-
-                    <h3>
-                      Sincronizadores
-                    </h3>
-
-
-                    <div className="compatibility-readme-table">
-
-                      {readmeInterpretado
-                        .sincronizadores
-                        .map(
-                          (
-                            item,
-                            indice
-                          ) => (
-                            <div
-                              className="compatibility-readme-row"
-                              key={`${item.nome}-${indice}`}
-                            >
-
-                              <div className="compatibility-readme-app">
-
-                                <strong>
-                                  {item.nome}
-                                </strong>
-
-                              </div>
-
-
-                              <div className="compatibility-readme-path">
-                                {item.caminho ||
-                                  item.versao ||
-                                  "Sem caminho informado"}
-                              </div>
-
-                            </div>
-                          )
-                        )}
-
-                    </div>
-
-                  </div>
-                )}
-
-
-                {readmeInterpretado
-                  .outros
-                  .length >
-                  0 && (
-
-                  <div className="compatibility-readme-section">
-
-                    <h3>
-                      Observações
-                    </h3>
-
-
-                    <div className="compatibility-readme-notes">
-
-                      {readmeInterpretado
-                        .outros
-                        .map(
-                          (
-                            texto,
-                            indice
-                          ) => (
-                            <p
-                              key={`${texto}-${indice}`}
-                            >
-                              {texto}
-                            </p>
-                          )
-                        )}
-
-                    </div>
-
-                  </div>
-                )}
 
               </div>
             )}
