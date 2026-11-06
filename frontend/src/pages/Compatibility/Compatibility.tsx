@@ -1932,17 +1932,24 @@ function Compatibility() {
             className={`compatibility-feedback compatibility-feedback-${feedback.tipo}`}
           >
             <div>
+
               {feedback.tipo ===
                 "sucesso" ? (
-                <MdCheckCircle size={21} />
+                <MdCheckCircle
+                  size={21}
+                />
               ) : (
-                <MdErrorOutline size={21} />
+                <MdErrorOutline
+                  size={21}
+                />
               )}
 
               <span>
                 {feedback.texto}
               </span>
+
             </div>
+
 
             <button
               type="button"
@@ -1952,8 +1959,11 @@ function Compatibility() {
                 )
               }
             >
-              <MdClose size={18} />
+              <MdClose
+                size={18}
+              />
             </button>
+
           </div>
         )}
 
@@ -1961,6 +1971,7 @@ function Compatibility() {
         <div className="compatibility-page-header">
 
           <div>
+
             <span className="compatibility-page-eyebrow">
               Sistemas
             </span>
@@ -1972,6 +1983,7 @@ function Compatibility() {
             <p>
               Consulte as versões utilizadas em cada release e as orientações necessárias para atualização.
             </p>
+
           </div>
 
 
@@ -1985,7 +1997,10 @@ function Compatibility() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <MdMenuBook size={19} />
+              <MdMenuBook
+                size={19}
+              />
+
               Abrir Wiki do IntelliCash
             </a>
 
@@ -2001,7 +2016,10 @@ function Compatibility() {
                 carregandoCompatibilidade
               }
             >
-              <MdRefresh size={19} />
+              <MdRefresh
+                size={19}
+              />
+
               Atualizar
             </button>
 
@@ -2012,9 +2030,12 @@ function Compatibility() {
 
         <div className="compatibility-info">
 
-          <MdLink size={22} />
+          <MdLink
+            size={22}
+          />
 
           <div>
+
             <strong>
               Cadastro geral + versão por release
             </strong>
@@ -2022,6 +2043,7 @@ function Compatibility() {
             <span>
               A ordem, os relacionamentos e os sistemas continuam definidos no cadastro geral.
             </span>
+
           </div>
 
         </div>
@@ -2030,7 +2052,9 @@ function Compatibility() {
         <section className="compatibility-global-card">
 
           <div className="compatibility-global-icon">
-            <MdSettings size={24} />
+            <MdSettings
+              size={24}
+            />
           </div>
 
 
@@ -2063,7 +2087,10 @@ function Compatibility() {
                 void abrirConfiguracaoGeral()
               }
             >
-              <MdSettings size={18} />
+              <MdSettings
+                size={18}
+              />
+
               Configurar sistemas
             </button>
           )}
@@ -2112,6 +2139,7 @@ function Compatibility() {
 
 
             {ambienteSelecionado && (
+
               <div className="compatibility-release-context-details">
 
                 <span>
@@ -2134,6 +2162,7 @@ function Compatibility() {
                 </span>
 
               </div>
+
             )}
 
           </div>
@@ -2141,11 +2170,13 @@ function Compatibility() {
 
           <div className="compatibility-release-switcher">
 
-            <label>
+            <label htmlFor="compatibility-environment">
               Trocar release
             </label>
 
+
             <select
+              id="compatibility-environment"
               value={
                 environmentId ??
                 ""
@@ -2160,11 +2191,24 @@ function Compatibility() {
                   )
               }
             >
+
+              {ambientes.length ===
+                0 && (
+                <option value="">
+                  Nenhum ambiente cadastrado
+                </option>
+              )}
+
+
               {ambientes.map(
                 ambiente => (
                   <option
-                    key={ambiente.id}
-                    value={ambiente.id}
+                    key={
+                      ambiente.id
+                    }
+                    value={
+                      ambiente.id
+                    }
                   >
                     {ambiente.nome}
                     {ambiente.concluido
@@ -2173,6 +2217,7 @@ function Compatibility() {
                   </option>
                 )
               )}
+
             </select>
 
           </div>
@@ -2185,6 +2230,7 @@ function Compatibility() {
           <div className="compatibility-view-heading-row">
 
             <div className="compatibility-view-title">
+
               <h2>
                 Compatibilidade da release
               </h2>
@@ -2195,6 +2241,7 @@ function Compatibility() {
                   ?.environmentName ??
                   "este ambiente"}.
               </p>
+
             </div>
 
 
@@ -2212,7 +2259,10 @@ function Compatibility() {
                     )
                   }
                 >
-                  <MdMenuBook size={18} />
+                  <MdMenuBook
+                    size={18}
+                  />
+
                   LEIA-ME
                 </button>
               )}
@@ -2227,7 +2277,10 @@ function Compatibility() {
                     abrirEdicaoRelease
                   }
                 >
-                  <MdTune size={18} />
+                  <MdTune
+                    size={18}
+                  />
+
                   Ajustar versões
                 </button>
               )}
@@ -2244,6 +2297,19 @@ function Compatibility() {
               Carregando compatibilidade...
             </div>
 
+          ) : !compatibilidade ? (
+
+            <div className="compatibility-page-empty">
+              Selecione um ambiente para consultar a compatibilidade.
+            </div>
+
+          ) : itensVisiveis.length ===
+            0 ? (
+
+            <div className="compatibility-page-empty">
+              Nenhum sistema está marcado para exibição nesta release.
+            </div>
+
           ) : (
 
             <div className="compatibility-view-grid">
@@ -2251,9 +2317,12 @@ function Compatibility() {
               {itensVisiveis.map(
                 item => (
                   <div
-                    key={item.key}
+                    key={
+                      item.key
+                    }
                     className="compatibility-view-item"
                   >
+
                     <strong>
                       {item.displayName}
                     </strong>
@@ -2262,6 +2331,7 @@ function Compatibility() {
                       {item.selectedVersion ||
                         "Não informado"}
                     </span>
+
                   </div>
                 )
               )}
@@ -2280,8 +2350,10 @@ function Compatibility() {
 
           <div
             className="compatibility-readme-modal-backdrop"
+            role="presentation"
             onMouseDown={
               evento => {
+
                 if (
                   evento.target ===
                   evento.currentTarget
@@ -2290,93 +2362,99 @@ function Compatibility() {
                     false
                   );
                 }
+
               }
             }
           >
 
-            <section className="compatibility-readme-modal">
+            <section
+              className="compatibility-readme-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="compatibility-readme-title"
+            >
 
               <header className="compatibility-readme-modal-header">
 
-  <div className="compatibility-readme-modal-title">
+                <div className="compatibility-readme-modal-title">
 
-    <div className="compatibility-readme-modal-icon">
-      <MdMenuBook size={21} />
-    </div>
-
-
-    <div className="compatibility-readme-modal-heading">
-
-      <span className="compatibility-readme-modal-eyebrow">
-        LEIA-ME DA RELEASE
-      </span>
+                  <div className="compatibility-readme-modal-icon">
+                    <MdMenuBook
+                      size={21}
+                    />
+                  </div>
 
 
-      <h2>
-        {compatibilidade.environmentName}
-      </h2>
+                  <div className="compatibility-readme-modal-heading">
+
+                    <span className="compatibility-readme-modal-eyebrow">
+                      LEIA-ME DA RELEASE
+                    </span>
 
 
-      <div className="compatibility-readme-modal-versions">
-
-        {ambienteSelecionado
-          ?.versoes
-          .intellicash && (
-
-          <span>
-            <small>IC</small>
-
-            <strong>
-              {ambienteSelecionado
-                .versoes
-                .intellicash}
-            </strong>
-          </span>
-
-        )}
+                    <h2 id="compatibility-readme-title">
+                      {compatibilidade.environmentName}
+                    </h2>
 
 
-        {readmeInterpretado
-          .titulo && (
+                    <div className="compatibility-readme-modal-versions">
 
-          <span className="compatibility-readme-modal-version-text">
-            {readmeInterpretado.titulo}
-          </span>
+                      {ambienteSelecionado
+                        ?.versoes
+                        .intellicash && (
 
-        )}
+                        <span>
 
-      </div>
+                          <small>
+                            IC
+                          </small>
 
-    </div>
+                          <strong>
+                            {ambienteSelecionado
+                              .versoes
+                              .intellicash}
+                          </strong>
 
-  </div>
+                        </span>
+
+                      )}
 
 
-  <button
-    type="button"
-    className="compatibility-readme-modal-close"
-    aria-label="Fechar LEIA-ME"
-    onClick={() =>
-      setReadmeAberto(
-        false
-      )
-    }
-  >
-    <MdClose size={21} />
-  </button>
+                      {readmeInterpretado
+                        .titulo && (
 
-</header>
+                        <span className="compatibility-readme-modal-version-text">
+                          {readmeInterpretado.titulo}
+                        </span>
+
+                      )}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="compatibility-readme-modal-close"
+                  aria-label="Fechar LEIA-ME"
+                  onClick={() =>
+                    setReadmeAberto(
+                      false
+                    )
+                  }
+                >
+                  <MdClose
+                    size={21}
+                  />
+                </button>
+
+              </header>
 
 
               <div className="compatibility-readme-modal-body">
-
-                {readmeInterpretado
-                  .titulo && (
-                  <div className="compatibility-readme-release-label">
-                    {readmeInterpretado.titulo}
-                  </div>
-                )}
-
 
                 {readmeInterpretado
                   .avisos
@@ -2393,82 +2471,97 @@ function Compatibility() {
                           indice
                         ) => (
                           <div
-                            key={indice}
+                            key={`${aviso}-${indice}`}
                             className="compatibility-readme-alert"
                           >
-                            <MdErrorOutline size={18} />
+
+                            <MdErrorOutline
+                              size={18}
+                            />
 
                             <span>
                               {aviso}
                             </span>
+
                           </div>
                         )
                       )}
 
                   </div>
+
                 )}
 
 
-                <div className="compatibility-readme-section">
+                {readmeInterpretado
+                  .aplicacoes
+                  .length >
+                  0 && (
 
-                  <h3>
-                    Versões e caminhos
-                  </h3>
+                  <div className="compatibility-readme-section">
+
+                    <h3>
+                      Versões e caminhos
+                    </h3>
 
 
-                  <div className="compatibility-readme-table">
+                    <div className="compatibility-readme-table">
 
-                    {readmeInterpretado
-                      .aplicacoes
-                      .map(
-                        (
-                          aplicacao,
-                          indice
-                        ) => (
-                          <div
-                            className="compatibility-readme-row"
-                            key={indice}
-                          >
+                      {readmeInterpretado
+                        .aplicacoes
+                        .map(
+                          (
+                            aplicacao,
+                            indice
+                          ) => (
+                            <div
+                              className="compatibility-readme-row"
+                              key={`${aplicacao.nome}-${indice}`}
+                            >
 
-                            <div className="compatibility-readme-app">
+                              <div className="compatibility-readme-app">
 
-                              <strong>
-                                {aplicacao.nome}
-                              </strong>
+                                <strong>
+                                  {aplicacao.nome}
+                                </strong>
 
-                              {aplicacao
-                                .versao && (
-                                <span>
-                                  {aplicacao.versao}
-                                </span>
-                              )}
+
+                                {aplicacao
+                                  .versao && (
+                                  <span>
+                                    {aplicacao.versao}
+                                  </span>
+                                )}
+
+                              </div>
+
+
+                              <div className="compatibility-readme-path">
+                                {aplicacao.caminho ||
+                                  "Sem caminho informado"}
+                              </div>
 
                             </div>
+                          )
+                        )}
 
-
-                            <div className="compatibility-readme-path">
-                              {aplicacao.caminho ||
-                                "Sem caminho informado"}
-                            </div>
-
-                          </div>
-                        )
-                      )}
+                    </div>
 
                   </div>
 
-                </div>
+                )}
 
 
                 {readmeInterpretado
                   .outros
                   .length >
                   0 && (
+
                   <div className="compatibility-readme-section">
 
                     <h3>
                       Observações
                     </h3>
+
 
                     <div className="compatibility-readme-notes">
 
@@ -2479,7 +2572,9 @@ function Compatibility() {
                             texto,
                             indice
                           ) => (
-                            <p key={indice}>
+                            <p
+                              key={`${texto}-${indice}`}
+                            >
                               {texto}
                             </p>
                           )
@@ -2488,6 +2583,7 @@ function Compatibility() {
                     </div>
 
                   </div>
+
                 )}
 
               </div>
@@ -2517,13 +2613,36 @@ function Compatibility() {
 
       {configurandoGeral && (
 
-        <div className="compatibility-modal-backdrop">
+        <div
+          className="compatibility-modal-backdrop"
+          role="presentation"
+          onMouseDown={
+            evento => {
 
-          <section className="compatibility-modal">
+              if (
+                evento.target ===
+                  evento.currentTarget &&
+                !salvando
+              ) {
+                setConfigurandoGeral(
+                  false
+                );
+              }
+
+            }
+          }
+        >
+
+          <section
+            className="compatibility-modal"
+            role="dialog"
+            aria-modal="true"
+          >
 
             <header className="compatibility-modal-header">
 
               <div>
+
                 <h2>
                   Configuração geral dos sistemas
                 </h2>
@@ -2531,19 +2650,26 @@ function Compatibility() {
                 <p>
                   Estas definições são reaproveitadas automaticamente em todas as releases.
                 </p>
+
               </div>
 
 
               <button
                 type="button"
                 className="compatibility-modal-close"
+                aria-label="Fechar"
                 onClick={() =>
                   setConfigurandoGeral(
                     false
                   )
                 }
+                disabled={
+                  salvando
+                }
               >
-                <MdClose size={22} />
+                <MdClose
+                  size={22}
+                />
               </button>
 
             </header>
@@ -2551,7 +2677,9 @@ function Compatibility() {
 
             <div className="compatibility-modal-guidance">
 
-              <MdInfoOutline size={18} />
+              <MdInfoOutline
+                size={18}
+              />
 
               <span>
                 O vínculo com o Redmine é feito pelo ID do projeto.
@@ -2561,15 +2689,19 @@ function Compatibility() {
 
 
             {erroRedmine && (
+
               <div className="compatibility-redmine-warning">
 
-                <MdErrorOutline size={19} />
+                <MdErrorOutline
+                  size={19}
+                />
 
                 <span>
                   {erroRedmine}
                 </span>
 
               </div>
+
             )}
 
 
@@ -2593,7 +2725,9 @@ function Compatibility() {
                   ) => (
 
                     <article
-                      key={item.key}
+                      key={
+                        item.key
+                      }
                       className="compatibility-editor-item"
                     >
 
@@ -2619,7 +2753,9 @@ function Compatibility() {
                                     item.key,
                                     {
                                       defaultVisible:
-                                        evento.target.checked,
+                                        evento
+                                          .target
+                                          .checked,
                                     }
                                   )
                               }
@@ -2637,7 +2773,8 @@ function Compatibility() {
                           <button
                             type="button"
                             disabled={
-                              indice === 0
+                              indice ===
+                              0
                             }
                             onClick={() =>
                               moverCatalogoItem(
@@ -2646,7 +2783,9 @@ function Compatibility() {
                               )
                             }
                           >
-                            <MdKeyboardArrowUp />
+                            <MdKeyboardArrowUp
+                              size={20}
+                            />
                           </button>
 
 
@@ -2654,7 +2793,8 @@ function Compatibility() {
                             type="button"
                             disabled={
                               indice ===
-                              lista.length - 1
+                              lista.length -
+                                1
                             }
                             onClick={() =>
                               moverCatalogoItem(
@@ -2663,12 +2803,15 @@ function Compatibility() {
                               )
                             }
                           >
-                            <MdKeyboardArrowDown />
+                            <MdKeyboardArrowDown
+                              size={20}
+                            />
                           </button>
 
 
                           {item.source !==
                             "environment" && (
+
                             <button
                               type="button"
                               onClick={() =>
@@ -2677,8 +2820,11 @@ function Compatibility() {
                                 )
                               }
                             >
-                              <MdDeleteOutline />
+                              <MdDeleteOutline
+                                size={19}
+                              />
                             </button>
+
                           )}
 
                         </div>
@@ -2689,27 +2835,34 @@ function Compatibility() {
                       <div className="compatibility-editor-fields">
 
                         <label>
+
                           <span>
                             Nome exibido
                           </span>
 
                           <input
-                            value={item.displayName}
+                            value={
+                              item.displayName
+                            }
                             onChange={
                               evento =>
                                 atualizarCatalogoItem(
                                   item.key,
                                   {
                                     displayName:
-                                      evento.target.value,
+                                      evento
+                                        .target
+                                        .value,
                                   }
                                 )
                             }
                           />
+
                         </label>
 
 
                         <label>
+
                           <span>
                             Projeto no Redmine
                           </span>
@@ -2723,22 +2876,36 @@ function Compatibility() {
                               evento =>
                                 alterarProjetoGlobal(
                                   item,
-                                  evento.target.value
+                                  evento
+                                    .target
+                                    .value
                                 )
                             }
+                            disabled={
+                              carregandoRedmine
+                            }
                           >
+
                             <option value="">
                               Sem vínculo
                             </option>
 
+
                             {projetosRedmine.map(
                               projeto => (
+
                                 <option
-                                  key={projeto.id}
-                                  value={projeto.id}
+                                  key={
+                                    projeto.id
+                                  }
+                                  value={
+                                    projeto.id
+                                  }
                                 >
-                                  {projeto.name}
+                                  {projeto.name} — ID{" "}
+                                  {projeto.id}
                                 </option>
+
                               )
                             )}
 
@@ -2766,6 +2933,9 @@ function Compatibility() {
                     false
                   )
                 }
+                disabled={
+                  salvando
+                }
               >
                 Cancelar
               </button>
@@ -2777,9 +2947,19 @@ function Compatibility() {
                 onClick={() =>
                   void salvarConfiguracaoGeral()
                 }
+                disabled={
+                  salvando
+                }
               >
-                <MdSave />
-                Salvar
+
+                <MdSave
+                  size={19}
+                />
+
+                {salvando
+                  ? "Salvando..."
+                  : "Salvar"}
+
               </button>
 
             </footer>
@@ -2787,19 +2967,43 @@ function Compatibility() {
           </section>
 
         </div>
+
       )}
 
 
       {editandoRelease &&
         compatibilidade && (
 
-          <div className="compatibility-modal-backdrop">
+          <div
+            className="compatibility-modal-backdrop"
+            role="presentation"
+            onMouseDown={
+              evento => {
 
-            <section className="compatibility-modal compatibility-release-modal">
+                if (
+                  evento.target ===
+                    evento.currentTarget &&
+                  !salvando
+                ) {
+                  setEditandoRelease(
+                    false
+                  );
+                }
+
+              }
+            }
+          >
+
+            <section
+              className="compatibility-modal compatibility-release-modal"
+              role="dialog"
+              aria-modal="true"
+            >
 
               <header className="compatibility-modal-header">
 
                 <div>
+
                   <h2>
                     Ajustar versões da release
                   </h2>
@@ -2807,19 +3011,26 @@ function Compatibility() {
                   <p>
                     {compatibilidade.environmentName}
                   </p>
+
                 </div>
 
 
                 <button
                   type="button"
                   className="compatibility-modal-close"
+                  aria-label="Fechar"
                   onClick={() =>
                     setEditandoRelease(
                       false
                     )
                   }
+                  disabled={
+                    salvando
+                  }
                 >
-                  <MdClose size={22} />
+                  <MdClose
+                    size={22}
+                  />
                 </button>
 
               </header>
@@ -2827,26 +3038,34 @@ function Compatibility() {
 
               <div className="compatibility-readme-editor">
 
-                <label>
+                <label htmlFor="compatibility-readme-editor">
 
                   <span>
                     LEIA-ME desta release
                   </span>
 
-
-                  <textarea
-                    value={
-                      readmeEdicao
-                    }
-                    onChange={
-                      evento =>
-                        setReadmeEdicao(
-                          evento.target.value
-                        )
-                    }
-                  />
+                  <small>
+                    Cole aqui as instruções que o suporte precisa consultar antes da atualização.
+                  </small>
 
                 </label>
+
+
+                <textarea
+                  id="compatibility-readme-editor"
+                  value={
+                    readmeEdicao
+                  }
+                  onChange={
+                    evento =>
+                      setReadmeEdicao(
+                        evento
+                          .target
+                          .value
+                      )
+                  }
+                  placeholder="Cole aqui o conteúdo do LEIA-ME desta release..."
+                />
 
               </div>
 
@@ -2867,7 +3086,9 @@ function Compatibility() {
                     item => (
 
                       <article
-                        key={item.key}
+                        key={
+                          item.key
+                        }
                         className="compatibility-editor-item"
                       >
 
@@ -2891,7 +3112,9 @@ function Compatibility() {
                                     item.key,
                                     {
                                       visible:
-                                        evento.target.checked,
+                                        evento
+                                          .target
+                                          .checked,
                                     }
                                   )
                               }
@@ -2924,7 +3147,9 @@ function Compatibility() {
                               evento =>
                                 alterarVersaoRelease(
                                   item,
-                                  evento.target.value
+                                  evento
+                                    .target
+                                    .value
                                 )
                             }
                           >
@@ -2941,12 +3166,17 @@ function Compatibility() {
                                 versao,
                                 origem,
                               ]) => (
+
                                 <option
                                   key={`${versao}-${origem}`}
-                                  value={versao}
+                                  value={
+                                    versao
+                                  }
                                 >
-                                  {versao} — {origem}
+                                  {versao} —{" "}
+                                  {origem}
                                 </option>
+
                               )
                             )}
 
@@ -2957,6 +3187,7 @@ function Compatibility() {
                             type="button"
                             className="compatibility-add-version-link"
                             onClick={() => {
+
                               setAdicionandoVersaoPara(
                                 item.key
                               );
@@ -2964,6 +3195,7 @@ function Compatibility() {
                               setNovaVersao(
                                 ""
                               );
+
                             }}
                           >
                             + Adicionar versão
@@ -2979,11 +3211,30 @@ function Compatibility() {
                                 value={
                                   novaVersao
                                 }
+                                placeholder="Ex.: 1.5.006.000"
                                 onChange={
                                   evento =>
                                     setNovaVersao(
-                                      evento.target.value
+                                      evento
+                                        .target
+                                        .value
                                     )
+                                }
+                                onKeyDown={
+                                  evento => {
+
+                                    if (
+                                      evento.key ===
+                                      "Enter"
+                                    ) {
+                                      evento.preventDefault();
+
+                                      void salvarNovaVersao(
+                                        item
+                                      );
+                                    }
+
+                                  }
                                 }
                               />
 
@@ -2997,6 +3248,25 @@ function Compatibility() {
                                 }
                               >
                                 Adicionar
+                              </button>
+
+
+                              <button
+                                type="button"
+                                className="compatibility-new-version-cancel"
+                                onClick={() => {
+
+                                  setAdicionandoVersaoPara(
+                                    null
+                                  );
+
+                                  setNovaVersao(
+                                    ""
+                                  );
+
+                                }}
+                              >
+                                Cancelar
                               </button>
 
                             </div>
@@ -3023,6 +3293,9 @@ function Compatibility() {
                       false
                     )
                   }
+                  disabled={
+                    salvando
+                  }
                 >
                   Cancelar
                 </button>
@@ -3034,9 +3307,19 @@ function Compatibility() {
                   onClick={() =>
                     void salvarRelease()
                   }
+                  disabled={
+                    salvando
+                  }
                 >
-                  <MdSave />
-                  Salvar
+
+                  <MdSave
+                    size={19}
+                  />
+
+                  {salvando
+                    ? "Salvando..."
+                    : "Salvar"}
+
                 </button>
 
               </footer>
