@@ -5,6 +5,10 @@ import {
   useState,
 } from "react";
 
+import type {
+  MouseEvent as ReactMouseEvent,
+} from "react";
+
 import {
   readSheet,
 } from "read-excel-file/browser";
@@ -15,6 +19,7 @@ import {
   MdErrorOutline,
   MdRefresh,
   MdSearch,
+  MdUnfoldMore,
 } from "react-icons/md";
 
 import Layout from "../../components/layout/Layout";
@@ -61,6 +66,45 @@ type DirecaoOrdenacao =
   | "desc";
 
 
+type ColunaTabela =
+  | "cliente"
+  | "documento"
+  | "uf"
+  | "parceiro"
+  | "produto"
+  | "versao"
+  | "licencas";
+
+
+type LargurasColunas = {
+  [key in ColunaTabela]: number;
+};
+
+
+const LARGURAS_INICIAIS:
+  LargurasColunas = {
+    cliente: 340,
+    documento: 180,
+    uf: 75,
+    parceiro: 170,
+    produto: 180,
+    versao: 125,
+    licencas: 130,
+  };
+
+
+const LARGURAS_MINIMAS:
+  LargurasColunas = {
+    cliente: 180,
+    documento: 130,
+    uf: 55,
+    parceiro: 110,
+    produto: 130,
+    versao: 95,
+    licencas: 100,
+  };
+
+
 function textoCelula(
   valor: unknown
 ) {
@@ -75,11 +119,10 @@ function documentoCelula(
 ) {
   return textoCelula(
     valor
-  )
-    .replace(
-      /\D/g,
-      ""
-    );
+  ).replace(
+    /\D/g,
+    ""
+  );
 }
 
 
@@ -148,45 +191,40 @@ function identificarProduto(
 
 
   /*
-   * EXCEÇÕES EXATAS
+   * EXCEÇÕES
    */
 
   if (
-    valor ===
-    "2.0.0.0"
+    valor === "2.0.0.0"
   ) {
     return "IntelliFood Serviço";
   }
 
 
   if (
-    valor ===
-    "2.0.1.0"
+    valor === "2.0.1.0"
   ) {
     return "Easy PDV";
   }
 
 
   if (
-    valor ===
-    "3.0.1.0" ||
-    valor ===
-    "3.0.2.2"
+    valor === "3.0.1.0" ||
+    valor === "3.0.2.2"
   ) {
     return "IntelliCash";
   }
 
 
   if (
-    valor ===
-    "3.0.11.8"
+    valor === "3.0.11.8"
   ) {
     return "Cotação Online Serviço";
   }
 
 
   /*
-   * REGRAS POR PREFIXO
+   * PREFIXOS
    */
 
   if (
@@ -295,9 +333,7 @@ function formatarDocumento(
 function formatarData(
   data: string
 ) {
-  if (
-    !data
-  ) {
+  if (!data) {
     return "-";
   }
 
@@ -435,6 +471,15 @@ function ClientVersions() {
       DirecaoOrdenacao
     >(
       "asc"
+    );
+
+
+  const [
+    largurasColunas,
+    setLargurasColunas,
+  ] =
+    useState<LargurasColunas>(
+      LARGURAS_INICIAIS
     );
 
 
@@ -621,9 +666,6 @@ function ClientVersions() {
                     item.version
                   )
               )
-              .filter(
-                Boolean
-              )
           )
         )
           .sort(
@@ -674,6 +716,70 @@ function ClientVersions() {
               )
           ),
 
+      [
+        clientes,
+      ]
+    );
+
+
+  /*
+   * CLIENTES ÚNICOS
+   *
+   * CPF/CNPJ diferente = cliente diferente.
+   * Se não houver documento, usa o nome.
+   */
+
+  const totalClientes =
+    useMemo(
+      () => {
+
+        const identificadores =
+          new Set<string>();
+
+
+        clientes.forEach(
+          item => {
+
+            const documento =
+              item.document
+                .replace(
+                  /\D/g,
+                  ""
+                );
+
+
+            if (
+              documento
+            ) {
+              identificadores.add(
+                `documento:${documento}`
+              );
+
+              return;
+            }
+
+
+            const nome =
+              item.fantasyName
+                .trim()
+                .toLowerCase();
+
+
+            if (
+              nome
+            ) {
+              identificadores.add(
+                `nome:${nome}`
+              );
+            }
+
+          }
+        );
+
+
+        return identificadores.size;
+
+      },
       [
         clientes,
       ]
@@ -774,7 +880,11 @@ function ClientVersions() {
                     a.fantasyName
                       .localeCompare(
                         b.fantasyName,
-                        "pt-BR"
+                        "pt-BR",
+                        {
+                          numeric:
+                            true,
+                        }
                       );
 
                   break;
@@ -904,25 +1014,159 @@ function ClientVersions() {
     );
 
 
-  const totalVersoesIdentificadas =
-    useMemo(
-      () =>
-        new Set(
-          clientes
-            .map(
-              item =>
-                item.version
-            )
-            .filter(
-              Boolean
-            )
-        )
-          .size,
+  function ordenarPor(
+    campo:
+      CampoOrdenacao
+  ) {
 
-      [
-        clientes,
-      ]
+    if (
+      campoOrdenacao ===
+      campo
+    ) {
+
+      setDirecaoOrdenacao(
+        atual =>
+          atual === "asc"
+            ? "desc"
+            : "asc"
+      );
+
+      return;
+    }
+
+
+    setCampoOrdenacao(
+      campo
     );
+
+
+    setDirecaoOrdenacao(
+      "asc"
+    );
+
+  }
+
+
+  function simboloOrdenacao(
+    campo:
+      CampoOrdenacao
+  ) {
+
+    if (
+      campoOrdenacao !==
+      campo
+    ) {
+      return (
+        <MdUnfoldMore
+          size={15}
+        />
+      );
+    }
+
+
+    return direcaoOrdenacao ===
+      "asc"
+      ? "↑"
+      : "↓";
+  }
+
+
+  function iniciarRedimensionamento(
+    evento:
+      ReactMouseEvent<HTMLButtonElement>,
+    coluna:
+      ColunaTabela
+  ) {
+
+    evento.preventDefault();
+
+    evento.stopPropagation();
+
+
+    const xInicial =
+      evento.clientX;
+
+
+    const larguraInicial =
+      largurasColunas[
+        coluna
+      ];
+
+
+    document.body.style.cursor =
+      "col-resize";
+
+    document.body.style.userSelect =
+      "none";
+
+
+    function mover(
+      eventoMouse:
+        MouseEvent
+    ) {
+
+      const diferenca =
+        eventoMouse.clientX -
+        xInicial;
+
+
+      const largura =
+        Math.max(
+          LARGURAS_MINIMAS[
+            coluna
+          ],
+          larguraInicial +
+            diferenca
+        );
+
+
+      setLargurasColunas(
+        atual => ({
+          ...atual,
+
+          [coluna]:
+            largura,
+        })
+      );
+
+    }
+
+
+    function finalizar() {
+
+      window.removeEventListener(
+        "mousemove",
+        mover
+      );
+
+
+      window.removeEventListener(
+        "mouseup",
+        finalizar
+      );
+
+
+      document.body.style.cursor =
+        "";
+
+      document.body.style.userSelect =
+        "";
+
+    }
+
+
+    window.addEventListener(
+      "mousemove",
+      mover
+    );
+
+
+    window.addEventListener(
+      "mouseup",
+      finalizar
+    );
+
+  }
 
 
   async function importarArquivo(
@@ -1003,10 +1247,8 @@ function ClientVersions() {
 
 
       if (
-        indiceFantasia <
-          0 ||
-        indiceDocumento <
-          0
+        indiceFantasia < 0 ||
+        indiceDocumento < 0
       ) {
         throw new Error(
           "O Excel precisa possuir as colunas Fantasia e CPF/CNPJ."
@@ -1114,25 +1356,31 @@ function ClientVersions() {
         ""
       );
 
+
       setUf(
         ""
       );
+
 
       setParceiro(
         ""
       );
 
+
       setProduto(
         ""
       );
+
 
       setVersao(
         ""
       );
 
+
       setCampoOrdenacao(
         "cliente"
       );
+
 
       setDirecaoOrdenacao(
         "asc"
@@ -1216,16 +1464,19 @@ function ClientVersions() {
                 importando
               }
             >
+
               <MdRefresh
                 size={19}
               />
 
               Atualizar
+
             </button>
 
 
             {podeImportar && (
               <>
+
                 <input
                   ref={
                     inputArquivoRef
@@ -1267,6 +1518,7 @@ function ClientVersions() {
                     importando
                   }
                 >
+
                   <MdCloudUpload
                     size={19}
                   />
@@ -1274,7 +1526,9 @@ function ClientVersions() {
                   {importando
                     ? "Importando..."
                     : "Importar Excel"}
+
                 </button>
+
               </>
             )}
 
@@ -1287,20 +1541,27 @@ function ClientVersions() {
           <div
             className={`client-versions-feedback client-versions-feedback-${feedback.tipo}`}
           >
+
             {feedback.tipo ===
               "sucesso" ? (
+
               <MdCheckCircle
                 size={20}
               />
+
             ) : (
+
               <MdErrorOutline
                 size={20}
               />
+
             )}
+
 
             <span>
               {feedback.texto}
             </span>
+
           </div>
         )}
 
@@ -1308,17 +1569,20 @@ function ClientVersions() {
         <section className="client-versions-summary">
 
           <div>
+
             <span>
-              Registros
+              Clientes
             </span>
 
             <strong>
-              {clientes.length}
+              {totalClientes}
             </strong>
+
           </div>
 
 
           <div>
+
             <span>
               Licenças ativas
             </span>
@@ -1328,32 +1592,26 @@ function ClientVersions() {
                 ?.totalActiveLicenses ??
                 0}
             </strong>
+
           </div>
 
 
           <div>
-            <span>
-              Versões identificadas
-            </span>
 
-            <strong>
-              {totalVersoesIdentificadas}
-            </strong>
-          </div>
-
-
-          <div>
             <span>
               Última importação
             </span>
 
             <strong className="client-versions-summary-date">
+
               {ultimaImportacao
                 ? formatarData(
                     ultimaImportacao.importedAt
                   )
                 : "Nenhuma"}
+
             </strong>
+
           </div>
 
         </section>
@@ -1363,17 +1621,23 @@ function ClientVersions() {
           <div className="client-versions-import-info">
 
             <span>
+
               Arquivo:
               {" "}
+
               <strong>
                 {ultimaImportacao.fileName}
               </strong>
+
             </span>
 
+
             <span>
+
               {ultimaImportacao.totalRows}
               {" "}
-              registros
+              registros importados
+
             </span>
 
           </div>
@@ -1415,20 +1679,24 @@ function ClientVersions() {
                 )
             }
           >
+
             <option value="">
               Todas as UFs
             </option>
 
             {ufs.map(
               item => (
+
                 <option
                   key={item}
                   value={item}
                 >
                   {item}
                 </option>
+
               )
             )}
+
           </select>
 
 
@@ -1443,20 +1711,24 @@ function ClientVersions() {
                 )
             }
           >
+
             <option value="">
               Todos os parceiros
             </option>
 
             {parceiros.map(
               item => (
+
                 <option
                   key={item}
                   value={item}
                 >
                   {item}
                 </option>
+
               )
             )}
+
           </select>
 
 
@@ -1471,20 +1743,24 @@ function ClientVersions() {
                 )
             }
           >
+
             <option value="">
               Todos os produtos
             </option>
 
             {produtos.map(
               item => (
+
                 <option
                   key={item}
                   value={item}
                 >
                   {item}
                 </option>
+
               )
             )}
+
           </select>
 
 
@@ -1499,93 +1775,24 @@ function ClientVersions() {
                 )
             }
           >
+
             <option value="">
               Todas as versões
             </option>
 
             {versoes.map(
               item => (
+
                 <option
                   key={item}
                   value={item}
                 >
                   {item}
                 </option>
+
               )
             )}
-          </select>
 
-        </section>
-
-
-        <section className="client-versions-order">
-
-          <span>
-            Ordenar por
-          </span>
-
-
-          <select
-            value={
-              campoOrdenacao
-            }
-            onChange={
-              evento =>
-                setCampoOrdenacao(
-                  evento.target
-                    .value as CampoOrdenacao
-                )
-            }
-          >
-            <option value="cliente">
-              Cliente
-            </option>
-
-            <option value="documento">
-              CPF/CNPJ
-            </option>
-
-            <option value="uf">
-              UF
-            </option>
-
-            <option value="parceiro">
-              Parceiro
-            </option>
-
-            <option value="produto">
-              Produto
-            </option>
-
-            <option value="versao">
-              Versão
-            </option>
-
-            <option value="licencas">
-              Licenças ativas
-            </option>
-          </select>
-
-
-          <select
-            value={
-              direcaoOrdenacao
-            }
-            onChange={
-              evento =>
-                setDirecaoOrdenacao(
-                  evento.target
-                    .value as DirecaoOrdenacao
-                )
-            }
-          >
-            <option value="asc">
-              Crescente
-            </option>
-
-            <option value="desc">
-              Decrescente
-            </option>
           </select>
 
         </section>
@@ -1594,15 +1801,20 @@ function ClientVersions() {
         <div className="client-versions-filter-summary">
 
           <span>
+
             {clientesFiltrados.length}
             {" "}
             registros encontrados
+
           </span>
 
+
           <strong>
+
             {totalLicencasFiltradas}
             {" "}
             licenças ativas nos filtros atuais
+
           </strong>
 
         </div>
@@ -1634,36 +1846,315 @@ function ClientVersions() {
 
               <table className="client-versions-table">
 
+                <colgroup>
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.cliente,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.documento,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.uf,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.parceiro,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.produto,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.versao,
+                    }}
+                  />
+
+                  <col
+                    style={{
+                      width:
+                        largurasColunas.licencas,
+                    }}
+                  />
+
+                </colgroup>
+
+
                 <thead>
 
                   <tr>
-                    <th>
-                      Cliente
-                    </th>
 
                     <th>
-                      CPF/CNPJ
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "cliente"
+                          )
+                        }
+                      >
+                        Cliente
+
+                        <span>
+                          {simboloOrdenacao(
+                            "cliente"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna Cliente"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "cliente"
+                            )
+                        }
+                      />
+
                     </th>
 
-                    <th>
-                      UF
-                    </th>
 
                     <th>
-                      Parceiro
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "documento"
+                          )
+                        }
+                      >
+                        CPF/CNPJ
+
+                        <span>
+                          {simboloOrdenacao(
+                            "documento"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna CPF/CNPJ"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "documento"
+                            )
+                        }
+                      />
+
                     </th>
 
-                    <th>
-                      Produto
-                    </th>
 
                     <th>
-                      Versão
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "uf"
+                          )
+                        }
+                      >
+                        UF
+
+                        <span>
+                          {simboloOrdenacao(
+                            "uf"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna UF"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "uf"
+                            )
+                        }
+                      />
+
                     </th>
 
+
                     <th>
-                      Licenças ativas
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "parceiro"
+                          )
+                        }
+                      >
+                        Parceiro
+
+                        <span>
+                          {simboloOrdenacao(
+                            "parceiro"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna Parceiro"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "parceiro"
+                            )
+                        }
+                      />
+
                     </th>
+
+
+                    <th>
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "produto"
+                          )
+                        }
+                      >
+                        Produto
+
+                        <span>
+                          {simboloOrdenacao(
+                            "produto"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna Produto"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "produto"
+                            )
+                        }
+                      />
+
+                    </th>
+
+
+                    <th>
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "versao"
+                          )
+                        }
+                      >
+                        Versão
+
+                        <span>
+                          {simboloOrdenacao(
+                            "versao"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna Versão"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "versao"
+                            )
+                        }
+                      />
+
+                    </th>
+
+
+                    <th>
+
+                      <button
+                        type="button"
+                        className="client-versions-sort-button"
+                        onClick={() =>
+                          ordenarPor(
+                            "licencas"
+                          )
+                        }
+                      >
+                        Licenças ativas
+
+                        <span>
+                          {simboloOrdenacao(
+                            "licencas"
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="client-versions-resizer"
+                        aria-label="Redimensionar coluna Licenças"
+                        onMouseDown={
+                          evento =>
+                            iniciarRedimensionamento(
+                              evento,
+                              "licencas"
+                            )
+                        }
+                      />
+
+                    </th>
+
                   </tr>
 
                 </thead>
@@ -1692,41 +2183,53 @@ function ClientVersions() {
                             {cliente.fantasyName}
                           </td>
 
+
                           <td>
                             {formatarDocumento(
                               cliente.document
                             )}
                           </td>
 
+
                           <td>
                             {cliente.state ||
                               "-"}
                           </td>
+
 
                           <td>
                             {cliente.partner ||
                               "-"}
                           </td>
 
+
                           <td>
+
                             <span className="client-versions-product">
                               {produtoCliente}
                             </span>
+
                           </td>
+
 
                           <td>
 
                             {cliente.version ? (
+
                               <span className="client-versions-version">
                                 {cliente.version}
                               </span>
+
                             ) : (
+
                               <span className="client-versions-version-empty">
                                 Não informado
                               </span>
+
                             )}
 
                           </td>
+
 
                           <td className="client-versions-licenses">
                             {cliente.activeLicenses}
