@@ -330,6 +330,11 @@ function Sidebar({
         </NavLink>
 
 
+        <NavLink to="/client-versions">
+          Versões dos Clientes
+        </NavLink>
+
+
         <NavLink to="/isa">
           ISA
         </NavLink>

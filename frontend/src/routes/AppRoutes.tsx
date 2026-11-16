@@ -11,6 +11,7 @@ import {
 
 import ProtectedRoute from "./ProtectedRoute";
 
+
 const Dashboard =
   lazy(
     () =>
@@ -19,6 +20,7 @@ const Dashboard =
       )
   );
 
+
 const TvDashboard =
   lazy(
     () =>
@@ -26,6 +28,7 @@ const TvDashboard =
         "../pages/TvDashboard/TvDashboard"
       )
   );
+
 
 const Settings =
   lazy(
@@ -41,6 +44,15 @@ const Compatibility =
     () =>
       import(
         "../pages/Compatibility/Compatibility"
+      )
+  );
+
+
+const ClientVersions =
+  lazy(
+    () =>
+      import(
+        "../pages/ClientVersions/ClientVersions"
       )
   );
 
@@ -115,6 +127,7 @@ function AppRoutes() {
             }
           />
 
+
           <Route
             path="/tv"
             element={
@@ -127,6 +140,7 @@ function AppRoutes() {
 
             }
           />
+
 
           <Route
             path="/"
@@ -149,6 +163,20 @@ function AppRoutes() {
               <ProtectedRoute>
 
                 <Compatibility />
+
+              </ProtectedRoute>
+
+            }
+          />
+
+
+          <Route
+            path="/client-versions"
+            element={
+
+              <ProtectedRoute>
+
+                <ClientVersions />
 
               </ProtectedRoute>
 
@@ -208,6 +236,7 @@ function AppRoutes() {
             }
           />
 
+
           <Route
             path="/settings"
             element={
@@ -236,5 +265,6 @@ function AppRoutes() {
   );
 
 }
+
 
 export default AppRoutes;
