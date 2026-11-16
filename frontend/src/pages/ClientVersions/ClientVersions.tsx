@@ -1022,28 +1022,6 @@ function ClientVersions() {
     );
 
 
-  const larguraTotalTabela =
-    useMemo(
-      () =>
-        Object.values(
-          largurasColunas
-        )
-          .reduce(
-            (
-              total,
-              largura
-            ) =>
-              total +
-              largura,
-            0
-          ),
-
-      [
-        largurasColunas,
-      ]
-    );
-
-
   function ordenarPor(
     campo:
       CampoOrdenacao
@@ -1836,15 +1814,7 @@ function ClientVersions() {
 
             <div className="client-versions-table-wrapper">
 
-              <table
-                className="client-versions-table"
-                style={{
-                  width:
-                    `${larguraTotalTabela}px`,
-                  minWidth:
-                    `${larguraTotalTabela}px`,
-                }}
-              >
+              <table className="client-versions-table">
 
                 <colgroup>
 
@@ -1982,9 +1952,11 @@ function ClientVersions() {
                         >
 
                           <td>
+
                             <span className="client-versions-name">
                               {cliente.fantasyName}
                             </span>
+
                           </td>
 
 
