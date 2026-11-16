@@ -46,6 +46,21 @@ type Feedback = {
 };
 
 
+type CampoOrdenacao =
+  | "cliente"
+  | "documento"
+  | "uf"
+  | "parceiro"
+  | "produto"
+  | "versao"
+  | "licencas";
+
+
+type DirecaoOrdenacao =
+  | "asc"
+  | "desc";
+
+
 function textoCelula(
   valor: unknown
 ) {
@@ -115,6 +130,129 @@ function licencasCelula(
   return Math.trunc(
     numero
   );
+}
+
+
+function identificarProduto(
+  versao: string
+) {
+  const valor =
+    versao
+      .trim()
+      .toLowerCase();
+
+
+  if (!valor) {
+    return "Não identificado";
+  }
+
+
+  /*
+   * EXCEÇÕES EXATAS
+   */
+
+  if (
+    valor ===
+    "2.0.0.0"
+  ) {
+    return "IntelliFood Serviço";
+  }
+
+
+  if (
+    valor ===
+    "2.0.1.0"
+  ) {
+    return "Easy PDV";
+  }
+
+
+  if (
+    valor ===
+    "3.0.1.0" ||
+    valor ===
+    "3.0.2.2"
+  ) {
+    return "IntelliCash";
+  }
+
+
+  if (
+    valor ===
+    "3.0.11.8"
+  ) {
+    return "Cotação Online Serviço";
+  }
+
+
+  /*
+   * REGRAS POR PREFIXO
+   */
+
+  if (
+    valor.startsWith(
+      "1.0."
+    )
+  ) {
+    return "EasyCheckOut";
+  }
+
+
+  if (
+    valor.startsWith(
+      "1.4."
+    ) ||
+    valor.startsWith(
+      "1.5."
+    )
+  ) {
+    return "EasyCash";
+  }
+
+
+  if (
+    valor.startsWith(
+      "1.8."
+    ) ||
+    valor.startsWith(
+      "1.9."
+    )
+  ) {
+    return "IntelliFood Serviço";
+  }
+
+
+  if (
+    valor.startsWith(
+      "2.1."
+    )
+  ) {
+    return "Easy PDV";
+  }
+
+
+  if (
+    valor.startsWith(
+      "3.1."
+    )
+  ) {
+    return "IntelliCash";
+  }
+
+
+  if (
+    valor.startsWith(
+      "3.2."
+    ) ||
+    valor.startsWith(
+      "3.3."
+    )
+  ) {
+    return "Venda Assistida";
+  }
+
+
+  return "Não identificado";
 }
 
 
@@ -265,10 +403,39 @@ function ClientVersions() {
 
 
   const [
+    produto,
+    setProduto,
+  ] =
+    useState("");
+
+
+  const [
     versao,
     setVersao,
   ] =
     useState("");
+
+
+  const [
+    campoOrdenacao,
+    setCampoOrdenacao,
+  ] =
+    useState<
+      CampoOrdenacao
+    >(
+      "cliente"
+    );
+
+
+  const [
+    direcaoOrdenacao,
+    setDirecaoOrdenacao,
+  ] =
+    useState<
+      DirecaoOrdenacao
+    >(
+      "asc"
+    );
 
 
   const [
@@ -442,6 +609,40 @@ function ClientVersions() {
     );
 
 
+  const produtos =
+    useMemo(
+      () =>
+        Array.from(
+          new Set(
+            clientes
+              .map(
+                item =>
+                  identificarProduto(
+                    item.version
+                  )
+              )
+              .filter(
+                Boolean
+              )
+          )
+        )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              a.localeCompare(
+                b,
+                "pt-BR"
+              )
+          ),
+
+      [
+        clientes,
+      ]
+    );
+
+
   const versoes =
     useMemo(
       () =>
@@ -489,52 +690,186 @@ function ClientVersions() {
             .toLowerCase();
 
 
-        return clientes.filter(
-          item => {
+        const filtrados =
+          clientes.filter(
+            item => {
 
-            const correspondeBusca =
-              !termo ||
-              item.fantasyName
-                .toLowerCase()
-                .includes(
-                  termo
-                ) ||
-              item.document
-                .includes(
-                  termo.replace(
-                    /\D/g,
-                    ""
-                  )
+              const itemProduto =
+                identificarProduto(
+                  item.version
                 );
 
 
-            const correspondeUf =
-              !uf ||
-              item.state ===
-                uf;
+              const correspondeBusca =
+                !termo ||
+                item.fantasyName
+                  .toLowerCase()
+                  .includes(
+                    termo
+                  ) ||
+                item.document
+                  .includes(
+                    termo.replace(
+                      /\D/g,
+                      ""
+                    )
+                  );
 
 
-            const correspondeParceiro =
-              !parceiro ||
-              item.partner ===
-                parceiro;
+              const correspondeUf =
+                !uf ||
+                item.state ===
+                  uf;
 
 
-            const correspondeVersao =
-              !versao ||
-              item.version ===
-                versao;
+              const correspondeParceiro =
+                !parceiro ||
+                item.partner ===
+                  parceiro;
 
 
-            return (
-              correspondeBusca &&
-              correspondeUf &&
-              correspondeParceiro &&
-              correspondeVersao
-            );
+              const correspondeProduto =
+                !produto ||
+                itemProduto ===
+                  produto;
 
-          }
-        );
+
+              const correspondeVersao =
+                !versao ||
+                item.version ===
+                  versao;
+
+
+              return (
+                correspondeBusca &&
+                correspondeUf &&
+                correspondeParceiro &&
+                correspondeProduto &&
+                correspondeVersao
+              );
+
+            }
+          );
+
+
+        return filtrados
+          .slice()
+          .sort(
+            (
+              a,
+              b
+            ) => {
+
+              let comparacao =
+                0;
+
+
+              switch (
+                campoOrdenacao
+              ) {
+
+                case "cliente":
+
+                  comparacao =
+                    a.fantasyName
+                      .localeCompare(
+                        b.fantasyName,
+                        "pt-BR"
+                      );
+
+                  break;
+
+
+                case "documento":
+
+                  comparacao =
+                    a.document
+                      .localeCompare(
+                        b.document,
+                        "pt-BR",
+                        {
+                          numeric:
+                            true,
+                        }
+                      );
+
+                  break;
+
+
+                case "uf":
+
+                  comparacao =
+                    a.state
+                      .localeCompare(
+                        b.state,
+                        "pt-BR"
+                      );
+
+                  break;
+
+
+                case "parceiro":
+
+                  comparacao =
+                    a.partner
+                      .localeCompare(
+                        b.partner,
+                        "pt-BR"
+                      );
+
+                  break;
+
+
+                case "produto":
+
+                  comparacao =
+                    identificarProduto(
+                      a.version
+                    )
+                      .localeCompare(
+                        identificarProduto(
+                          b.version
+                        ),
+                        "pt-BR"
+                      );
+
+                  break;
+
+
+                case "versao":
+
+                  comparacao =
+                    a.version
+                      .localeCompare(
+                        b.version,
+                        undefined,
+                        {
+                          numeric:
+                            true,
+                        }
+                      );
+
+                  break;
+
+
+                case "licencas":
+
+                  comparacao =
+                    a.activeLicenses -
+                    b.activeLicenses;
+
+                  break;
+
+              }
+
+
+              return direcaoOrdenacao ===
+                "asc"
+                ? comparacao
+                : -comparacao;
+
+            }
+          );
 
       },
       [
@@ -542,7 +877,10 @@ function ClientVersions() {
         busca,
         uf,
         parceiro,
+        produto,
         versao,
+        campoOrdenacao,
+        direcaoOrdenacao,
       ]
     );
 
@@ -784,8 +1122,20 @@ function ClientVersions() {
         ""
       );
 
+      setProduto(
+        ""
+      );
+
       setVersao(
         ""
+      );
+
+      setCampoOrdenacao(
+        "cliente"
+      );
+
+      setDirecaoOrdenacao(
+        "asc"
       );
 
 
@@ -847,7 +1197,7 @@ function ClientVersions() {
             </h1>
 
             <p>
-              Consulte versões e quantidade de licenças ativas a partir do relatório importado.
+              Consulte versões, produtos e quantidade de licenças ativas a partir do relatório importado.
             </p>
 
           </div>
@@ -1112,6 +1462,34 @@ function ClientVersions() {
 
           <select
             value={
+              produto
+            }
+            onChange={
+              evento =>
+                setProduto(
+                  evento.target.value
+                )
+            }
+          >
+            <option value="">
+              Todos os produtos
+            </option>
+
+            {produtos.map(
+              item => (
+                <option
+                  key={item}
+                  value={item}
+                >
+                  {item}
+                </option>
+              )
+            )}
+          </select>
+
+
+          <select
+            value={
               versao
             }
             onChange={
@@ -1135,6 +1513,79 @@ function ClientVersions() {
                 </option>
               )
             )}
+          </select>
+
+        </section>
+
+
+        <section className="client-versions-order">
+
+          <span>
+            Ordenar por
+          </span>
+
+
+          <select
+            value={
+              campoOrdenacao
+            }
+            onChange={
+              evento =>
+                setCampoOrdenacao(
+                  evento.target
+                    .value as CampoOrdenacao
+                )
+            }
+          >
+            <option value="cliente">
+              Cliente
+            </option>
+
+            <option value="documento">
+              CPF/CNPJ
+            </option>
+
+            <option value="uf">
+              UF
+            </option>
+
+            <option value="parceiro">
+              Parceiro
+            </option>
+
+            <option value="produto">
+              Produto
+            </option>
+
+            <option value="versao">
+              Versão
+            </option>
+
+            <option value="licencas">
+              Licenças ativas
+            </option>
+          </select>
+
+
+          <select
+            value={
+              direcaoOrdenacao
+            }
+            onChange={
+              evento =>
+                setDirecaoOrdenacao(
+                  evento.target
+                    .value as DirecaoOrdenacao
+                )
+            }
+          >
+            <option value="asc">
+              Crescente
+            </option>
+
+            <option value="desc">
+              Decrescente
+            </option>
           </select>
 
         </section>
@@ -1203,6 +1654,10 @@ function ClientVersions() {
                     </th>
 
                     <th>
+                      Produto
+                    </th>
+
+                    <th>
                       Versão
                     </th>
 
@@ -1217,55 +1672,71 @@ function ClientVersions() {
                 <tbody>
 
                   {clientesFiltrados.map(
-                    cliente => (
+                    cliente => {
 
-                      <tr
-                        key={
-                          cliente.id
-                        }
-                      >
+                      const produtoCliente =
+                        identificarProduto(
+                          cliente.version
+                        );
 
-                        <td className="client-versions-name">
-                          {cliente.fantasyName}
-                        </td>
 
-                        <td>
-                          {formatarDocumento(
-                            cliente.document
-                          )}
-                        </td>
+                      return (
 
-                        <td>
-                          {cliente.state ||
-                            "-"}
-                        </td>
+                        <tr
+                          key={
+                            cliente.id
+                          }
+                        >
 
-                        <td>
-                          {cliente.partner ||
-                            "-"}
-                        </td>
+                          <td className="client-versions-name">
+                            {cliente.fantasyName}
+                          </td>
 
-                        <td>
+                          <td>
+                            {formatarDocumento(
+                              cliente.document
+                            )}
+                          </td>
 
-                          {cliente.version ? (
-                            <span className="client-versions-version">
-                              {cliente.version}
+                          <td>
+                            {cliente.state ||
+                              "-"}
+                          </td>
+
+                          <td>
+                            {cliente.partner ||
+                              "-"}
+                          </td>
+
+                          <td>
+                            <span className="client-versions-product">
+                              {produtoCliente}
                             </span>
-                          ) : (
-                            <span className="client-versions-version-empty">
-                              Não informado
-                            </span>
-                          )}
+                          </td>
 
-                        </td>
+                          <td>
 
-                        <td className="client-versions-licenses">
-                          {cliente.activeLicenses}
-                        </td>
+                            {cliente.version ? (
+                              <span className="client-versions-version">
+                                {cliente.version}
+                              </span>
+                            ) : (
+                              <span className="client-versions-version-empty">
+                                Não informado
+                              </span>
+                            )}
 
-                      </tr>
+                          </td>
 
-                    )
+                          <td className="client-versions-licenses">
+                            {cliente.activeLicenses}
+                          </td>
+
+                        </tr>
+
+                      );
+
+                    }
                   )}
 
                 </tbody>
