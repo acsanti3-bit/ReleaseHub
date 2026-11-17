@@ -3252,57 +3252,35 @@ function TimeManagement() {
 
           <div className="time-management-table-header">
 
-            <button
-              type="button"
-              className="time-management-table-header-toggle"
-              onClick={() =>
-                setDetalhamentoAberto(
-                  atual =>
-                    !atual
-                )
-              }
-              aria-expanded={
-                detalhamentoAberto
-              }
-            >
+            <div className="time-management-table-heading-content">
 
-              <div>
-
-                <span className="time-management-kicker">
-                  Detalhamento
-                </span>
-
-                <h2>
-                  Apontamentos de horas
-                </h2>
-
-                {consultado && (
-
-                  <p>
-                    {apontamentosFiltrados.length}
-                    {" "}
-                    apontamento
-                    {apontamentosFiltrados.length === 1
-                      ? ""
-                      : "s"}
-                    {" "}
-                    encontrado
-                    {apontamentosFiltrados.length === 1
-                      ? ""
-                      : "s"}
-                  </p>
-
-                )}
-
-              </div>
-
-              <span className="time-management-table-collapse-icon">
-                {detalhamentoAberto
-                  ? "▴"
-                  : "▾"}
+              <span className="time-management-kicker">
+                Detalhamento
               </span>
 
-            </button>
+              <h2>
+                Apontamentos de horas
+              </h2>
+
+              {consultado && (
+
+                <p>
+                  {apontamentosFiltrados.length}
+                  {" "}
+                  apontamento
+                  {apontamentosFiltrados.length === 1
+                    ? ""
+                    : "s"}
+                  {" "}
+                  encontrado
+                  {apontamentosFiltrados.length === 1
+                    ? ""
+                    : "s"}
+                </p>
+
+              )}
+
+            </div>
 
 
             {detalhamentoAberto &&
@@ -3331,6 +3309,30 @@ function TimeManagement() {
               </div>
 
             )}
+
+
+            <button
+              type="button"
+              className="time-management-table-collapse-button"
+              onClick={() =>
+                setDetalhamentoAberto(
+                  atual =>
+                    !atual
+                )
+              }
+              aria-expanded={
+                detalhamentoAberto
+              }
+              aria-label={
+                detalhamentoAberto
+                  ? "Recolher apontamentos de horas"
+                  : "Expandir apontamentos de horas"
+              }
+            >
+              {detalhamentoAberto
+                ? "▴"
+                : "▾"}
+            </button>
 
           </div>
 

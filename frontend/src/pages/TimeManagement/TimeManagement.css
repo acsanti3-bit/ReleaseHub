@@ -763,51 +763,63 @@ html.dark
   padding-bottom: 14px;
 }
 
-.time-management-table-header-toggle {
-  display: flex;
-  flex: 1;
+.time-management-table-heading-content {
   min-width: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
 }
 
-.time-management-table-collapse-icon {
-  flex: 0 0 auto;
+.time-management-table-collapse-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  padding: 0;
+  transform: translateY(-50%);
   border: 1px solid #d8e0e8;
   border-radius: 8px;
+  background: #ffffff;
   color: #005aa9;
   font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-.time-management-table-header-toggle:hover
-.time-management-table-collapse-icon {
+.time-management-table-collapse-button:hover {
   border-color: #b8c3ce;
   background: #f5f9fc;
+}
+
+.time-management-table-collapse-button:focus-visible {
+  border-color: #005aa9;
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, 0.10);
 }
 
 .time-management-table-actions {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-left: auto;
+  padding-right: 44px;
 }
 
 .time-management-table-header {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+  min-height: 46px;
   margin-bottom: 14px;
+  padding-right: 44px;
 }
 
 .time-management-table-header h2 {
@@ -1183,7 +1195,7 @@ html.dark .time-management-summary-card.warning strong {
 html.dark .time-management-shortcuts button,
 html.dark .time-management-department-manage,
 html.dark .time-management-project-filter select,
-html.dark .time-management-table-collapse-icon {
+html.dark .time-management-table-collapse-button {
   border-color: #334155;
   background: #151f2e;
   color: #cbd5e1;
