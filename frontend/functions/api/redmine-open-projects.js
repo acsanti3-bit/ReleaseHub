@@ -858,6 +858,7 @@ export async function onRequestGet(
       ![
         "admin",
         "qualidade",
+        "gestor",
       ].includes(
         usuario.role
       )
