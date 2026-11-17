@@ -251,6 +251,115 @@
 }
 
 
+/* ATALHOS E FILTRO DE PROJETO */
+
+.time-management-query-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.time-management-query-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.time-management-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.time-management-shortcuts > span {
+  margin-right: 2px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.time-management-shortcuts button,
+.time-management-department-manage {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid #d8e0e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #44515c;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.time-management-shortcuts button:hover:not(:disabled),
+.time-management-department-manage:hover:not(:disabled) {
+  border-color: #b8c3ce;
+  background: #f8fafc;
+  color: #005aa9;
+}
+
+.time-management-shortcuts button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.time-management-project-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 14px;
+  border-left: 1px solid #e2e8ef;
+}
+
+.time-management-project-filter > span {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.time-management-project-filter select {
+  width: 210px;
+  height: 32px;
+  padding: 0 30px 0 10px;
+  border: 1px solid #d8e0e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 600;
+  outline: none;
+}
+
+.time-management-project-filter select:focus {
+  border-color: #005aa9;
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 90, 169, 0.08);
+}
+
+.time-management-department-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.time-management-department-manage {
+  color: #005aa9;
+}
+
+.time-management-department-manage.danger {
+  border-color: rgba(220, 38, 38, 0.22);
+  color: #c62828;
+}
+
+
 /* ERRO */
 
 .time-management-error {
@@ -270,7 +379,7 @@
   display: grid;
   grid-template-columns:
     repeat(
-      3,
+      4,
       minmax(0, 1fr)
     );
   gap: 12px;
@@ -314,6 +423,23 @@
   color: #17212b;
   font-size: 23px;
   font-weight: 800;
+}
+
+.time-management-summary-card small {
+  display: block;
+  margin-top: 5px;
+  color: #98a2b3;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.time-management-summary-card.warning::before {
+  background: #f58220;
+  opacity: 1;
+}
+
+.time-management-summary-card.warning strong {
+  color: #b54708;
 }
 
 
@@ -375,8 +501,16 @@
 .time-management-distribution-title h3 {
   margin: 0;
   color: #263849;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
+}
+
+.time-management-distribution-title small {
+  display: block;
+  margin-top: 3px;
+  color: #8a98a8;
+  font-size: 10.5px;
+  font-weight: 500;
 }
 
 .time-management-distribution-title span {
@@ -408,8 +542,8 @@
   min-width: 0;
   overflow: hidden;
   color: #44515c;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -417,9 +551,18 @@
 .time-management-distribution-row strong {
   flex: 0 0 auto;
   color: #17212b;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.time-management-distribution-card-full {
+  grid-column: 1 / -1;
+}
+
+.time-management-distribution-card-full
+.time-management-distribution-list {
+  max-height: 260px;
 }
 
 .time-management-distribution-bar {
@@ -448,6 +591,134 @@
 }
 
 
+/* PROJETOS EXPANSÍVEIS */
+
+.time-management-project-list {
+  gap: 8px;
+}
+
+.time-management-project-item {
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.time-management-project-item.expanded {
+  border-color: #cfe0ef;
+  background: #ffffff;
+}
+
+.time-management-project-button {
+  width: 100%;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.time-management-project-button:hover {
+  background: #f2f7fb;
+}
+
+.time-management-project-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.time-management-project-name small {
+  flex: 0 0 auto;
+  color: #8a98a8;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.time-management-project-hours {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-management-project-hours strong {
+  color: #17212b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.time-management-project-chevron {
+  width: 14px;
+  color: #005aa9;
+  font-size: 12px;
+  text-align: center;
+}
+
+.time-management-project-users {
+  margin: 0 8px 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #e6edf3;
+  border-radius: 0 0 8px 8px;
+  background: #f7fafc;
+}
+
+.time-management-project-users-heading {
+  margin-bottom: 9px;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.time-management-project-user +
+.time-management-project-user {
+  margin-top: 8px;
+}
+
+.time-management-project-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.time-management-project-user-row span {
+  min-width: 0;
+  overflow: hidden;
+  color: #44515c;
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.time-management-project-user-row strong {
+  flex: 0 0 auto;
+  color: #005aa9;
+  font-size: 12px;
+}
+
+.time-management-project-user-bar {
+  height: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3eaf1;
+}
+
+.time-management-project-user-bar > div {
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: #5b9bd5;
+}
+
+
 /* TABELA */
 
 .time-management-table-card {
@@ -459,6 +730,49 @@
   box-shadow:
     0 5px 16px
     rgba(15, 23, 42, 0.04);
+}
+
+.time-management-table-card.collapsed {
+  padding-bottom: 14px;
+}
+
+.time-management-table-header-toggle {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.time-management-table-collapse-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d8e0e8;
+  border-radius: 8px;
+  color: #005aa9;
+  font-size: 14px;
+}
+
+.time-management-table-header-toggle:hover
+.time-management-table-collapse-icon {
+  border-color: #b8c3ce;
+  background: #f5f9fc;
+}
+
+.time-management-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .time-management-table-header {
@@ -631,6 +945,19 @@
       1fr;
   }
 
+  .time-management-distribution-card-full {
+    grid-column: auto;
+  }
+
+  .time-management-query-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .time-management-department-actions {
+    justify-content: flex-start;
+  }
+
 }
 
 @media (max-width: 760px) {
@@ -638,6 +965,29 @@
   .time-management-summary {
     grid-template-columns:
       1fr;
+  }
+
+  .time-management-query-controls,
+  .time-management-shortcuts,
+  .time-management-project-filter {
+    width: 100%;
+  }
+
+  .time-management-project-filter {
+    padding-top: 10px;
+    padding-left: 0;
+    border-top: 1px solid #e2e8ef;
+    border-left: 0;
+  }
+
+  .time-management-project-filter select {
+    flex: 1;
+    width: auto;
+  }
+
+  .time-management-table-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .time-management-header h1 {
@@ -791,4 +1141,54 @@ html.dark .time-management-comment {
 
 html.dark .time-management-task-link {
   color: #60a5fa;
+}
+
+html.dark .time-management-summary-card small,
+html.dark .time-management-distribution-title small,
+html.dark .time-management-project-name small {
+  color: #94a3b8;
+}
+
+html.dark .time-management-summary-card.warning strong {
+  color: #fdba74;
+}
+
+html.dark .time-management-shortcuts button,
+html.dark .time-management-department-manage,
+html.dark .time-management-project-filter select,
+html.dark .time-management-table-collapse-icon {
+  border-color: #334155;
+  background: #151f2e;
+  color: #cbd5e1;
+}
+
+html.dark .time-management-project-filter {
+  border-left-color: #334155;
+}
+
+html.dark .time-management-project-filter > span {
+  color: #94a3b8;
+}
+
+html.dark .time-management-project-item.expanded {
+  border-color: #334155;
+  background: #111827;
+}
+
+html.dark .time-management-project-button:hover {
+  background: #1b2737;
+}
+
+html.dark .time-management-project-hours strong,
+html.dark .time-management-project-user-row span {
+  color: #e2e8f0;
+}
+
+html.dark .time-management-project-users {
+  border-top-color: #334155;
+  background: #151f2e;
+}
+
+html.dark .time-management-project-user-bar {
+  background: #334155;
 }

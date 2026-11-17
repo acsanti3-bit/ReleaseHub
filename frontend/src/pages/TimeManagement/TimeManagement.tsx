@@ -154,6 +154,25 @@ function formatarHoras(
 }
 
 
+function normalizarTexto(
+  valor: unknown
+) {
+
+  return String(
+    valor ??
+    ""
+  )
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .trim()
+    .toLowerCase();
+
+}
+
+
 function escaparCsv(
   valor:
     string |
@@ -281,6 +300,18 @@ function TimeManagement() {
     setAtividadeSelecionada,
   ] =
     useState("");
+
+  const [
+    projetoExpandido,
+    setProjetoExpandido,
+  ] =
+    useState("");
+
+  const [
+    detalhamentoAberto,
+    setDetalhamentoAberto,
+  ] =
+    useState(false);
 
 
   const [
@@ -700,6 +731,10 @@ function TimeManagement() {
       ""
     );
 
+    setProjetoExpandido(
+      ""
+    );
+
     try {
 
       await salvarPreferenciaGrupoHoras(
@@ -1069,6 +1104,38 @@ function TimeManagement() {
   }
 
 
+  const projetosDisponiveis =
+    useMemo(() => {
+
+      return Array.from(
+        new Set(
+          apontamentosDoGrupo
+            .map(
+              apontamento =>
+                apontamento.projeto
+                  ?.nome
+                  ?.trim() ||
+                ""
+            )
+            .filter(Boolean)
+        )
+      )
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
+              "pt-BR"
+            )
+        );
+
+    }, [
+      apontamentosDoGrupo,
+    ]);
+
+
   const apontamentosFiltrados =
     useMemo(() => {
 
@@ -1326,6 +1393,59 @@ function TimeManagement() {
     }, [
       apontamentosFiltrados,
     ]);
+
+
+  const mediaHorasPorUsuario =
+    totalUsuarios > 0
+      ? totalHoras /
+        totalUsuarios
+      : 0;
+
+
+  const horasNaoClassificadas =
+    useMemo(() => {
+
+      return apontamentosFiltrados.reduce(
+        (
+          total,
+          apontamento
+        ) => {
+
+          const atividade =
+            normalizarTexto(
+              apontamento.atividade
+                ?.nome
+            );
+
+          const naoClassificada =
+            !atividade ||
+            atividade ===
+              "a classificar";
+
+          return naoClassificada
+            ? total +
+              Number(
+                apontamento.horas ||
+                0
+              )
+            : total;
+
+        },
+        0
+      );
+
+    }, [
+      apontamentosFiltrados,
+    ]);
+
+
+  const percentualNaoClassificadas =
+    totalHoras > 0
+      ? (
+          horasNaoClassificadas /
+          totalHoras
+        ) * 100
+      : 0;
 
 
   const horasPorUsuario =
@@ -1713,6 +1833,14 @@ function TimeManagement() {
         ""
       );
 
+      setProjetoExpandido(
+        ""
+      );
+
+      setDetalhamentoAberto(
+        false
+      );
+
       setCampoOrdenacao(
         "data"
       );
@@ -1901,7 +2029,8 @@ function TimeManagement() {
 
   function renderDistribuicao(
     titulo: string,
-    itens: DistribuicaoItem[]
+    itens: DistribuicaoItem[],
+    classeAdicional = ""
   ) {
 
     const maiorValor =
@@ -1917,7 +2046,14 @@ function TimeManagement() {
 
     return (
 
-      <div className="time-management-distribution-card">
+      <div
+        className={[
+          "time-management-distribution-card",
+          classeAdicional,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
 
         <div className="time-management-distribution-title">
 
@@ -2000,6 +2136,270 @@ function TimeManagement() {
                     />
 
                   </div>
+
+                </div>
+
+              );
+
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  function renderDistribuicaoProjetos() {
+
+    const maiorValor =
+      horasPorProjeto.length > 0
+        ? Math.max(
+            ...horasPorProjeto.map(
+              item =>
+                item.horas
+            )
+          )
+        : 0;
+
+
+    return (
+
+      <div className="time-management-distribution-card time-management-projects-card">
+
+        <div className="time-management-distribution-title">
+
+          <div>
+
+            <h3>
+              Horas por projeto
+            </h3>
+
+            <small>
+              Clique em um projeto para ver as horas por usuário.
+            </small>
+
+          </div>
+
+          <span>
+            {horasPorProjeto.length}
+            {" "}
+            projeto
+            {horasPorProjeto.length === 1
+              ? ""
+              : "s"}
+          </span>
+
+        </div>
+
+
+        <div className="time-management-distribution-list time-management-project-list">
+
+          {horasPorProjeto.map(
+            item => {
+
+              const percentualBarra =
+                maiorValor > 0
+                  ? (
+                      item.horas /
+                      maiorValor
+                    ) * 100
+                  : 0;
+
+              const percentualTotal =
+                totalHoras > 0
+                  ? (
+                      item.horas /
+                      totalHoras
+                    ) * 100
+                  : 0;
+
+              const expandido =
+                projetoExpandido ===
+                item.nome;
+
+              const usuariosProjeto =
+                expandido
+                  ? agruparHoras(
+                      apontamentosFiltrados.filter(
+                        apontamento =>
+                          (
+                            apontamento.projeto
+                              ?.nome
+                              ?.trim() ||
+                            ""
+                          ) ===
+                          item.nome
+                      ),
+                      apontamento =>
+                        apontamento.usuario
+                          ?.nome ||
+                        ""
+                    )
+                  : [];
+
+              const maiorUsuario =
+                usuariosProjeto.length > 0
+                  ? Math.max(
+                      ...usuariosProjeto.map(
+                        usuario =>
+                          usuario.horas
+                      )
+                    )
+                  : 0;
+
+
+              return (
+
+                <div
+                  key={
+                    item.nome
+                  }
+                  className={
+                    expandido
+                      ? "time-management-project-item expanded"
+                      : "time-management-project-item"
+                  }
+                >
+
+                  <button
+                    type="button"
+                    className="time-management-project-button"
+                    onClick={() =>
+                      setProjetoExpandido(
+                        atual =>
+                          atual === item.nome
+                            ? ""
+                            : item.nome
+                      )
+                    }
+                    aria-expanded={
+                      expandido
+                    }
+                  >
+
+                    <div className="time-management-distribution-row">
+
+                      <span
+                        className="time-management-distribution-name time-management-project-name"
+                        title={
+                          item.nome
+                        }
+                      >
+                        {item.nome}
+
+                        <small>
+                          {percentualTotal.toLocaleString(
+                            "pt-BR",
+                            {
+                              minimumFractionDigits: 1,
+                              maximumFractionDigits: 1,
+                            }
+                          )}
+                          % do total
+                        </small>
+                      </span>
+
+                      <span className="time-management-project-hours">
+
+                        <strong>
+                          {formatarHoras(
+                            item.horas
+                          )}
+                        </strong>
+
+                        <span className="time-management-project-chevron">
+                          {expandido
+                            ? "▴"
+                            : "▾"}
+                        </span>
+
+                      </span>
+
+                    </div>
+
+
+                    <div className="time-management-distribution-bar">
+
+                      <div
+                        className="time-management-distribution-progress"
+                        style={{
+                          width:
+                            `${percentualBarra}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </button>
+
+
+                  {expandido && (
+
+                    <div className="time-management-project-users">
+
+                      <div className="time-management-project-users-heading">
+                        Horas por usuário neste projeto
+                      </div>
+
+                      {usuariosProjeto.map(
+                        usuario => {
+
+                          const percentualUsuario =
+                            maiorUsuario > 0
+                              ? (
+                                  usuario.horas /
+                                  maiorUsuario
+                                ) * 100
+                              : 0;
+
+                          return (
+
+                            <div
+                              key={
+                                usuario.nome
+                              }
+                              className="time-management-project-user"
+                            >
+
+                              <div className="time-management-project-user-row">
+
+                                <span>
+                                  {usuario.nome}
+                                </span>
+
+                                <strong>
+                                  {formatarHoras(
+                                    usuario.horas
+                                  )}
+                                </strong>
+
+                              </div>
+
+                              <div className="time-management-project-user-bar">
+
+                                <div
+                                  style={{
+                                    width:
+                                      `${percentualUsuario}%`,
+                                  }}
+                                />
+
+                              </div>
+
+                            </div>
+
+                          );
+
+                        }
+                      )}
+
+                    </div>
+
+                  )}
 
                 </div>
 
@@ -2205,59 +2605,117 @@ function TimeManagement() {
 
           <div className="time-management-query-footer">
 
-            <div className="time-management-shortcuts">
+            <div className="time-management-query-controls">
 
-              <span>
-                Atalhos:
-              </span>
+              <div className="time-management-shortcuts">
 
-              <button
-                type="button"
-                onClick={
-                  consultarHoje
-                }
-                disabled={
-                  carregando
-                }
-              >
-                Hoje
-              </button>
+                <span>
+                  Atalhos:
+                </span>
 
-              <button
-                type="button"
-                onClick={
-                  consultarEstaSemana
-                }
-                disabled={
-                  carregando
-                }
-              >
-                Esta semana
-              </button>
+                <button
+                  type="button"
+                  onClick={
+                    consultarHoje
+                  }
+                  disabled={
+                    carregando
+                  }
+                >
+                  Hoje
+                </button>
 
-              <button
-                type="button"
-                onClick={
-                  consultarEsteMes
-                }
-                disabled={
-                  carregando
-                }
-              >
-                Este mês
-              </button>
+                <button
+                  type="button"
+                  onClick={
+                    consultarEstaSemana
+                  }
+                  disabled={
+                    carregando
+                  }
+                >
+                  Esta semana
+                </button>
 
-              <button
-                type="button"
-                onClick={
-                  consultarMesAnterior
-                }
-                disabled={
-                  carregando
-                }
-              >
-                Mês anterior
-              </button>
+                <button
+                  type="button"
+                  onClick={
+                    consultarEsteMes
+                  }
+                  disabled={
+                    carregando
+                  }
+                >
+                  Este mês
+                </button>
+
+                <button
+                  type="button"
+                  onClick={
+                    consultarMesAnterior
+                  }
+                  disabled={
+                    carregando
+                  }
+                >
+                  Mês anterior
+                </button>
+
+              </div>
+
+
+              {consultado &&
+                projetosDisponiveis.length > 0 && (
+
+                <label className="time-management-project-filter">
+
+                  <span>
+                    Projeto
+                  </span>
+
+                  <select
+                    value={
+                      projetoSelecionado
+                    }
+                    onChange={
+                      event => {
+                        setProjetoSelecionado(
+                          event.target.value
+                        );
+
+                        setProjetoExpandido(
+                          ""
+                        );
+                      }
+                    }
+                  >
+
+                    <option value="">
+                      Todos os projetos
+                    </option>
+
+                    {projetosDisponiveis.map(
+                      projeto => (
+
+                        <option
+                          key={
+                            projeto
+                          }
+                          value={
+                            projeto
+                          }
+                        >
+                          {projeto}
+                        </option>
+
+                      )
+                    )}
+
+                  </select>
+
+                </label>
+
+              )}
 
             </div>
 
@@ -2371,24 +2829,9 @@ function TimeManagement() {
               </span>
 
               <strong>
-
                 {formatarHoras(
                   totalHoras
                 )}
-
-              </strong>
-
-            </div>
-
-
-            <div className="time-management-summary-card">
-
-              <span>
-                Usuários
-              </span>
-
-              <strong>
-                {totalUsuarios}
               </strong>
 
             </div>
@@ -2403,6 +2846,62 @@ function TimeManagement() {
               <strong>
                 {totalTarefas}
               </strong>
+
+            </div>
+
+
+            <div className="time-management-summary-card">
+
+              <span>
+                Média por usuário
+              </span>
+
+              <strong>
+                {formatarHoras(
+                  mediaHorasPorUsuario
+                )}
+              </strong>
+
+              <small>
+                considerando {totalUsuarios}
+                {" "}
+                usuário
+                {totalUsuarios === 1
+                  ? ""
+                  : "s"}
+              </small>
+
+            </div>
+
+
+            <div
+              className={
+                horasNaoClassificadas > 0
+                  ? "time-management-summary-card warning"
+                  : "time-management-summary-card"
+              }
+            >
+
+              <span>
+                Horas não classificadas
+              </span>
+
+              <strong>
+                {formatarHoras(
+                  horasNaoClassificadas
+                )}
+              </strong>
+
+              <small>
+                {percentualNaoClassificadas.toLocaleString(
+                  "pt-BR",
+                  {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1,
+                  }
+                )}
+                % do total
+              </small>
 
             </div>
 
@@ -2430,8 +2929,8 @@ function TimeManagement() {
 
                 <p>
 
-                  {usuarioSelecionado
-                    ? `Detalhamento das horas de ${usuarioSelecionado}.`
+                  {projetoSelecionado
+                    ? `Análise concentrada no projeto ${projetoSelecionado}.`
                     : grupoSelecionado
                       ? `Veja a distribuição das horas do departamento ${grupoSelecionado.nome}.`
                       : "Veja onde as horas estão concentradas no período selecionado."}
@@ -2445,26 +2944,20 @@ function TimeManagement() {
 
             <div className="time-management-distribution-grid">
 
-              {usuarioSelecionado
-                ? renderDistribuicao(
-                    "Horas por projeto",
-                    horasPorProjeto
-                  )
-                : renderDistribuicao(
-                    "Horas por usuário",
-                    horasPorUsuario
-                  )}
+              {renderDistribuicao(
+                "Horas por usuário",
+                horasPorUsuario
+              )}
 
 
-              {usuarioSelecionado
-                ? renderDistribuicao(
-                    "Horas por atividade",
-                    horasPorAtividade
-                  )
-                : renderDistribuicao(
-                    "Horas por projeto",
-                    horasPorProjeto
-                  )}
+              {renderDistribuicaoProjetos()}
+
+
+              {renderDistribuicao(
+                "Horas por atividade",
+                horasPorAtividade,
+                "time-management-distribution-card-full"
+              )}
 
             </div>
 
@@ -2473,42 +2966,71 @@ function TimeManagement() {
         )}
 
 
-        <section className="time-management-table-card">
+        <section
+          className={
+            detalhamentoAberto
+              ? "time-management-table-card open"
+              : "time-management-table-card collapsed"
+          }
+        >
 
           <div className="time-management-table-header">
 
-            <div>
+            <button
+              type="button"
+              className="time-management-table-header-toggle"
+              onClick={() =>
+                setDetalhamentoAberto(
+                  atual =>
+                    !atual
+                )
+              }
+              aria-expanded={
+                detalhamentoAberto
+              }
+            >
 
-              <span className="time-management-kicker">
-                Detalhamento
+              <div>
+
+                <span className="time-management-kicker">
+                  Detalhamento
+                </span>
+
+                <h2>
+                  Apontamentos de horas
+                </h2>
+
+                {consultado && (
+
+                  <p>
+                    {apontamentosFiltrados.length}
+                    {" "}
+                    apontamento
+                    {apontamentosFiltrados.length === 1
+                      ? ""
+                      : "s"}
+                    {" "}
+                    encontrado
+                    {apontamentosFiltrados.length === 1
+                      ? ""
+                      : "s"}
+                  </p>
+
+                )}
+
+              </div>
+
+              <span className="time-management-table-collapse-icon">
+                {detalhamentoAberto
+                  ? "▴"
+                  : "▾"}
               </span>
 
-              <h2>
-                Apontamentos de horas
-              </h2>
-
-              {consultado && (
-
-                <p>
-                  {apontamentosFiltrados.length}
-                  {" "}
-                  apontamento
-                  {apontamentosFiltrados.length === 1
-                    ? ""
-                    : "s"}
-                  {" "}
-                  encontrado
-                  {apontamentosFiltrados.length === 1
-                    ? ""
-                    : "s"}
-                </p>
-
-              )}
-
-            </div>
+            </button>
 
 
-            {consultado &&
+            {detalhamentoAberto &&
+              consultado &&
               apontamentos.length > 0 && (
 
               <div className="time-management-table-actions">
@@ -2536,6 +3058,8 @@ function TimeManagement() {
 
           </div>
 
+
+          {detalhamentoAberto && (
 
           <div className="time-management-table-wrapper">
 
@@ -2861,6 +3385,8 @@ function TimeManagement() {
             </table>
 
           </div>
+
+          )}
 
         </section>
 
