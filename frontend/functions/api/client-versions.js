@@ -28,6 +28,7 @@ function respostaJson(
     JSON.stringify(data),
     {
       status,
+
       headers:
         corsHeaders(context),
     }
@@ -118,6 +119,47 @@ function sanitizarLicencas(
 }
 
 
+async function garantirColunaProduto(
+  context
+) {
+  const resultado =
+    await context.env.DB
+      .prepare(
+        `
+          PRAGMA table_info(client_versions)
+        `
+      )
+      .all();
+
+
+  const colunas =
+    resultado.results ??
+    [];
+
+
+  const possuiProduto =
+    colunas.some(
+      coluna =>
+        coluna.name ===
+        "product"
+    );
+
+
+  if (
+    !possuiProduto
+  ) {
+    await context.env.DB
+      .prepare(
+        `
+          ALTER TABLE client_versions
+          ADD COLUMN product TEXT NOT NULL DEFAULT ''
+        `
+      )
+      .run();
+  }
+}
+
+
 async function garantirTabelas(
   context
 ) {
@@ -152,6 +194,8 @@ async function garantirTabelas(
 
           document TEXT NOT NULL DEFAULT '',
 
+          product TEXT NOT NULL DEFAULT '',
+
           state TEXT NOT NULL DEFAULT '',
 
           partner TEXT NOT NULL DEFAULT '',
@@ -172,6 +216,11 @@ async function garantirTabelas(
     .run();
 
 
+  await garantirColunaProduto(
+    context
+  );
+
+
   await context.env.DB
     .prepare(
       `
@@ -190,6 +239,18 @@ async function garantirTabelas(
         CREATE INDEX IF NOT EXISTS idx_client_versions_document
         ON client_versions (
           document
+        )
+      `
+    )
+    .run();
+
+
+  await context.env.DB
+    .prepare(
+      `
+        CREATE INDEX IF NOT EXISTS idx_client_versions_product
+        ON client_versions (
+          product
         )
       `
     )
@@ -262,6 +323,7 @@ async function montarResposta(
             import_id,
             fantasy_name,
             document,
+            product,
             state,
             partner,
             version,
@@ -305,6 +367,10 @@ async function montarResposta(
 
             document:
               item.document ??
+              "",
+
+            product:
+              item.product ??
               "",
 
             state:
@@ -376,7 +442,6 @@ export async function onRequestGet(
   context
 ) {
   try {
-
     await garantirTabelas(
       context
     );
@@ -396,7 +461,6 @@ export async function onRequestGet(
   } catch (
     erro
   ) {
-
     console.error(
       "Erro ao consultar versões dos clientes:",
       erro
@@ -411,7 +475,6 @@ export async function onRequestGet(
       },
       500
     );
-
   }
 }
 
@@ -420,7 +483,6 @@ export async function onRequestPost(
   context
 ) {
   try {
-
     await garantirTabelas(
       context
     );
@@ -467,6 +529,12 @@ export async function onRequestPost(
             document:
               sanitizarDocumento(
                 item?.document
+              ),
+
+            product:
+              sanitizarTexto(
+                item?.product,
+                250
               ),
 
             state:
@@ -589,18 +657,20 @@ export async function onRequestPost(
                     import_id,
                     fantasy_name,
                     document,
+                    product,
                     state,
                     partner,
                     version,
                     active_licenses
                   )
-                  VALUES (?, ?, ?, ?, ?, ?, ?)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 `
               )
               .bind(
                 importId,
                 item.fantasyName,
                 item.document,
+                item.product,
                 item.state,
                 item.partner,
                 item.version,
@@ -631,7 +701,6 @@ export async function onRequestPost(
   } catch (
     erro
   ) {
-
     console.error(
       "Erro ao importar versões dos clientes:",
       erro
@@ -648,6 +717,5 @@ export async function onRequestPost(
       },
       500
     );
-
   }
 }

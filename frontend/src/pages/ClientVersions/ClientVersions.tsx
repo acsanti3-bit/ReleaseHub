@@ -81,28 +81,26 @@ type LargurasColunas = {
 };
 
 
-const LARGURAS_INICIAIS:
-  LargurasColunas = {
-    cliente: 340,
-    documento: 180,
-    uf: 75,
-    parceiro: 170,
-    produto: 190,
-    versao: 130,
-    licencas: 135,
-  };
+const LARGURAS_INICIAIS: LargurasColunas = {
+  cliente: 340,
+  documento: 180,
+  uf: 75,
+  parceiro: 170,
+  produto: 190,
+  versao: 130,
+  licencas: 135,
+};
 
 
-const LARGURAS_MINIMAS:
-  LargurasColunas = {
-    cliente: 160,
-    documento: 125,
-    uf: 55,
-    parceiro: 100,
-    produto: 120,
-    versao: 90,
-    licencas: 100,
-  };
+const LARGURAS_MINIMAS: LargurasColunas = {
+  cliente: 160,
+  documento: 125,
+  uf: 55,
+  parceiro: 100,
+  produto: 120,
+  versao: 90,
+  licencas: 100,
+};
 
 
 function normalizarTexto(
@@ -192,116 +190,6 @@ function licencasCelula(
 }
 
 
-function identificarProduto(
-  versao: string
-) {
-  const valor =
-    versao
-      .trim()
-      .toLowerCase();
-
-
-  if (!valor) {
-    return "Não identificado";
-  }
-
-
-  if (
-    valor === "2.0.0.0"
-  ) {
-    return "IntelliFood Serviço";
-  }
-
-
-  if (
-    valor === "2.0.1.0"
-  ) {
-    return "Easy PDV";
-  }
-
-
-  if (
-    valor === "3.0.1.0" ||
-    valor === "3.0.2.2"
-  ) {
-    return "IntelliCash";
-  }
-
-
-  if (
-    valor === "3.0.11.8"
-  ) {
-    return "Cotação Online Serviço";
-  }
-
-
-  if (
-    valor.startsWith(
-      "1.0."
-    )
-  ) {
-    return "EasyCheckOut";
-  }
-
-
-  if (
-    valor.startsWith(
-      "1.4."
-    ) ||
-    valor.startsWith(
-      "1.5."
-    )
-  ) {
-    return "EasyCash";
-  }
-
-
-  if (
-    valor.startsWith(
-      "1.8."
-    ) ||
-    valor.startsWith(
-      "1.9."
-    )
-  ) {
-    return "IntelliFood Serviço";
-  }
-
-
-  if (
-    valor.startsWith(
-      "2.1."
-    )
-  ) {
-    return "Easy PDV";
-  }
-
-
-  if (
-    valor.startsWith(
-      "3.1."
-    )
-  ) {
-    return "IntelliCash";
-  }
-
-
-  if (
-    valor.startsWith(
-      "3.2."
-    ) ||
-    valor.startsWith(
-      "3.3."
-    )
-  ) {
-    return "Venda Assistida";
-  }
-
-
-  return "Não identificado";
-}
-
-
 function formatarDocumento(
   documento: string
 ) {
@@ -313,8 +201,7 @@ function formatarDocumento(
 
 
   if (
-    numeros.length ===
-    14
+    numeros.length === 14
   ) {
     return numeros.replace(
       /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
@@ -324,8 +211,7 @@ function formatarDocumento(
 
 
   if (
-    numeros.length ===
-    11
+    numeros.length === 11
   ) {
     return numeros.replace(
       /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
@@ -387,19 +273,18 @@ function ClientVersions() {
     clientes,
     setClientes,
   ] =
-    useState<
-      ClientVersion[]
-    >([]);
+    useState<ClientVersion[]>(
+      []
+    );
 
 
   const [
     ultimaImportacao,
     setUltimaImportacao,
   ] =
-    useState<
-      ClientVersionImport |
+    useState<ClientVersionImport | null>(
       null
-    >(null);
+    );
 
 
   const [
@@ -462,9 +347,7 @@ function ClientVersions() {
     campoOrdenacao,
     setCampoOrdenacao,
   ] =
-    useState<
-      CampoOrdenacao
-    >(
+    useState<CampoOrdenacao>(
       "cliente"
     );
 
@@ -473,9 +356,7 @@ function ClientVersions() {
     direcaoOrdenacao,
     setDirecaoOrdenacao,
   ] =
-    useState<
-      DirecaoOrdenacao
-    >(
+    useState<DirecaoOrdenacao>(
       "asc"
     );
 
@@ -493,15 +374,13 @@ function ClientVersions() {
     feedback,
     setFeedback,
   ] =
-    useState<
-      Feedback |
+    useState<Feedback | null>(
       null
-    >(null);
+    );
 
 
   async function carregar() {
     try {
-
       setCarregando(
         true
       );
@@ -523,7 +402,6 @@ function ClientVersions() {
     } catch (
       erro
     ) {
-
       setFeedback({
         tipo:
           "erro",
@@ -535,25 +413,21 @@ function ClientVersions() {
       });
 
     } finally {
-
       setCarregando(
         false
       );
-
     }
   }
 
 
   useEffect(
     () => {
-
       let ativo =
         true;
 
 
       async function iniciar() {
         try {
-
           const usuario =
             await buscarSessao();
 
@@ -572,12 +446,10 @@ function ClientVersions() {
         } catch (
           erro
         ) {
-
           console.error(
             "Erro ao consultar sessão:",
             erro
           );
-
         }
 
 
@@ -586,7 +458,6 @@ function ClientVersions() {
         ) {
           await carregar();
         }
-
       }
 
 
@@ -597,7 +468,6 @@ function ClientVersions() {
         ativo =
           false;
       };
-
     },
     []
   );
@@ -639,17 +509,16 @@ function ClientVersions() {
                 Boolean
               )
           )
-        )
-          .sort(
-            (
-              a,
-              b
-            ) =>
-              a.localeCompare(
-                b,
-                "pt-BR"
-              )
-          ),
+        ).sort(
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
+              "pt-BR"
+            )
+        ),
 
       [
         clientes,
@@ -662,24 +531,25 @@ function ClientVersions() {
       () =>
         Array.from(
           new Set(
-            clientes.map(
-              item =>
-                identificarProduto(
-                  item.version
-                )
-            )
-          )
-        )
-          .sort(
-            (
-              a,
-              b
-            ) =>
-              a.localeCompare(
-                b,
-                "pt-BR"
+            clientes
+              .map(
+                item =>
+                  item.product.trim()
               )
-          ),
+              .filter(
+                Boolean
+              )
+          )
+        ).sort(
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b,
+              "pt-BR"
+            )
+        ),
 
       [
         clientes,
@@ -701,21 +571,20 @@ function ClientVersions() {
                 Boolean
               )
           )
-        )
-          .sort(
-            (
+        ).sort(
+          (
+            a,
+            b
+          ) =>
+            b.localeCompare(
               a,
-              b
-            ) =>
-              b.localeCompare(
-                a,
-                undefined,
-                {
-                  numeric:
-                    true,
-                }
-              )
-          ),
+              undefined,
+              {
+                numeric:
+                  true,
+              }
+            )
+        ),
 
       [
         clientes,
@@ -723,17 +592,24 @@ function ClientVersions() {
     );
 
 
+  /*
+   * CLIENTES
+   *
+   * Cada CPF/CNPJ completo diferente
+   * representa um cliente.
+   *
+   * Matriz e filial com CNPJs diferentes
+   * contam separadamente.
+   */
   const totalClientes =
     useMemo(
       () => {
-
-        const identificadores =
+        const documentos =
           new Set<string>();
 
 
         clientes.forEach(
           item => {
-
             const documento =
               item.document.replace(
                 /\D/g,
@@ -744,34 +620,15 @@ function ClientVersions() {
             if (
               documento
             ) {
-              identificadores.add(
-                `documento:${documento}`
-              );
-
-              return;
-            }
-
-
-            const nome =
-              normalizarTexto(
-                item.fantasyName
-              );
-
-
-            if (
-              nome
-            ) {
-              identificadores.add(
-                `nome:${nome}`
+              documentos.add(
+                documento
               );
             }
-
           }
         );
 
 
-        return identificadores.size;
-
+        return documentos.size;
       },
       [
         clientes,
@@ -782,7 +639,6 @@ function ClientVersions() {
   const clientesFiltrados =
     useMemo(
       () => {
-
         const termo =
           normalizarTexto(
             busca
@@ -799,7 +655,6 @@ function ClientVersions() {
         const filtrados =
           clientes.filter(
             item => {
-
               const nomeCliente =
                 normalizarTexto(
                   item.fantasyName
@@ -838,15 +693,9 @@ function ClientVersions() {
                 item.partner === parceiro;
 
 
-              const produtoCliente =
-                identificarProduto(
-                  item.version
-                );
-
-
               const correspondeProduto =
                 !produto ||
-                produtoCliente === produto;
+                item.product === produto;
 
 
               const correspondeVersao =
@@ -861,7 +710,6 @@ function ClientVersions() {
                 correspondeProduto &&
                 correspondeVersao
               );
-
             }
           );
 
@@ -873,7 +721,6 @@ function ClientVersions() {
               a,
               b
             ) => {
-
               let comparacao =
                 0;
 
@@ -881,9 +728,7 @@ function ClientVersions() {
               switch (
                 campoOrdenacao
               ) {
-
                 case "cliente":
-
                   comparacao =
                     a.fantasyName
                       .localeCompare(
@@ -899,7 +744,6 @@ function ClientVersions() {
 
 
                 case "documento":
-
                   comparacao =
                     a.document
                       .localeCompare(
@@ -915,7 +759,6 @@ function ClientVersions() {
 
 
                 case "uf":
-
                   comparacao =
                     a.state
                       .localeCompare(
@@ -927,7 +770,6 @@ function ClientVersions() {
 
 
                 case "parceiro":
-
                   comparacao =
                     a.partner
                       .localeCompare(
@@ -939,15 +781,10 @@ function ClientVersions() {
 
 
                 case "produto":
-
                   comparacao =
-                    identificarProduto(
-                      a.version
-                    )
+                    a.product
                       .localeCompare(
-                        identificarProduto(
-                          b.version
-                        ),
+                        b.product,
                         "pt-BR"
                       );
 
@@ -955,7 +792,6 @@ function ClientVersions() {
 
 
                 case "versao":
-
                   comparacao =
                     a.version
                       .localeCompare(
@@ -971,13 +807,11 @@ function ClientVersions() {
 
 
                 case "licencas":
-
                   comparacao =
                     a.activeLicenses -
                     b.activeLicenses;
 
                   break;
-
               }
 
 
@@ -985,10 +819,8 @@ function ClientVersions() {
                 "asc"
                 ? comparacao
                 : -comparacao;
-
             }
           );
-
       },
       [
         clientes,
@@ -1026,12 +858,10 @@ function ClientVersions() {
     campo:
       CampoOrdenacao
   ) {
-
     if (
       campoOrdenacao ===
       campo
     ) {
-
       setDirecaoOrdenacao(
         atual =>
           atual === "asc"
@@ -1051,7 +881,6 @@ function ClientVersions() {
     setDirecaoOrdenacao(
       "asc"
     );
-
   }
 
 
@@ -1059,7 +888,6 @@ function ClientVersions() {
     campo:
       CampoOrdenacao
   ) {
-
     if (
       campoOrdenacao !==
       campo
@@ -1085,7 +913,6 @@ function ClientVersions() {
     coluna:
       ColunaTabela
   ) {
-
     evento.preventDefault();
 
     evento.stopPropagation();
@@ -1110,7 +937,6 @@ function ClientVersions() {
       eventoMouse:
         MouseEvent
     ) {
-
       const diferenca =
         eventoMouse.clientX -
         xInicial;
@@ -1134,12 +960,10 @@ function ClientVersions() {
             novaLargura,
         })
       );
-
     }
 
 
     function finalizar() {
-
       window.removeEventListener(
         "mousemove",
         mover
@@ -1155,7 +979,6 @@ function ClientVersions() {
       document.body.classList.remove(
         "client-versions-resizing"
       );
-
     }
 
 
@@ -1169,7 +992,6 @@ function ClientVersions() {
       "mouseup",
       finalizar
     );
-
   }
 
 
@@ -1177,7 +999,6 @@ function ClientVersions() {
     arquivo: File
   ) {
     try {
-
       setImportando(
         true
       );
@@ -1224,6 +1045,12 @@ function ClientVersions() {
         );
 
 
+      const indiceProduto =
+        cabecalho.indexOf(
+          "Produto"
+        );
+
+
       const indiceUf =
         cabecalho.indexOf(
           "U.F."
@@ -1250,10 +1077,11 @@ function ClientVersions() {
 
       if (
         indiceFantasia < 0 ||
-        indiceDocumento < 0
+        indiceDocumento < 0 ||
+        indiceProduto < 0
       ) {
         throw new Error(
-          "O Excel precisa possuir as colunas Fantasia e CPF/CNPJ."
+          "O Excel precisa possuir as colunas Fantasia, CPF/CNPJ e Produto."
         );
       }
 
@@ -1277,6 +1105,13 @@ function ClientVersions() {
                 documentoCelula(
                   linha[
                     indiceDocumento
+                  ]
+                ),
+
+              product:
+                textoCelula(
+                  linha[
+                    indiceProduto
                   ]
                 ),
 
@@ -1377,7 +1212,6 @@ function ClientVersions() {
     } catch (
       erro
     ) {
-
       setFeedback({
         tipo:
           "erro",
@@ -1389,7 +1223,6 @@ function ClientVersions() {
       });
 
     } finally {
-
       setImportando(
         false
       );
@@ -1401,7 +1234,6 @@ function ClientVersions() {
         inputArquivoRef.current.value =
           "";
       }
-
     }
   }
 
@@ -1465,7 +1297,6 @@ function ClientVersions() {
                   hidden
                   onChange={
                     evento => {
-
                       const arquivo =
                         evento
                           .target
@@ -1479,7 +1310,6 @@ function ClientVersions() {
                           arquivo
                         );
                       }
-
                     }
                   }
                 />
@@ -1937,85 +1767,76 @@ function ClientVersions() {
                 <tbody>
 
                   {clientesFiltrados.map(
-                    cliente => {
+                    cliente => (
 
-                      const produtoCliente =
-                        identificarProduto(
-                          cliente.version
-                        );
+                      <tr
+                        key={cliente.id}
+                      >
+
+                        <td>
+
+                          <span className="client-versions-name">
+                            {cliente.fantasyName}
+                          </span>
+
+                        </td>
 
 
-                      return (
+                        <td>
+                          {formatarDocumento(
+                            cliente.document
+                          )}
+                        </td>
 
-                        <tr
-                          key={cliente.id}
-                        >
 
-                          <td>
+                        <td>
+                          {cliente.state ||
+                            "-"}
+                        </td>
 
-                            <span className="client-versions-name">
-                              {cliente.fantasyName}
+
+                        <td>
+                          {cliente.partner ||
+                            "-"}
+                        </td>
+
+
+                        <td>
+
+                          <span className="client-versions-product">
+                            {cliente.product ||
+                              "Não informado"}
+                          </span>
+
+                        </td>
+
+
+                        <td>
+
+                          {cliente.version ? (
+
+                            <span className="client-versions-version">
+                              {cliente.version}
                             </span>
 
-                          </td>
+                          ) : (
 
-
-                          <td>
-                            {formatarDocumento(
-                              cliente.document
-                            )}
-                          </td>
-
-
-                          <td>
-                            {cliente.state ||
-                              "-"}
-                          </td>
-
-
-                          <td>
-                            {cliente.partner ||
-                              "-"}
-                          </td>
-
-
-                          <td>
-
-                            <span className="client-versions-product">
-                              {produtoCliente}
+                            <span className="client-versions-version-empty">
+                              Não informado
                             </span>
 
-                          </td>
+                          )}
+
+                        </td>
 
 
-                          <td>
+                        <td className="client-versions-licenses">
+                          {cliente.activeLicenses}
+                        </td>
 
-                            {cliente.version ? (
+                      </tr>
 
-                              <span className="client-versions-version">
-                                {cliente.version}
-                              </span>
-
-                            ) : (
-
-                              <span className="client-versions-version-empty">
-                                Não informado
-                              </span>
-
-                            )}
-
-                          </td>
-
-
-                          <td className="client-versions-licenses">
-                            {cliente.activeLicenses}
-                          </td>
-
-                        </tr>
-
-                      );
-
-                    }
+                    )
                   )}
 
                 </tbody>
