@@ -308,6 +308,12 @@ function TimeManagement() {
     useState("");
 
   const [
+    atividadeExpandida,
+    setAtividadeExpandida,
+  ] =
+    useState("");
+
+  const [
     detalhamentoAberto,
     setDetalhamentoAberto,
   ] =
@@ -732,6 +738,10 @@ function TimeManagement() {
     );
 
     setProjetoExpandido(
+      ""
+    );
+
+    setAtividadeExpandida(
       ""
     );
 
@@ -1359,24 +1369,6 @@ function TimeManagement() {
     ]);
 
 
-  const totalUsuarios =
-    useMemo(() => {
-
-      return new Set(
-        apontamentosFiltrados
-          .map(
-            apontamento =>
-              apontamento.usuario
-                ?.nome
-                ?.trim()
-          )
-          .filter(Boolean)
-      ).size;
-
-    }, [
-      apontamentosFiltrados,
-    ]);
-
 
   const totalTarefas =
     useMemo(() => {
@@ -1395,10 +1387,27 @@ function TimeManagement() {
     ]);
 
 
-  const mediaHorasPorUsuario =
-    totalUsuarios > 0
+  const totalDiasComApontamento =
+    useMemo(() => {
+
+      return new Set(
+        apontamentosFiltrados
+          .map(
+            apontamento =>
+              apontamento.data
+          )
+          .filter(Boolean)
+      ).size;
+
+    }, [
+      apontamentosFiltrados,
+    ]);
+
+
+  const mediaHorasPorDia =
+    totalDiasComApontamento > 0
       ? totalHoras /
-        totalUsuarios
+        totalDiasComApontamento
       : 0;
 
 
@@ -1834,6 +1843,10 @@ function TimeManagement() {
       );
 
       setProjetoExpandido(
+        ""
+      );
+
+      setAtividadeExpandida(
         ""
       );
 
@@ -2417,6 +2430,271 @@ function TimeManagement() {
   }
 
 
+
+  function renderDistribuicaoAtividades() {
+
+    const maiorValor =
+      horasPorAtividade.length > 0
+        ? Math.max(
+            ...horasPorAtividade.map(
+              item =>
+                item.horas
+            )
+          )
+        : 0;
+
+
+    return (
+
+      <div className="time-management-distribution-card time-management-distribution-card-full time-management-activities-card">
+
+        <div className="time-management-distribution-title">
+
+          <div>
+
+            <h3>
+              Horas por atividade
+            </h3>
+
+            <small>
+              Clique em uma atividade para ver as horas por usuário.
+            </small>
+
+          </div>
+
+          <span>
+            {horasPorAtividade.length}
+            {" "}
+            atividade
+            {horasPorAtividade.length === 1
+              ? ""
+              : "s"}
+          </span>
+
+        </div>
+
+
+        <div className="time-management-distribution-list time-management-activity-list">
+
+          {horasPorAtividade.map(
+            item => {
+
+              const percentualBarra =
+                maiorValor > 0
+                  ? (
+                      item.horas /
+                      maiorValor
+                    ) * 100
+                  : 0;
+
+              const percentualTotal =
+                totalHoras > 0
+                  ? (
+                      item.horas /
+                      totalHoras
+                    ) * 100
+                  : 0;
+
+              const expandida =
+                atividadeExpandida ===
+                item.nome;
+
+              const usuariosAtividade =
+                expandida
+                  ? agruparHoras(
+                      apontamentosFiltrados.filter(
+                        apontamento =>
+                          (
+                            apontamento.atividade
+                              ?.nome
+                              ?.trim() ||
+                            ""
+                          ) ===
+                          item.nome
+                      ),
+                      apontamento =>
+                        apontamento.usuario
+                          ?.nome ||
+                        ""
+                    )
+                  : [];
+
+              const maiorUsuario =
+                usuariosAtividade.length > 0
+                  ? Math.max(
+                      ...usuariosAtividade.map(
+                        usuario =>
+                          usuario.horas
+                      )
+                    )
+                  : 0;
+
+
+              return (
+
+                <div
+                  key={
+                    item.nome
+                  }
+                  className={
+                    expandida
+                      ? "time-management-project-item expanded"
+                      : "time-management-project-item"
+                  }
+                >
+
+                  <button
+                    type="button"
+                    className="time-management-project-button"
+                    onClick={() =>
+                      setAtividadeExpandida(
+                        atual =>
+                          atual === item.nome
+                            ? ""
+                            : item.nome
+                      )
+                    }
+                    aria-expanded={
+                      expandida
+                    }
+                  >
+
+                    <div className="time-management-distribution-row">
+
+                      <span
+                        className="time-management-distribution-name time-management-project-name"
+                        title={
+                          item.nome
+                        }
+                      >
+                        {item.nome}
+
+                        <small>
+                          {percentualTotal.toLocaleString(
+                            "pt-BR",
+                            {
+                              minimumFractionDigits: 1,
+                              maximumFractionDigits: 1,
+                            }
+                          )}
+                          % do total
+                        </small>
+                      </span>
+
+                      <span className="time-management-project-hours">
+
+                        <strong>
+                          {formatarHoras(
+                            item.horas
+                          )}
+                        </strong>
+
+                        <span className="time-management-project-chevron">
+                          {expandida
+                            ? "▴"
+                            : "▾"}
+                        </span>
+
+                      </span>
+
+                    </div>
+
+
+                    <div className="time-management-distribution-bar">
+
+                      <div
+                        className="time-management-distribution-progress"
+                        style={{
+                          width:
+                            `${percentualBarra}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </button>
+
+
+                  {expandida && (
+
+                    <div className="time-management-project-users">
+
+                      <div className="time-management-project-users-heading">
+                        Horas por usuário nesta atividade
+                      </div>
+
+                      {usuariosAtividade.map(
+                        usuario => {
+
+                          const percentualUsuario =
+                            maiorUsuario > 0
+                              ? (
+                                  usuario.horas /
+                                  maiorUsuario
+                                ) * 100
+                              : 0;
+
+                          return (
+
+                            <div
+                              key={
+                                usuario.nome
+                              }
+                              className="time-management-project-user"
+                            >
+
+                              <div className="time-management-project-user-row">
+
+                                <span>
+                                  {usuario.nome}
+                                </span>
+
+                                <strong>
+                                  {formatarHoras(
+                                    usuario.horas
+                                  )}
+                                </strong>
+
+                              </div>
+
+                              <div className="time-management-project-user-bar">
+
+                                <div
+                                  style={{
+                                    width:
+                                      `${percentualUsuario}%`,
+                                  }}
+                                />
+
+                              </div>
+
+                            </div>
+
+                          );
+
+                        }
+                      )}
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              );
+
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
   return (
 
     <Layout>
@@ -2853,22 +3131,24 @@ function TimeManagement() {
             <div className="time-management-summary-card">
 
               <span>
-                Média por usuário
+                Média por dia
               </span>
 
               <strong>
                 {formatarHoras(
-                  mediaHorasPorUsuario
+                  mediaHorasPorDia
                 )}
               </strong>
 
               <small>
-                considerando {totalUsuarios}
+                considerando {totalDiasComApontamento}
                 {" "}
-                usuário
-                {totalUsuarios === 1
+                dia
+                {totalDiasComApontamento === 1
                   ? ""
                   : "s"}
+                {" "}
+                com apontamento
               </small>
 
             </div>
@@ -2953,11 +3233,7 @@ function TimeManagement() {
               {renderDistribuicaoProjetos()}
 
 
-              {renderDistribuicao(
-                "Horas por atividade",
-                horasPorAtividade,
-                "time-management-distribution-card-full"
-              )}
+              {renderDistribuicaoAtividades()}
 
             </div>
 

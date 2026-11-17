@@ -719,6 +719,33 @@
 }
 
 
+/* ATIVIDADES EXPANSÍVEIS */
+
+.time-management-activities-card {
+  grid-column: 1 / -1;
+}
+
+.time-management-activity-list {
+  max-height: 360px;
+}
+
+.time-management-activities-card
+.time-management-project-item.expanded {
+  border-color: #d7e5f1;
+}
+
+.time-management-activities-card
+.time-management-project-users {
+  background: #f8fafc;
+}
+
+html.dark
+.time-management-activities-card
+.time-management-project-users {
+  background: #151f2e;
+}
+
+
 /* TABELA */
 
 .time-management-table-card {
