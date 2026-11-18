@@ -311,54 +311,89 @@ function Sidebar({
 
       <nav>
 
-        <NavLink to="/">
-          Monitoramento
-        </NavLink>
+        <div className="sidebar-group">
 
+          <span className="sidebar-group-title">
+            Visão geral
+          </span>
 
-        {podeAcessarAmbientes && (
-
-          <NavLink to="/environments">
-            Ambientes da Release
+          <NavLink to="/">
+            Dashboard
           </NavLink>
 
-        )}
+          <NavLink to="/tv">
+            Modo TV
+          </NavLink>
+
+        </div>
 
 
-        <NavLink to="/compatibility">
-          Compatibilidade
-        </NavLink>
+        <div className="sidebar-group">
+
+          <span className="sidebar-group-title">
+            Releases
+          </span>
 
 
-        <NavLink to="/client-versions">
-          Versões dos Clientes
-        </NavLink>
+          {podeAcessarAmbientes && (
+
+            <NavLink to="/environments">
+              Ambientes da Release
+            </NavLink>
+
+          )}
 
 
-        <NavLink to="/isa">
-          ISA
-        </NavLink>
+          <NavLink to="/compatibility">
+            Compatibilidade
+          </NavLink>
+
+        </div>
+
+
+        <div className="sidebar-group">
+
+          <span className="sidebar-group-title">
+            Clientes
+          </span>
+
+          <NavLink to="/client-versions">
+            Versões dos Clientes
+          </NavLink>
+
+        </div>
 
 
         {podeAcessarGestaoHoras && (
 
-          <NavLink to="/gestao-horas">
-            Gestão de Horas
-          </NavLink>
+          <div className="sidebar-group">
+
+            <span className="sidebar-group-title">
+              Administrativo
+            </span>
+
+            <NavLink to="/gestao-horas">
+              Gestão de Horas
+            </NavLink>
+
+          </div>
 
         )}
 
 
-        <NavLink to="/tv">
-          Modo TV
-        </NavLink>
-
-
         {podeAcessarConfiguracoes && (
 
-          <NavLink to="/settings">
-            Configurações
-          </NavLink>
+          <div className="sidebar-group">
+
+            <span className="sidebar-group-title">
+              Sistema
+            </span>
+
+            <NavLink to="/settings">
+              Configurações
+            </NavLink>
+
+          </div>
 
         )}
 
