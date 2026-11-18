@@ -368,6 +368,34 @@ function Sidebar({
       }
     >
 
+      <button
+        type="button"
+        className="sidebar-edge-toggle"
+        onClick={
+          alternarSidebar
+        }
+        title={
+          sidebarRecolhida
+            ? "Expandir barra lateral"
+            : "Recolher barra lateral"
+        }
+        aria-label={
+          sidebarRecolhida
+            ? "Expandir barra lateral"
+            : "Recolher barra lateral"
+        }
+        aria-expanded={
+          !sidebarRecolhida
+        }
+      >
+
+        {sidebarRecolhida
+          ? "›"
+          : "‹"}
+
+      </button>
+
+
       <div className="sidebar-header">
 
         <div className="sidebar-brand">
@@ -381,35 +409,6 @@ function Sidebar({
           </span>
 
         </div>
-
-
-        <button
-          type="button"
-          className="sidebar-collapse-button"
-          onClick={
-            alternarSidebar
-          }
-          title={
-            sidebarRecolhida
-              ? "Expandir barra lateral"
-              : "Recolher barra lateral"
-          }
-          aria-label={
-            sidebarRecolhida
-              ? "Expandir barra lateral"
-              : "Recolher barra lateral"
-          }
-          aria-expanded={
-            !sidebarRecolhida
-          }
-        >
-
-          <span
-            className="sidebar-collapse-icon"
-            aria-hidden="true"
-          />
-
-        </button>
 
       </div>
 
