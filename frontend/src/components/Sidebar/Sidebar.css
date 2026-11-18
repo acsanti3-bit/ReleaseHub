@@ -79,14 +79,14 @@
     position: absolute;
 
     top: 50%;
-    right: -5px;
+    right: -8px;
 
     transform:
         translateY(-50%);
 
     z-index: 30;
 
-    width: 14px;
+    width: 18px;
     height: 58px;
 
     display: flex;
@@ -95,20 +95,27 @@
 
     padding: 0;
 
-    border: 0;
-
-    border-radius:
-        0
-        7px
-        7px
-        0;
-
-    background:
+    border:
+        1px solid
         rgba(
             255,
             255,
             255,
-            0.05
+            0.12
+        );
+
+    border-radius:
+        0
+        8px
+        8px
+        0;
+
+    background:
+        rgba(
+            0,
+            45,
+            88,
+            0.22
         );
 
     color:
@@ -116,60 +123,71 @@
             255,
             255,
             255,
-            0.32
+            0.76
         );
 
     cursor: pointer;
 
-    opacity: 0.72;
+    opacity: 0.82;
 
-    box-shadow: none;
+    box-shadow:
+        1px 0 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.05
+        );
 
     transition:
         width 0.18s ease,
         right 0.18s ease,
         background 0.18s ease,
         color 0.18s ease,
-        opacity 0.18s ease;
+        opacity 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 
 .sidebar-edge-toggle:hover {
-    width: 20px;
+    width: 22px;
 
-    right: -10px;
+    right: -11px;
 
     background:
         rgba(
-            255,
-            255,
-            255,
-            0.13
+            0,
+            45,
+            88,
+            0.34
         );
 
-    color:
-        rgba(
-            255,
-            255,
-            255,
-            0.95
-        );
+    color: #FFFFFF;
 
     opacity: 1;
+
+    box-shadow:
+        2px 0 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.10
+        );
 }
 
 
 .sidebar-edge-toggle:focus-visible {
     outline:
-        1px solid
+        2px solid
         rgba(
-            255,
-            255,
-            255,
-            0.40
+            245,
+            130,
+            32,
+            0.50
         );
 
-    outline-offset: 1px;
+    outline-offset: 2px;
 }
 
 
@@ -185,7 +203,7 @@
 
     color: inherit;
 
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 400;
     line-height: 1;
 
@@ -331,9 +349,9 @@ nav {
 .sidebar.is-collapsed
 .sidebar-edge-toggle {
     top: 50%;
-    right: -5px;
+    right: -8px;
 
-    width: 14px;
+    width: 18px;
     height: 58px;
 
     transform:
@@ -341,10 +359,10 @@ nav {
 
     background:
         rgba(
-            255,
-            255,
-            255,
-            0.07
+            0,
+            45,
+            88,
+            0.26
         );
 
     color:
@@ -352,26 +370,30 @@ nav {
             255,
             255,
             255,
-            0.42
+            0.82
         );
+
+    opacity: 0.90;
 }
 
 
 .sidebar.is-collapsed
 .sidebar-edge-toggle:hover {
-    width: 20px;
+    width: 22px;
 
-    right: -10px;
+    right: -11px;
 
     background:
         rgba(
-            255,
-            255,
-            255,
-            0.15
+            0,
+            45,
+            88,
+            0.38
         );
 
     color: #FFFFFF;
+
+    opacity: 1;
 }
 
 
@@ -440,7 +462,15 @@ html.dark
             255,
             255,
             255,
-            0.035
+            0.06
+        );
+
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.08
         );
 
     color:
@@ -448,8 +478,12 @@ html.dark
             226,
             232,
             240,
-            0.28
+            0.52
         );
+
+    opacity: 0.78;
+
+    box-shadow: none;
 }
 
 
@@ -460,16 +494,12 @@ html.dark
             255,
             255,
             255,
-            0.09
+            0.12
         );
 
-    color:
-        rgba(
-            255,
-            255,
-            255,
-            0.92
-        );
+    color: #FFFFFF;
+
+    opacity: 1;
 }
 
 
@@ -481,7 +511,7 @@ html.dark
             255,
             255,
             255,
-            0.05
+            0.08
         );
 
     color:
@@ -489,8 +519,10 @@ html.dark
             226,
             232,
             240,
-            0.34
+            0.62
         );
+
+    opacity: 0.88;
 }
 
 
@@ -502,8 +534,10 @@ html.dark
             255,
             255,
             255,
-            0.11
+            0.14
         );
 
     color: #FFFFFF;
+
+    opacity: 1;
 }
