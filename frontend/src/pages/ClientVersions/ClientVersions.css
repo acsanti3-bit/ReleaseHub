@@ -2,163 +2,240 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+
   padding: 28px 32px 40px;
 }
+
 
 .client-versions-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+
   gap: 20px;
+
   padding-bottom: 18px;
+
   border-bottom: 1px solid #e1e7ec;
 }
 
+
 .client-versions-eyebrow {
   display: block;
+
   margin-bottom: 5px;
+
   color: #f58220;
+
   font-size: 11px;
   font-weight: 800;
+
   text-transform: uppercase;
+
   letter-spacing: .8px;
 }
 
+
 .client-versions-header h1 {
   margin: 0;
+
   color: #005aa9;
+
   font-size: 36px;
+
   font-weight: 750;
 }
 
+
 .client-versions-header p {
   margin: 7px 0 0;
+
   color: #7a8793;
+
   font-size: 13px;
+
   line-height: 1.5;
 }
+
 
 .client-versions-header-actions {
   display: flex;
   align-items: center;
+
   gap: 9px;
 }
 
+
 .client-versions-header-actions button {
   min-height: 42px;
+
   padding: 0 14px;
+
   border-radius: 9px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 7px;
+
   font-size: 12px;
   font-weight: 750;
+
   cursor: pointer;
 }
 
+
 .client-versions-refresh {
   border: 1px solid #cbd5df;
+
   background: #fff;
+
   color: #475467;
 }
 
+
 .client-versions-import {
   border: 1px solid #005aa9;
+
   background: #005aa9;
+
   color: #fff;
 }
 
+
 .client-versions-header-actions button:disabled {
   opacity: .55;
+
   cursor: not-allowed;
 }
 
+
 .client-versions-feedback {
   min-height: 44px;
+
   padding: 10px 13px;
+
   border: 1px solid;
+
   border-radius: 9px;
+
   display: flex;
   align-items: center;
+
   gap: 8px;
+
   font-size: 12px;
 }
 
+
 .client-versions-feedback-sucesso {
   border-color: #b7e1c0;
+
   background: #eefaf1;
+
   color: #286b38;
 }
 
+
 .client-versions-feedback-erro {
   border-color: #f5c4bd;
+
   background: #fff4f2;
+
   color: #a2372a;
 }
 
 
-/* RESUMO */
+/* =========================
+   RESUMO
+   ========================= */
 
 .client-versions-summary {
   display: grid;
+
   grid-template-columns:
     repeat(
       3,
       minmax(0, 1fr)
     );
+
   gap: 12px;
 }
 
+
 .client-versions-summary > div {
   min-height: 82px;
+
   padding: 15px 17px;
+
   border: 1px solid #dfe5eb;
+
   border-radius: 11px;
+
   background: #fff;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   gap: 5px;
 }
 
+
 .client-versions-summary span {
   color: #667085;
+
   font-size: 11px;
   font-weight: 700;
+
   text-transform: uppercase;
+
   letter-spacing: .04em;
 }
 
+
 .client-versions-summary strong {
   color: #005aa9;
+
   font-size: 24px;
 }
+
 
 .client-versions-summary
 .client-versions-summary-date {
   color: #344054;
+
   font-size: 14px;
 }
 
 
-/* IMPORTAÇÃO */
+/* =========================
+   IMPORTAÇÃO
+   ========================= */
 
 .client-versions-import-info {
   margin-top: -8px;
+
   display: flex;
   align-items: center;
+
   gap: 18px;
+
   color: #7b8794;
+
   font-size: 11px;
 }
+
 
 .client-versions-import-info strong {
   color: #475467;
 }
 
 
-/* FILTROS */
+/* =========================
+   FILTROS
+   ========================= */
 
 .client-versions-filters {
   display: grid;
@@ -171,20 +248,30 @@
     minmax(150px, 190px);
 
   gap: 9px;
+
   align-items: center;
 }
 
+
 .client-versions-search {
   min-height: 42px;
+
   display: flex;
   align-items: center;
+
   gap: 7px;
+
   padding: 0 11px;
+
   border: 1px solid #d0d5dd;
+
   border-radius: 8px;
+
   background: #fff;
+
   color: #667085;
 }
+
 
 .client-versions-search:focus-within {
   border-color: #005aa9;
@@ -199,291 +286,457 @@
     );
 }
 
+
 .client-versions-search input {
   flex: 1;
+
   width: 100%;
   min-width: 0;
+
   border: 0;
+
   outline: 0;
+
   background: transparent;
+
   color: #1f2937;
+
   font-size: 12.5px;
 }
+
 
 .client-versions-search input::-webkit-search-cancel-button {
   cursor: pointer;
 }
 
+
 .client-versions-filters select {
   min-height: 42px;
+
   padding: 0 10px;
+
   border: 1px solid #d0d5dd;
+
   border-radius: 8px;
+
   background: #fff;
+
   color: #344054;
+
   font-size: 12px;
+
   outline: none;
 }
+
 
 .client-versions-filter-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 12px;
+
   color: #667085;
+
   font-size: 11px;
 }
+
 
 .client-versions-filter-summary strong {
   color: #005aa9;
 }
 
 
-/* TABELA */
+/* =========================
+   TABELA
+   ========================= */
 
 .client-versions-card {
   overflow: hidden;
+
   border: 1px solid #e1e7ec;
+
   border-radius: 11px;
+
   background: #fff;
 }
 
+
 .client-versions-table-wrapper {
   width: 100%;
+
   overflow-x: auto;
 }
 
+
 .client-versions-table {
   width: 100%;
+
   min-width: 100%;
+
   border-collapse: collapse;
+
   table-layout: fixed;
 }
 
+
 .client-versions-table th {
   position: relative;
+
   height: 42px;
+
   padding: 0;
+
   overflow: visible;
+
   border-bottom: 1px solid #e7ebef;
   border-right: 1px solid #edf0f3;
+
   background: #f8fafc;
+
   color: #667085;
+
   vertical-align: middle;
 }
+
 
 .client-versions-table th:last-child {
   border-right: 0;
 }
 
+
 .client-versions-sort-button {
   width: 100%;
   height: 42px;
+
   padding: 0 18px 0 12px;
+
   border: 0;
+
   background: transparent;
+
   color: #667085;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 6px;
+
   font-size: 10.5px;
   font-weight: 800;
+
   text-align: left;
   text-transform: uppercase;
+
   letter-spacing: .04em;
+
   white-space: nowrap;
+
   cursor: pointer;
 }
 
+
 .client-versions-sort-button:hover {
   background: #eef3f7;
+
   color: #344054;
 }
 
+
 .client-versions-sort-button span {
   min-width: 16px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   color: #005aa9;
+
   font-size: 14px;
 }
 
 
-/* REDIMENSIONAMENTO */
+/* =========================
+   REDIMENSIONAMENTO
+   ========================= */
 
 .client-versions-resizer {
   position: absolute;
+
   top: 0;
   right: -5px;
+
   z-index: 20;
+
   width: 10px;
   height: 100%;
+
   cursor: col-resize;
 }
 
+
 .client-versions-resizer::after {
   content: "";
+
   position: absolute;
+
   top: 7px;
   bottom: 7px;
   left: 4px;
+
   width: 2px;
+
   border-radius: 2px;
+
   background: transparent;
 }
+
 
 .client-versions-resizer:hover::after {
   background: #005aa9;
 }
 
+
 body.client-versions-resizing,
 body.client-versions-resizing * {
   cursor: col-resize !important;
+
   user-select: none !important;
 }
 
+
 .client-versions-table td {
   padding: 11px 12px;
+
   overflow: hidden;
+
   border-bottom: 1px solid #f0f2f4;
+
   color: #475467;
+
   font-size: 12px;
+
   vertical-align: middle;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
+
 
 .client-versions-table tbody tr:hover {
   background: #f8fbfe;
 }
 
+
 .client-versions-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
+
 .client-versions-name {
   color: #344054;
+
   font-size: 12px;
+
   font-weight: 700;
 }
 
 
-/* PRODUTO */
+/* =========================
+   PRODUTO
+   ========================= */
 
 .client-versions-product {
   display: inline-flex;
   align-items: center;
+
   max-width: 100%;
+
   min-height: 25px;
+
   padding: 4px 8px;
+
   overflow: hidden;
+
   border-radius: 6px;
+
   background: #f2f4f7;
+
   color: #344054;
+
   font-size: 11.5px;
   font-weight: 750;
+
   text-overflow: ellipsis;
+
   white-space: nowrap;
 }
 
 
-/* VERSÃO */
+/* =========================
+   VERSÃO
+   ========================= */
 
 .client-versions-version {
   display: inline-flex;
+
   padding: 4px 7px;
+
   border-radius: 6px;
+
   background: #edf5fc;
+
   color: #005aa9;
+
   font-size: 11.5px;
+
   font-weight: 800;
+
   white-space: nowrap;
 }
 
+
 .client-versions-version-empty {
   color: #98a2b3;
+
   font-style: italic;
 }
 
 
-/* ATUALIZAÇÃO */
+/* =========================
+   ATUALIZAÇÃO
+   ========================= */
 
 .client-versions-update-status {
   display: inline-flex;
   align-items: center;
+
   gap: 6px;
+
   min-height: 25px;
-  padding: 4px 8px;
+
+  padding: 4px 9px;
+
   border: 1px solid transparent;
+
   border-radius: 999px;
+
   font-size: 10.5px;
   font-weight: 750;
+
   white-space: nowrap;
 }
+
 
 .client-versions-update-dot {
   width: 6px;
   height: 6px;
+
   flex: 0 0 6px;
+
   border-radius: 50%;
+
   background: currentColor;
 }
 
+
+/* Atualizado */
+
 .client-versions-update-status-atualizado {
   border-color: #cce8d3;
+
   background: #eef9f1;
+
   color: #287a3e;
 }
 
-.client-versions-update-status-atualizar {
-  border-color: #f6d5b5;
-  background: #fff6ed;
-  color: #b85d0b;
+
+/* 1 a 3 releases atrás */
+
+.client-versions-update-status-atencao {
+  border-color: #c9dcf5;
+
+  background: #eff6ff;
+
+  color: #2563a6;
 }
 
-.client-versions-update-status-acima {
-  border-color: #cddcf5;
-  background: #f0f5ff;
-  color: #365fa0;
+
+/* 4 ou mais releases atrás */
+
+.client-versions-update-status-atualizar {
+  border-color: #f1d888;
+
+  background: #fff9df;
+
+  color: #9a6b00;
 }
+
+
+/* Acima da release oficial */
+
+.client-versions-update-status-acima {
+  border-color: #ded4f5;
+
+  background: #f7f3ff;
+
+  color: #7656a6;
+}
+
+
+/* Sem informação */
 
 .client-versions-update-status-sem-versao,
 .client-versions-update-status-sem-referencia {
   border-color: #e4e7ec;
+
   background: #f8fafc;
+
   color: #7a8793;
 }
 
 
-/* LICENÇAS */
+/* =========================
+   LICENÇAS
+   ========================= */
 
 .client-versions-licenses {
   color: #344054 !important;
+
   font-size: 12.5px !important;
+
   font-weight: 800;
 }
 
+
 .client-versions-empty {
   padding: 48px 20px;
+
   color: #667085;
+
   font-size: 12px;
+
   text-align: center;
 }
 
 
-/* DARK MODE */
+/* =========================
+   DARK MODE
+   ========================= */
 
 html.dark
 .client-versions-header {
   border-color: #263548;
 }
 
+
 html.dark
 .client-versions-header h1 {
   color: #f1f5f9;
 }
+
 
 html.dark
 .client-versions-header p,
@@ -493,6 +746,7 @@ html.dark
 .client-versions-filter-summary {
   color: #94a3b8;
 }
+
 
 html.dark
 .client-versions-summary > div,
@@ -505,9 +759,12 @@ html.dark
 html.dark
 .client-versions-refresh {
   border-color: #263548;
+
   background: #162131;
+
   color: #cbd5e1;
 }
+
 
 html.dark
 .client-versions-summary
@@ -519,49 +776,62 @@ html.dark
   color: #e2e8f0 !important;
 }
 
+
 html.dark
 .client-versions-search input {
   color: #f1f5f9;
 }
 
+
 html.dark
 .client-versions-table th {
   border-color: #263548;
+
   background: #151f2e;
 }
+
 
 html.dark
 .client-versions-sort-button {
   color: #94a3b8;
 }
 
+
 html.dark
 .client-versions-sort-button:hover {
   background: #1b293b;
+
   color: #f1f5f9;
 }
+
 
 html.dark
 .client-versions-sort-button span {
   color: #60a5fa;
 }
 
+
 html.dark
 .client-versions-table td {
   border-color: #263548;
+
   color: #cbd5e1;
 }
+
 
 html.dark
 .client-versions-table tbody tr:hover {
   background: #1b293b;
 }
 
+
 html.dark
 .client-versions-product {
   background: #243244;
+
   color: #dbe4ee;
 }
+
 
 html.dark
 .client-versions-version {
@@ -577,7 +847,9 @@ html.dark
 }
 
 
-/* STATUS NO DARK MODE */
+/* =========================
+   STATUS DARK MODE
+   ========================= */
 
 html.dark
 .client-versions-update-status-atualizado {
@@ -600,35 +872,15 @@ html.dark
   color: #86efac;
 }
 
-html.dark
-.client-versions-update-status-atualizar {
-  border-color:
-    rgba(
-      251,
-      146,
-      60,
-      .20
-    );
-
-  background:
-    rgba(
-      249,
-      115,
-      22,
-      .10
-    );
-
-  color: #fdba74;
-}
 
 html.dark
-.client-versions-update-status-acima {
+.client-versions-update-status-atencao {
   border-color:
     rgba(
       96,
       165,
       250,
-      .20
+      .22
     );
 
   background:
@@ -636,58 +888,116 @@ html.dark
       59,
       130,
       246,
-      .10
+      .11
     );
 
   color: #93c5fd;
 }
+
+
+html.dark
+.client-versions-update-status-atualizar {
+  border-color:
+    rgba(
+      250,
+      204,
+      21,
+      .24
+    );
+
+  background:
+    rgba(
+      234,
+      179,
+      8,
+      .11
+    );
+
+  color: #fde047;
+}
+
+
+html.dark
+.client-versions-update-status-acima {
+  border-color:
+    rgba(
+      192,
+      132,
+      252,
+      .22
+    );
+
+  background:
+    rgba(
+      168,
+      85,
+      247,
+      .10
+    );
+
+  color: #d8b4fe;
+}
+
 
 html.dark
 .client-versions-update-status-sem-versao,
 html.dark
 .client-versions-update-status-sem-referencia {
   border-color: #334155;
+
   background: #1e293b;
+
   color: #94a3b8;
 }
 
 
-/* RESPONSIVO */
+/* =========================
+   RESPONSIVO
+   ========================= */
 
 @media (
   max-width: 1100px
 ) {
+
   .client-versions-filters {
     grid-template-columns:
       1fr
       1fr
       1fr;
   }
+
 
   .client-versions-search {
     grid-column:
       1 / -1;
   }
+
 }
+
 
 @media (
   max-width: 800px
 ) {
+
   .client-versions-summary {
     grid-template-columns:
       1fr;
   }
+
 
   .client-versions-filters {
     grid-template-columns:
       1fr
       1fr;
   }
+
 }
+
 
 @media (
   max-width: 650px
 ) {
+
   .client-versions-page {
     padding:
       20px
@@ -695,31 +1005,40 @@ html.dark
       30px;
   }
 
+
   .client-versions-header {
     align-items: stretch;
+
     flex-direction: column;
   }
+
 
   .client-versions-header-actions {
     width: 100%;
   }
 
+
   .client-versions-header-actions button {
     flex: 1;
   }
+
 
   .client-versions-filters {
     grid-template-columns:
       1fr;
   }
 
+
   .client-versions-search {
     grid-column:
       auto;
   }
 
+
   .client-versions-filter-summary {
     align-items: flex-start;
+
     flex-direction: column;
   }
+
 }
