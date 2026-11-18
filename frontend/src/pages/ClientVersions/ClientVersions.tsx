@@ -1,18 +1,6 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import type {
-  MouseEvent as ReactMouseEvent,
-} from "react";
-
-import {
-  readSheet,
-} from "read-excel-file/browser";
-
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
+import { readSheet } from "read-excel-file/browser";
 import {
   MdCheckCircle,
   MdCloudUpload,
@@ -23,33 +11,34 @@ import {
 } from "react-icons/md";
 
 import Layout from "../../components/layout/Layout";
-
-import {
-  buscarSessao,
-} from "../../services/AuthService";
-
+import { buscarSessao } from "../../services/AuthService";
 import {
   importarVersoesClientes,
   listarVersoesClientes,
 } from "../../services/ClientVersionService";
+import {
+  listarAmbientes,
+  obterAmbienteMaisRecente,
+} from "../../services/ReleaseEnvironmentService";
 
 import type {
   ClientVersion,
   ClientVersionImport,
   ClientVersionImportRow,
 } from "../../types/clientVersions";
+import {
+  criarSistemasFixos,
+} from "../../types/releaseEnvironment";
+import type {
+  ReleaseEnvironment,
+} from "../../types/releaseEnvironment";
 
 import "./ClientVersions.css";
 
-
 type Feedback = {
-  tipo:
-    | "sucesso"
-    | "erro";
-
+  tipo: "sucesso" | "erro";
   texto: string;
 };
-
 
 type CampoOrdenacao =
   | "cliente"
@@ -58,28 +47,25 @@ type CampoOrdenacao =
   | "parceiro"
   | "produto"
   | "versao"
+  | "atualizacao"
   | "licencas";
 
+type DirecaoOrdenacao = "asc" | "desc";
+type ColunaTabela = CampoOrdenacao;
+type LargurasColunas = Record<ColunaTabela, number>;
 
-type DirecaoOrdenacao =
-  | "asc"
-  | "desc";
+type StatusAtualizacao =
+  | "atualizado"
+  | "atualizar"
+  | "acima"
+  | "sem-versao"
+  | "sem-referencia";
 
-
-type ColunaTabela =
-  | "cliente"
-  | "documento"
-  | "uf"
-  | "parceiro"
-  | "produto"
-  | "versao"
-  | "licencas";
-
-
-type LargurasColunas = {
-  [key in ColunaTabela]: number;
+type ResultadoAtualizacao = {
+  status: StatusAtualizacao;
+  texto: string;
+  versaoReferencia?: string;
 };
-
 
 const LARGURAS_INICIAIS: LargurasColunas = {
   cliente: 340,
@@ -88,9 +74,9 @@ const LARGURAS_INICIAIS: LargurasColunas = {
   parceiro: 170,
   produto: 190,
   versao: 130,
+  atualizacao: 155,
   licencas: 135,
 };
-
 
 const LARGURAS_MINIMAS: LargurasColunas = {
   cliente: 160,
@@ -99,305 +85,349 @@ const LARGURAS_MINIMAS: LargurasColunas = {
   parceiro: 100,
   produto: 120,
   versao: 90,
+  atualizacao: 125,
   licencas: 100,
 };
 
+const COLUNAS: Array<{ campo: CampoOrdenacao; titulo: string }> = [
+  { campo: "cliente", titulo: "Cliente" },
+  { campo: "documento", titulo: "CPF/CNPJ" },
+  { campo: "uf", titulo: "UF" },
+  { campo: "parceiro", titulo: "Parceiro" },
+  { campo: "produto", titulo: "Produto" },
+  { campo: "versao", titulo: "Versão" },
+  { campo: "atualizacao", titulo: "Atualização" },
+  { campo: "licencas", titulo: "Licenças ativas" },
+];
 
-function normalizarTexto(
-  valor: unknown
-) {
-  return String(
-    valor ?? ""
-  )
+function normalizarTexto(valor: unknown) {
+  return String(valor ?? "")
     .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    )
+    .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
 }
 
-
-function textoCelula(
-  valor: unknown
-) {
-  return String(
-    valor ?? ""
-  ).trim();
+function normalizarProduto(valor: string) {
+  return valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 }
 
-
-function documentoCelula(
-  valor: unknown
-) {
-  return textoCelula(
-    valor
-  ).replace(
-    /\D/g,
-    ""
-  );
+function textoCelula(valor: unknown) {
+  return String(valor ?? "").trim();
 }
 
+function documentoCelula(valor: unknown) {
+  return textoCelula(valor).replace(/\D/g, "");
+}
 
-function versaoCelula(
-  valor: unknown
-) {
-  const versao =
-    textoCelula(
-      valor
-    );
-
+function versaoCelula(valor: unknown) {
+  const versao = textoCelula(valor);
 
   if (
     !versao ||
-    versao
-      .toLowerCase()
-      .includes(
-        "undefined.undefined"
-      )
+    versao.toLowerCase().includes("undefined.undefined")
   ) {
     return "";
   }
 
-
   return versao;
 }
 
+function licencasCelula(valor: unknown) {
+  const numero = Number(valor);
 
-function licencasCelula(
-  valor: unknown
-) {
-  const numero =
-    Number(
-      valor
-    );
-
-
-  if (
-    !Number.isFinite(
-      numero
-    ) ||
-    numero < 0
-  ) {
+  if (!Number.isFinite(numero) || numero < 0) {
     return 0;
   }
 
-
-  return Math.trunc(
-    numero
-  );
+  return Math.trunc(numero);
 }
 
+function formatarDocumento(documento: string) {
+  const numeros = documento.replace(/\D/g, "");
 
-function formatarDocumento(
-  documento: string
-) {
-  const numeros =
-    documento.replace(
-      /\D/g,
-      ""
-    );
-
-
-  if (
-    numeros.length === 14
-  ) {
+  if (numeros.length === 14) {
     return numeros.replace(
       /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
       "$1.$2.$3/$4-$5"
     );
   }
 
-
-  if (
-    numeros.length === 11
-  ) {
+  if (numeros.length === 11) {
     return numeros.replace(
       /^(\d{3})(\d{3})(\d{3})(\d{2})$/,
       "$1.$2.$3-$4"
     );
   }
 
-
   return documento;
 }
 
-
-function formatarData(
-  data: string
-) {
+function formatarData(data: string) {
   if (!data) {
     return "-";
   }
 
+  const normalizada = data.includes("T")
+    ? data
+    : `${data.replace(" ", "T")}Z`;
 
-  const normalizada =
-    data.includes("T")
-      ? data
-      : `${data.replace(
-          " ",
-          "T"
-        )}Z`;
+  const valor = new Date(normalizada);
 
-
-  const valor =
-    new Date(
-      normalizada
-    );
-
-
-  if (
-    Number.isNaN(
-      valor.getTime()
-    )
-  ) {
+  if (Number.isNaN(valor.getTime())) {
     return data;
   }
 
-
-  return valor.toLocaleString(
-    "pt-BR"
-  );
+  return valor.toLocaleString("pt-BR");
 }
 
+function localizarSistemaNaRelease(
+  ambiente: ReleaseEnvironment,
+  produto: string
+) {
+  const produtoNormalizado = normalizarProduto(produto);
+
+  if (!produtoNormalizado) {
+    return undefined;
+  }
+
+  const sistemas = criarSistemasFixos(
+    ambiente.sistemas,
+    ambiente.versoes
+  );
+
+  return sistemas.find(sistema => {
+    const chave = normalizarProduto(sistema.chave);
+    const nome = normalizarProduto(sistema.nome);
+
+    if (
+      produtoNormalizado === chave ||
+      produtoNormalizado === nome
+    ) {
+      return true;
+    }
+
+    if (
+      produtoNormalizado === "isa" &&
+      chave === "intellistock"
+    ) {
+      return true;
+    }
+
+    return (
+      produtoNormalizado.length >= 4 &&
+      (
+        produtoNormalizado.includes(chave) ||
+        produtoNormalizado.includes(nome) ||
+        chave.includes(produtoNormalizado) ||
+        nome.includes(produtoNormalizado)
+      )
+    );
+  });
+}
+
+function obterPartesVersao(versao: string) {
+  return versao.match(/\d+/g)?.map(Number) ?? [];
+}
+
+function compararVersoes(
+  versaoCliente: string,
+  versaoReferencia: string
+) {
+  const cliente = obterPartesVersao(versaoCliente);
+  const referencia = obterPartesVersao(versaoReferencia);
+  const quantidade = Math.max(cliente.length, referencia.length);
+
+  for (let indice = 0; indice < quantidade; indice += 1) {
+    const parteCliente = cliente[indice] ?? 0;
+    const parteReferencia = referencia[indice] ?? 0;
+
+    if (parteCliente > parteReferencia) {
+      return 1;
+    }
+
+    if (parteCliente < parteReferencia) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+function verificarAtualizacao(
+  cliente: ClientVersion,
+  release: ReleaseEnvironment | null
+): ResultadoAtualizacao {
+  if (!cliente.version?.trim()) {
+    return {
+      status: "sem-versao",
+      texto: "Sem versão",
+    };
+  }
+
+  if (!release) {
+    return {
+      status: "sem-referencia",
+      texto: "Sem referência",
+    };
+  }
+
+  const sistema = localizarSistemaNaRelease(
+    release,
+    cliente.product
+  );
+
+  const versaoReferencia = sistema?.versao?.trim() || "";
+
+  if (!sistema || !versaoReferencia) {
+    return {
+      status: "sem-referencia",
+      texto: "Sem referência",
+    };
+  }
+
+  const comparacao = compararVersoes(
+    cliente.version,
+    versaoReferencia
+  );
+
+  if (comparacao === 0) {
+    return {
+      status: "atualizado",
+      texto: "Atualizado",
+      versaoReferencia,
+    };
+  }
+
+  if (comparacao < 0) {
+    return {
+      status: "atualizar",
+      texto: "Atualizar",
+      versaoReferencia,
+    };
+  }
+
+  return {
+    status: "acima",
+    texto: "Acima da release",
+    versaoReferencia,
+  };
+}
+
+function pesoStatusAtualizacao(resultado: ResultadoAtualizacao) {
+  switch (resultado.status) {
+    case "atualizar":
+      return 0;
+
+    case "sem-versao":
+      return 1;
+
+    case "sem-referencia":
+      return 2;
+
+    case "atualizado":
+      return 3;
+
+    case "acima":
+      return 4;
+  }
+}
 
 function ClientVersions() {
-  const inputArquivoRef =
-    useRef<HTMLInputElement>(
-      null
-    );
+  const inputArquivoRef = useRef<HTMLInputElement>(null);
 
+  const [clientes, setClientes] = useState<ClientVersion[]>([]);
 
   const [
-    clientes,
-    setClientes,
-  ] =
-    useState<ClientVersion[]>(
-      []
-    );
-
+    releaseReferencia,
+    setReleaseReferencia,
+  ] = useState<ReleaseEnvironment | null>(null);
 
   const [
     ultimaImportacao,
     setUltimaImportacao,
-  ] =
-    useState<ClientVersionImport | null>(
-      null
-    );
+  ] = useState<ClientVersionImport | null>(null);
 
+  const [carregando, setCarregando] = useState(true);
+  const [importando, setImportando] = useState(false);
+  const [podeImportar, setPodeImportar] = useState(false);
 
-  const [
-    carregando,
-    setCarregando,
-  ] =
-    useState(true);
-
-
-  const [
-    importando,
-    setImportando,
-  ] =
-    useState(false);
-
-
-  const [
-    podeImportar,
-    setPodeImportar,
-  ] =
-    useState(false);
-
-
-  const [
-    busca,
-    setBusca,
-  ] =
-    useState("");
-
-
-  const [
-    uf,
-    setUf,
-  ] =
-    useState("");
-
-
-  const [
-    parceiro,
-    setParceiro,
-  ] =
-    useState("");
-
-
-  const [
-    produto,
-    setProduto,
-  ] =
-    useState("");
-
-
-  const [
-    versao,
-    setVersao,
-  ] =
-    useState("");
-
+  const [busca, setBusca] = useState("");
+  const [uf, setUf] = useState("");
+  const [parceiro, setParceiro] = useState("");
+  const [produto, setProduto] = useState("");
+  const [versao, setVersao] = useState("");
 
   const [
     campoOrdenacao,
     setCampoOrdenacao,
-  ] =
-    useState<CampoOrdenacao>(
-      "cliente"
-    );
-
+  ] = useState<CampoOrdenacao>("cliente");
 
   const [
     direcaoOrdenacao,
     setDirecaoOrdenacao,
-  ] =
-    useState<DirecaoOrdenacao>(
-      "asc"
-    );
-
+  ] = useState<DirecaoOrdenacao>("asc");
 
   const [
     largurasColunas,
     setLargurasColunas,
-  ] =
-    useState<LargurasColunas>(
-      LARGURAS_INICIAIS
-    );
-
+  ] = useState<LargurasColunas>(LARGURAS_INICIAIS);
 
   const [
     feedback,
     setFeedback,
-  ] =
-    useState<Feedback | null>(
-      null
-    );
-
+  ] = useState<Feedback | null>(null);
 
   async function carregar() {
     try {
-      setCarregando(
-        true
-      );
-
+      setCarregando(true);
 
       const resultado =
         await listarVersoesClientes();
-
 
       setClientes(
         resultado.clients
       );
 
-
       setUltimaImportacao(
         resultado.lastImport
       );
+
+      try {
+        const ambientes =
+          await listarAmbientes();
+
+        const releasesConcluidas =
+          ambientes.filter(
+            ambiente =>
+              ambiente.concluido === true
+          );
+
+        const ultimaReleaseConcluida =
+          obterAmbienteMaisRecente(
+            releasesConcluidas
+          );
+
+        setReleaseReferencia(
+          ultimaReleaseConcluida ?? null
+        );
+
+      } catch (
+        erroRelease
+      ) {
+        console.error(
+          "Erro ao carregar release de referência:",
+          erroRelease
+        );
+
+        setReleaseReferencia(
+          null
+        );
+      }
 
     } catch (
       erro
@@ -419,194 +449,162 @@ function ClientVersions() {
     }
   }
 
+  useEffect(() => {
+    let ativo =
+      true;
 
-  useEffect(
-    () => {
-      let ativo =
-        true;
-
-
-      async function iniciar() {
-        try {
-          const usuario =
-            await buscarSessao();
-
-
-          if (
-            ativo
-          ) {
-            setPodeImportar(
-              usuario?.role ===
-                "admin" ||
-              usuario?.role ===
-                "qualidade"
-            );
-          }
-
-        } catch (
-          erro
-        ) {
-          console.error(
-            "Erro ao consultar sessão:",
-            erro
-          );
-        }
-
+    async function iniciar() {
+      try {
+        const usuario =
+          await buscarSessao();
 
         if (
           ativo
         ) {
-          await carregar();
+          setPodeImportar(
+            usuario?.role ===
+              "admin" ||
+            usuario?.role ===
+              "qualidade"
+          );
         }
+
+      } catch (
+        erro
+      ) {
+        console.error(
+          "Erro ao consultar sessão:",
+          erro
+        );
       }
 
+      if (
+        ativo
+      ) {
+        await carregar();
+      }
+    }
 
-      void iniciar();
+    void iniciar();
 
+    return () => {
+      ativo =
+        false;
+    };
+  }, []);
 
-      return () => {
-        ativo =
-          false;
-      };
-    },
-    []
+  const ufs = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          clientes
+            .map(
+              item =>
+                item.state.trim()
+            )
+            .filter(
+              Boolean
+            )
+        )
+      ).sort(),
+    [
+      clientes,
+    ]
   );
 
-
-  const ufs =
-    useMemo(
-      () =>
-        Array.from(
-          new Set(
-            clientes
-              .map(
-                item =>
-                  item.state.trim()
-              )
-              .filter(
-                Boolean
-              )
-          )
-        ).sort(),
-
-      [
-        clientes,
-      ]
-    );
-
-
-  const parceiros =
-    useMemo(
-      () =>
-        Array.from(
-          new Set(
-            clientes
-              .map(
-                item =>
-                  item.partner.trim()
-              )
-              .filter(
-                Boolean
-              )
-          )
-        ).sort(
-          (
-            a,
-            b
-          ) =>
-            a.localeCompare(
-              b,
-              "pt-BR"
+  const parceiros = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          clientes
+            .map(
+              item =>
+                item.partner.trim()
             )
-        ),
-
-      [
-        clientes,
-      ]
-    );
-
-
-  const produtos =
-    useMemo(
-      () =>
-        Array.from(
-          new Set(
-            clientes
-              .map(
-                item =>
-                  item.product.trim()
-              )
-              .filter(
-                Boolean
-              )
-          )
-        ).sort(
-          (
-            a,
-            b
-          ) =>
-            a.localeCompare(
-              b,
-              "pt-BR"
+            .filter(
+              Boolean
             )
-        ),
-
-      [
-        clientes,
-      ]
-    );
-
-
-  const versoes =
-    useMemo(
-      () =>
-        Array.from(
-          new Set(
-            clientes
-              .map(
-                item =>
-                  item.version.trim()
-              )
-              .filter(
-                Boolean
-              )
+        )
+      ).sort(
+        (
+          a,
+          b
+        ) =>
+          a.localeCompare(
+            b,
+            "pt-BR"
           )
-        ).sort(
-          (
-            a,
-            b
-          ) =>
-            b.localeCompare(
-              a,
-              undefined,
-              {
-                numeric:
-                  true,
-              }
+      ),
+    [
+      clientes,
+    ]
+  );
+
+  const produtos = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          clientes
+            .map(
+              item =>
+                item.product.trim()
             )
-        ),
+            .filter(
+              Boolean
+            )
+        )
+      ).sort(
+        (
+          a,
+          b
+        ) =>
+          a.localeCompare(
+            b,
+            "pt-BR"
+          )
+      ),
+    [
+      clientes,
+    ]
+  );
 
-      [
-        clientes,
-      ]
-    );
+  const versoes = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          clientes
+            .map(
+              item =>
+                item.version.trim()
+            )
+            .filter(
+              Boolean
+            )
+        )
+      ).sort(
+        (
+          a,
+          b
+        ) =>
+          b.localeCompare(
+            a,
+            undefined,
+            {
+              numeric:
+                true,
+            }
+          )
+      ),
+    [
+      clientes,
+    ]
+  );
 
-
-  /*
-   * CLIENTES
-   *
-   * Cada CPF/CNPJ completo diferente
-   * representa um cliente.
-   *
-   * Matriz e filial com CNPJs diferentes
-   * contam separadamente.
-   */
   const totalClientes =
     useMemo(
       () => {
         const documentos =
           new Set<string>();
-
 
         clientes.forEach(
           item => {
@@ -615,7 +613,6 @@ function ClientVersions() {
                 /\D/g,
                 ""
               );
-
 
             if (
               documento
@@ -627,14 +624,12 @@ function ClientVersions() {
           }
         );
 
-
         return documentos.size;
       },
       [
         clientes,
       ]
     );
-
 
   const clientesFiltrados =
     useMemo(
@@ -644,13 +639,11 @@ function ClientVersions() {
             busca
           );
 
-
         const termoNumerico =
           busca.replace(
             /\D/g,
             ""
           );
-
 
         const filtrados =
           clientes.filter(
@@ -660,13 +653,11 @@ function ClientVersions() {
                   item.fantasyName
                 );
 
-
               const documentoCliente =
                 item.document.replace(
                   /\D/g,
                   ""
                 );
-
 
               const correspondeBusca =
                 !termo ||
@@ -682,26 +673,25 @@ function ClientVersions() {
                   )
                 );
 
-
               const correspondeUf =
                 !uf ||
-                item.state === uf;
-
+                item.state ===
+                  uf;
 
               const correspondeParceiro =
                 !parceiro ||
-                item.partner === parceiro;
-
+                item.partner ===
+                  parceiro;
 
               const correspondeProduto =
                 !produto ||
-                item.product === produto;
-
+                item.product ===
+                  produto;
 
               const correspondeVersao =
                 !versao ||
-                item.version === versao;
-
+                item.version ===
+                  versao;
 
               return (
                 correspondeBusca &&
@@ -713,7 +703,6 @@ function ClientVersions() {
             }
           );
 
-
         return filtrados
           .slice()
           .sort(
@@ -723,7 +712,6 @@ function ClientVersions() {
             ) => {
               let comparacao =
                 0;
-
 
               switch (
                 campoOrdenacao
@@ -742,7 +730,6 @@ function ClientVersions() {
 
                   break;
 
-
                 case "documento":
                   comparacao =
                     a.document
@@ -757,7 +744,6 @@ function ClientVersions() {
 
                   break;
 
-
                 case "uf":
                   comparacao =
                     a.state
@@ -767,7 +753,6 @@ function ClientVersions() {
                       );
 
                   break;
-
 
                 case "parceiro":
                   comparacao =
@@ -779,7 +764,6 @@ function ClientVersions() {
 
                   break;
 
-
                 case "produto":
                   comparacao =
                     a.product
@@ -789,7 +773,6 @@ function ClientVersions() {
                       );
 
                   break;
-
 
                 case "versao":
                   comparacao =
@@ -805,6 +788,22 @@ function ClientVersions() {
 
                   break;
 
+                case "atualizacao":
+                  comparacao =
+                    pesoStatusAtualizacao(
+                      verificarAtualizacao(
+                        a,
+                        releaseReferencia
+                      )
+                    ) -
+                    pesoStatusAtualizacao(
+                      verificarAtualizacao(
+                        b,
+                        releaseReferencia
+                      )
+                    );
+
+                  break;
 
                 case "licencas":
                   comparacao =
@@ -813,7 +812,6 @@ function ClientVersions() {
 
                   break;
               }
-
 
               return direcaoOrdenacao ===
                 "asc"
@@ -829,11 +827,11 @@ function ClientVersions() {
         parceiro,
         produto,
         versao,
+        releaseReferencia,
         campoOrdenacao,
         direcaoOrdenacao,
       ]
     );
-
 
   const totalLicencasFiltradas =
     useMemo(
@@ -847,16 +845,13 @@ function ClientVersions() {
             item.activeLicenses,
           0
         ),
-
       [
         clientesFiltrados,
       ]
     );
 
-
   function ordenarPor(
-    campo:
-      CampoOrdenacao
+    campo: CampoOrdenacao
   ) {
     if (
       campoOrdenacao ===
@@ -872,21 +867,17 @@ function ClientVersions() {
       return;
     }
 
-
     setCampoOrdenacao(
       campo
     );
-
 
     setDirecaoOrdenacao(
       "asc"
     );
   }
 
-
   function simboloOrdenacao(
-    campo:
-      CampoOrdenacao
+    campo: CampoOrdenacao
   ) {
     if (
       campoOrdenacao !==
@@ -899,13 +890,11 @@ function ClientVersions() {
       );
     }
 
-
     return direcaoOrdenacao ===
       "asc"
       ? "↑"
       : "↓";
   }
-
 
   function iniciarRedimensionamento(
     evento:
@@ -914,24 +903,19 @@ function ClientVersions() {
       ColunaTabela
   ) {
     evento.preventDefault();
-
     evento.stopPropagation();
-
 
     const xInicial =
       evento.clientX;
-
 
     const larguraInicial =
       largurasColunas[
         coluna
       ];
 
-
     document.body.classList.add(
       "client-versions-resizing"
     );
-
 
     function mover(
       eventoMouse:
@@ -941,7 +925,6 @@ function ClientVersions() {
         eventoMouse.clientX -
         xInicial;
 
-
       const novaLargura =
         Math.max(
           LARGURAS_MINIMAS[
@@ -950,7 +933,6 @@ function ClientVersions() {
           larguraInicial +
             diferenca
         );
-
 
       setLargurasColunas(
         atual => ({
@@ -962,31 +944,26 @@ function ClientVersions() {
       );
     }
 
-
     function finalizar() {
       window.removeEventListener(
         "mousemove",
         mover
       );
 
-
       window.removeEventListener(
         "mouseup",
         finalizar
       );
-
 
       document.body.classList.remove(
         "client-versions-resizing"
       );
     }
 
-
     window.addEventListener(
       "mousemove",
       mover
     );
-
 
     window.addEventListener(
       "mouseup",
@@ -994,35 +971,32 @@ function ClientVersions() {
     );
   }
 
-
   async function importarArquivo(
-    arquivo: File
+    arquivo:
+      File
   ) {
     try {
       setImportando(
         true
       );
 
-
       setFeedback(
         null
       );
-
 
       const linhas =
         await readSheet(
           arquivo
         );
 
-
       if (
-        linhas.length < 2
+        linhas.length <
+        2
       ) {
         throw new Error(
           "O Excel não possui dados para importar."
         );
       }
-
 
       const cabecalho =
         linhas[0].map(
@@ -1032,59 +1006,53 @@ function ClientVersions() {
             )
         );
 
-
       const indiceFantasia =
         cabecalho.indexOf(
           "Fantasia"
         );
-
 
       const indiceDocumento =
         cabecalho.indexOf(
           "CPF/CNPJ"
         );
 
-
       const indiceProduto =
         cabecalho.indexOf(
           "Produto"
         );
-
 
       const indiceUf =
         cabecalho.indexOf(
           "U.F."
         );
 
-
       const indiceParceiro =
         cabecalho.indexOf(
           "Parceiro"
         );
-
 
       const indiceVersao =
         cabecalho.indexOf(
           "Version"
         );
 
-
       const indiceTotal =
         cabecalho.indexOf(
           "Total"
         );
 
-
       if (
-        indiceFantasia < 0 ||
-        indiceDocumento < 0 ||
-        indiceProduto < 0
+        indiceFantasia <
+          0 ||
+        indiceDocumento <
+          0 ||
+        indiceProduto <
+          0
       ) {
         throw new Error(
           "O Excel precisa possuir as colunas Fantasia, CPF/CNPJ e Produto."
         );
       }
-
 
       const registros:
         ClientVersionImportRow[] =
@@ -1125,7 +1093,8 @@ function ClientVersions() {
                   : "",
 
               partner:
-                indiceParceiro >= 0
+                indiceParceiro >=
+                0
                   ? textoCelula(
                       linha[
                         indiceParceiro
@@ -1134,7 +1103,8 @@ function ClientVersions() {
                   : "",
 
               version:
-                indiceVersao >= 0
+                indiceVersao >=
+                0
                   ? versaoCelula(
                       linha[
                         indiceVersao
@@ -1143,7 +1113,8 @@ function ClientVersions() {
                   : "",
 
               activeLicenses:
-                indiceTotal >= 0
+                indiceTotal >=
+                0
                   ? licencasCelula(
                       linha[
                         indiceTotal
@@ -1157,15 +1128,14 @@ function ClientVersions() {
               item.fantasyName
           );
 
-
       if (
-        registros.length === 0
+        registros.length ===
+        0
       ) {
         throw new Error(
           "Nenhum cliente válido foi encontrado no Excel."
         );
       }
-
 
       const resultado =
         await importarVersoesClientes(
@@ -1173,16 +1143,13 @@ function ClientVersions() {
           registros
         );
 
-
       setClientes(
         resultado.clients
       );
 
-
       setUltimaImportacao(
         resultado.lastImport
       );
-
 
       setBusca("");
       setUf("");
@@ -1190,16 +1157,13 @@ function ClientVersions() {
       setProduto("");
       setVersao("");
 
-
       setCampoOrdenacao(
         "cliente"
       );
 
-
       setDirecaoOrdenacao(
         "asc"
       );
-
 
       setFeedback({
         tipo:
@@ -1227,7 +1191,6 @@ function ClientVersions() {
         false
       );
 
-
       if (
         inputArquivoRef.current
       ) {
@@ -1236,7 +1199,6 @@ function ClientVersions() {
       }
     }
   }
-
 
   return (
     <Layout>
@@ -1261,7 +1223,6 @@ function ClientVersions() {
 
           </div>
 
-
           <div className="client-versions-header-actions">
 
             <button
@@ -1275,15 +1236,12 @@ function ClientVersions() {
                 importando
               }
             >
-
               <MdRefresh
                 size={19}
               />
 
               Atualizar
-
             </button>
-
 
             {podeImportar && (
               <>
@@ -1298,10 +1256,7 @@ function ClientVersions() {
                   onChange={
                     evento => {
                       const arquivo =
-                        evento
-                          .target
-                          .files?.[0];
-
+                        evento.target.files?.[0];
 
                       if (
                         arquivo
@@ -1313,7 +1268,6 @@ function ClientVersions() {
                     }
                   }
                 />
-
 
                 <button
                   type="button"
@@ -1327,7 +1281,6 @@ function ClientVersions() {
                     importando
                   }
                 >
-
                   <MdCloudUpload
                     size={19}
                   />
@@ -1335,7 +1288,6 @@ function ClientVersions() {
                   {importando
                     ? "Importando..."
                     : "Importar Excel"}
-
                 </button>
 
               </>
@@ -1345,10 +1297,11 @@ function ClientVersions() {
 
         </header>
 
-
         {feedback && (
           <div
-            className={`client-versions-feedback client-versions-feedback-${feedback.tipo}`}
+            className={
+              `client-versions-feedback client-versions-feedback-${feedback.tipo}`
+            }
           >
 
             {feedback.tipo ===
@@ -1366,7 +1319,6 @@ function ClientVersions() {
 
             )}
 
-
             <span>
               {feedback.texto}
             </span>
@@ -1374,11 +1326,9 @@ function ClientVersions() {
           </div>
         )}
 
-
         <section className="client-versions-summary">
 
           <div>
-
             <span>
               Clientes
             </span>
@@ -1386,12 +1336,9 @@ function ClientVersions() {
             <strong>
               {totalClientes}
             </strong>
-
           </div>
 
-
           <div>
-
             <span>
               Licenças ativas
             </span>
@@ -1401,12 +1348,9 @@ function ClientVersions() {
                 ?.totalActiveLicenses ??
                 0}
             </strong>
-
           </div>
 
-
           <div>
-
             <span>
               Última importação
             </span>
@@ -1420,38 +1364,30 @@ function ClientVersions() {
                 : "Nenhuma"}
 
             </strong>
-
           </div>
 
         </section>
-
 
         {ultimaImportacao && (
           <div className="client-versions-import-info">
 
             <span>
-
               Arquivo:
               {" "}
 
               <strong>
                 {ultimaImportacao.fileName}
               </strong>
-
             </span>
 
-
             <span>
-
               {ultimaImportacao.totalRows}
               {" "}
               registros importados
-
             </span>
 
           </div>
         )}
-
 
         <section className="client-versions-filters">
 
@@ -1463,7 +1399,9 @@ function ClientVersions() {
 
             <input
               type="search"
-              value={busca}
+              value={
+                busca
+              }
               placeholder="Buscar cliente ou CPF/CNPJ..."
               autoComplete="off"
               onChange={
@@ -1476,9 +1414,10 @@ function ClientVersions() {
 
           </label>
 
-
           <select
-            value={uf}
+            value={
+              uf
+            }
             onChange={
               evento =>
                 setUf(
@@ -1486,29 +1425,30 @@ function ClientVersions() {
                 )
             }
           >
-
             <option value="">
               Todas as UFs
             </option>
 
             {ufs.map(
               item => (
-
                 <option
-                  key={item}
-                  value={item}
+                  key={
+                    item
+                  }
+                  value={
+                    item
+                  }
                 >
                   {item}
                 </option>
-
               )
             )}
-
           </select>
 
-
           <select
-            value={parceiro}
+            value={
+              parceiro
+            }
             onChange={
               evento =>
                 setParceiro(
@@ -1516,29 +1456,30 @@ function ClientVersions() {
                 )
             }
           >
-
             <option value="">
               Todos os parceiros
             </option>
 
             {parceiros.map(
               item => (
-
                 <option
-                  key={item}
-                  value={item}
+                  key={
+                    item
+                  }
+                  value={
+                    item
+                  }
                 >
                   {item}
                 </option>
-
               )
             )}
-
           </select>
 
-
           <select
-            value={produto}
+            value={
+              produto
+            }
             onChange={
               evento =>
                 setProduto(
@@ -1546,29 +1487,30 @@ function ClientVersions() {
                 )
             }
           >
-
             <option value="">
               Todos os produtos
             </option>
 
             {produtos.map(
               item => (
-
                 <option
-                  key={item}
-                  value={item}
+                  key={
+                    item
+                  }
+                  value={
+                    item
+                  }
                 >
                   {item}
                 </option>
-
               )
             )}
-
           </select>
 
-
           <select
-            value={versao}
+            value={
+              versao
+            }
             onChange={
               evento =>
                 setVersao(
@@ -1576,50 +1518,43 @@ function ClientVersions() {
                 )
             }
           >
-
             <option value="">
               Todas as versões
             </option>
 
             {versoes.map(
               item => (
-
                 <option
-                  key={item}
-                  value={item}
+                  key={
+                    item
+                  }
+                  value={
+                    item
+                  }
                 >
                   {item}
                 </option>
-
               )
             )}
-
           </select>
 
         </section>
 
-
         <div className="client-versions-filter-summary">
 
           <span>
-
             {clientesFiltrados.length}
             {" "}
             registros encontrados
-
           </span>
 
-
           <strong>
-
             {totalLicencasFiltradas}
             {" "}
             licenças ativas nos filtros atuais
-
           </strong>
 
         </div>
-
 
         <section className="client-versions-card">
 
@@ -1634,7 +1569,8 @@ function ClientVersions() {
 
             <div className="client-versions-empty">
 
-              {clientes.length === 0
+              {clientes.length ===
+                0
                 ? "Nenhum Excel foi importado ainda."
                 : "Nenhum cliente encontrado com esses filtros."}
 
@@ -1656,7 +1592,9 @@ function ClientVersions() {
                     coluna => (
 
                       <col
-                        key={coluna}
+                        key={
+                          coluna
+                        }
                         style={{
                           width:
                             `${largurasColunas[coluna]}px`,
@@ -1668,55 +1606,25 @@ function ClientVersions() {
 
                 </colgroup>
 
-
                 <thead>
 
                   <tr>
 
-                    {[
-                      [
-                        "cliente",
-                        "Cliente",
-                      ],
-                      [
-                        "documento",
-                        "CPF/CNPJ",
-                      ],
-                      [
-                        "uf",
-                        "UF",
-                      ],
-                      [
-                        "parceiro",
-                        "Parceiro",
-                      ],
-                      [
-                        "produto",
-                        "Produto",
-                      ],
-                      [
-                        "versao",
-                        "Versão",
-                      ],
-                      [
-                        "licencas",
-                        "Licenças ativas",
-                      ],
-                    ].map(
+                    {COLUNAS.map(
                       (
-                        [
+                        {
                           campo,
                           titulo,
-                        ]
+                        }
                       ) => (
 
                         <th
-                          key={campo}
+                          key={
+                            campo
+                          }
                           style={{
                             width:
-                              `${largurasColunas[
-                                campo as ColunaTabela
-                              ]}px`,
+                              `${largurasColunas[campo]}px`,
                           }}
                         >
 
@@ -1725,7 +1633,7 @@ function ClientVersions() {
                             className="client-versions-sort-button"
                             onClick={() =>
                               ordenarPor(
-                                campo as CampoOrdenacao
+                                campo
                               )
                             }
                           >
@@ -1734,22 +1642,23 @@ function ClientVersions() {
 
                             <span>
                               {simboloOrdenacao(
-                                campo as CampoOrdenacao
+                                campo
                               )}
                             </span>
 
                           </button>
 
-
                           <div
                             className="client-versions-resizer"
                             role="separator"
-                            aria-label={`Redimensionar coluna ${titulo}`}
+                            aria-label={
+                              `Redimensionar coluna ${titulo}`
+                            }
                             onMouseDown={
                               evento =>
                                 iniciarRedimensionamento(
                                   evento,
-                                  campo as ColunaTabela
+                                  campo
                                 )
                             }
                           />
@@ -1763,80 +1672,104 @@ function ClientVersions() {
 
                 </thead>
 
-
                 <tbody>
 
                   {clientesFiltrados.map(
-                    cliente => (
+                    cliente => {
+                      const atualizacao =
+                        verificarAtualizacao(
+                          cliente,
+                          releaseReferencia
+                        );
 
-                      <tr
-                        key={cliente.id}
-                      >
+                      return (
 
-                        <td>
+                        <tr
+                          key={
+                            cliente.id
+                          }
+                        >
 
-                          <span className="client-versions-name">
-                            {cliente.fantasyName}
-                          </span>
+                          <td>
+                            <span className="client-versions-name">
+                              {cliente.fantasyName}
+                            </span>
+                          </td>
 
-                        </td>
+                          <td>
+                            {formatarDocumento(
+                              cliente.document
+                            )}
+                          </td>
 
+                          <td>
+                            {cliente.state ||
+                              "-"}
+                          </td>
 
-                        <td>
-                          {formatarDocumento(
-                            cliente.document
-                          )}
-                        </td>
+                          <td>
+                            {cliente.partner ||
+                              "-"}
+                          </td>
 
+                          <td>
+                            <span className="client-versions-product">
+                              {cliente.product ||
+                                "Não informado"}
+                            </span>
+                          </td>
 
-                        <td>
-                          {cliente.state ||
-                            "-"}
-                        </td>
+                          <td>
 
+                            {cliente.version ? (
 
-                        <td>
-                          {cliente.partner ||
-                            "-"}
-                        </td>
+                              <span className="client-versions-version">
+                                {cliente.version}
+                              </span>
 
+                            ) : (
 
-                        <td>
+                              <span className="client-versions-version-empty">
+                                Não informado
+                              </span>
 
-                          <span className="client-versions-product">
-                            {cliente.product ||
-                              "Não informado"}
-                          </span>
+                            )}
 
-                        </td>
+                          </td>
 
+                          <td>
 
-                        <td>
+                            <span
+                              className={
+                                `client-versions-update-status client-versions-update-status-${atualizacao.status}`
+                              }
+                              title={
+                                atualizacao
+                                  .versaoReferencia
+                                  ? `Release concluída: ${atualizacao.versaoReferencia}`
+                                  : undefined
+                              }
+                            >
 
-                          {cliente.version ? (
+                              <span
+                                className="client-versions-update-dot"
+                                aria-hidden="true"
+                              />
 
-                            <span className="client-versions-version">
-                              {cliente.version}
+                              {atualizacao.texto}
+
                             </span>
 
-                          ) : (
+                          </td>
 
-                            <span className="client-versions-version-empty">
-                              Não informado
-                            </span>
+                          <td className="client-versions-licenses">
+                            {cliente.activeLicenses}
+                          </td>
 
-                          )}
+                        </tr>
 
-                        </td>
-
-
-                        <td className="client-versions-licenses">
-                          {cliente.activeLicenses}
-                        </td>
-
-                      </tr>
-
-                    )
+                      );
+                    }
                   )}
 
                 </tbody>
@@ -1854,6 +1787,5 @@ function ClientVersions() {
     </Layout>
   );
 }
-
 
 export default ClientVersions;
