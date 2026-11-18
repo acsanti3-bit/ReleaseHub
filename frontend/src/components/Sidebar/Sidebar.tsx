@@ -50,11 +50,13 @@ function obterUsuarioSalvo():
         SESSION_USER_KEY
       );
 
+
     if (!valor) {
 
       return null;
 
     }
+
 
     return JSON.parse(
       valor
@@ -95,6 +97,7 @@ function salvarUsuario(
   } catch {
 
     // sessionStorage indisponível.
+
   }
 
 }
@@ -232,6 +235,7 @@ function Sidebar({
         } catch {
 
           // localStorage indisponível.
+
         }
 
 
@@ -389,9 +393,14 @@ function Sidebar({
         }
       >
 
-        {sidebarRecolhida
-          ? "›"
-          : "‹"}
+        <span
+          className="sidebar-edge-arrow"
+          aria-hidden="true"
+        >
+          {sidebarRecolhida
+            ? "›"
+            : "‹"}
+        </span>
 
       </button>
 
@@ -421,9 +430,11 @@ function Sidebar({
             Visão geral
           </span>
 
+
           <NavLink to="/">
             Dashboard
           </NavLink>
+
 
           <NavLink to="/tv">
             Modo TV
@@ -461,6 +472,7 @@ function Sidebar({
             Clientes
           </span>
 
+
           <NavLink to="/client-versions">
             Versões de Clientes
           </NavLink>
@@ -475,6 +487,7 @@ function Sidebar({
             <span className="sidebar-group-title">
               Administrativo
             </span>
+
 
             <NavLink to="/gestao-horas">
               Gestão de Horas
@@ -492,6 +505,7 @@ function Sidebar({
             <span className="sidebar-group-title">
               Sistema
             </span>
+
 
             <NavLink to="/settings">
               Configurações
