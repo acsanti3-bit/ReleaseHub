@@ -36,6 +36,9 @@ interface Props {
 const SESSION_USER_KEY =
   "releasehub-session-user";
 
+const SIDEBAR_COLLAPSED_KEY =
+  "releasehub-sidebar-collapsed";
+
 
 function obterUsuarioSalvo():
   AuthUser | null {
@@ -97,6 +100,26 @@ function salvarUsuario(
 }
 
 
+function obterSidebarRecolhida():
+  boolean {
+
+  try {
+
+    return (
+      localStorage.getItem(
+        SIDEBAR_COLLAPSED_KEY
+      ) === "true"
+    );
+
+  } catch {
+
+    return false;
+
+  }
+
+}
+
+
 function Sidebar({
   darkMode,
   onToggleTheme,
@@ -122,6 +145,15 @@ function Sidebar({
     setSaindo,
   ] =
     useState(false);
+
+
+  const [
+    sidebarRecolhida,
+    setSidebarRecolhida,
+  ] =
+    useState(
+      obterSidebarRecolhida
+    );
 
 
   useEffect(() => {
@@ -177,6 +209,38 @@ function Sidebar({
     };
 
   }, []);
+
+
+  function alternarSidebar() {
+
+    setSidebarRecolhida(
+      valorAtual => {
+
+        const novoValor =
+          !valorAtual;
+
+
+        try {
+
+          localStorage.setItem(
+            SIDEBAR_COLLAPSED_KEY,
+            String(
+              novoValor
+            )
+          );
+
+        } catch {
+
+          // localStorage indisponível.
+        }
+
+
+        return novoValor;
+
+      }
+    );
+
+  }
 
 
   async function handleLogout() {
@@ -294,17 +358,58 @@ function Sidebar({
 
   return (
 
-    <aside className="sidebar">
+    <aside
+      className={
+        `sidebar ${
+          sidebarRecolhida
+            ? "is-collapsed"
+            : ""
+        }`
+      }
+    >
 
       <div className="sidebar-header">
 
-        <h2>
-          IWS ReleaseHub
-        </h2>
+        <div className="sidebar-brand">
 
-        <span>
-          v1.0.0
-        </span>
+          <h2>
+            IWS ReleaseHub
+          </h2>
+
+          <span>
+            v1.0.0
+          </span>
+
+        </div>
+
+
+        <button
+          type="button"
+          className="sidebar-collapse-button"
+          onClick={
+            alternarSidebar
+          }
+          title={
+            sidebarRecolhida
+              ? "Expandir barra lateral"
+              : "Recolher barra lateral"
+          }
+          aria-label={
+            sidebarRecolhida
+              ? "Expandir barra lateral"
+              : "Recolher barra lateral"
+          }
+          aria-expanded={
+            !sidebarRecolhida
+          }
+        >
+
+          <span
+            className="sidebar-collapse-icon"
+            aria-hidden="true"
+          />
+
+        </button>
 
       </div>
 
@@ -358,7 +463,7 @@ function Sidebar({
           </span>
 
           <NavLink to="/client-versions">
-            Versões dos Clientes
+            Versões de Clientes
           </NavLink>
 
         </div>

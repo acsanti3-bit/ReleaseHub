@@ -1,5 +1,9 @@
 .sidebar {
     width: 260px;
+    min-width: 260px;
+
+    position: relative;
+
     background: #005AA9;
     color: white;
 
@@ -8,33 +12,161 @@
 
     padding: 28px 18px;
 
+    overflow: hidden;
+
     transition:
+        width 0.25s ease,
+        min-width 0.25s ease,
+        padding 0.25s ease,
         background 0.25s ease,
         color 0.25s ease;
 }
 
 
+/* =========================
+   CABEÇALHO
+   ========================= */
+
 .sidebar-header {
-    margin-bottom: 30px;
-    padding: 0 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 28px;
+
+    padding: 0 4px 0 10px;
+}
+
+
+.sidebar-brand {
+    min-width: 0;
+
+    opacity: 1;
+
+    transition:
+        opacity 0.15s ease;
 }
 
 
 .sidebar-header h2 {
     margin: 0;
+
+    white-space: nowrap;
+
     font-size: 25px;
     font-weight: 700;
+
     letter-spacing: -0.4px;
 }
 
 
 .sidebar-header span {
     display: block;
+
     margin-top: 4px;
 
     color: #cfd8e3;
+
     font-size: 12px;
     font-weight: 500;
+}
+
+
+/* =========================
+   BOTÃO RECOLHER
+   ========================= */
+
+.sidebar-collapse-button {
+    width: 34px;
+    height: 34px;
+
+    min-width: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.22);
+
+    border-radius: 8px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    color: white;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.sidebar-collapse-button:hover {
+    background:
+        rgba(255, 255, 255, 0.16);
+
+    border-color:
+        rgba(255, 255, 255, 0.35);
+}
+
+
+.sidebar-collapse-button:focus-visible {
+    outline:
+        2px solid
+        rgba(255, 255, 255, 0.75);
+
+    outline-offset: 2px;
+}
+
+
+/*
+   Ícone desenhado em CSS.
+   Retângulo com divisão lateral,
+   parecido com botão de sidebar.
+*/
+
+.sidebar-collapse-icon {
+    position: relative;
+
+    width: 17px;
+    height: 15px;
+
+    margin: 0 !important;
+
+    border:
+        1.5px solid
+        currentColor;
+
+    border-radius: 3px;
+
+    color: inherit;
+}
+
+
+.sidebar-collapse-icon::before {
+    content: "";
+
+    position: absolute;
+
+    top: 1px;
+    bottom: 1px;
+
+    left: 5px;
+
+    width: 1.5px;
+
+    border-radius: 2px;
+
+    background:
+        currentColor;
 }
 
 
@@ -45,28 +177,45 @@
 .sidebar nav {
     display: flex;
     flex-direction: column;
-    gap: 22px;
+
+    gap: 17px;
+
+    opacity: 1;
+
+    transition:
+        opacity 0.15s ease;
 }
 
 
 .sidebar-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+
+    gap: 5px;
 }
 
 
 .sidebar-group-title {
     padding: 0 12px;
-    margin-bottom: 3px;
 
-    color: rgba(255, 255, 255, 0.58);
+    margin-bottom: 2px;
 
-    font-size: 10px;
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.48
+        );
+
+    font-size: 9px;
     font-weight: 700;
 
-    letter-spacing: 1.1px;
+    letter-spacing: 1.15px;
+
     text-transform: uppercase;
+
+    white-space: nowrap;
 }
 
 
@@ -75,14 +224,15 @@
 
     text-decoration: none;
 
-    padding: 11px 14px;
+    padding: 10px 14px;
 
     border-radius: 9px;
 
+    white-space: nowrap;
+
     transition:
         background 0.2s ease,
-        color 0.2s ease,
-        transform 0.15s ease;
+        color 0.2s ease;
 
     font-size: 15px;
     font-weight: 600;
@@ -94,7 +244,12 @@
 
 .sidebar nav a:hover {
     background:
-        rgba(255, 255, 255, 0.12);
+        rgba(
+            255,
+            255,
+            255,
+            0.10
+        );
 }
 
 
@@ -107,8 +262,64 @@
 
 .sidebar nav a.active {
     box-shadow:
-        0 4px 12px
-        rgba(0, 0, 0, 0.12);
+        0 3px 10px
+        rgba(
+            0,
+            0,
+            0,
+            0.10
+        );
+}
+
+
+/* =========================
+   SIDEBAR RECOLHIDA
+   ========================= */
+
+.sidebar.is-collapsed {
+    width: 58px;
+    min-width: 58px;
+
+    padding:
+        28px
+        12px;
+}
+
+
+.sidebar.is-collapsed
+.sidebar-header {
+    justify-content: center;
+
+    margin-bottom: 0;
+
+    padding: 0;
+}
+
+
+.sidebar.is-collapsed
+.sidebar-brand {
+    display: none;
+}
+
+
+.sidebar.is-collapsed
+.sidebar-collapse-button {
+    width: 34px;
+    min-width: 34px;
+
+    height: 34px;
+}
+
+
+.sidebar.is-collapsed
+nav {
+    display: none;
+}
+
+
+.sidebar.is-collapsed
+.sidebar-auth {
+    display: none;
 }
 
 
@@ -121,29 +332,78 @@ html.dark .sidebar {
 }
 
 
-html.dark .sidebar-header span {
+html.dark
+.sidebar-header span {
     color: #94A3B8;
 }
 
 
-html.dark .sidebar-group-title {
-    color: rgba(226, 232, 240, 0.48);
+html.dark
+.sidebar-group-title {
+    color:
+        rgba(
+            226,
+            232,
+            240,
+            0.40
+        );
 }
 
 
-html.dark .sidebar nav a {
+html.dark
+.sidebar nav a {
     color: #E2E8F0;
 }
 
 
-html.dark .sidebar nav a:hover {
+html.dark
+.sidebar nav a:hover {
     background:
-        rgba(255, 255, 255, 0.08);
+        rgba(
+            255,
+            255,
+            255,
+            0.07
+        );
 }
 
 
-html.dark .sidebar nav a.active,
-html.dark .sidebar nav a.active:hover {
+html.dark
+.sidebar nav a.active,
+html.dark
+.sidebar nav a.active:hover {
     background: #F58220;
     color: #FFFFFF;
+}
+
+
+html.dark
+.sidebar-collapse-button {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+}
+
+
+html.dark
+.sidebar-collapse-button:hover {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.12
+        );
 }
