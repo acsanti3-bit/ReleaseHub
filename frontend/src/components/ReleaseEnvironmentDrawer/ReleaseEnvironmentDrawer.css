@@ -601,17 +601,14 @@
 }
 
 .release-system-version-inherited {
-    padding-right: 92px !important;
+    padding-right: 10px !important;
     background: #f8fafc !important;
     color: #667085 !important;
     cursor: default;
 }
 
 .release-inherited-badge {
-    position: absolute;
-    top: 50%;
-    right: 8px;
-    transform: translateY(-50%);
+    position: static;
     padding: 2px 6px;
     border-radius: 999px;
     background: #eaf2f8;
@@ -1346,3 +1343,25 @@ html.dark .release-intellicash-remessa-required input:focus {
         0 0 0 3px
         rgba(245, 130, 32, .12);
 }
+/* Compatibilidade: ações em fluxo normal, sem sobreposição. */
+.release-compatibility-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+.release-compatibility-actions .release-inherited-badge { white-space: nowrap; }
+.release-compatibility-edit {
+    border: 1px solid #d8dee5;
+    border-radius: 6px;
+    padding: 2px 5px;
+    background: #fff;
+    color: #005aa9;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.release-compatibility-edit:disabled { opacity: .65; cursor: default; }
+html.dark .release-compatibility-edit { background: #1e293b; color: #93c5fd; border-color: #475569; }

@@ -9,10 +9,6 @@ import {
 } from "react-icons/md";
 
 import {
-  useNavigate,
-} from "react-router-dom";
-
-import {
   criarSistemasFixos,
 } from "../../types/releaseEnvironment";
 
@@ -276,8 +272,9 @@ function ReleaseEnvironmentDrawer({
   onSave,
 }: Props) {
 
-  const navigate =
-    useNavigate();
+  const [editandoSistemas, setEditandoSistemas] = useState<string[]>([]);
+  const [tvAlterada, setTvAlterada] = useState<string[]>([]);
+  const ambienteJaExiste = environments.some(ambiente => ambiente.id === environment.id);
 
   const [
     form,
@@ -309,13 +306,6 @@ function ReleaseEnvironmentDrawer({
     setQuantidadeRemessaIntellicash,
   ] =
     useState<string>("");
-
-  const ambienteJaExiste =
-    environments.some(
-      ambiente =>
-        ambiente.id ===
-        environment.id
-    );
 
   const versaoIntellicashAtual =
     form.sistemas
@@ -467,6 +457,8 @@ function ReleaseEnvironmentDrawer({
           environment.remessas ?? [],
       });
 
+      setEditandoSistemas([]);
+      setTvAlterada([]);
       setQuantidadeRemessaIntellicash(
         ""
       );
@@ -491,6 +483,28 @@ function ReleaseEnvironmentDrawer({
         form.sistemas,
       ]
     );
+
+  const sistemasResolvidos = useMemo(() => sistemas.map(sistema => {
+    if (SISTEMAS_PRINCIPAIS.includes(sistema.chave as SistemaPrincipal)) return sistema;
+    const origem = sistemasReferencia.find(item => item.chave === sistema.chave);
+    const mostrandoNaTv = !ambienteJaExiste && !tvAlterada.includes(sistema.chave)
+      ? origem?.mostrarNaTv ?? sistema.mostrarNaTv
+      : sistema.mostrarNaTv;
+    if (editandoSistemas.includes(sistema.chave)) return { ...sistema, mostrarNaTv: mostrandoNaTv };
+    const versao = sistema.versao?.trim() || origem?.versao?.trim() || "";
+    const executavel = sistema.executavel?.trim() ||
+      (versao && versao === origem?.versao?.trim() ? origem?.executavel : undefined);
+    return { ...sistema, versao, executavel, mostrarNaTv: mostrandoNaTv };
+  }), [sistemas, sistemasReferencia, editandoSistemas, ambienteJaExiste, tvAlterada]);
+
+  function iniciarEdicao(chave: string) {
+    const resolvido = sistemasResolvidos.find(item => item.chave === chave);
+    if (!resolvido) return;
+    setForm(atual => ({ ...atual, sistemas: (atual.sistemas ?? []).map(item =>
+      item.chave === chave ? { ...item, versao: resolvido.versao, executavel: resolvido.executavel } : item
+    ) }));
+    setEditandoSistemas(atual => atual.includes(chave) ? atual : [...atual, chave]);
+  }
 
   const executavelIntellicashOriginal =
     criarSistemasFixos(
@@ -536,10 +550,8 @@ function ReleaseEnvironmentDrawer({
     valor: string
   ) {
 
-    const sistemaPrincipal =
-      SISTEMAS_PRINCIPAIS.includes(
-        chave as SistemaPrincipal
-      );
+    const sistemaPrincipal = SISTEMAS_PRINCIPAIS.includes(chave as SistemaPrincipal);
+    if (!sistemaPrincipal && !editandoSistemas.includes(chave)) return;
 
     setForm(
       atual => {
@@ -563,6 +575,7 @@ function ReleaseEnvironmentDrawer({
               return {
                 ...sistema,
                 versao: valor,
+                ...(!sistemaPrincipal && sistema.versao !== valor ? { executavel: undefined } : {}),
               };
 
             }
@@ -600,14 +613,6 @@ function ReleaseEnvironmentDrawer({
       }
     );
 
-    if (
-      !sistemaPrincipal &&
-      ambienteJaExiste
-    ) {
-
-      return;
-
-    }
 
   }
 
@@ -645,6 +650,7 @@ function ReleaseEnvironmentDrawer({
     valor: boolean
   ) {
 
+    setTvAlterada(atual => atual.includes(chave) ? atual : [...atual, chave]);
     setForm(
       atual => ({
         ...atual,
@@ -673,6 +679,7 @@ function ReleaseEnvironmentDrawer({
     valor: boolean
   ) {
 
+    setTvAlterada(sistemas.map(sistema => sistema.chave));
     setForm(
       atual => ({
         ...atual,
@@ -883,17 +890,7 @@ function ReleaseEnvironmentDrawer({
           form.versoes
             .intellistock,
 
-        iwbserver:
-          form.sistemas
-            ?.find(
-              sistema =>
-                sistema.chave ===
-                "iwbserver"
-            )
-            ?.versao
-            ?.trim() ||
-          form.versoes
-            .iwbserver,
+        iwbserver: sistemasResolvidos.find(sistema => sistema.chave === "iwbserver")?.versao?.trim() || "",
 
       };
 
@@ -980,10 +977,7 @@ function ReleaseEnvironmentDrawer({
         versoes,
 
         sistemas:
-          (
-            form.sistemas ??
-            []
-          ).map(
+          sistemasResolvidos.map(
             sistema => ({
               ...sistema,
 
@@ -1223,7 +1217,7 @@ function ReleaseEnvironmentDrawer({
             <span>
               IntelliCash, EasyCash, EasyCheckOut, EasyPDV e IntelliStock devem ter a versão informada em cada release.
               As demais aplicações herdam a versão da release anterior mais próxima. Se não houver uma anterior cadastrada,
-              é usada a próxima release disponível. Alterações ficam na página Compatibilidade.
+              é usada a próxima release disponível. A versão e a data do executável podem ser ajustadas pelo botão Editar.
             </span>
 
           </div>
@@ -1242,7 +1236,7 @@ function ReleaseEnvironmentDrawer({
 
                 {ambienteReferencia ? (
                   <>
-                    As aplicações secundárias foram preenchidas com base em{" "}
+                    Campos vazios das aplicações secundárias usam como referência a{" "}
                     <strong>
                       Release{" "}
                       {
@@ -1254,7 +1248,7 @@ function ReleaseEnvironmentDrawer({
                 ) : (
                   <>
                     Nenhuma release de referência foi encontrada.
-                    As aplicações secundárias ficarão sem versão herdada.
+                    Os campos sem informação própria ficarão vazios.
                   </>
                 )}
 
@@ -1324,7 +1318,7 @@ function ReleaseEnvironmentDrawer({
             className="release-system-list"
           >
 
-            {sistemas.map(
+            {sistemasResolvidos.map(
               sistema => {
 
                 const principal =
@@ -1341,23 +1335,9 @@ function ReleaseEnvironmentDrawer({
                 const herdado =
                   !principal;
 
-                const sistemaOrigem =
-                  sistemasReferencia
-                    .find(
-                      item =>
-                        item.chave ===
-                        sistema.chave
-                    );
-
-                const versaoExibida =
-                  herdado &&
-                  !ambienteJaExiste
-                    ? sistemaOrigem
-                        ?.versao ??
-                      ""
-                    : sistema
-                        .versao ??
-                      "";
+                const editando = editandoSistemas.includes(sistema.chave);
+                const bloqueado = herdado && !editando;
+                const versaoExibida = sistema.versao ?? "";
 
                 return (
 
@@ -1398,7 +1378,7 @@ function ReleaseEnvironmentDrawer({
 
                       <input
                         className={`release-system-version ${
-                          herdado
+                          bloqueado
                             ? "release-system-version-inherited"
                             : ""
                         }`}
@@ -1406,9 +1386,7 @@ function ReleaseEnvironmentDrawer({
                         value={
                           versaoExibida
                         }
-                        disabled={
-                          herdado
-                        }
+                        disabled={bloqueado}
                         placeholder="Versão"
                         onChange={
                           evento =>
@@ -1423,73 +1401,26 @@ function ReleaseEnvironmentDrawer({
                       />
 
                       {herdado && (
-
-                        <div
-                          style={{
-                            display:
-                              "flex",
-                            alignItems:
-                              "center",
-                            gap:
-                              "6px",
-                            flexWrap:
-                              "wrap",
-                          }}
-                        >
-
-                          <span
-                            className="release-inherited-badge"
+                        <div className="release-compatibility-actions">
+                          <span className="release-inherited-badge">Compatibilidade</span>
+                          <button
+                            type="button"
+                            className="release-compatibility-edit"
+                            disabled={editando}
+                            title="Editar versão e executável neste ambiente"
+                            onClick={() => iniciarEdicao(sistema.chave)}
                           >
-                            Compatibilidade
-                          </span>
-
-                          {ambienteJaExiste && (
-
-                            <button
-                              type="button"
-                              title="Editar esta versão na página de Compatibilidade"
-                              onClick={
-                                () => {
-                                  onClose();
-
-                                  navigate(
-                                    `/compatibility?environment=${environment.id}`
-                                  );
-                                }
-                              }
-                              style={{
-                                border:
-                                  "1px solid #D8DEE5",
-                                borderRadius:
-                                  "7px",
-                                padding:
-                                  "4px 8px",
-                                background:
-                                  "#FFFFFF",
-                                color:
-                                  "#005AA9",
-                                fontSize:
-                                  "11px",
-                                fontWeight:
-                                  700,
-                                cursor:
-                                  "pointer",
-                              }}
-                            >
-                              Editar
-                            </button>
-
-                          )}
-
+                            {editando ? "Editando" : "Editar"}
+                          </button>
                         </div>
-
                       )}
 
                     </div>
 
                     <input
-                      className="release-system-executable"
+                      className={`release-system-executable ${bloqueado ? "release-system-version-inherited" : ""}`}
                       type="text"
+                      disabled={bloqueado}
                       value={
                         sistema
                           .executavel ??

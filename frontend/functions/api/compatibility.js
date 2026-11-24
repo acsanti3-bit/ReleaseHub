@@ -7,6 +7,10 @@ import {
   listarCatalogoGlobal,
 } from "./compatibility-systems.js";
 
+import {
+  listarAmbientesParaHeranca,
+} from "./environments.js";
+
 
 function respostaErro(
   mensagem,
@@ -266,6 +270,16 @@ async function listarVersoesAmbiente(
     }
   }
 
+
+  // Usa a mesma resolução de herança da tela Ambientes da Release.
+  const ambientesResolvidos = await listarAmbientesParaHeranca(context);
+  const resolvido = ambientesResolvidos.find(
+    item => Number(item.id) === Number(ambiente.id)
+  );
+  for (const sistema of resolvido?.sistemas ?? []) {
+    mapa.set(normalizarTexto(sistema.chave), sistema);
+    mapa.set(normalizarTexto(sistema.nome), sistema);
+  }
 
   return mapa;
 }
@@ -701,8 +715,8 @@ async function montarResposta(
 
 
           const selectedVersion =
-            versionSource ===
-              "environment"
+            definicao.source === "environment" ||
+            versionSource === "environment"
               ? ambienteVersao
               : String(
                   override
@@ -908,49 +922,22 @@ async function buscarExecutavelCompartilhado(
   }
 
 
-  const row =
-    await context.env.DB
-      .prepare(
-        `
-          SELECT
-            executavel
-
-          FROM release_environment_versions
-
-          WHERE
-            chave = ?
-            AND versao = ?
-            AND TRIM(
-              COALESCE(
-                executavel,
-                ''
-              )
-            ) <> ''
-
-          ORDER BY
-            environment_id DESC
-
-          LIMIT 1
-        `
-      )
-      .bind(
-        chaveNormalizada,
-        versaoNormalizada
-      )
-      .first();
-
-
-  return String(
-    row?.executavel ??
-    ""
-  ).trim();
+  const row = await context.env.DB.prepare(`
+    SELECT CASE WHEN COUNT(DISTINCT TRIM(executavel)) = 1 THEN MIN(TRIM(executavel)) ELSE '' END AS executavel
+    FROM release_environment_versions
+    WHERE chave = ? AND versao = ? AND TRIM(COALESCE(executavel, '')) <> ''
+  `).bind(chaveNormalizada, versaoNormalizada).first();
+  return String(row?.executavel ?? "").trim();
 }
+
 
 async function atualizarVersaoNoAmbiente(
   context,
   environmentId,
   definicao,
-  versao
+  versao,
+  ambiente,
+  mapaAmbiente
 ) {
   const chave =
     chaveAmbienteDaDefinicao(
@@ -976,35 +963,37 @@ async function atualizarVersaoNoAmbiente(
         120
       );
 
-      const executavelCompartilhado =
-  await buscarExecutavelCompartilhado(
-    context,
-    chave,
-    versaoNormalizada
+  const versaoAtual = obterVersaoDoAmbiente(definicao, mapaAmbiente, ambiente);
+
+  // Salvar README, visibilidade ou origem não deve alterar o executável.
+  if (versaoAtual === versaoNormalizada) return;
+
+  const sistemaAtual = mapaAmbiente.get(normalizarTexto(chave));
+  const executavelCompartilhado = await buscarExecutavelCompartilhado(
+    context, chave, versaoNormalizada
   );
 
-  await context.env.DB
-    .prepare(
-      `
-UPDATE release_environment_versions
+  const registro = await context.env.DB.prepare(`
+    SELECT chave FROM release_environment_versions
+    WHERE environment_id = ? AND chave = ?
+  `).bind(environmentId, chave).first();
 
-SET
-  versao = ?,
-  executavel = ?
-
-WHERE
-  environment_id = ?
-  AND chave = ?
-      `
-    )
-    .bind(
-      versaoNormalizada,
-      executavelCompartilhado,
-      environmentId,
-      chave
-    )
-    .run();
-
+  if (registro) {
+    await context.env.DB.prepare(`
+      UPDATE release_environment_versions
+      SET versao = ?, executavel = ?
+      WHERE environment_id = ? AND chave = ?
+    `).bind(versaoNormalizada, executavelCompartilhado, environmentId, chave).run();
+  } else if (sistemaAtual && sistemaAtual.ordem != null) {
+    // Releases antigas podem não ter uma linha persistida para o sistema herdado.
+    await context.env.DB.prepare(`
+      INSERT INTO release_environment_versions
+        (environment_id, chave, nome, versao, executavel, ordem, mostrar_na_tv)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(environmentId, chave, sistemaAtual.nome, versaoNormalizada,
+      executavelCompartilhado, sistemaAtual.ordem,
+      sistemaAtual.mostrarNaTv === false ? 0 : 1).run();
+  }
 
   const colunaLegada =
     COLUNAS_LEGADAS_AMBIENTE[
@@ -1142,6 +1131,10 @@ async function aplicarVersoesDaCompatibilidade(
   catalogo,
   overrides
 ) {
+  const ambiente = await buscarAmbiente(context, environmentId);
+  if (!ambiente) return;
+  const mapaAmbiente = await listarVersoesAmbiente(context, ambiente);
+
   const porChave =
     new Map(
       catalogo.map(
@@ -1175,7 +1168,9 @@ async function aplicarVersoesDaCompatibilidade(
       context,
       environmentId,
       definicao,
-      override.selectedVersion
+      override.selectedVersion,
+      ambiente,
+      mapaAmbiente
     );
   }
 }

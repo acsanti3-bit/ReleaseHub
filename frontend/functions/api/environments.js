@@ -681,10 +681,9 @@ async function listarSistemas(
       versao &&
       executavel
     ) {
-      executaveisCompartilhados.set(
-        `${chave}::${versao}`,
-        executavel
-      );
+      const id = `${chave}::${versao}`;
+      const anterior = executaveisCompartilhados.get(id);
+      executaveisCompartilhados.set(id, anterior === undefined || anterior === executavel ? executavel : "");
     }
   }
 
@@ -789,42 +788,12 @@ async function buscarExecutavelCompartilhado(
   }
 
 
-  const row =
-    await context.env.DB
-      .prepare(
-        `
-          SELECT
-            executavel
-
-          FROM release_environment_versions
-
-          WHERE
-            chave = ?
-            AND versao = ?
-            AND TRIM(
-              COALESCE(
-                executavel,
-                ''
-              )
-            ) <> ''
-
-          ORDER BY
-            environment_id DESC
-
-          LIMIT 1
-        `
-      )
-      .bind(
-        chaveNormalizada,
-        versaoNormalizada
-      )
-      .first();
-
-
-  return String(
-    row?.executavel ??
-    ""
-  ).trim();
+  const row = await context.env.DB.prepare(`
+    SELECT CASE WHEN COUNT(DISTINCT TRIM(executavel)) = 1 THEN MIN(TRIM(executavel)) ELSE '' END AS executavel
+    FROM release_environment_versions
+    WHERE chave = ? AND versao = ? AND TRIM(COALESCE(executavel, '')) <> ''
+  `).bind(chaveNormalizada, versaoNormalizada).first();
+  return String(row?.executavel ?? "").trim();
 }
 
 
@@ -988,177 +957,34 @@ async function propagarExecutavelCompartilhado(
 }
 
 
-async function salvarSistemas(
-  context,
-  environmentId,
-  sistemas
-) {
-  /*
-    Antes de apagar os registros desta
-    release, completa datas vazias através
-    de outra release que possua exatamente
-    o mesmo sistema + versão.
-  */
-  const sistemasResolvidos =
-    [];
-
-
-  for (
-    const sistema of
-    sistemas
-  ) {
-    const versao =
-      String(
-        sistema.versao ??
-        ""
-      ).trim();
-
-    let executavel =
-      String(
-        sistema.executavel ??
-        ""
-      ).trim();
-
-
-    if (
-      !executavel &&
-      versao
-    ) {
-      executavel =
-        await buscarExecutavelCompartilhado(
-          context,
-          sistema.chave,
-          versao
-        );
+async function salvarSistemas(context, environmentId, sistemas, anteriores = []) {
+  const mapaAnterior = new Map(anteriores.map(sistema => [sistema.chave, sistema]));
+  const sistemasResolvidos = [];
+  const alterados = [];
+  for (const sistema of sistemas) {
+    const versao = String(sistema.versao ?? "").trim();
+    let executavel = String(sistema.executavel ?? "").trim();
+    const anterior = mapaAnterior.get(sistema.chave);
+    const compartilhado = versao ? await buscarExecutavelCompartilhado(context, sistema.chave, versao) : "";
+    // Só uma data efetivamente informada/alterada pode sobrescrever outras releases.
+    const dataAnterior = String(anterior?.executavel ?? "").trim();
+    const alterouData = anterior
+      ? executavel !== dataAnterior && (anterior.versao === versao || executavel !== compartilhado)
+      : executavel !== compartilhado;
+    if (versao && executavel && alterouData) {
+      alterados.push({ ...sistema, versao, executavel });
     }
-
-
-    sistemasResolvidos.push({
-      ...sistema,
-
-      versao,
-
-      executavel,
-    });
+    if (!executavel && versao) executavel = compartilhado;
+    sistemasResolvidos.push({ ...sistema, versao, executavel });
   }
-
-
-  await context.env.DB
-    .prepare(
-      `
-        DELETE FROM release_environment_versions
-
-        WHERE
-          environment_id = ?
-      `
-    )
-    .bind(
-      environmentId
-    )
-    .run();
-
-
-  for (
-    const sistema of
-    sistemasResolvidos
-  ) {
-    await context.env.DB
-      .prepare(
-        `
-          INSERT INTO release_environment_versions (
-            environment_id,
-            chave,
-            nome,
-            versao,
-            executavel,
-            ordem,
-            mostrar_na_tv
-          )
-
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `
-      )
-      .bind(
-        environmentId,
-        sistema.chave,
-        sistema.nome,
-        sistema.versao,
-        sistema.executavel ??
-          "",
-        sistema.ordem,
-        sistema.mostrarNaTv
-          ? 1
-          : 0
-      )
-      .run();
+  await context.env.DB.prepare(`DELETE FROM release_environment_versions WHERE environment_id = ?`).bind(environmentId).run();
+  for (const sistema of sistemasResolvidos) {
+    await context.env.DB.prepare(`INSERT INTO release_environment_versions (environment_id, chave, nome, versao, executavel, ordem, mostrar_na_tv) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .bind(environmentId, sistema.chave, sistema.nome, sistema.versao, sistema.executavel, sistema.ordem, sistema.mostrarNaTv ? 1 : 0).run();
   }
-
-
-  /*
-    Agora propaga qualquer data cadastrada
-    para as outras releases equivalentes.
-  */
-  for (
-    const sistema of
-    sistemasResolvidos
-  ) {
-    await propagarExecutavelCompartilhado(
-      context,
-      sistema
-    );
-  }
-
-
+  for (const sistema of alterados) await propagarExecutavelCompartilhado(context, sistema);
   return sistemasResolvidos;
 }
-
-
-async function salvarSistemas(
-  context,
-  environmentId,
-  sistemas
-) {
-  await context.env.DB
-    .prepare(
-      `
-        DELETE FROM release_environment_versions
-        WHERE environment_id = ?
-      `
-    )
-    .bind(environmentId)
-    .run();
-
-  for (const sistema of sistemas) {
-    await context.env.DB
-      .prepare(
-        `
-          INSERT INTO release_environment_versions (
-            environment_id,
-            chave,
-            nome,
-            versao,
-            executavel,
-            ordem,
-            mostrar_na_tv
-          )
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `
-      )
-      .bind(
-        environmentId,
-        sistema.chave,
-        sistema.nome,
-        sistema.versao,
-        sistema.executavel ?? "",
-        sistema.ordem,
-        sistema.mostrarNaTv
-          ? 1
-          : 0
-      )
-      .run();
-  }
-}
-
 
 function obterSistemaProjeto(
   nome,
@@ -1511,110 +1337,41 @@ async function buscarAmbientePorId(
 }
 
 
-async function buscarAmbienteAnterior(
-  context,
-  versaoIntellicash,
-  excluirId = null
-) {
-  const resultado =
-    await context.env.DB
-      .prepare(
-        `
-          SELECT id, intellicash
-          FROM release_environments
-        `
-      )
-      .all();
-
-  const candidatos =
-    (resultado.results ?? [])
-      .filter(row => {
-        if (
-          excluirId !== null &&
-          Number(row.id) ===
-            Number(excluirId)
-        ) {
-          return false;
-        }
-
-        const versao =
-          String(
-            row.intellicash ?? ""
-          ).trim();
-
-        return (
-          Boolean(versao) &&
-          compararVersoes(
-            versao,
-            versaoIntellicash
-          ) < 0
-        );
-      })
-      .sort(
-        (a, b) =>
-          compararVersoes(
-            String(
-              b.intellicash ?? ""
-            ),
-            String(
-              a.intellicash ?? ""
-            )
-          )
-      );
-
-  if (candidatos.length) {
-    return buscarAmbientePorId(
-      context,
-      candidatos[0].id
-    );
-  }
-
-  const posteriores =
-    (resultado.results ?? [])
-      .filter(row => {
-        if (
-          excluirId !== null &&
-          Number(row.id) ===
-            Number(excluirId)
-        ) {
-          return false;
-        }
-
-        const versao =
-          String(
-            row.intellicash ?? ""
-          ).trim();
-
-        return (
-          Boolean(versao) &&
-          compararVersoes(
-            versao,
-            versaoIntellicash
-          ) > 0
-        );
-      })
-      .sort(
-        (a, b) =>
-          compararVersoes(
-            String(
-              a.intellicash ?? ""
-            ),
-            String(
-              b.intellicash ?? ""
-            )
-          )
-      );
-
-  if (!posteriores.length) {
-    return null;
-  }
-
-  return buscarAmbientePorId(
-    context,
-    posteriores[0].id
-  );
+export async function listarAmbientesParaHeranca(context) {
+  const [resultado, sistemasPorAmbiente] = await Promise.all([
+    context.env.DB.prepare(`SELECT id, nome, prazo, concluido, intellicash, easycash, easycheckout, easypdv, intellistock, iwbserver FROM release_environments`).all(),
+    listarSistemas(context),
+  ]);
+  return resolverHerancas((resultado.results ?? []).map(row => transformarAmbiente(
+    row, normalizarSistemas(sistemasPorAmbiente.get(row.id) ?? [], row)
+  )));
 }
 
+function escolherReferencia(ambientes, versao, excluirId = null) {
+  if (!versao) return null;
+  const candidatos = ambientes.filter(item => item.versoes.intellicash &&
+    (excluirId === null || Number(item.id) !== Number(excluirId)));
+  const anteriores = candidatos.filter(item => compararVersoes(item.versoes.intellicash, versao) < 0)
+    .sort((a, b) => compararVersoes(b.versoes.intellicash, a.versoes.intellicash));
+  if (anteriores.length) return anteriores[0];
+  return candidatos.filter(item => compararVersoes(item.versoes.intellicash, versao) > 0)
+    .sort((a, b) => compararVersoes(a.versoes.intellicash, b.versoes.intellicash))[0] ?? null;
+}
+
+function resolverHerancas(ambientes) {
+  const ordenados = [...ambientes].sort((a, b) => compararVersoes(a.versoes.intellicash, b.versoes.intellicash));
+  for (const ambiente of ordenados) {
+    if (!ambiente.versoes.intellicash) continue;
+    const referencia = escolherReferencia(ordenados, ambiente.versoes.intellicash, ambiente.id);
+    ambiente.sistemas = herdarSistemasSecundarios(ambiente.sistemas, referencia);
+    ambiente.versoes.iwbserver = obterVersaoSistema(ambiente.sistemas, "iwbserver");
+  }
+  return ambientes;
+}
+
+async function buscarAmbienteAnterior(context, versaoIntellicash, excluirId = null) {
+  return escolherReferencia(await listarAmbientesParaHeranca(context), versaoIntellicash, excluirId);
+}
 
 function herdarSistemasSecundarios(
   sistemas,
@@ -1656,19 +1413,12 @@ function herdarSistemasSecundarios(
         return sistema;
       }
 
+      const versao = String(sistema.versao ?? "").trim() || String(anterior.versao ?? "").trim();
       return {
         ...sistema,
-        versao:
-          String(
-            anterior.versao ?? ""
-          ).trim(),
-        executavel:
-          String(
-            anterior.executavel ?? ""
-          ).trim(),
-        mostrarNaTv:
-          anterior.mostrarNaTv ??
-          true,
+        versao,
+        executavel: String(sistema.executavel ?? "").trim() ||
+          (versao && versao === String(anterior.versao ?? "").trim() ? String(anterior.executavel ?? "").trim() : ""),
       };
     }
   );
@@ -1756,6 +1506,8 @@ export async function onRequestGet(
         }
       );
 
+    resolverHerancas(ambientes);
+
     return Response.json(
       ambientes
     );
@@ -1829,6 +1581,21 @@ export async function onRequestPost(
         ambienteAnterior
       );
 
+    // A criação mantém a configuração de TV anterior quando não há escolha explícita.
+    if (ambienteAnterior) {
+      sistemas = sistemas.map(sistema => {
+        if (SISTEMAS_PRINCIPAIS.has(sistema.chave)) return sistema;
+        const informado = Array.isArray(body.sistemas) && body.sistemas.some(item =>
+          (normalizarTexto(item.chave) === normalizarTexto(sistema.chave) ||
+           normalizarTexto(item.nome) === normalizarTexto(sistema.nome)) &&
+          typeof item.mostrarNaTv === "boolean"
+        );
+        if (informado) return sistema;
+        const anterior = ambienteAnterior.sistemas.find(item => item.chave === sistema.chave);
+        return { ...sistema, mostrarNaTv: anterior?.mostrarNaTv ?? sistema.mostrarNaTv };
+      });
+    }
+
     const id =
       body.id ?? Date.now();
 
@@ -1898,7 +1665,8 @@ export async function onRequestPost(
   await salvarSistemas(
     context,
     id,
-    sistemas
+    sistemas,
+    (ambienteAnterior?.sistemas ?? []).filter(sistema => !SISTEMAS_PRINCIPAIS.has(sistema.chave))
   );
 
     await salvarComplementosAmbiente(
@@ -2027,6 +1795,22 @@ export async function onRequestPut(
       );
     }
 
+    const ambientesResolvidos = await listarAmbientesParaHeranca(context);
+    const referencia = escolherReferencia(ambientesResolvidos, intellicash, body.id);
+    const anterioresResolvidos = ambientesResolvidos.find(item => Number(item.id) === Number(body.id))?.sistemas ?? ambienteAnterior.sistemas;
+    sistemas = sistemas.map(sistema => {
+      if (SISTEMAS_PRINCIPAIS.has(sistema.chave)) return sistema;
+      const salvo = ambienteAnterior.sistemas.find(item => item.chave === sistema.chave);
+      if (!salvo) return sistema;
+      const versao = sistema.versao || salvo.versao;
+      return {
+        ...sistema,
+        versao,
+        executavel: sistema.executavel || (versao === salvo.versao ? salvo.executavel : ""),
+      };
+    });
+    sistemas = herdarSistemasSecundarios(sistemas, referencia);
+
     const vaiConcluir =
       !ambienteAnterior.concluido &&
       Boolean(body.concluido);
@@ -2112,7 +1896,8 @@ export async function onRequestPut(
       await salvarSistemas(
         context,
         body.id,
-        sistemas
+        sistemas,
+        anterioresResolvidos
       );
 
     await salvarComplementosAmbiente(
