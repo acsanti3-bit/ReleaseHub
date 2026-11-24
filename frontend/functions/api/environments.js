@@ -1369,6 +1369,81 @@ function resolverHerancas(ambientes) {
   return ambientes;
 }
 
+// Propaga somente alterações de versão dos sistemas secundários.
+// A fotografia anterior à edição evita confundir herança recalculada com dados antigos.
+function planejarHerancaContinua(ambientes, environmentId, versaoRelease, anterior, atual) {
+  if (!anterior || !atual || SISTEMAS_PRINCIPAIS.has(atual.chave)) return [];
+  const antiga = String(anterior.versao ?? "").trim();
+  const nova = String(atual.versao ?? "").trim();
+  if (!antiga || !nova || antiga === nova || !versaoRelease) return [];
+  const posteriores = ambientes.filter(ambiente =>
+    Number(ambiente.id) !== Number(environmentId) &&
+    ambiente.versoes.intellicash &&
+    compararVersoes(ambiente.versoes.intellicash, versaoRelease) > 0
+  ).sort((a, b) => compararVersoes(a.versoes.intellicash, b.versoes.intellicash));
+  const plano = [];
+  for (let i = 0; i < posteriores.length;) {
+    // Releases com a mesma versão de IntelliCash são tratadas como um grupo.
+    const grupo = [posteriores[i++]];
+    while (i < posteriores.length && compararVersoes(
+      posteriores[i].versoes.intellicash, grupo[0].versoes.intellicash
+    ) === 0) grupo.push(posteriores[i++]);
+    const candidatos = grupo.map(ambiente => ({ ambiente,
+      sistema: ambiente.sistemas.find(item => item.chave === atual.chave) }));
+    // Uma versão diferente é uma barreira: não atravessar uma alteração anterior.
+    if (candidatos.some(({ sistema }) => !sistema ||
+      (String(sistema.versao ?? "").trim() && String(sistema.versao ?? "").trim() !== antiga))) break;
+    for (const { ambiente, sistema } of candidatos) {
+      plano.push({ ambiente, anterior: sistema, atual: { ...sistema,
+        versao: nova, executavel: String(atual.executavel ?? "").trim() } });
+    }
+  }
+  return plano;
+}
+
+export async function propagarVersaoSecundaria(context, ambientes, environmentId, versaoRelease, anterior, atual) {
+  const plano = planejarHerancaContinua(ambientes, environmentId, versaoRelease, anterior, atual);
+  if (!plano.length) return;
+  const projetos = (await context.env.DB.prepare(`SELECT id, nome FROM projects`).all()).results ?? [];
+  const comandos = [];
+  for (const item of plano) {
+    const { ambiente, atual: sistema } = item;
+    // Preserva nome, ordem e visibilidade dos registros existentes.
+    comandos.push(context.env.DB.prepare(`UPDATE release_environment_versions
+      SET versao = ?, executavel = ? WHERE environment_id = ? AND chave = ?`)
+      .bind(sistema.versao, sistema.executavel, ambiente.id, sistema.chave));
+    comandos.push(context.env.DB.prepare(`INSERT INTO release_environment_versions
+      (environment_id, chave, nome, versao, executavel, ordem, mostrar_na_tv)
+      SELECT ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (
+        SELECT 1 FROM release_environment_versions WHERE environment_id = ? AND chave = ?)`)
+      .bind(ambiente.id, sistema.chave, sistema.nome, sistema.versao, sistema.executavel,
+        sistema.ordem, sistema.mostrarNaTv === false ? 0 : 1, ambiente.id, sistema.chave));
+    if (sistema.chave === "iwbserver") {
+      comandos.push(context.env.DB.prepare(`UPDATE release_environments SET iwbserver = ? WHERE id = ?`)
+        .bind(sistema.versao, ambiente.id));
+    }
+    for (const projeto of projetos) {
+      if (obterSistemaProjeto(projeto.nome, ambiente.sistemas)?.chave !== sistema.chave) continue;
+      // Atualiza apenas o projeto afetado. Mantém prazo e demais campos existentes.
+      comandos.push(context.env.DB.prepare(`INSERT INTO release_projects
+        (environment_id, project_id, versao, executavel, prazo) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(environment_id, project_id) DO UPDATE SET
+          versao = excluded.versao, executavel = excluded.executavel, updated_at = CURRENT_TIMESTAMP`)
+        .bind(ambiente.id, projeto.id, sistema.versao, sistema.executavel, ambiente.prazo ?? ""));
+    }
+  }
+  // O batch do D1 aplica os registros propagados em uma transação.
+  await context.env.DB.batch(comandos);
+  for (const item of plano) {
+    await registrarAuditoria(context, {
+      acao: "EDITAR", entidade: "ambiente", entidadeId: item.ambiente.id,
+      entidadeNome: item.ambiente.nome,
+      dadosAnteriores: { sistema: item.anterior },
+      dadosNovos: { sistema: item.atual, origemHeranca: environmentId },
+    });
+  }
+}
+
 async function buscarAmbienteAnterior(context, versaoIntellicash, excluirId = null) {
   return escolherReferencia(await listarAmbientesParaHeranca(context), versaoIntellicash, excluirId);
 }
@@ -1899,6 +1974,11 @@ export async function onRequestPut(
         sistemas,
         anterioresResolvidos
       );
+
+    for (const sistema of sistemas) {
+      const anterior = anterioresResolvidos.find(item => item.chave === sistema.chave);
+      await propagarVersaoSecundaria(context, ambientesResolvidos, body.id, intellicash, anterior, sistema);
+    }
 
     await salvarComplementosAmbiente(
       context,

@@ -9,6 +9,7 @@ import {
 
 import {
   listarAmbientesParaHeranca,
+  propagarVersaoSecundaria,
 } from "./environments.js";
 
 
@@ -1122,6 +1123,7 @@ WHERE
       )
       .run();
   }
+  return { chave, versao: versaoNormalizada, executavel: executavelCompartilhado };
 }
 
 
@@ -1134,6 +1136,10 @@ async function aplicarVersoesDaCompatibilidade(
   const ambiente = await buscarAmbiente(context, environmentId);
   if (!ambiente) return;
   const mapaAmbiente = await listarVersoesAmbiente(context, ambiente);
+  const ambientesAntes = await listarAmbientesParaHeranca(context);
+  const ambienteAntes = ambientesAntes.find(item => Number(item.id) === Number(environmentId));
+  const alteracoes = [];
+
 
   const porChave =
     new Map(
@@ -1164,7 +1170,7 @@ async function aplicarVersoesDaCompatibilidade(
     }
 
 
-    await atualizarVersaoNoAmbiente(
+    const alteracao = await atualizarVersaoNoAmbiente(
       context,
       environmentId,
       definicao,
@@ -1172,6 +1178,13 @@ async function aplicarVersoesDaCompatibilidade(
       ambiente,
       mapaAmbiente
     );
+    if (alteracao) alteracoes.push(alteracao);
+  }
+  const ambienteAtual = await buscarAmbiente(context, environmentId);
+  for (const atual of alteracoes) {
+    const anterior = ambienteAntes?.sistemas.find(item => item.chave === atual.chave);
+    await propagarVersaoSecundaria(context, ambientesAntes, environmentId,
+      ambienteAtual?.intellicash, anterior, atual);
   }
 }
 
