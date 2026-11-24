@@ -623,6 +623,7 @@ function somarContagens(
   );
 }
 
+
 function obterUltimaMovimentacao(
   issues
 ) {
@@ -711,7 +712,12 @@ function dataComMargem(
   return new Date(
     timestamp -
     minutos * 60 * 1000
-  ).toISOString();
+  )
+    .toISOString()
+    .replace(
+      /\.\d{3}Z$/,
+      "Z"
+    );
 }
 
 
@@ -1195,7 +1201,8 @@ async function sincronizarIncrementalProjeto(
   let tarefasSincronizadas = 0;
   let ultimaMovimentacao = null;
   let ultimoTimestamp = -1;
-    for (
+
+  for (
     const issue
     of issues
   ) {
@@ -1975,7 +1982,8 @@ async function sincronizarProjetoScheduler(
     }
   }
 
-    const pagina =
+
+  const pagina =
     await buscarPaginaIssues(
       context,
       projetoRedmine.id,
@@ -2084,19 +2092,6 @@ async function sincronizarProjetoScheduler(
     pagina.issues
   );
 
-
-  /*
-    IMPORTANTE:
-
-    O scheduler processa as tarefas em páginas.
-    Enquanto todas as páginas do projeto não forem
-    concluídas, os valores ficam somente nesta
-    tabela acumuladora.
-
-    Assim o Modo TV continua exibindo o último
-    resultado completo e nunca enxerga uma
-    sincronização pela metade.
-  */
 
   if (
     issueOffset === 0
@@ -2332,12 +2327,6 @@ async function sincronizarProjetoScheduler(
     pagina.issues.length ===
       0;
 
-
-  /*
-    Somente quando TODAS as páginas do projeto
-    terminaram, publica o resultado completo
-    na tabela usada pelo Modo TV.
-  */
 
   if (
     projectDone
@@ -2575,6 +2564,7 @@ async function sincronizarProjetoScheduler(
         : true,
   });
 }
+
 
 export async function onRequestPost(
   context
@@ -2991,20 +2981,6 @@ export async function onRequestPost(
       }
     }
 
-    const statusIgnoradosLista =
-      Array.from(
-        statusIgnorados.entries()
-      ).map(
-        (
-          [
-            status,
-            quantidade,
-          ]
-        ) => ({
-          status,
-          quantidade,
-        })
-      );
 
     return Response.json({
       sucesso:
@@ -3028,13 +3004,28 @@ export async function onRequestPost(
       projetosIgnorados,
 
       statusIgnorados:
-        statusIgnoradosLista,
+        Array.from(
+          statusIgnorados.entries()
+        ).map(
+          (
+            [
+              status,
+              quantidade,
+            ]
+          ) => ({
+            status,
+            quantidade,
+          })
+        ),
 
       sincronizadoEm:
         new Date()
           .toISOString(),
     });
-  } catch (erro) {
+
+  } catch (
+    erro
+  ) {
     console.error(
       "Erro ao sincronizar Redmine:",
       erro
@@ -3043,7 +3034,8 @@ export async function onRequestPost(
     return respostaErro(
       erro instanceof Error
         ? erro.message
-        : "Não foi possível sincronizar os dados com o Redmine."
+        : "Não foi possível sincronizar os dados com o Redmine.",
+      500
     );
   }
 }
