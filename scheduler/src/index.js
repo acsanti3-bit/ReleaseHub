@@ -19,16 +19,34 @@ async function listarAmbientes(
       }
     );
 
+
   if (
     !response.ok
   ) {
+    const texto =
+      await response.text();
+
+
     throw new Error(
-      `Erro ${response.status} ao buscar os ambientes do ReleaseHub.`
+      [
+        `Erro ${response.status} ao buscar os ambientes do ReleaseHub.`,
+        texto
+          ? `Resposta: ${texto}`
+          : null,
+      ]
+        .filter(
+          Boolean
+        )
+        .join(
+          " | "
+        )
     );
   }
 
+
   const ambientes =
     await response.json();
+
 
   if (
     !Array.isArray(
@@ -40,6 +58,7 @@ async function listarAmbientes(
     );
   }
 
+
   return ambientes;
 }
 
@@ -50,9 +69,13 @@ async function sincronizarProjeto(
   projectOffset,
   issueOffset
 ) {
+  const url =
+    `${RELEASEHUB_URL}/api/redmine-sync`;
+
+
   const response =
     await fetch(
-      `${RELEASEHUB_URL}/api/redmine-sync`,
+      url,
       {
         method:
           "POST",
@@ -83,11 +106,14 @@ async function sincronizarProjeto(
       }
     );
 
+
   const texto =
     await response.text();
 
+
   let resultado =
     null;
+
 
   try {
     resultado =
@@ -96,19 +122,53 @@ async function sincronizarProjeto(
             texto
           )
         : null;
+
   } catch {
     resultado =
       null;
   }
 
+
   if (
     !response.ok
   ) {
+    const mensagemApi =
+      resultado?.erro ||
+      resultado?.message ||
+      texto ||
+      "A API não retornou detalhes do erro.";
+
+
     throw new Error(
-      resultado?.erro ??
-      `Erro ${response.status} ao sincronizar o projeto ${projectOffset} do ambiente ${ambiente.id}.`
+      [
+        `HTTP ${response.status} ${response.statusText}`,
+        `Ambiente: ${ambiente.id} - ${ambiente.nome}`,
+        `Projeto offset: ${projectOffset}`,
+        `Issue offset: ${issueOffset}`,
+        `Erro da API: ${mensagemApi}`,
+      ].join(
+        " | "
+      )
     );
   }
+
+
+  if (
+    !resultado ||
+    typeof resultado !==
+      "object"
+  ) {
+    throw new Error(
+      [
+        "A API de sincronização retornou uma resposta inválida.",
+        `HTTP ${response.status}`,
+        `Resposta: ${texto || "(vazia)"}`,
+      ].join(
+        " | "
+      )
+    );
+  }
+
 
   return resultado;
 }
@@ -121,29 +181,38 @@ async function sincronizarAmbiente(
   let projectOffset =
     0;
 
+
   let totalProjetos =
     null;
+
 
   let issueOffset =
     0;
 
+
   let projetosAtualizados =
     0;
+
 
   let tarefasEncontradas =
     0;
 
+
   let tarefasSincronizadas =
     0;
+
 
   let projetosIgnorados =
     0;
 
+
   let errosProjetos =
     0;
 
+
   let iteracoes =
     0;
+
 
   while (
     totalProjetos === null ||
@@ -153,13 +222,16 @@ async function sincronizarAmbiente(
     iteracoes +=
       1;
 
+
     if (
-      iteracoes > 200
+      iteracoes >
+      200
     ) {
       throw new Error(
         `O ambiente ${ambiente.id} ultrapassou o limite de segurança de projetos.`
       );
     }
+
 
     try {
       const resultado =
@@ -170,12 +242,14 @@ async function sincronizarAmbiente(
           issueOffset
         );
 
+
       totalProjetos =
         Number(
           resultado
             ?.totalProjetos ??
           0
         );
+
 
       projetosAtualizados +=
         Number(
@@ -184,6 +258,7 @@ async function sincronizarAmbiente(
           0
         );
 
+
       tarefasEncontradas +=
         Number(
           resultado
@@ -191,12 +266,14 @@ async function sincronizarAmbiente(
           0
         );
 
+
       tarefasSincronizadas +=
         Number(
           resultado
             ?.tarefasSincronizadas ??
           0
         );
+
 
       projetosIgnorados +=
         Array.isArray(
@@ -207,6 +284,7 @@ async function sincronizarAmbiente(
               .projetosIgnorados
               .length
           : 0;
+
 
       console.log(
         `[ReleaseHub] Projeto ${projectOffset + 1}/${totalProjetos} processado no ambiente ${ambiente.id}.`,
@@ -246,6 +324,7 @@ async function sincronizarAmbiente(
         }
       );
 
+
       if (
         !resultado?.projectDone
       ) {
@@ -255,22 +334,27 @@ async function sincronizarAmbiente(
               ?.nextIssueOffset
           );
 
+
         if (
           !Number.isInteger(
             issueOffset
           ) ||
-          issueOffset < 0
+          issueOffset <
+            0
         ) {
           throw new Error(
             "A API retornou um deslocamento de tarefas inválido."
           );
         }
 
+
         continue;
       }
 
+
       issueOffset =
         0;
+
 
       if (
         !resultado?.hasMore
@@ -278,44 +362,73 @@ async function sincronizarAmbiente(
         break;
       }
 
+
       projectOffset =
         Number(
           resultado
             ?.nextProjectOffset
         );
 
+
       if (
         !Number.isInteger(
           projectOffset
         ) ||
-        projectOffset < 0
+        projectOffset <
+          0
       ) {
         throw new Error(
           "A API retornou um deslocamento de projeto inválido."
         );
       }
-    } catch (erro) {
+
+    } catch (
+      erro
+    ) {
       errosProjetos +=
         1;
 
+
+      const mensagem =
+        erro instanceof Error
+          ? erro.message
+          : String(
+              erro
+            );
+
+
       console.error(
-        `[ReleaseHub] Erro no projeto ${projectOffset + 1} do ambiente ${ambiente.id} - ${ambiente.nome}:`,
-        erro
+        `[ReleaseHub] Erro no projeto ${projectOffset + 1} do ambiente ${ambiente.id} - ${ambiente.nome}: ${mensagem}`
       );
 
+
       if (
-        totalProjetos === null
+        erro instanceof Error &&
+        erro.stack
+      ) {
+        console.error(
+          erro.stack
+        );
+      }
+
+
+      if (
+        totalProjetos ===
+        null
       ) {
         throw erro;
       }
 
+
       projectOffset +=
         1;
+
 
       issueOffset =
         0;
     }
   }
+
 
   return {
     totalProjetos:
@@ -346,17 +459,21 @@ async function executarSincronizacao(
     );
   }
 
+
   const inicio =
     new Date();
+
 
   console.log(
     `[ReleaseHub] Sincronização automática iniciada em ${inicio.toISOString()}.`
   );
 
+
   const ambientes =
     await listarAmbientes(
       secret
     );
+
 
   const ambientesAtivos =
     ambientes.filter(
@@ -364,19 +481,24 @@ async function executarSincronizacao(
         !ambiente.concluido
     );
 
+
   console.log(
     `[ReleaseHub] ${ambientes.length} ambiente(s) encontrado(s), ${ambientesAtivos.length} ativo(s).`
   );
 
+
   if (
-    ambientesAtivos.length === 0
+    ambientesAtivos.length ===
+    0
   ) {
     console.log(
       "[ReleaseHub] Nenhum ambiente ativo para sincronizar."
     );
 
+
     return;
   }
+
 
   /*
    * No plano Free, cada execução do Worker possui limites de CPU
@@ -389,24 +511,30 @@ async function executarSincronizacao(
       120000
     );
 
+
   const indiceAmbiente =
     ciclo %
     ambientesAtivos.length;
+
 
   const ambiente =
     ambientesAtivos[
       indiceAmbiente
     ];
 
+
   console.log(
     `[ReleaseHub] Ambiente selecionado neste ciclo: ${ambiente.id} - ${ambiente.nome}.`
   );
 
+
   let resultado =
     null;
 
+
   let erroAmbiente =
     null;
+
 
   try {
     resultado =
@@ -414,6 +542,7 @@ async function executarSincronizacao(
         ambiente,
         secret
       );
+
 
     console.log(
       `[ReleaseHub] Ambiente ${ambiente.id} sincronizado.`,
@@ -446,18 +575,41 @@ async function executarSincronizacao(
             .tarefasSincronizadas,
       }
     );
-  } catch (erro) {
+
+  } catch (
+    erro
+  ) {
     erroAmbiente =
       erro;
 
+
+    const mensagem =
+      erro instanceof Error
+        ? erro.message
+        : String(
+            erro
+          );
+
+
     console.error(
-      `[ReleaseHub] Erro no ambiente ${ambiente.id} - ${ambiente.nome}:`,
-      erro
+      `[ReleaseHub] Erro no ambiente ${ambiente.id} - ${ambiente.nome}: ${mensagem}`
     );
+
+
+    if (
+      erro instanceof Error &&
+      erro.stack
+    ) {
+      console.error(
+        erro.stack
+      );
+    }
   }
+
 
   const fim =
     new Date();
+
 
   console.log(
     "[ReleaseHub] Sincronização automática finalizada.",
