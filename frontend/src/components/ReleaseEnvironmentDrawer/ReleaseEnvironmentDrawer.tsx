@@ -9,6 +9,10 @@ import {
 } from "react-icons/md";
 
 import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
   criarSistemasFixos,
 } from "../../types/releaseEnvironment";
 
@@ -19,7 +23,6 @@ import type {
 
 import "./ReleaseEnvironmentDrawer.css";
 
-
 type Props = {
   environment: ReleaseEnvironment;
   environments?: ReleaseEnvironment[];
@@ -29,14 +32,12 @@ type Props = {
   ) => Promise<void> | void;
 };
 
-
 type SistemaPrincipal =
   | "intellicash"
   | "easycash"
   | "easycheckout"
   | "easypdv"
   | "intellistock";
-
 
 const SISTEMAS_PRINCIPAIS: SistemaPrincipal[] = [
   "intellicash",
@@ -45,7 +46,6 @@ const SISTEMAS_PRINCIPAIS: SistemaPrincipal[] = [
   "easypdv",
   "intellistock",
 ];
-
 
 const NOMES_SISTEMAS_PRINCIPAIS: Record<
   SistemaPrincipal,
@@ -57,7 +57,6 @@ const NOMES_SISTEMAS_PRINCIPAIS: Record<
   easypdv: "EasyPDV",
   intellistock: "IntelliStock",
 };
-
 
 function obterPartesVersao(
   valor: string
@@ -71,7 +70,6 @@ function obterPartesVersao(
   );
 
 }
-
 
 function compararVersoes(
   versaoA: string,
@@ -94,7 +92,6 @@ function compararVersoes(
       partesB.length
     );
 
-
   for (
     let indice = 0;
     indice < quantidade;
@@ -106,7 +103,6 @@ function compararVersoes(
 
     const parteB =
       partesB[indice] ?? 0;
-
 
     if (
       parteA !== parteB
@@ -120,11 +116,9 @@ function compararVersoes(
 
   }
 
-
   return 0;
 
 }
-
 
 function obterVersaoIntellicash(
   ambiente: ReleaseEnvironment
@@ -147,7 +141,6 @@ function obterVersaoIntellicash(
 
 }
 
-
 function normalizarDateTimeLocal(
   valor?: string
 ): string {
@@ -156,10 +149,8 @@ function normalizarDateTimeLocal(
     return "";
   }
 
-
   const data =
     new Date(valor);
-
 
   if (
     Number.isNaN(
@@ -171,10 +162,8 @@ function normalizarDateTimeLocal(
 
   }
 
-
   const ano =
     data.getFullYear();
-
 
   const mes =
     String(
@@ -184,7 +173,6 @@ function normalizarDateTimeLocal(
       "0"
     );
 
-
   const dia =
     String(
       data.getDate()
@@ -192,7 +180,6 @@ function normalizarDateTimeLocal(
       2,
       "0"
     );
-
 
   const horas =
     String(
@@ -202,7 +189,6 @@ function normalizarDateTimeLocal(
       "0"
     );
 
-
   const minutos =
     String(
       data.getMinutes()
@@ -211,11 +197,9 @@ function normalizarDateTimeLocal(
       "0"
     );
 
-
   return `${ano}-${mes}-${dia}T${horas}:${minutos}`;
 
 }
-
 
 function paraIsoDateTime(
   valor: string
@@ -225,10 +209,8 @@ function paraIsoDateTime(
     return "";
   }
 
-
   const data =
     new Date(valor);
-
 
   if (
     Number.isNaN(
@@ -240,11 +222,9 @@ function paraIsoDateTime(
 
   }
 
-
   return data.toISOString();
 
 }
-
 
 function criarIdRemessa(): string {
 
@@ -254,7 +234,6 @@ function criarIdRemessa(): string {
 
 }
 
-
 function normalizarDataExecutavel(
   valor?: string
 ): string | undefined {
@@ -262,17 +241,14 @@ function normalizarDataExecutavel(
   const data =
     valor?.trim();
 
-
   if (!data) {
     return undefined;
   }
-
 
   const brasileira =
     data.match(
       /^(\d{2})\/(\d{2})\/(\d{4})$/
     );
-
 
   if (brasileira) {
 
@@ -280,22 +256,18 @@ function normalizarDataExecutavel(
 
   }
 
-
   const iso =
     data.match(
       /^(\d{4})-(\d{2})-(\d{2})$/
     );
 
-
   if (iso) {
     return data;
   }
 
-
   return undefined;
 
 }
-
 
 function ReleaseEnvironmentDrawer({
   environment,
@@ -303,6 +275,9 @@ function ReleaseEnvironmentDrawer({
   onClose,
   onSave,
 }: Props) {
+
+  const navigate =
+    useNavigate();
 
   const [
     form,
@@ -323,13 +298,11 @@ function ReleaseEnvironmentDrawer({
       })
     );
 
-
   const [
     salvando,
     setSalvando,
   ] =
     useState(false);
-
 
   const [
     quantidadeRemessaIntellicash,
@@ -337,14 +310,12 @@ function ReleaseEnvironmentDrawer({
   ] =
     useState<string>("");
 
-
   const ambienteJaExiste =
     environments.some(
       ambiente =>
         ambiente.id ===
         environment.id
     );
-
 
   const versaoIntellicashAtual =
     form.sistemas
@@ -360,7 +331,6 @@ function ReleaseEnvironmentDrawer({
       ?.trim() ??
     "";
 
-
   const ambienteReferencia =
     useMemo(
       () => {
@@ -372,7 +342,6 @@ function ReleaseEnvironmentDrawer({
           return null;
 
         }
-
 
         const candidatos =
           environments
@@ -400,7 +369,6 @@ function ReleaseEnvironmentDrawer({
                 )
             );
 
-
         const anteriores =
           candidatos
             .filter(
@@ -418,7 +386,6 @@ function ReleaseEnvironmentDrawer({
                 )
             );
 
-
         if (
           anteriores.length > 0
         ) {
@@ -426,7 +393,6 @@ function ReleaseEnvironmentDrawer({
           return anteriores[0];
 
         }
-
 
         const posteriores =
           candidatos
@@ -445,7 +411,6 @@ function ReleaseEnvironmentDrawer({
                 )
             );
 
-
         return (
           posteriores[0] ??
           null
@@ -459,7 +424,6 @@ function ReleaseEnvironmentDrawer({
       ]
     );
 
-
   const sistemasReferencia =
     useMemo(
       () => {
@@ -471,7 +435,6 @@ function ReleaseEnvironmentDrawer({
           return [];
 
         }
-
 
         return criarSistemasFixos(
           ambienteReferencia
@@ -487,7 +450,6 @@ function ReleaseEnvironmentDrawer({
         ambienteReferencia,
       ]
     );
-
 
   useEffect(
     () => {
@@ -505,7 +467,6 @@ function ReleaseEnvironmentDrawer({
           environment.remessas ?? [],
       });
 
-
       setQuantidadeRemessaIntellicash(
         ""
       );
@@ -515,7 +476,6 @@ function ReleaseEnvironmentDrawer({
       environment,
     ]
   );
-
 
   const sistemas =
     useMemo(
@@ -532,7 +492,6 @@ function ReleaseEnvironmentDrawer({
       ]
     );
 
-
   const executavelIntellicashOriginal =
     criarSistemasFixos(
       environment.sistemas ?? [],
@@ -544,7 +503,6 @@ function ReleaseEnvironmentDrawer({
     )?.executavel?.trim() ??
     "";
 
-
   const executavelIntellicashAtual =
     sistemas.find(
       sistema =>
@@ -553,11 +511,9 @@ function ReleaseEnvironmentDrawer({
     )?.executavel?.trim() ??
     "";
 
-
   const executavelIntellicashAlterado =
     executavelIntellicashAtual !==
     executavelIntellicashOriginal;
-
 
   function alterarCampo<
     K extends keyof ReleaseEnvironment
@@ -575,7 +531,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   function alterarVersao(
     chave: string,
     valor: string
@@ -585,7 +540,6 @@ function ReleaseEnvironmentDrawer({
       SISTEMAS_PRINCIPAIS.includes(
         chave as SistemaPrincipal
       );
-
 
     setForm(
       atual => {
@@ -606,7 +560,6 @@ function ReleaseEnvironmentDrawer({
 
               }
 
-
               return {
                 ...sistema,
                 versao: valor,
@@ -615,11 +568,9 @@ function ReleaseEnvironmentDrawer({
             }
           );
 
-
         const versoesAtualizadas = {
           ...atual.versoes,
         };
-
 
         if (
           chave in
@@ -636,7 +587,6 @@ function ReleaseEnvironmentDrawer({
 
         }
 
-
         return {
           ...atual,
 
@@ -650,7 +600,6 @@ function ReleaseEnvironmentDrawer({
       }
     );
 
-
     if (
       !sistemaPrincipal &&
       ambienteJaExiste
@@ -661,7 +610,6 @@ function ReleaseEnvironmentDrawer({
     }
 
   }
-
 
   function alterarExecutavel(
     chave: string,
@@ -692,7 +640,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   function alterarExibicaoNaTv(
     chave: string,
     valor: boolean
@@ -722,7 +669,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   function alterarTodosNaTv(
     valor: boolean
   ) {
@@ -748,7 +694,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   function alterarLiberadoEm(
     valor: string
   ) {
@@ -764,7 +709,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   function validar(): boolean {
 
     if (
@@ -779,10 +723,8 @@ function ReleaseEnvironmentDrawer({
 
     }
 
-
     const versoesObrigatorias =
       SISTEMAS_PRINCIPAIS;
-
 
     for (
       const chave
@@ -796,7 +738,6 @@ function ReleaseEnvironmentDrawer({
             chave
         );
 
-
       const versao =
         sistema
           ?.versao
@@ -804,7 +745,6 @@ function ReleaseEnvironmentDrawer({
         form.versoes[
           chave
         ]?.trim();
-
 
       if (
         !versao
@@ -820,7 +760,6 @@ function ReleaseEnvironmentDrawer({
 
     }
 
-
     if (
       executavelIntellicashAlterado
     ) {
@@ -830,7 +769,6 @@ function ReleaseEnvironmentDrawer({
           quantidadeRemessaIntellicash,
           10
         );
-
 
       if (
         !Number.isFinite(
@@ -846,7 +784,6 @@ function ReleaseEnvironmentDrawer({
         return false;
 
       }
-
 
       if (
         !normalizarDataExecutavel(
@@ -864,11 +801,9 @@ function ReleaseEnvironmentDrawer({
 
     }
 
-
     return true;
 
   }
-
 
   async function salvar() {
 
@@ -880,13 +815,11 @@ function ReleaseEnvironmentDrawer({
 
     }
 
-
     try {
 
       setSalvando(
         true
       );
-
 
       const versoes = {
 
@@ -902,7 +835,6 @@ function ReleaseEnvironmentDrawer({
           form.versoes
             .intellicash,
 
-
         easycash:
           form.sistemas
             ?.find(
@@ -914,7 +846,6 @@ function ReleaseEnvironmentDrawer({
             ?.trim() ||
           form.versoes
             .easycash,
-
 
         easycheckout:
           form.sistemas
@@ -928,7 +859,6 @@ function ReleaseEnvironmentDrawer({
           form.versoes
             .easycheckout,
 
-
         easypdv:
           form.sistemas
             ?.find(
@@ -941,7 +871,6 @@ function ReleaseEnvironmentDrawer({
           form.versoes
             .easypdv,
 
-
         intellistock:
           form.sistemas
             ?.find(
@@ -953,7 +882,6 @@ function ReleaseEnvironmentDrawer({
             ?.trim() ||
           form.versoes
             .intellistock,
-
 
         iwbserver:
           form.sistemas
@@ -969,12 +897,10 @@ function ReleaseEnvironmentDrawer({
 
       };
 
-
       const remessasAtualizadas =
         [
           ...(form.remessas ?? []),
         ];
-
 
       if (
         executavelIntellicashAlterado
@@ -985,13 +911,11 @@ function ReleaseEnvironmentDrawer({
             executavelIntellicashAtual
           );
 
-
         const quantidade =
           Number.parseInt(
             quantidadeRemessaIntellicash,
             10
           );
-
 
         if (
           dataRemessa
@@ -1028,7 +952,6 @@ function ReleaseEnvironmentDrawer({
 
           };
 
-
           remessasAtualizadas.push(
             remessa
           );
@@ -1037,30 +960,24 @@ function ReleaseEnvironmentDrawer({
 
       }
 
-
       const ambienteSalvo:
         ReleaseEnvironment = {
 
         ...form,
 
-
         nome:
           form.nome.trim(),
-
 
         prazo:
           form.prazo
             ?.trim() ||
           "",
 
-
         liberadoEm:
           form.liberadoEm ||
           undefined,
 
-
         versoes,
-
 
         sistemas:
           (
@@ -1082,17 +999,14 @@ function ReleaseEnvironmentDrawer({
             })
           ),
 
-
         remessas:
           remessasAtualizadas,
 
       };
 
-
       await onSave(
         ambienteSalvo
       );
-
 
       onClose();
 
@@ -1116,7 +1030,6 @@ function ReleaseEnvironmentDrawer({
 
   }
 
-
   return (
     <>
 
@@ -1138,7 +1051,6 @@ function ReleaseEnvironmentDrawer({
           }
         }
       />
-
 
       <aside
         className="release-drawer"
@@ -1165,7 +1077,6 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
-
           <button
             type="button"
             onClick={onClose}
@@ -1179,7 +1090,6 @@ function ReleaseEnvironmentDrawer({
           </button>
 
         </header>
-
 
         <div
           className="release-drawer-body"
@@ -1213,7 +1123,6 @@ function ReleaseEnvironmentDrawer({
             />
 
           </div>
-
 
           <div
             className="release-field"
@@ -1267,7 +1176,6 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
-
           <div
             className="release-field"
           >
@@ -1304,7 +1212,6 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
-
           <div
             className="release-reference"
           >
@@ -1320,7 +1227,6 @@ function ReleaseEnvironmentDrawer({
             </span>
 
           </div>
-
 
           {versaoIntellicashAtual && (
 
@@ -1358,13 +1264,11 @@ function ReleaseEnvironmentDrawer({
 
           )}
 
-
           <div
             className="release-divider"
           >
             Sistemas da Release
           </div>
-
 
           <div
             className="release-tv-controls"
@@ -1383,7 +1287,6 @@ function ReleaseEnvironmentDrawer({
               </span>
 
             </div>
-
 
             <div
               className="release-tv-actions"
@@ -1417,7 +1320,6 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
-
           <div
             className="release-system-list"
           >
@@ -1432,15 +1334,12 @@ function ReleaseEnvironmentDrawer({
                         SistemaPrincipal
                     );
 
-
                 const referencia =
                   sistema.chave ===
                   "intellicash";
 
-
                 const herdado =
                   !principal;
-
 
                 const sistemaOrigem =
                   sistemasReferencia
@@ -1449,7 +1348,6 @@ function ReleaseEnvironmentDrawer({
                         item.chave ===
                         sistema.chave
                     );
-
 
                 const versaoExibida =
                   herdado &&
@@ -1460,7 +1358,6 @@ function ReleaseEnvironmentDrawer({
                     : sistema
                         .versao ??
                       "";
-
 
                 return (
 
@@ -1485,7 +1382,6 @@ function ReleaseEnvironmentDrawer({
                         }
                       </span>
 
-
                       {referencia && (
 
                         <small>
@@ -1495,7 +1391,6 @@ function ReleaseEnvironmentDrawer({
                       )}
 
                     </div>
-
 
                     <div
                       className="release-system-version-wrap"
@@ -1527,19 +1422,70 @@ function ReleaseEnvironmentDrawer({
                         }
                       />
 
-
                       {herdado && (
 
-                        <span
-                          className="release-inherited-badge"
+                        <div
+                          style={{
+                            display:
+                              "flex",
+                            alignItems:
+                              "center",
+                            gap:
+                              "6px",
+                            flexWrap:
+                              "wrap",
+                          }}
                         >
-                          Compatibilidade
-                        </span>
+
+                          <span
+                            className="release-inherited-badge"
+                          >
+                            Compatibilidade
+                          </span>
+
+                          {ambienteJaExiste && (
+
+                            <button
+                              type="button"
+                              title="Editar esta versão na página de Compatibilidade"
+                              onClick={
+                                () => {
+                                  onClose();
+
+                                  navigate(
+                                    `/compatibility?environment=${environment.id}`
+                                  );
+                                }
+                              }
+                              style={{
+                                border:
+                                  "1px solid #D8DEE5",
+                                borderRadius:
+                                  "7px",
+                                padding:
+                                  "4px 8px",
+                                background:
+                                  "#FFFFFF",
+                                color:
+                                  "#005AA9",
+                                fontSize:
+                                  "11px",
+                                fontWeight:
+                                  700,
+                                cursor:
+                                  "pointer",
+                              }}
+                            >
+                              Editar
+                            </button>
+
+                          )}
+
+                        </div>
 
                       )}
 
                     </div>
-
 
                     <input
                       className="release-system-executable"
@@ -1561,7 +1507,6 @@ function ReleaseEnvironmentDrawer({
                               .value
                           );
 
-
                           if (
                             sistema.chave ===
                             "intellicash"
@@ -1576,7 +1521,6 @@ function ReleaseEnvironmentDrawer({
                         }
                       }
                     />
-
 
                     <label
                       className={`release-tv-toggle ${
@@ -1611,7 +1555,6 @@ function ReleaseEnvironmentDrawer({
 
                     </label>
 
-
                     {sistema.chave ===
                       "intellicash" &&
                       executavelIntellicashAlterado && (
@@ -1631,7 +1574,6 @@ function ReleaseEnvironmentDrawer({
                             </span>
 
                           </div>
-
 
                           <label>
 
@@ -1673,7 +1615,6 @@ function ReleaseEnvironmentDrawer({
 
           </div>
 
-
           <button
             type="button"
             className="release-save"
@@ -1700,6 +1641,5 @@ function ReleaseEnvironmentDrawer({
   );
 
 }
-
 
 export default ReleaseEnvironmentDrawer;

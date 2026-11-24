@@ -884,6 +884,67 @@ function termosProjetoPorChave(
   ];
 }
 
+async function buscarExecutavelCompartilhado(
+  context,
+  chave,
+  versao
+) {
+  const chaveNormalizada =
+    String(
+      chave ?? ""
+    ).trim();
+
+  const versaoNormalizada =
+    String(
+      versao ?? ""
+    ).trim();
+
+
+  if (
+    !chaveNormalizada ||
+    !versaoNormalizada
+  ) {
+    return "";
+  }
+
+
+  const row =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            executavel
+
+          FROM release_environment_versions
+
+          WHERE
+            chave = ?
+            AND versao = ?
+            AND TRIM(
+              COALESCE(
+                executavel,
+                ''
+              )
+            ) <> ''
+
+          ORDER BY
+            environment_id DESC
+
+          LIMIT 1
+        `
+      )
+      .bind(
+        chaveNormalizada,
+        versaoNormalizada
+      )
+      .first();
+
+
+  return String(
+    row?.executavel ??
+    ""
+  ).trim();
+}
 
 async function atualizarVersaoNoAmbiente(
   context,
@@ -915,19 +976,30 @@ async function atualizarVersaoNoAmbiente(
         120
       );
 
+      const executavelCompartilhado =
+  await buscarExecutavelCompartilhado(
+    context,
+    chave,
+    versaoNormalizada
+  );
 
   await context.env.DB
     .prepare(
       `
-        UPDATE release_environment_versions
-        SET
-          versao = ?
-        WHERE environment_id = ?
-          AND chave = ?
+UPDATE release_environment_versions
+
+SET
+  versao = ?,
+  executavel = ?
+
+WHERE
+  environment_id = ?
+  AND chave = ?
       `
     )
     .bind(
       versaoNormalizada,
+      executavelCompartilhado,
       environmentId,
       chave
     )
@@ -1040,17 +1112,22 @@ async function atualizarVersaoNoAmbiente(
     await context.env.DB
       .prepare(
         `
-          UPDATE release_projects
-          SET
-            versao = ?,
-            updated_at =
-              CURRENT_TIMESTAMP
-          WHERE environment_id = ?
-            AND project_id = ?
+UPDATE release_projects
+
+SET
+  versao = ?,
+  executavel = ?,
+  updated_at =
+    CURRENT_TIMESTAMP
+
+WHERE
+  environment_id = ?
+  AND project_id = ?
         `
       )
       .bind(
         versaoNormalizada,
+        executavelCompartilhado,
         environmentId,
         projeto.id
       )

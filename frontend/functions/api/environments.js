@@ -644,10 +644,59 @@ async function listarSistemas(
       )
       .all();
 
+
+  /*
+    A data do executável pertence
+    ao sistema + versão.
+
+    Primeiro montamos um catálogo
+    das datas já conhecidas.
+  */
+  const executaveisCompartilhados =
+    new Map();
+
+
+  for (
+    const row of
+    resultado.results ?? []
+  ) {
+    const chave =
+      String(
+        row.chave ?? ""
+      ).trim();
+
+    const versao =
+      String(
+        row.versao ?? ""
+      ).trim();
+
+    const executavel =
+      String(
+        row.executavel ?? ""
+      ).trim();
+
+
+    if (
+      chave &&
+      versao &&
+      executavel
+    ) {
+      executaveisCompartilhados.set(
+        `${chave}::${versao}`,
+        executavel
+      );
+    }
+  }
+
+
   const mapa =
     new Map();
 
-  for (const row of resultado.results) {
+
+  for (
+    const row of
+    resultado.results ?? []
+  ) {
     if (
       !mapa.has(
         row.environment_id
@@ -659,17 +708,50 @@ async function listarSistemas(
       );
     }
 
+
+    const chave =
+      String(
+        row.chave ?? ""
+      ).trim();
+
+    const versao =
+      String(
+        row.versao ?? ""
+      ).trim();
+
+    const executavelSalvo =
+      String(
+        row.executavel ?? ""
+      ).trim();
+
+    const executavelCompartilhado =
+      executaveisCompartilhados.get(
+        `${chave}::${versao}`
+      ) ??
+      "";
+
+
     mapa
-      .get(row.environment_id)
+      .get(
+        row.environment_id
+      )
       .push({
-        chave: row.chave,
-        nome: row.nome,
-        versao:
-          row.versao ?? "",
+        chave:
+          row.chave,
+
+        nome:
+          row.nome,
+
+        versao,
+
         executavel:
-          row.executavel ?? "",
+          executavelSalvo ||
+          executavelCompartilhado,
+
         ordem:
-          Number(row.ordem) || 0,
+          Number(
+            row.ordem
+          ) || 0,
 
         mostrarNaTv:
           Number(
@@ -678,7 +760,356 @@ async function listarSistemas(
       });
   }
 
+
   return mapa;
+}
+
+
+async function buscarExecutavelCompartilhado(
+  context,
+  chave,
+  versao
+) {
+  const chaveNormalizada =
+    String(
+      chave ?? ""
+    ).trim();
+
+  const versaoNormalizada =
+    String(
+      versao ?? ""
+    ).trim();
+
+
+  if (
+    !chaveNormalizada ||
+    !versaoNormalizada
+  ) {
+    return "";
+  }
+
+
+  const row =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            executavel
+
+          FROM release_environment_versions
+
+          WHERE
+            chave = ?
+            AND versao = ?
+            AND TRIM(
+              COALESCE(
+                executavel,
+                ''
+              )
+            ) <> ''
+
+          ORDER BY
+            environment_id DESC
+
+          LIMIT 1
+        `
+      )
+      .bind(
+        chaveNormalizada,
+        versaoNormalizada
+      )
+      .first();
+
+
+  return String(
+    row?.executavel ??
+    ""
+  ).trim();
+}
+
+
+async function propagarExecutavelCompartilhado(
+  context,
+  sistema
+) {
+  const chave =
+    String(
+      sistema?.chave ??
+      ""
+    ).trim();
+
+  const versao =
+    String(
+      sistema?.versao ??
+      ""
+    ).trim();
+
+  const executavel =
+    String(
+      sistema?.executavel ??
+      ""
+    ).trim();
+
+
+  if (
+    !chave ||
+    !versao ||
+    !executavel
+  ) {
+    return;
+  }
+
+
+  /*
+    Todas as releases que utilizam
+    o mesmo sistema + versão recebem
+    a mesma data.
+  */
+  await context.env.DB
+    .prepare(
+      `
+        UPDATE release_environment_versions
+
+        SET
+          executavel = ?
+
+        WHERE
+          chave = ?
+          AND versao = ?
+      `
+    )
+    .bind(
+      executavel,
+      chave,
+      versao
+    )
+    .run();
+
+
+  const ambientesResultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT DISTINCT
+            environment_id
+
+          FROM release_environment_versions
+
+          WHERE
+            chave = ?
+            AND versao = ?
+        `
+      )
+      .bind(
+        chave,
+        versao
+      )
+      .all();
+
+
+  const projetosResultado =
+    await context.env.DB
+      .prepare(
+        `
+          SELECT
+            id,
+            nome
+
+          FROM projects
+        `
+      )
+      .all();
+
+
+  const projetosDoSistema =
+    (
+      projetosResultado.results ??
+      []
+    ).filter(
+      projeto =>
+        Boolean(
+          obterSistemaProjeto(
+            projeto.nome,
+            [
+              {
+                ...sistema,
+
+                chave,
+
+                versao,
+
+                executavel,
+              },
+            ]
+          )
+        )
+    );
+
+
+  /*
+    Também atualiza release_projects,
+    para TV e demais telas não ficarem
+    com uma data antiga.
+  */
+  for (
+    const ambiente of
+    ambientesResultado.results ??
+    []
+  ) {
+    for (
+      const projeto of
+      projetosDoSistema
+    ) {
+      await context.env.DB
+        .prepare(
+          `
+            UPDATE release_projects
+
+            SET
+              executavel = ?,
+              updated_at =
+                CURRENT_TIMESTAMP
+
+            WHERE
+              environment_id = ?
+              AND project_id = ?
+              AND versao = ?
+          `
+        )
+        .bind(
+          executavel,
+          ambiente.environment_id,
+          projeto.id,
+          versao
+        )
+        .run();
+    }
+  }
+}
+
+
+async function salvarSistemas(
+  context,
+  environmentId,
+  sistemas
+) {
+  /*
+    Antes de apagar os registros desta
+    release, completa datas vazias através
+    de outra release que possua exatamente
+    o mesmo sistema + versão.
+  */
+  const sistemasResolvidos =
+    [];
+
+
+  for (
+    const sistema of
+    sistemas
+  ) {
+    const versao =
+      String(
+        sistema.versao ??
+        ""
+      ).trim();
+
+    let executavel =
+      String(
+        sistema.executavel ??
+        ""
+      ).trim();
+
+
+    if (
+      !executavel &&
+      versao
+    ) {
+      executavel =
+        await buscarExecutavelCompartilhado(
+          context,
+          sistema.chave,
+          versao
+        );
+    }
+
+
+    sistemasResolvidos.push({
+      ...sistema,
+
+      versao,
+
+      executavel,
+    });
+  }
+
+
+  await context.env.DB
+    .prepare(
+      `
+        DELETE FROM release_environment_versions
+
+        WHERE
+          environment_id = ?
+      `
+    )
+    .bind(
+      environmentId
+    )
+    .run();
+
+
+  for (
+    const sistema of
+    sistemasResolvidos
+  ) {
+    await context.env.DB
+      .prepare(
+        `
+          INSERT INTO release_environment_versions (
+            environment_id,
+            chave,
+            nome,
+            versao,
+            executavel,
+            ordem,
+            mostrar_na_tv
+          )
+
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+        `
+      )
+      .bind(
+        environmentId,
+        sistema.chave,
+        sistema.nome,
+        sistema.versao,
+        sistema.executavel ??
+          "",
+        sistema.ordem,
+        sistema.mostrarNaTv
+          ? 1
+          : 0
+      )
+      .run();
+  }
+
+
+  /*
+    Agora propaga qualquer data cadastrada
+    para as outras releases equivalentes.
+  */
+  for (
+    const sistema of
+    sistemasResolvidos
+  ) {
+    await propagarExecutavelCompartilhado(
+      context,
+      sistema
+    );
+  }
+
+
+  return sistemasResolvidos;
 }
 
 
@@ -1463,11 +1894,12 @@ export async function onRequestPost(
       )
       .run();
 
-    await salvarSistemas(
-      context,
-      id,
-      sistemas
-    );
+  sistemas =
+  await salvarSistemas(
+    context,
+    id,
+    sistemas
+  );
 
     await salvarComplementosAmbiente(
       context,
@@ -1558,7 +1990,7 @@ export async function onRequestPut(
       );
     }
 
-    const sistemas =
+    let sistemas =
       normalizarSistemas(
         body.sistemas,
         body.versoes
@@ -1676,11 +2108,12 @@ export async function onRequestPut(
       )
       .run();
 
-    await salvarSistemas(
-      context,
-      body.id,
-      sistemas
-    );
+    sistemas =
+      await salvarSistemas(
+        context,
+        body.id,
+        sistemas
+      );
 
     await salvarComplementosAmbiente(
       context,
